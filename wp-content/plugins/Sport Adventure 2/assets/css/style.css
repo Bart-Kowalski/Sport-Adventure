@@ -1,0 +1,19 @@
+/* Global section backgrounds */
+section:not(.hero-12, .section-wyprawa-header, .section-header, .cta-37, #brxe-zcmzhs, .recommended-trips--hp) {
+    background-color: white;
+}
+
+section:not(.hero-12, .section-wyprawa-header, .section-header, .cta-37, #brxe-zcmzhs, .recommended-trips--hp):nth-child(odd) {
+    background-image: url('/wp-content/uploads/background12.png');
+    background-repeat: repeat;
+    background-size: 1046px 1031px;
+    background-position: center center;
+}
+
+section:not(.hero-12, .section-wyprawa-header, .section-header, .cta-37, #brxe-zcmzhs, .recommended-trips--hp):nth-child(even), .body-wyprawa section {
+    background-image: url('/wp-content/uploads/background22.png');
+    background-repeat: repeat;
+    background-size: 1046px 1031px;
+    background-position: center center;
+    background-color: #FDF4EC;
+} 
