@@ -71,8 +71,9 @@ require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/woo-variant-sync.php';
 require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/custom-queries.php';
 require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/parent-data-tags.php';
 
-// Include ACF variation fields
-require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/acf-variation-fields.php';
+// Include ACF variation fields - USING SIMPLE VERSION
+// require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/acf-variation-fields.php'; // Complex version (has issues)
+require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/acf-variation-fields-simple.php'; // Simple version - direct save
 
 // Include custom breadcrumbs
 require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/custom-breadcrumbs.php';

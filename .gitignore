@@ -20,6 +20,9 @@ wp-content/uploads/
 wp-content/plugins/akismet/
 wp-content/plugins/hello.php
 
+# Plugin-specific exclusions
+wp-content/plugins/Sport Adventure 2/documentation/
+
 # WordPress Themes (exclude only default themes, keep custom ones)
 wp-content/themes/twentytwentyfive/
 wp-content/themes/twentytwentyfour/

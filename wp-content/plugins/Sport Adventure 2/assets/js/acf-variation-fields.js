@@ -1,11 +1,16 @@
 /**
- * ACF Variation Fields JavaScript
+ * ACF Variation Fields JavaScript (OPTIMIZED)
  * 
  * Handles initialization and management of ACF fields within WooCommerce product variations.
  * Ensures proper field functionality including date pickers, file uploads, and relationship fields.
  * 
+ * PERFORMANCE OPTIMIZATIONS:
+ * - Reduced timeouts from 100-1000ms to 50-250ms for faster initialization
+ * - Prevents duplicate initialization using a Set to track initialized variations
+ * - Combines multiple operations in single timeouts to reduce delay
+ * 
  * @package Sport Adventure Custom
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 jQuery(document).ready(function($) {
@@ -115,33 +120,43 @@ jQuery(document).ready(function($) {
     // Event handlers for variation lifecycle
     $('#woocommerce-product-data').on('woocommerce_variations_loaded woocommerce_variations_added', function() {
         initializedVariations.clear();
-        setTimeout(initVariationACFFields, 100);
-        setTimeout(cleanupDuplicateExpandDetails, 200);
+        // Reduced timeout for faster loading
+        setTimeout(function() {
+            initVariationACFFields();
+            cleanupDuplicateExpandDetails();
+        }, 50);
     });
     
     $('#woocommerce-product-data').on('woocommerce_variations_saved', function() {
         initializedVariations.clear();
-        setTimeout(initVariationACFFields, 200);
-        setTimeout(cleanupDuplicateExpandDetails, 300);
+        // Reduced timeout for faster loading
+        setTimeout(function() {
+            initVariationACFFields();
+            cleanupDuplicateExpandDetails();
+        }, 50);
     });
     
     $(document).on('woocommerce_variation_form_updated', function() {
         initializedVariations.clear();
-        setTimeout(initVariationACFFields, 300);
-        setTimeout(cleanupDuplicateExpandDetails, 400);
+        // Reduced timeout for faster loading
+        setTimeout(function() {
+            initVariationACFFields();
+            cleanupDuplicateExpandDetails();
+        }, 50);
     });
     
     // ACF integration
     if (typeof acf !== 'undefined') {
         acf.addAction('ready', function($el) {
             if ($el.closest('.woocommerce_variation').length) {
-                setTimeout(initVariationACFFields, 200);
+                // Reduced timeout for faster loading
+                setTimeout(initVariationACFFields, 50);
             }
         });
     }
     
-            // Initial load
-            setTimeout(initVariationACFFields, 1000);
+            // Initial load - faster timeout
+            setTimeout(initVariationACFFields, 250);
 
             // Fix stock field accessibility
             function fixStockFieldAccessibility() {
@@ -195,11 +210,11 @@ jQuery(document).ready(function($) {
 
             // Run stock field fix on various events
             $('#woocommerce-product-data').on('woocommerce_variations_loaded woocommerce_variations_added woocommerce_variations_saved', function() {
-                setTimeout(fixStockFieldAccessibility, 100);
+                setTimeout(fixStockFieldAccessibility, 50);
             });
 
-            // Initial stock field fix
-            setTimeout(fixStockFieldAccessibility, 1000);
+            // Initial stock field fix - faster timeout
+            setTimeout(fixStockFieldAccessibility, 250);
 
             // Fallback periodic check (reduced frequency for production)
             setInterval(function() {

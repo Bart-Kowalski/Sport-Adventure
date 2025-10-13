@@ -355,6 +355,39 @@ if (!function_exists('sa_update_all_products_closest_dates')) {
     function sa_update_all_products_closest_dates() {
         global $wpdb;
         
+        // FIX: Check if any admin is currently editing products to prevent race conditions
+        $active_edits = $wpdb->get_var("
+            SELECT COUNT(*) FROM {$wpdb->options}
+            WHERE option_name LIKE '_edit_lock'
+            AND option_value > " . (time() - 150) . "
+        ");
+        
+        if ($active_edits > 0) {
+            // Get retry count to prevent infinite postponement
+            $retry_count = get_transient('sa_cron_retry_count');
+            $retry_count = $retry_count ? intval($retry_count) : 0;
+            
+            // Max 3 retries (30 min, 60 min, 90 min), then run anyway
+            if ($retry_count < 3) {
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("SA Cron: Postponing closest date update - {$active_edits} active product edits detected (retry {$retry_count}/3)");
+                }
+                
+                set_transient('sa_cron_retry_count', $retry_count + 1, 7200); // 2 hours expiry
+                wp_schedule_single_event(time() + 1800, 'sa_update_all_products_closest_dates'); // Retry in 30 min
+                return;
+            } else {
+                // Max retries reached, run anyway but log warning
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("SA Cron: Running closest date update despite {$active_edits} active edits (max retries reached)");
+                }
+                delete_transient('sa_cron_retry_count');
+            }
+        } else {
+            // No active edits, clear retry counter
+            delete_transient('sa_cron_retry_count');
+        }
+        
         // Get all variable products
         $product_ids = $wpdb->get_col("
             SELECT ID FROM {$wpdb->posts}
@@ -362,8 +395,16 @@ if (!function_exists('sa_update_all_products_closest_dates')) {
             AND post_status = 'publish'
         ");
         
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("SA Cron: Starting closest date update for " . count($product_ids) . " products");
+        }
+        
         foreach ($product_ids as $product_id) {
             sa_update_product_closest_date($product_id);
+        }
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("SA Cron: Completed closest date update");
         }
     }
 }
@@ -372,13 +413,33 @@ add_action('sa_update_all_products_closest_dates', 'sa_update_all_products_close
 // Update closest date when variations are saved
 if (!function_exists('sa_update_closest_date_on_variation_save')) {
     function sa_update_closest_date_on_variation_save($variation_id, $i) {
+        // FIX: Skip if this is a Quick Edit action (no ACF data being edited)
+        if (isset($_POST['action']) && $_POST['action'] === 'inline-save') {
+            return;
+        }
+        
+        // FIX: Skip if no ACF data in the save context
+        if (!isset($_POST['acf']) || empty($_POST['acf'])) {
+            return;
+        }
+        
+        // FIX: Verify ACF date was actually saved before updating parent
+        $acf_date = get_post_meta($variation_id, 'wyprawa-termin__data-poczatkowa', true);
+        if (empty($acf_date)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("SA Warning: No ACF date found for variation {$variation_id}, skipping closest date update");
+            }
+            return;
+        }
+        
         $variation = wc_get_product($variation_id);
         if ($variation && $variation->get_parent_id()) {
             sa_update_product_closest_date($variation->get_parent_id());
         }
     }
 }
-add_action('woocommerce_save_product_variation', 'sa_update_closest_date_on_variation_save', 10, 2);
+// FIX: Changed priority from 10 to 15 to ensure ACF save completes first (priority 5)
+add_action('woocommerce_save_product_variation', 'sa_update_closest_date_on_variation_save', 15, 2);
 
 
 //

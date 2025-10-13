@@ -1078,8 +1078,12 @@ add_filter('handle_bulk_actions-edit-product', function($redirect_to, $action, $
                 }
                 
                 if ($term) {
-                    wp_set_object_terms($variation->ID, [$term->term_id], 'miesiace');
-                    $updated++;
+                    // Get parent product ID - taxonomy should be assigned to parent, not variation
+                    $parent_product_id = wp_get_post_parent_id($variation->ID);
+                    if ($parent_product_id) {
+                        wp_set_object_terms($parent_product_id, [$term->term_id], 'miesiace');
+                        $updated++;
+                    }
                 }
             }
         }
