@@ -1,0 +1,28 @@
+@if $option-margin == on {
+	// Generate Margin Classes
+	@each $axis, $prop in $axes {
+		@each $size, $extension in $sizeExtensions {
+			.margin-#{$axis}--#{$extension} {
+				margin-#{$prop}: var(--space-#{$extension});
+			}
+		}
+	}
+	.margin--none {
+		padding: 0;
+	}
+	// Generate Margin Classes with Breakpoints
+	@each $breakpoint, $value in $breakpoints {
+		@include breakpoint($breakpoint) {
+			@each $axis, $prop in $axes {
+				@each $size, $extension in $sizeExtensions {
+					.margin-#{$axis}--#{$extension}-#{$breakpoint} {
+						margin-#{$prop}: var(--space-#{$extension});
+					}
+				}
+			}
+			.margin--#{$breakpoint}-none {
+				padding: 0;
+			}
+		}
+	}
+}

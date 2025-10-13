@@ -1,0 +1,113 @@
+.x-accordion {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.x-accordion_content {
+    display: none;
+}
+
+:where(.x-accordion_content-inner) {
+    padding: 15px;
+}
+
+/* .x-accordion_header[aria-expanded=true] + .x-accordion_content {
+    display: flex;
+} */
+
+/*.x-accordion[data-x-accordion*=expandFirst] > .brxe-block:first-child .x-accordion_content {
+     display: flex;
+ }
+
+ .x-accordion[data-x-accordion*=expandAll] .x-accordion_content {
+    display: flex;
+ }
+*/
+.x-accordion[data-x-accordion*=expandFirst] > .brxe-block:first-child > .x-accordion_content {
+     display: flex;
+ }
+
+ .x-accordion[data-x-accordion*=expandAll] > .brxe-block > .x-accordion_content {
+    display: flex;
+ }
+
+ .x-accordion_header {
+    padding: 15px;
+    transition: all .15s ease;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none; 
+ }
+
+ .x-accordion_header[tabindex] {
+    cursor: pointer;
+ }
+
+ :where(.x-accordion_header) {
+    background-color: #EFEFEF;
+ }
+
+ .x-accordion_header[data-controls] {
+    pointer-events: none;
+ }
+
+ .x-accordion_item .x-accordion_header:not([tabindex]) .x-accordion_icon {
+    display: none;
+ }
+
+ .x-accordion_icon {
+    font-size: 1em;
+    transition: transform .15s ease;
+ }
+
+ .x-accordion_header[role=button] .x-accordion_icon,
+ button.x-accordion_header .x-accordion_icon  {
+    display: inline-block
+ }
+
+.x-accordion_header[aria-expanded=true] .brxe-icon {
+    transform: rotateX(180deg);
+}
+
+.x-accordion_heading-wrapper {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.x-accordion_heading {
+    width: 100%;
+}
+
+.x-accordion_title {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.x-accordion_item.brxe-block {
+    align-items: stretch;
+}
+
+/* acss override */
+
+:where(.brxe-xproaccordion) .x-accordion_item {
+    gap: 0;
+}
+
+/* builder */
+
+.x-accordion:not([data-x-expand*=expandFirst]).x-accordion_builder-collapse .x-accordion_content {
+    display: none;
+}
+
+.x-accordion[data-x-expand*=expandFirst].x-accordion_builder-collapse > .brxe-block:not(:first-child) .x-accordion_content {
+    display: none!important;
+}
+
+.x-accordion[data-x-expand*=expandFirst].x-accordion_builder-collapse > .brxe-block:first-child .x-accordion_content {
+    display: flex!important;
+}

@@ -1,0 +1,516 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-24 17:45+0000\n"
+"PO-Revision-Date: 2022-10-20 16:44+0000\n"
+"Last-Translator: Sofia Works <info@techandpromo.com>\n"
+"Language-Team: Lithuanian <http://trans.trustmate.io/projects/"
+"woocommerce-plugin/main/lt/>\n"
+"Language: lt_LT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > "
+"19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? "
+"1 : 2);\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "Susikurti TrustMate paskyrą"
+
+msgid "Settings"
+msgstr "Nustatymai"
+
+msgid "Widgets"
+msgstr "Widgetai"
+
+# Headers and buttons
+msgid "settings"
+msgstr "nustatymai"
+
+msgid "Configure plugin"
+msgstr "Konfigūruoti įskiepį"
+
+msgid "If you already have TrustMate account"
+msgstr "Jei jau turite TrustMate paskyrą"
+
+msgid "skip this step"
+msgstr "praleiskite šį žingsnelį"
+
+msgid "Save changes"
+msgstr "Išsaugoti pakeitimus"
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+"Norėdami pradėti rinkti atsiliepimus, jums reikia TrustMate paskyros. Visa "
+"laimė, kad galite ją sukurti"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "per vieną minutę. Mes naudosime duomenis iš WooCommerce,"
+
+msgid "to make this process very easy"
+msgstr "kad šis procesas būtų kuo lengvesnis"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr ""
+"Įmonės informacija vėliau gali būti atnaujinta TrustMate valdymo skydelyje"
+
+msgid "By registering I accept"
+msgstr "Registruodamasis, aš sutinku"
+
+msgid "terms of service"
+msgstr "paslaugų teikimo sąlygomis"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr ""
+"įskaitant sutikimą, kad su manimi galėtų susisiekti TrustMate klientų "
+"aptarnavimo tarnyba"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr "Aš prašysiu klientų palikti atsiliepimus elektroniniu paštu"
+
+msgid "I accept"
+msgstr "Aš sutinku"
+
+msgid "the data entrustment agreement"
+msgstr "duomenų perdavimo sutartis"
+
+msgid "Configure invitations and widgets"
+msgstr "Konfigūruoti kvietimus ir widgetus"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr ""
+"Patvirtinkite žemiau esančią formą ir spauskite „Sukurti „TrustMate“ paskyrą“"
+
+msgid "Account data"
+msgstr "Paskyros duomenys"
+
+msgid "Company registration data"
+msgstr "įmonės registracijos data"
+
+msgid "Website address"
+msgstr "Interneto svetainės adresas"
+
+msgid "Owner's e-mail"
+msgstr "Savininko el. paštas"
+
+msgid "Company name"
+msgstr "Įmonės pavadinimas"
+
+msgid "Street"
+msgstr "Gatvė"
+
+msgid "City"
+msgstr "Miestas"
+
+msgid "Zip code"
+msgstr "Pašto kodas"
+
+msgid "Country"
+msgstr "Šalis"
+
+msgid "Tax identification number"
+msgstr "Mokesčių mokėtojo numeris"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Paskyra sukurta"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr ""
+"Patikrinkite savo el. paštą, kad nustatytumėte TrustMate paskyros slaptažodį"
+
+msgid "Account already exists"
+msgstr "Tokia paskyra jau yra"
+
+msgid "Invald data sent"
+msgstr "Nusiųsti neteisingi duomenys"
+
+msgid "Unexpected error"
+msgstr "Nenumatyta klaida"
+
+msgid "Cannot create account"
+msgstr "Nepavyko sukurti paskyros"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "Registracijos adresas WooCommerce Nustatymuose neužbaigtas"
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Kažkas negerai. Bandykite dar kartą arba susisiekite su TrustMate klientų "
+"aptarnavimo tarnyba"
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+"Nepavyko aktyvuoti widgeto. Bandykite dar kartą arba susisiekite su "
+"TrustMate klientų aptarnavimo tarnyba"
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr ""
+"Jūsų TrustMate vartotojo kodas (UUID iš TrustMate skydelio, Integracijos "
+"skyriaus)"
+
+msgid "Automatic review invitations"
+msgstr "Automatiniai atsiliepimų pakvietimai"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+"Norėdami greitai rinkti klientų atsiliepimus, įjunkite automatinius kvietimus"
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+"Kol įjungta - programos skriptas siunčia kvietimus jūsų klientams, kuris "
+"prašo klientų palikti atsiliepimą"
+
+msgid "In TrustMate panel you can"
+msgstr "TrustMate skydelyje galite"
+
+msgid "change invitation sending delay"
+msgstr "pakeisti kvietimų siuntimo uždelsimą"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "nustatyti, kiek kartų klientui bus priminta parašyti atsiliepimą"
+
+msgid "adjust invitation colors to your brand"
+msgstr "nustatykite kvietimų spalvas pagal savo prekės ženklą"
+
+msgid "turn on and off product review invitations"
+msgstr "įjunkite arba išjunkite produktų atsiliepimų kvietimus"
+
+msgid "and more!"
+msgstr "ir dar daugiau!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Paprašykite leidimo siųsti kvietimą"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr ""
+"Norint siųsti kvietimus dėl atsiliepimų, pirmiausiai reikia kliento sutikimo"
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+"Jei nerenkate tų sutikimų patys (atskiras žymimasis laukelis arba atitinkami "
+"nuostatai), tuomet įjunkite šį pasirinkimą"
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+"Jei tiesiogiai neprašote kliento sutikimo išsiųsti kvietimą, siūlome "
+"išplėsti savo nuostatus įtraukiant turinį iš"
+
+msgid "this file"
+msgstr "šio failo"
+
+msgid "Disabled"
+msgstr "Išjungta"
+
+msgid "After successful order"
+msgstr "Po sėkmingo užsakymo"
+
+msgid "After successful payment"
+msgstr "Po sėkmingo apmokėjimo"
+
+msgid "After marked as completed"
+msgstr "Po to, kai pažymėta kaip baigta"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Rodyti atsiliepimus su widgetais"
+
+msgid "Show badge with shop's grade"
+msgstr "Rodyti ženklelį su parduotuvės įvertinimu"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Rodyti išsistumiantį widgetą su parduotuvės įvertinimu"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr ""
+"Daug vietos neužimantis ženklelis, priklijuojamas prie ekrano krašto ir "
+"užima mažai vietos"
+
+msgid "Click shows a modal with recent reviews"
+msgstr "Paspaudus rodomas modalas su naujausiais atsiliepimais"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Galite pakeisti rodymo padėtį TrustMate skydelyje"
+
+msgid "Why use it?"
+msgstr "Kodėl jį naudoti?"
+
+msgid "sales increase"
+msgstr "pardavimų padidėjimas"
+
+msgid "customers do not leave site searching for reviews"
+msgstr "klientų nepalieka svetainės ieškodami atsiliepimų"
+
+msgid "can boost your SEO"
+msgstr "gali pagerinti jūsų SEO"
+
+msgid "can make search engines show stars under your results"
+msgstr ""
+"gali priversti paieškos variklius rodyti žvaigždutes po jūsų paieškos "
+"rezultatais"
+
+msgid "Show badge with products' grade"
+msgstr "Rodyti ženklelį su produktų įvertinimu"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr ""
+"Paspaudus rodomas modalas su naujausiais atsiliepimais ir įvertinimų "
+"pasiskirstymu"
+
+msgid "Widget is a finishing touch on your product page"
+msgstr "Widgetas yra užbaigiantis prisilietimas produkto puslapiui"
+
+msgid "product sales increase"
+msgstr "produktų pardavimo padidėjimas"
+
+msgid "can boost your product SEO"
+msgstr "gali pagerinti jūsų produkto SEO"
+
+msgid "can make search engines show stars under product result"
+msgstr ""
+"gali priversti paieškos variklius rodyti žvaigždutes po jūsų produkto "
+"paieškos rezultatais"
+
+msgid "Popping up reviews"
+msgstr "Tiesiog stulbinantys atsiliepimai"
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+"Widgetas su trijų tipų iššokančiais langeliais, kurie užtikrina jūsų "
+"klientams jūsų paslaugų kokybę"
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+"Padėtis yra konfigūruojama, keičiama. Dėl netradicinių vaizdų ir pranešimų "
+"jie yra labai pastebimi"
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Jei norite naudoti savo paties vaizdus, susisiekite su mumis adresu "
+"support@trustmate.io"
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"Dėžutės neužima daug vietos ir yra paprastas būdas parodyti atsiliepimus"
+
+msgid "Show grade and reviews on product page"
+msgstr "Rodyti įvertinimą ir atsiliepimus produkto puslapyje"
+
+msgid "Page-wide reviews similar to popular comments sections showing under your product"
+msgstr ""
+"Atsiliepimai per visą puslapį, panašūs į populiarias komentarų skiltis, "
+"rodomas po jūsų produktu"
+
+msgid "Remember, there are more widgets available"
+msgstr "Atminkite, kad yra ir daugiau widgetų"
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "Galite įdėti juos į savo svetainę naudodami wordpress HTML widgetus"
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Tiesiog nukopijuokite kodą iš TrustMate skydelio, widgeto sekcijos"
+
+msgid "Turn on"
+msgstr "Įjungti"
+
+msgid "Click to show widget description"
+msgstr "Paspauskite, kad būtų rodomas widgeto aprašymas"
+
+# Hornet
+msgid "Small widget that displays the average rating and the number of reviews"
+msgstr "Mažas widgetas, kuris rodo vidutinį įvertinimą ir atsiliepimų skaičių"
+
+msgid "The stars will appear on the product card near the photo and on the product tiles throughout the store"
+msgstr ""
+"Žvaigždutės bus rodomos produkto kortelėje šalia, nuotraukos ir produkto "
+"plytelėse visoje parduotuvėje"
+
+msgid "The widget displays the current number of reviews about the product and the current average rating"
+msgstr ""
+"Widgetas rodo esamą atsiliepimų skaičių apie produktą ir dabartinį vidutinį "
+"įvertinimą"
+
+msgid "It can be embedded next to the main product description on the product sheet or in product lists in your store"
+msgstr ""
+"Jį galima įterpti šalia pagrindinio produkto aprašymo produkto lape arba "
+"jūsų parduotuvės prekių sąrašuose"
+
+msgid "Benefits"
+msgstr "Privalumai"
+
+msgid "distinguishes the product by encouraging customers to click on it and make purchases"
+msgstr "išskiria produktą, skatinant klientus spausti ant jo ir atlikti pirkimą"
+
+# Chupacabra
+msgid "Widget social proof (large box)"
+msgstr "Widgetas Socialinis įrodymas (didelis)"
+
+msgid "Static widget with customer reviews sending a message \"you can trust us\""
+msgstr ""
+"Statinis widgetas su klientų atsiliepimais, kuris siunčia pranešimą „galite "
+"mumis pasitikėti“"
+
+msgid "Widget includes both company and product reviews"
+msgstr "Widgetas turi tiek įmonių tiek ir produktų apžvalgas"
+
+msgid "Anytime you can adjust widget outlook without developer help, even after embedding it on your site"
+msgstr ""
+"Bet kada galite koreguoti widgeto išvaizdą be programuotojų pagalbos, net "
+"įdėję jį į savo svetainę"
+
+msgid "Microdata"
+msgstr "Mikroduomenys"
+
+msgid "If you enable microdata, widget will make your reviews understandable for search engines like Google"
+msgstr ""
+"Jei įgalinsite mikroduomenis, widgetas padarys jūsų atsiliepimus suprantamus "
+"paieškos sistemoms, tokioms, kaip „Google“"
+
+msgid "Search engine results with your site will be enriched with additional data like average rating, stars, review count"
+msgstr ""
+"Jūsų svetainės paieškos variklio rezultatai bus papildyti papildomais "
+"duomenimis, pavyzdžiui, vidutiniu įvertinimu, žvaigždutėmis, peržiūrų "
+"skaičiumi"
+
+# Ferret
+msgid "Carousel"
+msgstr "Karuselė"
+
+msgid "Dynamic \"carousel\" widget catches the eye of customers presenting up to the last 21 reviews. You set the scrolling speed of the visible ratings yourself"
+msgstr ""
+"Dinaminis „Karuselės“ widgetas patraukia klientų dėmesį, rodydamas iki 21 "
+"naujausios apžvalgos. Jūs patys nustatote matomų įvertinimų slinkimo greitį"
+
+msgid "Using the carousel you increase the attractiveness of your website to search engines, e.g. Google"
+msgstr ""
+"Naudodami karuselę, jūs padidinate savo svetainės patrauklumą paieškos "
+"sistemoms, pvz. „Google“"
+
+msgid "Let customers read reviews about your company without leaving your website"
+msgstr ""
+"Leiskite klientams skaityti atsiliepimus apie jūsų įmonę nepalikus svetainės"
+
+msgid "The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+"Karuselė yra reaguojanti ir prisitaiko prie kiekvieno puslapio vaizdo ir "
+"mobilių įrenginių"
+
+msgid "Product review carousel"
+msgstr "Produktų apžvalgų karuselė"
+
+# Owl
+msgid "Certificate widget"
+msgstr "Sertifikato widgetas"
+
+msgid "If you meet the program conditions visible on the main page of the panel, TrustMate will automatically display the badge in your store along with information about the current rating"
+msgstr ""
+"Jei atitiksite programos sąlygas, kurios yra matomos pagrindiniame skydelio "
+"puslapyje, tuomet „TrustMate“ automatiškai rodys ženklelį jūsų parduotuvėje "
+"kartu su informacija apie dabartinį įvertinimą"
+
+msgid "This will result in more buying interest from potential customers"
+msgstr "Tai padidins potencialių klientų susidomėjimą apsipirkti"
+
+# FAQ section
+msgid "FAQ"
+msgstr "DUK"
+
+msgid "Can I ask only for company reviews"
+msgstr "Ar galiu rodyti rodyti tik įmonės atsiliepimus"
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+"Taip. Turite pažymėti įmonės kvietimo konfigūraciją kaip automatinę ir "
+"įsitikinti, kad jokia produkto pakvietimo konfigūracija nėra pažymėta kaip "
+"tokia"
+
+msgid "Can I ask only for product reviews"
+msgstr "Ar galiu rodyto tik produktų atsiliepimus"
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+"Taip. Produkto kvietimo konfigūraciją turite pažymėti kaip automatinę ir "
+"įsitikinti, kad jokia įmonės kvietimo konfigūracija nėra pažymėta kaip tokia"
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+"Atminkite, kad produktų pakvietimai veiktų, „TrustMate“ nustatymuose turite "
+"įkelti produktų sklaidos kanalą (feed)"
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Ar galiu rodyti atsiliepimus apie įmonę ir apie produktus"
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+"Taip. Jūs turite pažymėt tiek įmonės, tiek produkto kvietimo konfigūracijas "
+"kaip automatines"
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+"Tokiu atveju rekomenduojame sukonfigūruoti įmonės kvietimus išsiųsti bent "
+"kelias dienas prieš produktą"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Siunčiant juos kartu gali sumažėti konversijų rodiklis"
+
+msgid "What is UUID"
+msgstr "Kas yra UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "UUID kodas yra unikalus jūsų „TrustMate“ paskyros identifikatorius"
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "Tai rasite skiltyje <em>Integracija</em>"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Kaip galiu pridėti widgetą su balais ir apžvalgomis"
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+"Widgetas, kuris prilimpa prie ekrano krašto, gali būti įjungtas vienu "
+"paspaudimu papildinio konfigūracijoje"
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+"Visi kiti Widgetai, kuriuos galite įterpti į savo svetainę naudodami "
+"Wordpress funkcijas: valdikliai ir temos"
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+"Kada turėčiau įjungti „Prašyti leidimo siųsti kvietimą palikti atsiliepimą“"
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+"Visada, kai negaunate tokio sutikimo ankstesniuose operacijos etapuose ir "
+"jūsų taisyklių dokumentas neturi problemos sprendimo"
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Kaip paslėpti WooCommerce produktų apžvalgas"
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Jūs turite išjungti numatytąsias WooCommerce apžvalgas čia: <em>WooCommerce →"
+" Nustatymai → Produktai → Įgalinti produktų apžvalgas</em>"
+
+msgid "Do you support WPML?"
+msgstr "Ar jūs palaikote WPML?"
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+"Taip, bet atminkite, kad turite pridėti kvietimų konfigūracijas visoms "
+"kalboms, kurias norite naudoti TrustMate.io skydelyje"
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Kaip galiu nustatyti, kuri mano produktų kategorija bus siunčiama į TrustMate"
+".io?"
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""
+"Jei savo produktui naudojate kelias kategorijas, vienintelis būdas yra "
+"naudoti pirminės kategorijos funkciją iš Yoast SEO papildinio"

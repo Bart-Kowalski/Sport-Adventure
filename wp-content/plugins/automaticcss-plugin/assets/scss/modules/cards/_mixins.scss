@@ -1,0 +1,142 @@
+@mixin card($style: $primary-card-style, $output: all) {
+	// Setup concentric radius variable
+	--concentric-radius: calc(var(--radius) + var(--card-padding) / 2);
+	// Check for "alt" style
+	@if $style == alt {
+		// If user wants alt style, check for primary style and serve the opposite
+		@if $primary-card-style == "light" or $primary-card-style == "Light" {
+			$style: dark;
+		}
+		@if $primary-card-style == "dark" or $primary-card-style == "Dark" {
+			$style: light;
+		}
+	}
+	// Loop through style properties
+	@if $style == "light" or $style == "Light" {
+		@each $prop, $value in $card-styles-light {
+			@if $value != null {
+				--#{$prop}: var(--light-#{$prop});
+			}
+		}
+	}
+	@if $style == "dark" or $style == "Dark" {
+		@each $prop, $value in $card-styles-dark {
+			@if $value != null {
+				--#{$prop}: var(--dark-#{$prop});
+			}
+		}
+	}
+	// Output all properties ("all" is default)
+	// This allows user to specify non-all output to avoid duplicating properties
+	@if $output == all {
+		// Main Styles
+		display: var(--card-display, flex) !important;
+		flex-direction: var(--card-flex-direction, column);
+		position: relative;
+		overflow: var(--card-overflow, clip);
+		background-clip: padding-box;
+		transition: var(--card-transition, var(--transition));
+		font-size: var(--card-text-size, var(--text-s));
+		// Border Styles
+		/// Check and handle concentric radius option
+		@if $option-card-concentric-radius == on {
+			--card-radius: var(--concentric-radius);
+		}
+		border-width: var(--card-border-width, var(--border-width));
+		border-style: var(--card-border-style, var(--border-style));
+		border-color: var(--card-border-color, transparent);
+		border-radius: var(--card-radius, var(--radius, 0));
+		// Spacing
+		padding: var(--card-padding, var(--space-m));
+		gap: var(--card-gap, var(--content-gap));
+		// Colors
+		background: var(--card-background, var(--white));
+		color: var(--card-text-color, var(--text-dark));
+		// Typography
+		line-height: var(--card-line-height, inherit);
+		// Hover
+		&:hover {
+			background: var(--card-background-hover, var(--card-background));
+		}
+		// Media Styles
+		& :where([class*="__media"]:not([class*="wrapper"])) {
+			border-radius: var(--card-media-radius, var(--radius, 0));
+			aspect-ratio: var(--card-media-aspect-ratio, 16/9);
+			object-fit: var(--card-media-object-fit, fill);
+			overflow: clip;
+			inline-size: 100%;
+			& img {
+				object-fit: var(--card-media-object-fit, fill);
+			}
+		}
+		// Avatar Styles
+		& img[class*="__avatar"]:not([class*="wrapper"]), [class*="__avatar"] img {
+			border-radius: var(--card-avatar-radius, 50vw);
+			border-width: var(--card-avatar-border-width, 0);
+			border-style: var(--card-avatar-border-style, solid);
+			border-color: var(--card-avatar-border-color, transparent);
+			inline-size: var(--card-avatar-size, 48px);
+			block-size: var(--card-avatar-size, 48px);
+			align-self: center;
+			aspect-ratio: 1;
+			object-fit: cover;
+			overflow: clip;
+			img {
+				object-fit: cover;
+			}
+		}
+		// Text Styles
+		:is(h1,h2,h3,h4,h5,h6) {
+			font-size: var(--card-heading-size, var(--h3));
+			color: var(--card-heading-color, var(--text-dark));
+		}
+		// Link Styles
+		// Must exclude headings, icons, and buttons
+		:where(a):where(:not(h1 a,h2 a,h3 a,h4 a,h5 a,h6 a, [class*="btn--"], [data-icon])) {
+			color: var(--card-link-color, var(--primary));
+			&:hover {
+				color: var(--card-link-hover-color, var(--primary-hover));
+			}
+		}
+		// Shadow Styles
+		@if $light-card-shadow != null or $dark-card-shadow != null {
+			box-shadow: var(--card-shadow, none);
+		}
+	}
+	// Main Icon Style
+	& :where([class*="__icon"]) {
+		--icon-radius: var(--card-icon-radius, var(--radius, 0));
+		--icon-size: var(--card-icon-size, 48px);
+		@if $style == dark {
+			@include icon($dark-card-icon-style);
+		}
+		@if $style == light {
+			@include icon($light-card-icon-style);
+		}
+	}
+	// Other Icons
+	& :where([data-icon]) {
+		@if $style == dark {
+			@include icon($dark-card-icon-style);
+		}
+		@if $style == light {
+			@include icon($light-card-icon-style);
+		}
+	}
+	// Button Adjustments
+	[class*="btn--"] {
+		--btn-font-size: var(--card-button-font-size, var(--text-s));
+		@if $style == "light" or $style == "Light" {
+			@include btn($light-card-button-style, no);
+		}
+		@if $style == "dark" or $style == "Dark" {
+			@include btn($dark-card-button-style, no);
+		}
+	}
+}
+
+@mixin card-container($range-syntax) {
+	@container card (#{$range-syntax}) {
+		@content;
+	}
+}

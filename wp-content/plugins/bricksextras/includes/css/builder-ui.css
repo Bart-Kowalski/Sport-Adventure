@@ -1,0 +1,8 @@
+#bricks-panel-elements [data-element-name^='x']:before {
+    content: '+';
+    position: absolute;
+    left: 5px;
+    top: 8px;
+    line-height: 0;
+    transform: rotate(45deg);
+}

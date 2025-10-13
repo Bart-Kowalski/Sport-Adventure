@@ -1,0 +1,152 @@
+@import "form-vars";
+
+@if $option-forms == on {
+:root {
+	--f-label-size: #{$f-label-size};
+  --f-label-font-weight: #{$f-label-font-weight};
+  --f-label-line-height: #{$f-label-line-height};
+  --f-label-padding-x: #{$f-label-padding-x};
+  --f-label-padding-y: #{$f-label-padding-y};
+  --f-label-margin-bottom: #{$f-label-margin-bottom};
+  --f-label-text-transform: #{$f-label-text-transform};
+  --f-label-inside-position-left: #{$f-label-inside-position-left};
+  --f-label-inside-position-top: #{$f-label-inside-position-top};
+  --f-label-inside-scale: #{$f-label-inside-scale};
+
+  --f-legend-text-weight: #{$f-legend-text-weight};
+  --f-legend-size: #{$f-legend-size};
+  --f-legend-margin-bottom: #{$f-legend-margin-bottom};
+  --f-legend-border: #{$f-legend-border};
+  --f-legend-line-height: #{$f-legend-line-height};
+
+  --f-help-text-weight: #{$f-help-text-weight};
+  --f-help-size: #{$f-help-size};
+  --f-help-line-height: #{$f-help-line-height};
+  --f-help-margin-block: #{$f-help-margin-block};
+
+  --f-field-margin-bottom: #{$f-field-margin-bottom};
+  --f-fieldset-margin-bottom: #{$f-fieldset-margin-bottom};
+  --f-grid-gutter: #{$f-grid-gutter};
+
+  --f-input-border-style: #{$f-input-border-style};
+  --f-input-border-top-size: #{$f-input-border-top-size}rem;
+  --f-input-border-right-size: #{$f-input-border-right-size}rem;
+  --f-input-border-bottom-size: #{$f-input-border-bottom-size}rem;
+  --f-input-border-left-size: #{$f-input-border-left-size}rem;
+  --f-input-border-radius: #{$f-input-border-radius};
+  --f-input-size: #{$f-input-size};
+  --f-input-font-weight: #{$f-input-font-weight};
+  --f-input-line-height: #{$f-input-line-height};
+  --f-input-height: #{$f-input-height}rem;
+  --f-input-padding-x: #{$f-input-padding-x};
+  --f-input-padding-y: #{$f-input-padding-y};
+
+  --f-btn-border-style: #{$f-btn-border-style};
+  --f-btn-border-width: #{$f-btn-border-width};
+  --f-btn-border-radius: #{$f-btn-border-radius};
+  --f-btn-text-size: #{$f-btn-text-size};
+  --f-btn-font-weight: #{$f-btn-font-weight};
+  --f-btn-line-height: #{$f-btn-line-height};
+  --f-btn-padding-y: #{$f-btn-padding-y};
+  --f-btn-padding-x: #{$f-btn-padding-x};
+  --f-btn-margin-top: #{$f-btn-margin-top};
+  --f-btn-text-decoration: #{$f-btn-text-decoration};
+  --f-btn-text-transform: #{$f-btn-text-transform};
+
+  --f-option-label-font-weight: #{$f-option-label-font-weight};
+  --f-option-label-size: #{$f-option-label-size};
+  --f-option-label-spacing: #{$f-option-label-spacing};
+	--f-option-label-line-height: #{$f-option-label-line-height};
+
+  --f-progress-height: #{$f-progress-height};
+  --f-progress-bar-radius: #{$f-progress-bar-radius};
+
+  --f-tab-border-size: #{$f-tab-border-size};
+  --f-tab-border-style: #{$f-tab-border-style};
+  --f-tab-border-radius: #{$f-tab-border-radius};
+  --f-tab-text-size: #{$f-tab-text-size};
+  --f-tab-text-weight: #{$f-tab-text-weight};
+  --f-tab-text-line-height: #{$f-tab-text-line-height};
+  --f-tab-text-align: #{$f-tab-text-align};
+  --f-tab-text-transform: #{$f-tab-text-transform};
+  --f-tab-text-decoration: #{$f-tab-text-decoration};
+  --f-tab-padding-y: #{$f-tab-padding-y};
+  --f-tab-padding-x: #{$f-tab-padding-x};
+  --f-tab-margin-x: #{$f-tab-margin-x};
+  --f-tab-width: #{$f-tab-width};
+  --f-tab-active-border-bottom-size: #{$f-tab-active-border-bottom-size};
+  --f-tab-active-text-weight: #{$f-tab-active-text-weight};
+  --f-tab-active-border-size: #{$f-tab-active-border-size};
+  --f-tab-active-border-style: #{$f-tab-active-border-style};
+  --f-tab-group-padding-y: #{$f-tab-group-padding-y};
+  --f-tab-group-padding-x: #{$f-tab-group-padding-x};
+  --f-tab-group-border-bottom-size: #{$f-tab-group-border-bottom-size};
+  --f-tab-group-border-bottom-style: #{$f-tab-group-border-bottom-style};
+  --f-tab-group-margin-bottom: #{$f-tab-group-margin-bottom};
+}
+
+	@if $option-forms == on {
+		@if $option-ws-form == on {
+			.form--light, .form--dark {
+					form[data-wsf-style-id] {
+							--wsf-form-transition: var(--transition-duration) var(--transition-timing) var(--transition-delay);
+							--wsf-field-radio-size: calc(var(--f-option-label-size) * var(--f-option-label-line-height));
+					}
+			}
+
+			.form--light {
+					form[data-wsf-style-id] {
+							--wsf-field-color-background-hover: #{$f-light-input-color-background-hover};
+							--wsf-field-border-color-hover: #{$f-light-input-border-color-hover};
+							--wsf-field-color-hover: #{$f-light-input-text-color-hover};
+							--wsf-field-color-placeholder-hover: #{$f-light-input-placeholder-color-hover};
+							--wsf-field-color-background-focus: #{$f-light-input-background};
+							--wsf-field-checkbox-checked-color-background: #{$f-light-option-action-color};
+							--wsf-field-checkbox-checked-switch-color-background:#{$f-light-option-action-color};
+							--wsf-field-radio-checked-color: #{$f-light-option-action-color};
+							--wsf-field-radio-checked-switch-color-background: #{$f-light-option-action-color};
+							--wsf-field-radio-color-background: #{$f-light-option-background-color};
+							--wsf-field-border: 1px solid #{$f-light-option-border-color};
+							--wsf-field-color-placeholder: hsl(#{$f-light-input-placeholder-hsl} / #{$f-light-input-placeholder-opacity});
+							--wsf-field-button-primary-color-background-hover: #{$f-light-btn-background-hover};
+							--wsf-field-button-primary-border-color-hover: #{$f-light-btn-border-color-hover};
+							--wsf-field-button-primary-color: #{$f-light-btn-text-color};
+							--wsf-field-button-primary-color-hover: #{$f-light-btn-text-color-hover};
+							--wsf-field-button-secondary-color-background: #{$f-light-secondary-btn-background-color};
+							--wsf-field-button-secondary-color-background-hover: #{$f-light-secondary-btn-background-color-hover};
+							--wsf-field-button-secondary-border-color: #{$f-light-secondary-btn-background-color};
+							--wsf-field-button-secondary-border-color-hover: #{$f-light-secondary-btn-background-color-hover};
+							--wsf-field-button-secondary-color: #{$f-light-secondary-btn-text-color};
+							--wsf-field-button-secondary-color-hover: #{$f-light-secondary-btn-text-color-hover};
+					}
+			}
+
+			.form--dark {
+					form[data-wsf-style-id] {
+							--wsf-field-color-background-hover: #{$f-dark-input-color-background-hover};
+							--wsf-field-border-color-hover: #{$f-dark-input-border-color-hover};
+							--wsf-field-color-hover: #{$f-dark-input-text-color-hover};
+							--wsf-field-color-placeholder-hover: #{$f-dark-input-placeholder-color-hover};
+							--wsf-field-color-background-focus: #{$f-dark-input-background};
+							--wsf-field-checkbox-checked-color-background: #{$f-dark-option-action-color};
+							--wsf-field-checkbox-checked-switch-color-background:#{$f-dark-option-action-color};
+							--wsf-field-radio-checked-color: #{$f-dark-option-action-color};
+							--wsf-field-radio-checked-switch-color-background: #{$f-dark-option-action-color};
+							--wsf-field-radio-color-background: #{$f-dark-option-background-color};
+							--wsf-field-border: 1px solid #{$f-dark-option-border-color};
+							--wsf-field-color-placeholder: hsl(#{$f-dark-input-placeholder-hsl} / #{$f-dark-input-placeholder-opacity});
+							--wsf-field-button-primary-color-background-hover: #{$f-dark-btn-background-hover};
+							--wsf-field-button-primary-border-color-hover: #{$f-dark-btn-border-color-hover};
+							--wsf-field-button-primary-color: #{$f-dark-btn-text-color};
+							--wsf-field-button-primary-color-hover: #{$f-dark-btn-text-color-hover};
+							--wsf-field-button-secondary-color-background: #{$f-dark-secondary-btn-background-color};
+							--wsf-field-button-secondary-color-background-hover: #{$f-dark-secondary-btn-background-color-hover};
+							--wsf-field-button-secondary-border-color: #{$f-dark-secondary-btn-background-color};
+							--wsf-field-button-secondary-border-color-hover: #{$f-dark-secondary-btn-background-color-hover};
+							--wsf-field-button-secondary-color: #{$f-dark-secondary-btn-text-color};
+							--wsf-field-button-secondary-color-hover: #{$f-dark-secondary-btn-text-color-hover};
+					}
+			}
+		}
+	}
+}

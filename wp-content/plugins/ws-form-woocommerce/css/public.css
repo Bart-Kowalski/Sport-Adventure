@@ -1,0 +1,13 @@
+.product.wsf-wc-product-price-hide .price,
+.product.wsf-wc-product-price-variation-hide form.cart .woocommerce-variation-price,
+.product.wsf-wc-product-price-variation-hide form.cart .woocommerce-variation-price .price,
+.product.wsf-wc-product-quantity-hide form.cart .quantity,
+.product.wsf-wc-product-quantity-hide form.cart .qty,
+.product.wsf-wc-product-add-to-cart-hide form.cart .single_add_to_cart_button {
+	display: none !important;
+}
+
+/* Flex Fix - Elementor */
+.product.elementor form.cart.wsf-form {
+	flex-wrap: wrap !important;
+}

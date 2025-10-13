@@ -1,0 +1,25 @@
+@if $option-centering == on {
+		// Establish styling for all extensions
+		[class*="center--"]:where(:not([class*="self"], .ct-section)),
+		.ct-section[class*="center--"]:where(:not([class*="self"])) > .ct-section-inner-wrap {
+			@include center(core);
+		}
+		// Generate Classes
+    @each $extension in $centering-extensions {
+      .center--#{$extension}:not(.ct-section),
+      .ct-section.center--#{$extension} > .ct-section-inner-wrap {
+        @include center(#{$extension}, tokens);
+      }
+    }
+  }
+	// Generate Breakpoint Classes
+  @each $breakpoint, $value in $breakpoints {
+    @include breakpoint($breakpoint) {
+      @each $extension in $centering-extensions {
+        .center--#{$extension}-#{$breakpoint}:not(.ct-section),
+        .ct-section.center--#{$extension}-#{$breakpoint} > .ct-section-inner-wrap {
+          @include center(#{$extension}, tokens);
+        }
+      }
+    }
+  }

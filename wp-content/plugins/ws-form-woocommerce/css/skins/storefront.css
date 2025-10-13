@@ -1,0 +1,13 @@
+.wsf-woocommerce .wsf-woocommerce-price {
+	font-size: 16px;
+}
+
+.wsf-woocommerce fieldset {
+	background: none;
+}
+
+.wsf-woocommerce fieldset legend {
+	background: none;
+	font-size: 16px;
+	margin-left: 0;
+}

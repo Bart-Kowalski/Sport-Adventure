@@ -1,0 +1,20 @@
+@if $option-animation-text-reveal == on {
+	.text-reveal-animation span {
+		background: linear-gradient(90deg, var(--text-color-animated) 100%, transparent);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: var(--text-color-initial);
+		background-size: 0% 100%;
+		background-repeat: no-repeat;
+		animation: text-reveal linear forwards;
+		animation-timeline: view();
+		animation-range: var(--animation-offset-start) var(--animation-offset-end);
+		animation-duration: 300ms;
+	}
+
+	@keyframes text-reveal {
+		to {
+			background-size: 100% 100%;
+		}
+	}
+}

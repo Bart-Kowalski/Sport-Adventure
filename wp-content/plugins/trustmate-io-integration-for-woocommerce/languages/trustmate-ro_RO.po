@@ -1,0 +1,497 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-22 08:57+0000\n"
+"PO-Revision-Date: 2023-02-11 10:45+0000\n"
+"Last-Translator: Paula Kulcsar <paula.kulcsar@gmail.com>\n"
+"Language-Team: Romanian <http://trans.trustmate.io/projects/"
+"woocommerce-plugin/main/ro/>\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2;\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "Creează cont TrustMate"
+
+msgid "Settings"
+msgstr "Setări"
+
+msgid "Widgets"
+msgstr "Widgets"
+
+# Headers and buttons
+msgid "settings"
+msgstr "setări"
+
+msgid "Configure plugin"
+msgstr "Configurează plugin"
+
+msgid "If you already have TrustMate account"
+msgstr "Dacă ai deja un cont TrustMate"
+
+msgid "skip this step"
+msgstr "sari peste acest pas"
+
+msgid "Save changes"
+msgstr "Salvează modificările"
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+"Pentru a începe să colectezi recenzii, vei avea nevoie de un cont TrustMate. "
+"Ai noroc că îl poți crea"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "într-un minut. Vom folosi date din WooCommerce"
+
+msgid "to make this process very easy"
+msgstr "pentru a face acest proces foarte ușor"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr "Detaliile companiei pot fi actualizate ulterior în panoul TrustMate"
+
+msgid "By registering I accept"
+msgstr "Prin înregistrare, accept"
+
+msgid "terms of service"
+msgstr "termenii de utilizare"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr ""
+"inclusiv consimțământul de a fi contactat de către serviciul clienți "
+"TrustMate"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr "Voi cere clienților o recenzie prin e-mail"
+
+msgid "I accept"
+msgstr "Accept"
+
+msgid "the data entrustment agreement"
+msgstr "acordul de încredințare a datelor"
+
+msgid "Configure invitations and widgets"
+msgstr "Configură invitațiile și widgeturile"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr ""
+"Verifică formularul de mai jos și fă clic pe \"Creează un cont TrustMate\""
+
+msgid "Account data"
+msgstr "Datele contului"
+
+msgid "Company registration data"
+msgstr "Date de înregistrare a companiei"
+
+msgid "Website address"
+msgstr "Adresa site-ului web"
+
+msgid "Owner's e-mail"
+msgstr "Adresa de e-mail a proprietarului"
+
+msgid "Company name"
+msgstr "Numele companiei"
+
+msgid "Street"
+msgstr "Strada"
+
+msgid "City"
+msgstr "Orașul"
+
+msgid "Zip code"
+msgstr "Codul postal"
+
+msgid "Country"
+msgstr "Țara"
+
+msgid "Tax identification number"
+msgstr "Numărul de identificare fiscală"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Cont creat"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr ""
+"Te rugăm să îți verifici e-mailul pentru a seta parola contului TrustMate"
+
+msgid "Account already exists"
+msgstr "Contul există deja"
+
+msgid "Invalid data sent"
+msgstr "Date trimise invalide"
+
+msgid "Unexpected error"
+msgstr "Eroare neașteptată"
+
+msgid "Cannot create account"
+msgstr "Nu se poate crea un cont"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "Adresa de înregistrare din Setări WooCommerce nu este completă"
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Ceva a mers prost. Te rugăm să încerci din nou sau contactează serviciul "
+"clienți TrustMate"
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+"Activarea widget-ului a eșuat. Te rugăm să încerci din nou sau contactează "
+"serviciul clienți TrustMate"
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr ""
+"Codul tău de utilizator TrustMate (UUID din panoul TrustMate, secțiunea "
+"Integrare)"
+
+msgid "Automatic review invitations"
+msgstr "Invitații automate de recenzie"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+"Pentru a colecta rapid recenziile clienților, activează invitațiile automate"
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+"În timp ce scriptul este activ, acesta trimite invitații clienților tăi "
+"pentru a le cere o recenzie"
+
+msgid "In TrustMate panel you can"
+msgstr "În panoul TrustMate poți să"
+
+msgid "change invitation sending delay"
+msgstr "schimbi întârzierea trimiterii invitației"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "setezi de câte ori i se reamintește clientului să scrie o recenzie"
+
+msgid "adjust invitation colors to your brand"
+msgstr "personalizezi culorile invitației la marca ta"
+
+msgid "turn on and off product review invitations"
+msgstr "activezi și să dezactivezi invitațiile de revizuire a produselor"
+
+msgid "and more!"
+msgstr "și nu numai!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Solicită permisiunea de a trimite o invitație"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr ""
+"Pentru a trimite inviații de revizuire ai nevoie de consimțământul clientului"
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+"Dacă nu colectezi aceste consimțăminte de unul singur (casetă de selectare "
+"separată sau reglementări corespunzătoare), activează această opțiune"
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+"Dacă nu soliciți direct clientului consimțământul pentru a trimite "
+"invitații, îți sugerăm să extinzi regulamentul cu conținut din"
+
+msgid "this file"
+msgstr "acest fișier"
+
+msgid "Disabled"
+msgstr "Dezactivat"
+
+msgid "After successful order"
+msgstr "După o comandă de succes"
+
+msgid "After successful payment"
+msgstr "După o plată cu succes"
+
+msgid "After marked as completed"
+msgstr "După ce a fost marcat ca fiind finalizat"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Afișează recenzii cu widget-uri"
+
+msgid "Show badge with shop's grade"
+msgstr "Afișează ecusonul cu ratingul magazinului"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Afișează widget-ul glisant cu ratingul magazinului"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr ""
+"Insigna non-invazivă este lipită de marginea ecranului și ocupă puțin spațiu"
+
+msgid "Click shows a modal with recent reviews"
+msgstr "Un clic afișează un modul cu recenzii recente"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Poți schimba poziția de afișare în panoul TrustMate"
+
+msgid "Why use it?"
+msgstr "De ce să-l folosești?"
+
+msgid "sales increase"
+msgstr "creșterea vânzărilor"
+
+msgid "customers do not leave site searching for reviews"
+msgstr "clienții nu părăsesc site-ul căutând recenzii"
+
+msgid "can boost your SEO"
+msgstr "îți poate optimiza SEO"
+
+msgid "can make search engines show stars under your results"
+msgstr ""
+"poate face ca motoarele de căutare să afișeze stele sub rezultatele tale"
+
+msgid "Show badge with products' grade"
+msgstr "Afișează insigna cu ratingul produselor"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr "Un clic afișează un mod cu recenziile recente și distribuția notelor"
+
+msgid "Widget is a finishing touch on your product page"
+msgstr "Widgetul este o notă finală pe pagina ta de produs"
+
+msgid "product sales increase"
+msgstr "creșterea vânzărilor de produse"
+
+msgid "can boost your product SEO"
+msgstr "poate optimiza SEO-ul produsului tău"
+
+msgid "can make search engines show stars under product result"
+msgstr ""
+"poate face ca motoarele de căutare să afișeze stele sub rezultatul produsului"
+
+msgid "Popping up reviews"
+msgstr "Recenzii pop-up"
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+"Social proof widget cu până la trei tipuri de casete care asigură clienții "
+"despre calitatea serviciilor tale"
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+"Poziția este configurabilă. Datorită imaginilor și mesajelor "
+"neconvenționale, acestea sunt foarte vizibile"
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Dacă dorești să folosești imagini personalizate, contactează-ne la "
+"support@trustmate.io"
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"Cutiile nu ocupă mult spațiu și sunt o modalitate ușoară de a-ți prezenta "
+"recenziile"
+
+msgid "Show grade and reviews on product page"
+msgstr "Afișează nota și recenziile pe pagina produsului"
+
+msgid "Page-wide reviews similar to popular comments sections showing under your product"
+msgstr ""
+"Recenzii la nivelul întregii pagini, similare cu secțiunile de comentarii "
+"populare care apar sub produsul tău"
+
+msgid "Remember, there are more widgets available"
+msgstr "Nu uita, există mai multe widget-uri disponibile"
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "Le poți pune pe site-ul tău folosind widget-uri HTML wordpress"
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Trebuie doar să copiezi codul din secțiunea widget a panoului TrustMate"
+
+msgid "Turn on"
+msgstr "Pornește"
+
+msgid "Click to show widget description"
+msgstr "Apasă pentru a afișa descrierea widget-ului"
+
+# Hornet
+msgid "Small widget that displays the average rating and the number of reviews"
+msgstr ""
+
+msgid "The stars will appear on the product card near the photo and on the product tiles throughout the store"
+msgstr ""
+
+msgid "The widget displays the current number of reviews about the product and the current average rating"
+msgstr ""
+
+msgid "It can be embedded next to the main product description on the product sheet or in product lists in your store"
+msgstr ""
+
+msgid "Benefits"
+msgstr ""
+
+msgid "distinguishes the product by encouraging customers to click on it and make purchases"
+msgstr ""
+
+# Chupacabra
+msgid "Widget social proof (large box)"
+msgstr ""
+
+msgid "Static widget with customer reviews sending a message \"you can trust us\""
+msgstr ""
+
+msgid "Widget includes both company and product reviews"
+msgstr ""
+
+msgid "Anytime you can adjust widget outlook without developer help, even after embedding it on your site"
+msgstr ""
+
+msgid "Microdata"
+msgstr ""
+
+msgid "If you enable microdata, widget will make your reviews understandable for search engines like Google"
+msgstr ""
+
+msgid "Search engine results with your site will be enriched with additional data like average rating, stars, review count"
+msgstr ""
+
+# Ferret
+msgid "Carousel"
+msgstr "Carusel"
+
+msgid "Dynamic \"carousel\" widget catches the eye of customers presenting up to the last 21 reviews. You set the scrolling speed of the visible ratings yourself"
+msgstr ""
+"Widgetul dinamic \"carusel\" atrage atenția clienților care prezintă până la "
+"ultimele 21 de recenzii. Setează tu însuți viteza de derulare a evaluărilor "
+"vizibile"
+
+msgid "Using the carousel you increase the attractiveness of your website to search engines, e.g. Google"
+msgstr ""
+"Cu ajutorul caruselului vei crește atractivitatea site-ului tău pentru "
+"motoarele de căutare, precum Google"
+
+msgid "Let customers read reviews about your company without leaving your website"
+msgstr ""
+"Oferă clienților posibilitatea de a citi recenzii despre compania ta fără a "
+"părăsi site-ul tău web"
+
+msgid "The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+"Caruselul este responsiv și se adaptează la fiecare vizualizare a paginii și "
+"la fiecare dispozitiv mobil"
+
+msgid "Product review carousel"
+msgstr "Carusel de recenzii de produse"
+
+# Owl
+msgid "Certificate widget"
+msgstr ""
+
+msgid "If you meet the program conditions visible on the main page of the panel, TrustMate will automatically display the badge in your store along with information about the current rating"
+msgstr ""
+
+msgid "This will result in more buying interest from potential customers"
+msgstr ""
+
+# FAQ section
+msgid "FAQ"
+msgstr "ÎNTREBĂRI FRECVENTE"
+
+msgid "Can I ask only for company reviews"
+msgstr "Pot să solicit doar recenzii ale companiei"
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+"Da. Trebuie să setezi configurația invitației companiei ca fiind automată și "
+"să te asiguri că nicio configurație a invitației produsului nu este setată "
+"ca atare"
+
+msgid "Can I ask only for product reviews"
+msgstr "Pot solicita doar recenzii de produse"
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+"Da. Trebuie să setezi configurația produsului companiei ca fiind automată și "
+"să te asiguri că nicio configurație a invitației produsului nu este setată "
+"ca atare"
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+"Nu uita, pentru ca invitațiile de produse să funcționeze, trebuie să încarci "
+"feed-ul de produse în setările TrustMate"
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Pot să solicit atât recenzii despre companie, cât și despre produs"
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+"Da. Trebuie să setezi atât configurațiile de invitație a companiei, cât și "
+"cele de invitație a produsului ca fiind automate"
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+"În acest caz, îți recomandăm să configurezi invitațiile companiei pentru a "
+"le trimite cu cel puțin câteva zile înainte de produs"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Dacă le trimiți împreună, este posibil ca rata de conversie să scadă"
+
+msgid "What is UUID"
+msgstr "Ce este UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "Codul UUID este un identificator unic pentru contul tău TrustMate"
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "O vei găsi în secțiunea 1<em>Integrare2</em>"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Cum pot adăuga un widget cu note și recenzii"
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+"Widgetul care se lipește de marginea ecranului poate fi activat cu un singur "
+"clic în configurația plugin-ului"
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+"Toate celelalte widget-uri pe care le poți încorpora pe site-ul tău folosind "
+"caracteristicile Wordpress: widget-uri și teme"
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+"Când ar trebui să activez \" Solicită permisiunea de a trimite o invitație "
+"la recenzie\""
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+"Atunci când nu obții un astfel de consimțământ în etapele anterioare ale "
+"tranzacției și în documentul tău de reguli, nu te ocupa niciodată de această "
+"problemă"
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Cum pot ascunde recenziile produselor WooCommerce"
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Trebuie să dezactivezi recenziile WooCommerce implicite în: <em>WooCommerce →"
+" Setări → Produse → Activează recenziile produselor</em>"
+
+msgid "Do you support WPML?"
+msgstr "Ai suport WPML?"
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+"Da, dar nu uita că trebuie să adaugi configurații de invitație pentru toate "
+"limbile pe care vrei să le folosești în panoul TrustMate.io"
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Cum pot decide care din categoria mea de produse este trimisă la TrustMate."
+"io?"
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""
+"Dacă folosești mai multe categorii pentru produsul tău, singura modalitate "
+"este să folosești funcția de categorie primară din plugin-ul Yoast SEO"

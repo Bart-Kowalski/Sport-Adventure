@@ -1,0 +1,704 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2025-03-06 08:57+0000\n"
+"Last-Translator: Michał Zagdan <michal.zagdan@trustmate.io>\n"
+"Language-Team: Polish <http://trans.trustmate.io/projects/woocommerce-plugin/"
+"main/pl/>\n"
+"Language: pl_PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "Utwórz konto w TrustMate"
+
+msgid "Settings"
+msgstr "Ustawienia"
+
+msgid "Widgets"
+msgstr "Widgety"
+
+# Headers and buttons
+msgid "settings"
+msgstr "ustawienia"
+
+msgid "Configure plugin"
+msgstr "Skonfiguruj wtyczkę"
+
+msgid "If you already have TrustMate account"
+msgstr "Jeśli już posiadasz konto w TrustMate"
+
+msgid "skip this step"
+msgstr "pomiń ten krok"
+
+msgid "Save changes"
+msgstr "Zapisz zmiany"
+
+# Install
+msgid ""
+"To start collecting reviews you need TrustMate account. Fortunetly you can "
+"create it"
+msgstr ""
+"Aby rozpocząć zbieranie opinii potrzebne jest konto w TrustMate. Na "
+"szczęście możesz je założyć"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "w kilka sekund. Wykorzystamy Twoje dane z WooCommerce"
+
+msgid "to make this process very easy"
+msgstr "aby Ci ten proces maksymalnie ułatwić"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr "Dane firmy mogą być później zaktualizowane w panelu TrustMate"
+
+msgid "By registering I accept"
+msgstr "Rejestrując się akceptuję"
+
+msgid "terms of service"
+msgstr "warunki korzystania z serwisu"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr "w tym zgodę na kontakt z działem obsługi TrustMate"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr ""
+"Chcę zapraszać klientów do wystawienia oceny za pomocą wiadomości e-mail"
+
+msgid "I accept"
+msgstr "Akceptuję"
+
+msgid "the data entrustment agreement"
+msgstr "umowę powierzenia danych"
+
+msgid "Configure invitations and widgets"
+msgstr "Konfiguruj zaproszenia i widgety"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr "Zweryfikuj poniższy formularz i kliknij \"Utwórz konto w TrustMate\""
+
+msgid "Account data"
+msgstr "Dane konta"
+
+msgid "Company registration data"
+msgstr "Dane rejestracyjne firmy"
+
+msgid "Website address"
+msgstr "Adres URL strony"
+
+msgid "Owner's e-mail"
+msgstr "Adres e-mail administratora"
+
+msgid "Company name"
+msgstr "Nazwa firmy"
+
+msgid "Street"
+msgstr "Ulica i nr"
+
+msgid "City"
+msgstr "Miejscowość"
+
+msgid "Zip code"
+msgstr "Kod pocztowy"
+
+msgid "Country"
+msgstr "Kraj"
+
+msgid "Tax identification number"
+msgstr "NIP firmy"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Konto utworzone"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr "Sprawdź e-mail aby ustawić hasło do panelu TrustMate"
+
+msgid "Account already exists"
+msgstr "Konto już istnieje"
+
+msgid "Invalid data sent"
+msgstr "Wysłano nieprawidłowe dane"
+
+msgid "Unexpected error"
+msgstr "Niespodziewany błąd"
+
+msgid "Cannot create account"
+msgstr "Nie można utworzyć konta"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "Adres firmy nie jest kompletny w ustawieniach WooCommerce"
+
+msgid ""
+"Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Coś poszło nie tak. Prosimy spróbować ponownie lub skontaktować się z "
+"działem obsługi klienta TrustMate"
+
+msgid ""
+"Widget activation failed. Please try again or contact TrustMate customer "
+"service"
+msgstr ""
+"Nie udało się włączyć widgetu. Prosimy spróbować ponownie lub skontaktować "
+"się z działem obsługi klienta TrustMate"
+
+# Config form
+msgid ""
+"Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr "Twój kod użytkownika TrustMate (UUID z panelu TrustMate → Integracje)"
+
+msgid "Additional TrustMate account UUIDs per language"
+msgstr "Dodatkowe konta TrustMate dla poszczególnych języków"
+
+msgid "Use this only if you have multiple TrustMate language accounts"
+msgstr "Użyj tylko jeśli masz wiele kont TrustMate dla poszczególnych języków"
+
+msgid "Currently we only support Polylang for WooCommerce"
+msgstr "Aktualnie wspieramy tylko Polylang dla WooCommerce"
+
+msgid "Add another"
+msgstr "Dodaj kolejne konto"
+
+msgid "Automatic review invitations"
+msgstr "Automatyczne zaproszenia do oceny firmy i produktów"
+
+msgid ""
+"Enable instant company review form on thank you page - do not use with After "
+"successful order status"
+msgstr ""
+"Włącz formularz natychmiastowej oceny firmy na stronie podziękowania - nie "
+"działa poprawnie ze statusem Po złożeniu zamówienia"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+"W celu szybkiego gromadzenia opinii klientów włącz automatyczną wysyłkę "
+"zaproszeń"
+
+msgid ""
+"While active, script sends invitations to your customers asking for review"
+msgstr ""
+"Po uruchomieniu skrypt będzie wysyłał zaproszenia do wystawienia opinii do "
+"Twoich klientów pytając ich o ocenę firmy oraz produktów"
+
+msgid "In TrustMate panel you can"
+msgstr "W panelu TrustMate możesz"
+
+msgid "change invitation sending delay"
+msgstr "ustawić po jakim czasie wysyłać zaproszenia"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "ustawić liczbę przypomnień o wystawieniu opinii"
+
+msgid "adjust invitation colors to your brand"
+msgstr "dostosować kolorystykę zaproszenia do Twojej branży"
+
+msgid "turn on and off product review invitations"
+msgstr "włączyć lub wyłączyć zaproszenia do oceny produktów"
+
+msgid "and more!"
+msgstr "i wiele więcej!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Pytaj o zgodę na wysłanie zaproszenia"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr ""
+"Aby wysłać zaproszenie do wystawienia opinii, klient musi wyrazić na to zgodę"
+
+msgid ""
+"If you do not collect those consents by yourself (separate checkbox or "
+"proper regulations), turn this option on"
+msgstr ""
+"Jeśli nie zbierasz takiej zgody samodzielnie (np. osobny checkbosem lub "
+"zapiskiem w regulamienie), włącz tę opcję"
+
+msgid ""
+"If you do not directly ask customer for consent to send invitation, we "
+"suggest to extend your regulations with content from"
+msgstr ""
+"Jeśli nie pytasz klientów bezpośrednio o zgodę na wysłanie zaproszenia, "
+"zalecamy rozszerzyć regulamin o treść z"
+
+msgid "this file"
+msgstr "tego pliku"
+
+msgid "Disabled"
+msgstr "Wyłączone"
+
+msgid "After successful order"
+msgstr "Po złożeniu zamówienia"
+
+msgid "After successful payment"
+msgstr "Po płatności"
+
+msgid "After marked as completed"
+msgstr "Po oznaczeniu jako zrealizowane"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Pokazuj opinie używając widgetów"
+
+msgid "Type"
+msgstr "Rodzaj"
+
+msgid "Company"
+msgstr "Firmowy"
+
+msgid "Product"
+msgstr "Produktowy"
+
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "Description"
+msgstr "Opis"
+
+msgid "Show badge with shop's grade"
+msgstr "Pokaż odznakę z oceną sklepu"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Pokaż wysuwany widget z oceną sklepu"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr ""
+"Nieinwazyjna odznaka jest przyczepiona do krawędzi ekranu i zajmuje niewiele "
+"miejsca"
+
+msgid "Click shows a modal with recent reviews"
+msgstr "Kliknięcie otwiera okienko z ostatnimi opiniami"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Możesz zmienić umiejscowienie w panelu TrustMate"
+
+msgid "Why use it?"
+msgstr "Dlaczego warto?"
+
+msgid "sales increase"
+msgstr "zwiększenie sprzedaży"
+
+msgid "customers do not leave site searching for reviews"
+msgstr "klienci nie opuszczają Twojej strony szukając opinii"
+
+msgid "can boost your SEO"
+msgstr "wzrost w pozycjonowaniu w Google"
+
+msgid "can make search engines show stars under your results"
+msgstr "możliwość pojawienia się gwiazdek pod wynikami wyszukiwania"
+
+msgid "Show badge with products' grade"
+msgstr "Pokaż odznakę z oceną produktu"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr "Kliknięcie pokazuje okienko z ostatnimi opiniami i rozkładem ocen"
+
+msgid "Widget is a finishing touch on your product page"
+msgstr ""
+"Widget jest zwieńczeniem informacji o produkcie na Twojej stronie "
+"internetowej"
+
+msgid "product sales increase"
+msgstr "zwiększenie sprzedaży produktu"
+
+msgid "can boost your product SEO"
+msgstr "wzrost w pozycjonowaniu produktu w Google"
+
+msgid "can make search engines show stars under product result"
+msgstr ""
+"możliwość pojawienia się gwiazdek pod wynikami wyszukiwania Twojego produktu"
+
+msgid "Popping up reviews"
+msgstr "Wyskakujące opinie"
+
+msgid ""
+"Social proof widget with up to three types of popping up boxes which ensure "
+"your customers about quality of your services"
+msgstr ""
+"Widgety zwiększający sprzedaż (social proof) to trzy zmieniające się okienka "
+"upewniające Twoich klientów o jakości świadczonych przez Ciebie usług"
+
+msgid ""
+"Position is configurable. Thanks to unconventional images and messages they "
+"are very noticable"
+msgstr ""
+"Wyświetlają się klientowi w wybranym przez Ciebie miejscu. Zwracają jego "
+"uwagę różnymi komunikatami oraz nieszablonowymi grafikami"
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Jeżeli chcesz umieścić swoją grafikę skontaktuj się z support@trustmate.io"
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"Okienka zajmują mało miejsca, więc jesteś w stanie nieinwazyjnie pokazywać "
+"informację o Twojej ocenie"
+
+msgid "Show grade and reviews on product page"
+msgstr "Pokaż ocenę i opinie na stronie produktu"
+
+msgid ""
+"Page-wide reviews similar to popular comments sections showing under your "
+"product"
+msgstr ""
+"Opinie wyświetlane pod produktem, na całą szerokość strony, przypominające "
+"sekcję z komentarzami"
+
+msgid "Remember, there are more widgets available"
+msgstr "Pamiętaj, jest więcej dostępnych widgetów"
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "Możesz je osadzić na swojej stronie używając widżetów HTML Wordpressa"
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Wystarczy że skopiujesz kod z panelu TrustMate z sekcji widgety"
+
+msgid "Turn on"
+msgstr "Włącz widget"
+
+msgid "Click to show widget description"
+msgstr "Kliknij, aby wyświetlić opis widżetu"
+
+# Hornet
+msgid "Widget that displays the rating and reviews"
+msgstr "Widget wyświetlający ocenę i liczbę opinii"
+
+msgid ""
+"A minimalistic widget displaying average rating next to a product "
+"description."
+msgstr ""
+"Hornet to prosty i minimalistyczny widget produktowy, wyświetlający "
+"uśrednioną ocenę na karcie produktowej tuż przy głównym opisie oraz na "
+"liście produktów."
+
+msgid "Hornet allows customers to read reviews."
+msgstr "Po kliknięciu, pozwala na zapoznanie się z opiniami."
+
+msgid "Simple and effective."
+msgstr "Prosty i efektowny."
+
+# MultiHornet
+msgid ""
+"Display product average rating on category pages and other product listings."
+msgstr ""
+"Wyświetl średnią ocenę obok produktu na stronach kategorii i innych listach "
+"produktów."
+
+msgid "Create a star constellation in your product lists!"
+msgstr "Stwórz gwiazdozbiór na swoich listach produktowych!"
+
+# Chupacabra
+msgid "Social Proof (big box)"
+msgstr "Social proof (duży box)"
+
+msgid ""
+"Average rating, recent reviews and customer photos displayed on static cards "
+"directly on your website."
+msgstr ""
+"Średnia ocena, najnowsze opinie i zdjęcia klientów wyświetlane na "
+"statycznych kartach bezpośrednio na Twojej stronie."
+
+msgid "Neat and simple."
+msgstr "Prosto i przejrzyście."
+
+msgid "Can I ask only for company reviews"
+msgstr "Czy mogę zapraszać tylko do oceny firmy"
+
+# Ferret2
+msgid "Catch your customers’ attention with this immersive widget!"
+msgstr "Przyciągnij uwagę swoich klientów ruchomym widgetem!"
+
+msgid ""
+"Showcase your average rating and the most recent reviews on auto-scrolling "
+"tiles and make your website look even cooler!"
+msgstr ""
+"Zaprezentuj średnią ocenę oraz najświeższe opinie na automatycznie "
+"przewijanych kaflach i spraw, żeby Twoja strona wyglądała jeszcze lepiej!"
+
+msgid "Can I ask only for product reviews"
+msgstr "Czy mogę zapraszać tylko do oceny produktów"
+
+# ProductFerret2
+msgid "Attract your customers’ attention with this dynamic widget."
+msgstr "Przyciągnij uwagę klientów tym ruchomym widgetem."
+
+msgid ""
+"Average rating, recent reviews, customer images - everything in one place!"
+msgstr ""
+"Średnia ocena, najświeższe opinie, zdjęcia od klientów - wszystko w jednym "
+"miejscu!"
+
+msgid "Fits like a glove and works like a dream!"
+msgstr "Działa i wygląda świetnie!"
+
+# Dodo2
+msgid "Static box with rating (small / large)"
+msgstr "Ocena firmy - pasek / box"
+
+msgid "Showcase your review count and average rating with this simple widget."
+msgstr ""
+"Pochwal się ilością opinii i pokaż średnią ocen na tym prostym widgecie."
+
+msgid ""
+"No matter if your customers want to read reviews or submit their own - "
+"Dodo’s got you covered!"
+msgstr ""
+"Twoi klienci chcą przeczytać albo dodać opinię? Z Dodo zrobią to bez "
+"problemu."
+
+msgid "Not too little, not too much - just perfect!"
+msgstr "Nie za duży, nie za mały - po prostu idealny!"
+
+# Muskrat2
+msgid "Badge with the company's rating and grades distribution (edge)"
+msgstr "Odznaka z oceną firmy oraz rozkładem ocen (krawędź)"
+
+msgid "Amaze your customers with this modern, interactive widget!"
+msgstr "Zaskocz swoich klientów nowoczesnym i interaktywnym widgetem."
+
+msgid ""
+"Display your average rating and review count, showcase the most recent "
+"reviews and collect new ones with just a few clicks."
+msgstr ""
+"Zaprezentuj średnią i ilość ocen, wyświetl najświeższe opinie i łatwo zbierz "
+"kolejne."
+
+msgid "Simply and intuitively."
+msgstr "Intuicyjnie i prosto."
+
+# Bee
+msgid "Company rating - top bar"
+msgstr "Ocena firmy - pasek górny"
+
+msgid "Show off the number of reviews and display the average rating with this simple widget."
+msgstr "Pochwal się liczbą opinii i pokaż średnią ocen na tym prostym widgecie."
+
+msgid "Buyers will know right away that they are dealing with a trustworthy company when they enter your store."
+msgstr "Kupujący zaraz po wejściu na Twój sklep będą wiedzieli, że mają do czynienia z wiarygodną firmą."
+
+# Alpaca
+msgid "Social Proof (pop-up reviews)"
+msgstr "Social Proof - wyskakujące opinie"
+
+msgid "Attention grabber like no other."
+msgstr "Przyciągaj uwagę jak magnes!"
+
+msgid ""
+"Display your average rating, number of reviews and present the most recent "
+"ones with this unmissable widget."
+msgstr ""
+"Wyświetlj średnią ocenę, liczbę opiniii i przedstaw najnowsze z nich na "
+"widgecie, którego nie da się przeoczyć."
+
+msgid "Let Alpaca give your website that wow factor!"
+msgstr "Alpaca sprawi, że Twoja strona wywoła efekt WOW!"
+
+# Hydra
+msgid "Modular widget - product reviews, expert reviews, Q&A"
+msgstr "Widget modułowy - opinie o produkcie, recenzje ekspertów, Q&A"
+
+msgid "Wow your customers with this versatile, modular widget!"
+msgstr "Zachwyć klientów tym wszechstronnym, modułowym widgetem!"
+
+msgid ""
+"Average rating, results of product surveys, up to 50 recent reviews, expert "
+"evaluations, and the Q&A module - Hydra has everything in one place."
+msgstr ""
+"Średnia ocena, wyniki ankiet produktowych, do 50 ostatnich opinii, recenzje "
+"eksperckie oraz moduł pytań i odpowiedzi - Hydra ma to wszystko w jednym "
+"miejscu."
+
+msgid "Designed for those who want more."
+msgstr "Wprost stworzona dla tych, którzy chcą więcej."
+
+# Badger2
+msgid "Badge - product rating (edge)"
+msgstr "Odznaka - ocena produktu (krawędź)"
+
+msgid "Small but mighty!"
+msgstr "Mały, ale potężny!"
+
+msgid "Bring your average rating to view and showcase the full review content by expanding this little widget."
+msgstr "Wyświetl średnią ocenę i zaprezentuj pełną treść opinii, rozszerzając ten maleńki widget."
+
+# Lemur
+msgid "Sliding out widget with reviews"
+msgstr "Wyjeżdżający widget z opiniami"
+
+msgid "Get your reviews noticed with this sliding widget."
+msgstr "Kwintesencja minimalizmu - niewielki, wyjeżdżający widget z opiniami."
+
+msgid ""
+"Lemur is a perfect way to demonstrate your average rating, and when "
+"expanded, also latest reviews and TrustMate-granted badges."
+msgstr ""
+"Zwinięty, wyświetla jedynie średnią ocenę a po rozwinięciu prezentuje "
+"najnowsze recenzje i przyznane przez TrustMate wyróżnienia."
+
+msgid "What’s not to love about it?"
+msgstr "Pasuje wszędzie."
+
+# Ferret
+msgid "Carousel"
+msgstr "Widget karuzela z opiniami"
+
+msgid ""
+"Dynamic \"carousel\" widget catches the eye of customers presenting up to "
+"the last 21 reviews. You set the scrolling speed of the visible ratings "
+"yourself"
+msgstr ""
+"Ruchomy widget “karuzela” przyciąga wzrok klientów prezentując do 21 "
+"ostatnich opinii. Samodzielnie ustalasz prędkość przewijania widocznych ocen"
+
+msgid ""
+"Using the carousel you increase the attractiveness of your website to search "
+"engines, e.g. Google"
+msgstr ""
+"Korzystając z karuzeli zwiększasz atrakcyjność swojej witryny dla "
+"wyszukiwarek np. Google"
+
+msgid ""
+"Let customers read reviews about your company without leaving your website"
+msgstr ""
+"Pozwól klientom zapoznać się z opiniami o Twojej firmie bez opuszczania "
+"strony www"
+
+msgid ""
+"The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+"Karuzela jest responsywna dzięki czemu dostosuje się do każdego widoku "
+"strony oraz urządzeń mobilnych"
+
+msgid "Product review carousel"
+msgstr "Pokaż karuzelę z opiniami produktowymi"
+
+# Owl
+msgid "Widget with badges"
+msgstr "Widget z odznakami"
+
+# Owl
+msgid "Want to present TrustMate-granted awards in style?"
+msgstr "Chcesz stylowo prezentować nagrody przyznane przez TrustMate?"
+
+msgid "Owl’s here to help!"
+msgstr "Owl chętnie Ci w tym pomoże!"
+
+# FAQ section
+msgid "FAQ"
+msgstr "Najczęściej zadawane pytania"
+
+msgid ""
+"Yes. You need to mark company invitation configuration as automatic and make "
+"sure no product invitation configuration is marked as such"
+msgstr ""
+"Tak. Wystarczy, że ustawisz konfigurację z oceną firmy 1-5 jako automatyczną "
+"oraz że żadna konfiguracja produktowa nie będzie ustawiona jako automatyczna"
+
+msgid ""
+"Yes. You need to mark product invitation configuration as automatic and make "
+"sure no company invitation configuration is marked as such"
+msgstr ""
+"Tak. Wystarczy, że ustawisz konfigurację produktową 1-5 jako automatyczną "
+"oraz że żadna konfiguracja firmowa nie będzie ustawiona jako automatyczna"
+
+msgid ""
+"Remember, for product invitations to work you need to load product feed in "
+"TrustMate settings"
+msgstr ""
+"Pamiętaj: aby zaproszenia do oceny produktów działały, musisz wcześniej "
+"wgrać adres feedu produktowego w ustawieniach"
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Czy mogę zapraszać jednocześnie do oceny firmy i produktów"
+
+msgid ""
+"Yes. You need to mark both company and product invitation configurations as "
+"automatic"
+msgstr ""
+"Tak. Wystarczy, że ustawisz zarówno konfigurację firmową z oceną 1-5 jak i "
+"konfigurację produktową 1-5 jako automatyczną"
+
+msgid ""
+"Is such case we recommend configuring company invitations to send at least "
+"couple days befor product"
+msgstr ""
+"W takim przypadku rekomendujemy, aby zaproszenie firmowe wysyłało się "
+"przynajmniej kilka dni wcześniej niż zaproszenie produktowe"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Wysyłanie ich w tym samym czasie może zmniejszyć konwersję"
+
+msgid "What is UUID"
+msgstr "Co to jest UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "Kod UUID to unikatowy identyfikator Twojego konta w TrustMate"
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "Znajdziesz go w zakładce <em>Integracje</em>"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Jak dodać widget z oceną/opiniami o firmie"
+
+msgid ""
+"Widget which stick to screen edge can be turned on with one click in plugin "
+"configuration"
+msgstr ""
+"Widgety przyklejone do krawędzi ekranu mogą być włączone jednym klikiem w "
+"konfiguracji wtyczki"
+
+msgid ""
+"All other widget you can embed on your site using Wordpress features: "
+"widgets and themes"
+msgstr ""
+"Pozostałe możesz osadzić na stronie używając mechanizmów Wordpressa: "
+"widżetów lub skórek"
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr "Kiedy powinienem włączyć opcję „Pytać o zgodę na zaproszenie do oceny”"
+
+msgid ""
+"Always when you do not collect such consent in previous transaction steps "
+"and your rules document do not handle the issue"
+msgstr ""
+"Zawsze wtedy, gdy zgoda nie jest zbierana na wcześniejszym etapie (np. "
+"podczas składania zamówienia) ani gdy Twój regulamin nie opisuje takiej "
+"sytuacji"
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Jak pokazywać opinie produktowe tylko z TrustMate"
+
+msgid ""
+"You need to turn off default WooCommerce reviews in: <em>WooCommerce → "
+"Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Należy wyłączyć domyślne opinie WooCommerce: <em>WooCommerce → Ustawienia → "
+"Produkty → Włącz opinie o produktach</em>"
+
+msgid "Do you support WPML?"
+msgstr "Czy wspieracie wtyczkę WPML?"
+
+msgid ""
+"Yes, but keep in mind that you need to add invitation configurations for all "
+"languages you want to use in TrustMate.io panel"
+msgstr ""
+"Tak, jednak należy pamiętać, że muszą być utworzone konfiguracje zaproszeń "
+"we wszystkich używanych językach"
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Jak mogę zdecydować która kategoria produktu jest wysyłana do TrustMate.io?"
+
+msgid ""
+"If you use multiple categories for your product the only way is to use "
+"primary category feature from Yoast SEO plugin"
+msgstr ""
+"Jeśli korzystasz z wielu kategorii dla pojedynczych produktów, jedynym "
+"sposobem jest użycie wtyczki Yoast SEO plugin i jej funkcjonalności "
+"kategorii głównych"
+
+msgid "Widgets that will be withdrawn"
+msgstr "Widgety, które zostaną wycofane"

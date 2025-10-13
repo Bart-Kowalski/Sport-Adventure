@@ -1,0 +1,1726 @@
+# Copyright (C) 2025 AdTribes.io
+# This file is distributed under the GPL3.
+msgid ""
+msgstr ""
+"Project-Id-Version: Product Feed PRO for WooCommerce 13.4.4.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woo-product-feed-pro\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-05-28T23:39:35+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: woo-product-feed-pro\n"
+
+#. Plugin Name of the plugin
+#: woocommerce-sea.php
+msgid "Product Feed PRO for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: woocommerce-sea.php
+msgid "https://www.adtribes.io/support/?utm_source=wpadmin&utm_medium=plugin&utm_campaign=woosea_product_feed_pro"
+msgstr ""
+
+#. Description of the plugin
+#: woocommerce-sea.php
+msgid "Configure and maintain your WooCommerce product feeds for Google Shopping, Catalog managers, Remarketing, Bing, Skroutz, Yandex, Comparison shopping websites and over a 100 channels more."
+msgstr ""
+
+#. Author of the plugin
+#: woocommerce-sea.php
+msgid "AdTribes.io"
+msgstr ""
+
+#. Author URI of the plugin
+#: woocommerce-sea.php
+msgid "https://www.adtribes.io"
+msgstr ""
+
+#: bootstrap-old.php:633
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:644
+#: includes/Classes/Heartbeat.php:45
+#: includes/Classes/Heartbeat.php:159
+#: includes/Classes/Product_Feed_Admin.php:41
+#: includes/Classes/Product_Feed_Admin.php:97
+#: includes/Classes/Product_Feed_Admin.php:255
+#: includes/Classes/Product_Feed_Admin.php:295
+#: includes/Classes/Product_Feed_Admin.php:347
+#: includes/Classes/Usage.php:760
+#: includes/Classes/Usage.php:790
+#: includes/Classes/WP_Admin.php:263
+#: includes/Classes/WP_Admin.php:301
+#: includes/Classes/WP_Admin.php:329
+#: includes/Classes/WP_Admin.php:352
+#: includes/Classes/WP_Admin.php:431
+msgid "Invalid security token"
+msgstr ""
+
+#: bootstrap/app.php:160
+msgid "The class does not have a run method. Please make sure to extend the Abstract_Class class."
+msgstr ""
+
+#. translators: %1$s = opening <strong> tag; %2$s = closing </strong> tag; %3$s = opening <p> tag; %4$s = closing </p> tag
+#: bootstrap/app.php:210
+#, php-format
+msgid "%3$s%1$sProduct Feed Pro for WooCommerce %2$splugin missing dependency.%4$s"
+msgstr ""
+
+#: includes/autoload.php:64
+#: includes/autoload.php:84
+msgid "Please contact support if this issue persists."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/About_Page.php:41
+#: includes/Classes/Admin_Pages/About_Page.php:42
+msgid "About"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:52
+msgid "Feed configuration"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:53
+msgid "Create feed"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:128
+msgid "General"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:129
+msgid "Field Mapping"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:130
+#: templates/edit-feed/tabs/field-mapping-tab.php:297
+msgid "Category Mapping"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:131
+#: templates/edit-feed/tabs/field-mapping-tab.php:297
+msgid "Filters & Rules"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:132
+msgid "Conversion & Google Analytics"
+msgstr ""
+
+#. translators: %s: WooCommerce Product Feed PRO plugin rating link
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:274
+#: templates/settings-page.php:45
+#, php-format
+msgid "If you like our %1$s plugin please leave us a %2$s rating. Thanks in advance!"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:295
+msgid "You do not have permission to edit feeds"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:306
+msgid "Feed not found"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:648
+#: includes/Classes/Heartbeat.php:49
+#: includes/Classes/Product_Feed_Admin.php:45
+#: includes/Classes/Product_Feed_Admin.php:101
+#: includes/Classes/Product_Feed_Admin.php:259
+#: includes/Classes/Product_Feed_Admin.php:299
+#: includes/Classes/Product_Feed_Attributes.php:585
+msgid "You do not have permission to manage product feed."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:761
+#: includes/Classes/Usage.php:756
+#: includes/Classes/Usage.php:786
+#: includes/Classes/WP_Admin.php:259
+#: includes/Classes/WP_Admin.php:297
+#: includes/Classes/WP_Admin.php:325
+#: includes/Classes/WP_Admin.php:348
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:762
+msgid "Permission denied."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:773
+msgid "Feed title is required."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:778
+msgid "Channel field is required."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:783
+msgid "Field mapping is empty or you haven't saved the field mapping. Go to the Field Mapping tab and save the field mapping."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:790
+msgid "Required feed configuration fields are missing."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Edit_Feed_Page.php:799
+msgid "All required fields are filled."
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Help_Page.php:41
+#: includes/Classes/Admin_Pages/Help_Page.php:42
+#: templates/header.php:28
+msgid "Help"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/License_Page.php:41
+#: includes/Classes/Admin_Pages/License_Page.php:42
+msgid "License"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:42
+msgid "Product Feed Pro for WooCommerce"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:43
+msgid "Product Feed Pro"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:95
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:96
+msgid "Manage feeds"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:133
+#: templates/edit-feed/edit-feed.php:31
+msgid "Edit Feed"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:138
+msgid "Duplicate Feed"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:143
+msgid "Refresh Feed"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:148
+msgid "Cancel Feed Processing"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Manage_Feeds_Page.php:153
+msgid "Delete Feed"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Settings_Page.php:41
+#: includes/Classes/Admin_Pages/Settings_Page.php:42
+msgid "Settings"
+msgstr ""
+
+#: includes/Classes/Admin_Pages/Upgrade_To_Elite_Page.php:39
+#: includes/Classes/Admin_Pages/Upgrade_To_Elite_Page.php:40
+#: templates/notices/upgrade-to-elite-notice.php:22
+msgid "Upgrade To Elite"
+msgstr ""
+
+#: includes/Classes/Filters.php:296
+#: includes/Classes/Rules.php:250
+msgid "You are not allowed to perform this action."
+msgstr ""
+
+#: includes/Classes/Heartbeat.php:53
+#: includes/Classes/WP_Admin.php:271
+msgid "Invalid request."
+msgstr ""
+
+#: includes/Classes/Heartbeat.php:83
+msgid "Product feed(s) not found."
+msgstr ""
+
+#: includes/Classes/Heartbeat.php:115
+msgid "Product Feed: heartbeat"
+msgstr ""
+
+#: includes/Classes/Heartbeat.php:168
+#: includes/Classes/Product_Feed_Admin.php:53
+#: includes/Classes/Product_Feed_Admin.php:106
+#: includes/Classes/Product_Feed_Admin.php:266
+#: includes/Classes/Product_Feed_Admin.php:306
+msgid "Product feed not found."
+msgstr ""
+
+#: includes/Classes/Marketing.php:51
+#: templates/about-page.php:41
+msgid "Advanced Coupons"
+msgstr ""
+
+#: includes/Classes/Notices.php:246
+msgid "Ok, you deserve it"
+msgstr ""
+
+#: includes/Classes/Notices.php:252
+msgid "Nope, maybe later"
+msgstr ""
+
+#: includes/Classes/Notices.php:258
+msgid "I already did"
+msgstr ""
+
+#: includes/Classes/Plugin_Installer.php:95
+msgid "You do not have sufficient permissions to install and activate plugins."
+msgstr ""
+
+#: includes/Classes/Plugin_Installer.php:100
+msgid "The plugin is not valid."
+msgstr ""
+
+#: includes/Classes/Plugin_Installer.php:119
+msgid "The plugin is already installed."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:191
+msgid "You do not have permission to cancel feeds."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:202
+#: includes/Classes/Product_Feed_Admin.php:628
+#: includes/Classes/Product_Feed_Admin.php:689
+msgid "No feed ID provided."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:213
+#: includes/Classes/Product_Feed_Admin.php:638
+#: includes/Classes/Product_Feed_Admin.php:699
+#: templates/edit-feed/edit-feed.php:58
+msgid "Feed not found."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:241
+msgid "Feed processing has been cancelled."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:315
+msgid "Product feed has been deleted."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:327
+msgid "Nonce verification failed"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:351
+msgid "You do not have permission to manage product feeds."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:358
+msgid "Invalid request. Feed IDs or action missing."
+msgstr ""
+
+#. translators: %s is the feed ID.
+#: includes/Classes/Product_Feed_Admin.php:370
+#, php-format
+msgid "Feed with ID %d not found."
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:383
+#, php-format
+msgid "Error deleting feed ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the feed title.
+#: includes/Classes/Product_Feed_Admin.php:397
+#, php-format
+msgid "Copy of %s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:424
+#, php-format
+msgid "Error duplicating feed ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:436
+#, php-format
+msgid "Error setting feed ID %1$d as ready: %2$s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:448
+#, php-format
+msgid "Error deactivating feed ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:465
+#, php-format
+msgid "Error refreshing feed ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Classes/Product_Feed_Admin.php:491
+#, php-format
+msgid "Error canceling feed ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s is the action name.
+#: includes/Classes/Product_Feed_Admin.php:497
+#, php-format
+msgid "Unknown action: %s"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:507
+msgid "deleted"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:510
+msgid "duplicated"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:513
+msgid "activated"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:516
+msgid "deactivated"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:519
+msgid "refreshed"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:522
+msgid "cancelled"
+msgstr ""
+
+#. translators: %1$d is the number of feeds processed, %2$s is the action name.
+#: includes/Classes/Product_Feed_Admin.php:528
+#, php-format
+msgid "%1$d feed was successfully %2$s."
+msgid_plural "%1$d feeds were successfully %2$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Classes/Product_Feed_Admin.php:539
+msgid "However, some errors occurred:"
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:596
+msgid "Failed to process any feeds."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:617
+msgid "You do not have permission to activate feeds."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:652
+msgid "Feed activated successfully."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:678
+msgid "You do not have permission to deactivate feeds."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Admin.php:713
+msgid "Feed deactivated successfully."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Attributes.php:591
+msgid "No attributes found."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Attributes.php:599
+msgid "No channel data found."
+msgstr ""
+
+#: includes/Classes/Product_Feed_Attributes.php:605
+msgid "Channel file not found."
+msgstr ""
+
+#: includes/Classes/Usage.php:538
+msgid "Once Weekly"
+msgstr ""
+
+#: includes/Classes/Usage.php:640
+msgid "Allow usage tracking"
+msgstr ""
+
+#. Translators: %1$s: Line break, %2$s: Link to usage tracking documentation, %3$s: Closing anchor tag.
+#: includes/Classes/Usage.php:644
+#, php-format
+msgid "By allowing us to track usage data we can better help you because we know with which WordPress configurations, themes and plugins we should test.%1$sComplete documentation on usage tracking is available %2$shere%3$s."
+msgstr ""
+
+#. translators: %1$s = opening <p> tag; %2$s = closing </p> tag; %3$s = opening <a> tag; %4$s = closing </a> tag
+#: includes/Classes/Usage.php:685
+#, php-format
+msgid ""
+"%1$sAllow Product Feed Pro for WooCommerce to track plugin usage? Opt-in to let us track usage data so we know with which WordPress configurations, themes and plugins we should test with.%2$s\n"
+"                        %1$sComplete documentation on usage tracking is available %3$shere%4$s.%2$s"
+msgstr ""
+
+#: includes/Classes/Usage.php:769
+#: includes/Classes/Usage.php:799
+msgid "Usage tracking has been enabled."
+msgstr ""
+
+#: includes/Classes/Usage.php:771
+#: includes/Classes/Usage.php:801
+msgid "Usage tracking has been disabled."
+msgstr ""
+
+#: includes/Classes/Usage.php:774
+#: includes/Classes/Usage.php:804
+msgid "Failed to enable usage tracking."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:113
+msgid "About Page"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:121
+msgid "Help Page"
+msgstr ""
+
+#. translators: %1$s and %2$s are placeholders for html tags.
+#: includes/Classes/WP_Admin.php:142
+#, php-format
+msgid "You're using Product Feed Pro FREE VERSION. To unlock more features consider %1$supgrading to Elite%2$s."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:198
+msgid "Sync Product Feed"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:200
+msgid "Sync Product Feed to custom post type and legacy options (Backwards compatibility)"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:204
+msgid "Clear custom attributes cache"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:206
+msgid "Clear custom attributes product meta keys cache"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:210
+msgid "Convert feed URLs to lowercase"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:212
+msgid "Standardize all feed file URLs to lowercase format for better compatibility"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:286
+msgid "Settings updated."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:314
+msgid "Migration successful."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:334
+msgid "Custom attributes cache cleared."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:336
+msgid "Custom attributes cache not found."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:413
+msgid "Feed URLs updated to lowercase in database. Some files could not be renamed due to permission issues."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:419
+msgid "Feed URLs and files successfully updated to lowercase."
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:435
+msgid "You do not have permission to do this"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:439
+msgid "Notification dismissed"
+msgstr ""
+
+#: includes/Classes/WP_Admin.php:441
+msgid "Error dismissing notification"
+msgstr ""
+
+#. translators: %1$s = opening <a> tag; %2$s = closing </a> tag
+#: includes/Factories/Admin_Notice.php:121
+#, php-format
+msgid "%1$sPlease ensure you have the %3$s plugin installed and activated.%2$s%4$sClick here to activate &rarr;%5$s"
+msgstr ""
+
+#: includes/Factories/Admin_Notice.php:136
+msgid "Activate this plugin"
+msgstr ""
+
+#. translators: %1$s = opening <p> tag; %2$s = closing </p> tag; %3$s = Product Feed Pro for WooCommerce
+#: includes/Factories/Admin_Notice.php:144
+#, php-format
+msgid "%1$sUnable to activate %3$s plugin. Please install and activate WooCoomerce plugin first.%2$s"
+msgstr ""
+
+#. translators: %1$s = opening <p> tag; %2$s = closing </p> tag; %3$s = Product Feed Pro for WooCommerce
+#: includes/Factories/Admin_Notice.php:155
+#, php-format
+msgid "%1$s%3$sClick here to install %5$s plugin &rarr;%4$s%2$s"
+msgstr ""
+
+#: includes/Factories/Admin_Notice.php:169
+msgid "Install this plugin"
+msgstr ""
+
+#. translators: %1$s = opening <a> tag; %2$s = closing </a> tag
+#: includes/Factories/Admin_Notice.php:182
+#, php-format
+msgid "%1$s%3$s version needs to be on at least version %4$s to work properly with Product Feed Pro Pro. %2$s%1$sPlease update by clicking below.%2$s%5$sUpdate plugin &rarr;%6$s"
+msgstr ""
+
+#: includes/Factories/Admin_Notice.php:198
+msgid "Update plugin"
+msgstr ""
+
+#: includes/Factories/Vite_App.php:434
+msgid "Manifest file not found. Did you run the build script from package.json file?"
+msgstr ""
+
+#: includes/Factories/Vite_App.php:663
+msgid "Sample Blocks"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:181
+#: includes/Helpers/Product_Feed_Helper.php:311
+msgid "Hourly"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:182
+#: includes/Helpers/Product_Feed_Helper.php:312
+msgid "Twice Daily"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:183
+#: includes/Helpers/Product_Feed_Helper.php:313
+msgid "Daily"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:186
+#: includes/Helpers/Product_Feed_Helper.php:316
+msgid "No Refresh"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:200
+msgid "Inactive"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:205
+msgid "Ready"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:207
+msgid "Processing"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:209
+msgid "Error"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:211
+msgid "Stopped"
+msgstr ""
+
+#: includes/Helpers/Formatting.php:213
+msgid "Unknown"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:32
+#: includes/Post_Types/Product_Feed_Post_Type.php:34
+#: includes/Post_Types/Product_Feed_Post_Type.php:36
+msgid "Product Feeds"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:33
+#: includes/Post_Types/Product_Feed_Post_Type.php:48
+#: templates/license-page.php:23
+msgid "Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:35
+msgid "Parent Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:37
+msgid "View Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:38
+msgid "Add Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:39
+msgid "New Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:40
+msgid "Edit Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:41
+msgid "Update Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:42
+msgid "Search Product Feed"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:43
+msgid "No Product Feed found"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:44
+msgid "No Product Feeds found in Trash"
+msgstr ""
+
+#: includes/Post_Types/Product_Feed_Post_Type.php:49
+msgid "Product Feed CPT"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:127
+msgid "contains"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:128
+msgid "doesn't contain"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:129
+msgid "is equal to"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:130
+msgid "is not equal to"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:131
+msgid "is greater than"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:132
+msgid "is greater or equal to"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:133
+msgid "is less than"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:134
+msgid "is less or equal to"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:135
+msgid "is empty"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:136
+msgid "is not empty"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:142
+msgid "multiply"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:143
+msgid "divide"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:144
+msgid "plus"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:145
+msgid "minus"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:146
+msgid "find and replace"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:163
+msgid "Exclude"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:164
+msgid "Include only"
+msgstr ""
+
+#: includes/Traits/Filters_Rules_Trait.php:167
+msgid "Action"
+msgstr ""
+
+#: templates/about-page.php:14
+#: templates/help-page.php:14
+#: templates/license-page.php:12
+#: templates/settings-page.php:79
+msgid "AdTribes"
+msgstr ""
+
+#: templates/about-page.php:19
+msgid "About AdTribes"
+msgstr ""
+
+#: templates/about-page.php:20
+msgid "Hello and welcome to AdTribes, the most popular advertising solution for WooCommerce."
+msgstr ""
+
+#: templates/about-page.php:26
+msgid "Rymera Team"
+msgstr ""
+
+#: templates/about-page.php:28
+msgid "About The Makers - Rymera Web Co"
+msgstr ""
+
+#: templates/about-page.php:29
+msgid "Over the years, we've worked with thousands of smart store owners who were frustrated by the complexities of managing their online stores and advertising campaigns efficiently."
+msgstr ""
+
+#: templates/about-page.php:30
+msgid "That's where AdTribes comes in - a state-of-the-art suite of product feed tools designed to streamline your advertising efforts and integrate seamlessly with your existing WooCommerce store."
+msgstr ""
+
+#: templates/about-page.php:31
+msgid "AdTribes is brought to you by the same dedicated team that has been at the forefront of WooCommerce solutions for over a decade. We're passionate about helping you achieve the best results with our tools. We're thrilled you're using our tool and invite you to try our other plugins as well!"
+msgstr ""
+
+#: templates/about-page.php:42
+msgid "Advanced Coupons for WooCommerce (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:45
+msgid "Extends your coupon features so you can market your store better. Adds cart conditions (coupon rules), buy one get one (BOGO) deals, url coupons, coupon categories and loads more."
+msgstr ""
+
+#: templates/about-page.php:50
+#: templates/about-page.php:70
+#: templates/about-page.php:90
+#: templates/about-page.php:110
+#: templates/about-page.php:130
+#: templates/about-page.php:150
+#: templates/about-page.php:170
+msgid "Status:"
+msgstr ""
+
+#: templates/about-page.php:51
+#: templates/about-page.php:71
+#: templates/about-page.php:91
+#: templates/about-page.php:111
+#: templates/about-page.php:131
+#: templates/about-page.php:151
+#: templates/about-page.php:171
+msgid "Installed"
+msgstr ""
+
+#: templates/about-page.php:51
+#: templates/about-page.php:71
+#: templates/about-page.php:91
+#: templates/about-page.php:111
+#: templates/about-page.php:131
+#: templates/about-page.php:151
+#: templates/about-page.php:171
+msgid "Not installed"
+msgstr ""
+
+#: templates/about-page.php:54
+#: templates/about-page.php:74
+#: templates/about-page.php:94
+#: templates/about-page.php:114
+#: templates/about-page.php:134
+#: templates/about-page.php:154
+#: templates/about-page.php:174
+#: templates/about-page.php:175
+msgid "Install Plugin"
+msgstr ""
+
+#: templates/about-page.php:61
+msgid "StoreAgent AI for WooCommerce"
+msgstr ""
+
+#: templates/about-page.php:62
+msgid "StoreAgent AI for WooCommerce (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:65
+msgid "Boost your WooCommerce store with AI agents. Generate product descriptions, automatically create review summaries with sentiment analysis, add AI-powered product Q&A, and loads more."
+msgstr ""
+
+#: templates/about-page.php:81
+msgid "WC Vendors"
+msgstr ""
+
+#: templates/about-page.php:82
+msgid "WC Vendors (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:85
+msgid "Easiest way to create your multivendor marketplace and earn commission from every sale. Create a WooCommerce marketplace with multi-seller, product vendor & multi vendor commissions."
+msgstr ""
+
+#: templates/about-page.php:101
+msgid "WooCommerce Wholesale Prices"
+msgstr ""
+
+#: templates/about-page.php:102
+msgid "WooCommerce Wholesale Prices (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:105
+msgid "The #1 WooCommerce wholesale plugin for adding wholesale prices & managing B2B customers. Trusted by over 25k store owners for managing wholesale orders, pricing, visibility, user roles, and more."
+msgstr ""
+
+#: templates/about-page.php:121
+msgid "Invoice Gateway for WooCommerce"
+msgstr ""
+
+#: templates/about-page.php:122
+msgid "Invoice Gateway for WooCommerce (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:125
+msgid "Accept orders via a special invoice payment gateway method which lets your customer enter their order without upfront payment. Then just issue an invoice from your accounting system and paste in the number."
+msgstr ""
+
+#: templates/about-page.php:141
+msgid "Store Exporter for WooCommerce"
+msgstr ""
+
+#: templates/about-page.php:142
+msgid "Store Exporter for WooCommerce (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:145
+msgid "Easily export Orders, Subscriptions, Coupons, Products, Categories, Tags to a variety of formats. The deluxe version also adds scheduled exporting for easy reporting and syncing with other systems."
+msgstr ""
+
+#: templates/about-page.php:161
+msgid "Store Toolkit for WooCommerce"
+msgstr ""
+
+#: templates/about-page.php:162
+msgid "Store Toolkit for WooCommerce (Free Plugin)"
+msgstr ""
+
+#: templates/about-page.php:165
+msgid "A growing set of commonly-used WooCommerce admin tools such as deleting WooCommerce data in bulk, such as products, orders, coupons, and customers. It also adds extra small features, order filtering, and more."
+msgstr ""
+
+#: templates/components/feed-url.php:31
+msgid "Copy URL"
+msgstr ""
+
+#: templates/components/feed-url.php:44
+msgid "Open in new tab"
+msgstr ""
+
+#: templates/components/feed-url.php:51
+msgid "Processing..."
+msgstr ""
+
+#: templates/components/feed-url.php:54
+msgid "The feed is processing, please wait until it is ready."
+msgstr ""
+
+#: templates/components/feed-url.php:59
+msgid "Feed not available"
+msgstr ""
+
+#: templates/components/feed-url.php:62
+msgid "The feed file is not available, refresh the feed to generate a new file."
+msgstr ""
+
+#: templates/edit-feed/edit-feed.php:34
+msgid "Create New Feed"
+msgstr ""
+
+#: templates/edit-feed/edit-feed.php:38
+msgid "All Feeds"
+msgstr ""
+
+#: templates/edit-feed/edit-feed.php:51
+msgid "Feed settings updated successfully."
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:54
+msgid "Map your products or categories to the categories of your selected channel. For some channels adding their categorisation in the product feed is mandatory. Even when category mappings are not mandatory it is likely your products will get better visibility and higher conversions when mappings have been added."
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:67
+msgid "Fetching Google Product Taxonomy: Please wait until the process is finished. Refresh this page to check the status."
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:78
+msgid "Google Product Taxonomy is failed to fetch. Reattempt to fetch Google Product Taxonomy by deactivating and reactivating the plugin."
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:98
+msgid "Your category"
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:98
+msgid "Number of products"
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:99
+msgid "category"
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:114
+msgid "Save mappings"
+msgstr ""
+
+#: templates/edit-feed/tabs/category-mapping-tab.php:117
+#: templates/edit-feed/tabs/field-mapping-tab.php:299
+#: templates/edit-feed/tabs/filters-rules-tab.php:194
+#: templates/edit-feed/tabs/general-tab.php:283
+msgid "Save & Continue"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:63
+msgid "<strong>Google Analytics UTM codes:</strong><br/>Adding Google Analytics UTM codes is not mandatory, it will however enable you to get detailed insights into how your products are performing in Google Analytics reporting and allow you to tweak and tune your campaign making it more profitable. We strongly advise you to add the Google Analytics tracking. When enabled the plugin will append the Google Analytics UTM parameters to your landingpage URL's."
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:79
+msgid "Enable Google Analytics tracking"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:88
+msgid "Google Analytics campaign source (utm_source)"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:92
+msgid "Google Analytics campaign medium (utm_medium)"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:96
+msgid "Google Analytics campaign name (utm_campaign)"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:100
+msgid "Google Analytics campaign term (utm_term)"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:101
+msgid "dynamically added Product ID"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:104
+msgid "Google Analytics campaign content (utm_content)"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:116
+#: templates/edit-feed/tabs/field-mapping-tab.php:287
+#: templates/edit-feed/tabs/filters-rules-tab.php:188
+msgid "Save"
+msgstr ""
+
+#: templates/edit-feed/tabs/conversion-analytics-tab.php:121
+msgid "Generate Product Feed"
+msgstr ""
+
+#. translators: %s = link to learn static values.
+#: templates/edit-feed/tabs/field-mapping-tab.php:90
+#, php-format
+msgid ""
+"<p>For the selected channel the attributes shown below are mandatory, please map them to your product attributes. \n"
+"                We've already pre-filled a lot of mappings so all you have to do is check those and map the ones that are left blank or add new ones by hitting the 'Add field mapping' button.</p>\n"
+"                <p><strong><i><a href=\"%s\" target=\"_blank\">Learn how to use static values</a></i></strong></p>"
+msgstr ""
+
+#: templates/edit-feed/tabs/field-mapping-tab.php:115
+msgid "Prefix"
+msgstr ""
+
+#: templates/edit-feed/tabs/field-mapping-tab.php:116
+#: templates/edit-feed/tabs/filters-rules-tab.php:114
+msgid "Value"
+msgstr ""
+
+#: templates/edit-feed/tabs/field-mapping-tab.php:117
+msgid "Suffix"
+msgstr ""
+
+#: templates/edit-feed/tabs/field-mapping-tab.php:270
+msgid "You haven't selected a channel for this feed yet."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:89
+msgid "Type"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:92
+msgid "IF"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:94
+msgid "Specify the condition under which this filter or rule will be applied. Choose an attribute or condition that will trigger this rule."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:103
+msgid "Condition"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:105
+msgid "Define the specific condition to be met. Options include equals, not equals, greater than, less than, etc., depending on the selected attribute."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:116
+msgid "Enter the value that the condition should match. This value will be compared against the attribute chosen in the IF field."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:125
+msgid "CS"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:127
+msgid "Enable this option if the condition should be case-sensitive. This means that 'Product' and 'product' will be treated as different values."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:136
+msgid "Then"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:138
+msgid "Specify the action to be taken if the condition is met. This could be including, excluding, or modifying a product attribute."
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:147
+msgid "IS"
+msgstr ""
+
+#: templates/edit-feed/tabs/filters-rules-tab.php:149
+msgid "Define the result or value to be applied when the condition is met. This complements the action specified in the THEN field."
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:61
+msgid "Project name"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:85
+msgid "Country"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:93
+#: templates/edit-feed/tabs/general-tab.php:99
+msgid "Select a country"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:110
+msgid "Channel"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:128
+msgid "Include product variations"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:141
+msgid "And only include default product variation"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:154
+msgid "And only include lowest priced product variation(s)"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:167
+msgid "File format"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:186
+msgid "Delimiter"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:205
+msgid "Refresh interval"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:232
+msgid "Refresh only when products changed"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:246
+msgid "Create a preview of the feed"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:262
+msgid "Remove products that did not have sales in the last days"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:264
+msgid "What does this do?"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:274
+msgid "days"
+msgstr ""
+
+#: templates/edit-feed/tabs/general-tab.php:281
+msgid "Save Changes"
+msgstr ""
+
+#: templates/filters-rules/filter-row.php:21
+msgid "Filter"
+msgstr ""
+
+#: templates/filters-rules/filter-row.php:54
+#: templates/filters-rules/rule-row.php:59
+msgid "Case sensitive"
+msgstr ""
+
+#: templates/filters-rules/rule-row.php:26
+msgid "Rule"
+msgstr ""
+
+#: templates/header.php:20
+msgid "Upgrade to Elite"
+msgstr ""
+
+#: templates/header.php:33
+msgid "Helpful Articles"
+msgstr ""
+
+#: templates/header.php:37
+msgid "Create a Google Shopping Feed"
+msgstr ""
+
+#: templates/header.php:41
+msgid "Adding GTIN, Brand, MPN and More"
+msgstr ""
+
+#: templates/header.php:45
+msgid "Help, my Feed is Stuck!"
+msgstr ""
+
+#: templates/header.php:48
+msgid "Resources"
+msgstr ""
+
+#: templates/header.php:52
+msgid "Feed Marketing Blog"
+msgstr ""
+
+#: templates/header.php:56
+msgid "Support"
+msgstr ""
+
+#: templates/header.php:60
+msgid "YouTube Channel"
+msgstr ""
+
+#: templates/help-page.php:19
+msgid "Getting Help"
+msgstr ""
+
+#: templates/help-page.php:20
+msgid "We're here to help you get the most out of Product Feed Pro for WooCommerce."
+msgstr ""
+
+#: templates/help-page.php:28
+msgid "Knowledge Base"
+msgstr ""
+
+#: templates/help-page.php:31
+msgid "Access our self-service help documentation via the Knowledge Base. You'll find answers and solutions for a wide range of well know situations . You'll also find a Getting Started guide here for the plugin."
+msgstr ""
+
+#: templates/help-page.php:32
+msgid "Open Knowledge Base"
+msgstr ""
+
+#: templates/help-page.php:37
+msgid "Free Version WordPress.org Help Forums"
+msgstr ""
+
+#: templates/help-page.php:40
+msgid "Our support staff regularly check and help our free users at the official plugin WordPress.org help forums. Submit a post there with your question and we'll get back to you as soon as possible."
+msgstr ""
+
+#: templates/help-page.php:41
+msgid "Visit WordPress.org Forums"
+msgstr ""
+
+#: templates/license-page.php:18
+msgid "Enter your license keys below to enjoy full access, plugin updates, and support."
+msgstr ""
+
+#: templates/license-page.php:30
+msgid "Version: "
+msgstr ""
+
+#: templates/license-page.php:34
+msgid "License Status: "
+msgstr ""
+
+#: templates/license-page.php:35
+msgid "Free Version"
+msgstr ""
+
+#: templates/license-page.php:40
+msgid "Upgrade to Product Feed Elite"
+msgstr ""
+
+#: templates/license-page.php:41
+msgid "The Product Feed Elite version has multi-lingual/multi-currency integrations via WPML, Aelia, Curcy + more. Additional product fields such as brand, GTIN, MPN, EAN, as well as conditions & filters. Google Dynamic remarketing tags, Facebook pixel support & more."
+msgstr ""
+
+#: templates/license-page.php:43
+msgid "New additional product fields like Brand, GTIN, MPN, EAN, and more."
+msgstr ""
+
+#: templates/license-page.php:44
+msgid "Remarketing and advanced pixel support."
+msgstr ""
+
+#: templates/license-page.php:45
+msgid "Advanced data manipulation with extra conditions & filters."
+msgstr ""
+
+#: templates/license-page.php:48
+msgid "Get Product Feed Elite & Unlock All Features"
+msgstr ""
+
+#: templates/license-page.php:52
+msgid "Learn more about Elite features"
+msgstr ""
+
+#: templates/license-page.php:57
+msgid "Product Feed Elite"
+msgstr ""
+
+#: templates/manage-feeds.php:52
+msgid "Manage Feeds"
+msgstr ""
+
+#: templates/manage-feeds.php:60
+msgid "Bulk Actions"
+msgstr ""
+
+#: templates/manage-feeds.php:61
+msgid "Activate"
+msgstr ""
+
+#: templates/manage-feeds.php:62
+msgid "Deactivate"
+msgstr ""
+
+#: templates/manage-feeds.php:63
+msgid "Refresh"
+msgstr ""
+
+#: templates/manage-feeds.php:64
+msgid "Cancel"
+msgstr ""
+
+#: templates/manage-feeds.php:65
+msgid "Duplicate"
+msgstr ""
+
+#: templates/manage-feeds.php:66
+msgid "Delete"
+msgstr ""
+
+#: templates/manage-feeds.php:70
+#: templates/manage-feeds.php:356
+msgid "Add New Feed"
+msgstr ""
+
+#: templates/manage-feeds.php:81
+msgid "Feed Name"
+msgstr ""
+
+#: templates/manage-feeds.php:82
+#: templates/manage-feeds.php:111
+msgid "Format"
+msgstr ""
+
+#: templates/manage-feeds.php:83
+#: templates/manage-feeds.php:116
+msgid "Status"
+msgstr ""
+
+#: templates/manage-feeds.php:84
+#: templates/manage-feeds.php:131
+msgid "Last Updated"
+msgstr ""
+
+#: templates/manage-feeds.php:85
+#: templates/manage-feeds.php:136
+msgid "Refresh Interval"
+msgstr ""
+
+#: templates/manage-feeds.php:86
+#: templates/manage-feeds.php:141
+msgid "Feed URL"
+msgstr ""
+
+#: templates/manage-feeds.php:87
+#: templates/manage-feeds.php:146
+msgid "Actions"
+msgstr ""
+
+#: templates/manage-feeds.php:106
+msgid "Feed Type:"
+msgstr ""
+
+#: templates/manage-feeds.php:123
+msgid "Click to deactivate the feed."
+msgstr ""
+
+#: templates/manage-feeds.php:125
+msgid "Click to activate the feed."
+msgstr ""
+
+#: templates/manage-feeds.php:158
+msgid "Show"
+msgstr ""
+
+#: templates/manage-feeds.php:163
+msgid "10"
+msgstr ""
+
+#: templates/manage-feeds.php:164
+msgid "25"
+msgstr ""
+
+#: templates/manage-feeds.php:165
+msgid "50"
+msgstr ""
+
+#: templates/manage-feeds.php:166
+msgid "100"
+msgstr ""
+
+#: templates/manage-feeds.php:168
+msgid "feeds per page"
+msgstr ""
+
+#: templates/manage-feeds.php:182
+msgid "First page"
+msgstr ""
+
+#: templates/manage-feeds.php:198
+msgid "Previous page"
+msgstr ""
+
+#: templates/manage-feeds.php:290
+msgid "Next page"
+msgstr ""
+
+#: templates/manage-feeds.php:305
+msgid "Last page"
+msgstr ""
+
+#: templates/manage-feeds.php:317
+msgid "No feeds"
+msgstr ""
+
+#: templates/manage-feeds.php:320
+msgid "Whoops! It looks like you don't have any feeds yet."
+msgstr ""
+
+#: templates/manage-feeds.php:331
+msgid "Let's Get Started!"
+msgstr ""
+
+#: templates/manage-feeds.php:334
+msgid "Click the <strong>Add New Feed</strong> button to begin creating your feed."
+msgstr ""
+
+#. translators: %1$s: Opening anchor tag, %2$s: Closing anchor tag.
+#: templates/manage-feeds.php:341
+#, php-format
+msgid "<strong>Need help?</strong> Check out our %1$sGetting Started%2$s guide for step-by-step instructions and tips!"
+msgstr ""
+
+#. translators: %1$s: br and span tag, %2$s: span tag
+#: templates/marketing/acfw-marketing-page.php:21
+#, php-format
+msgid "Get Better Results With %1$s Better WooCommerce Coupons %2$s"
+msgstr ""
+
+#. translators: %s: line break.
+#: templates/marketing/acfw-marketing-page.php:45
+#, php-format
+msgid "Advanced Coupon%sCapabilities"
+msgstr ""
+
+#. translators: %s: line break.
+#: templates/marketing/acfw-marketing-page.php:62
+#, php-format
+msgid "Store Credit%sSystem"
+msgstr ""
+
+#. translators: %s: line break.
+#: templates/marketing/acfw-marketing-page.php:79
+#, php-format
+msgid "Loyalty%sProgram"
+msgstr ""
+
+#. translators: %s: line break.
+#: templates/marketing/acfw-marketing-page.php:96
+#, php-format
+msgid "BOGO%sPromotions"
+msgstr ""
+
+#. translators: %s: line break.
+#: templates/marketing/acfw-marketing-page.php:113
+#, php-format
+msgid "Versatile Gift%sCard Solutions"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:127
+msgid "Advanced Coupons is the best WooCommerce coupon plugin because it adds more coupon discount types, store credit, and all the advanced options you wish WooCommerce coupons could already do."
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:136
+msgid "Step 1"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:137
+msgid "Enhance your Coupon Capabilities"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:141
+msgid "Implement BOGO deals and smart cart conditions to create offers that adjust to customer behaviors and cart contents, ensuring timely and relevant discounts."
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:142
+msgid "Boost customer retention with a loyalty program and store credits to encourage frequent visits and enhance long-term profitability."
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:147
+msgid "Get Advanced Coupons"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:153
+msgid "Step 2"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:154
+msgid "Configure your Coupon Features"
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:158
+msgid "Create targeted promotions using coupon templates to help you streamline your promotions and grow your profits."
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:159
+msgid "Optimize coupon management by categorizing, restricting roles, and enabling URL activation to boost engagement and loyalty."
+msgstr ""
+
+#: templates/marketing/acfw-marketing-page.php:164
+msgid "Activate Plugin"
+msgstr ""
+
+#: templates/notices/allow-tracking-notice.php:84
+msgid "Usage Tracking Persmission"
+msgstr ""
+
+#: templates/notices/allow-tracking-notice.php:89
+msgid "Allow Tracking"
+msgstr ""
+
+#: templates/notices/allow-tracking-notice.php:92
+msgid "Do Not Allow"
+msgstr ""
+
+#: templates/notices/failed-dependency-notice.php:84
+msgid "Action required"
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:10
+msgid "Create filter and rules so exactly the right products end up in your product feed. These filters and rules are only eligable for the current product feed you are configuring and will not be used for other feeds."
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:13
+msgid "<strong>Filters:</strong> Exclude or include products that meet certain conditions."
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:17
+msgid "Detailed information and filter examples"
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:25
+msgid "Create a product feed for just 1 category"
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:30
+msgid "Change attribute values based on other attribute values or conditions."
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:34
+msgid "Detailed information about rules and some examples"
+msgstr ""
+
+#: templates/notices/feed-filter-rule-notice.php:39
+msgid "Order of execution: the filters and rules will be executed in the order of creation."
+msgstr ""
+
+#: templates/notices/generic-notice.php:44
+msgid "Dismiss"
+msgstr ""
+
+#: templates/notices/generic-notice.php:49
+#: templates/notices/review-request.php:34
+msgid "Dismiss this notice..."
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:13
+msgid "Would you like to get more out of your product feeds? Upgrade to the Elite version of the plugin and you will get:"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:14
+msgid "Priority support - we will help you to get your product feed(s) up-and-running;"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:15
+msgid "GTIN, Brand, MPN, EAN, Condition and more fields for your product feeds"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:15
+#: templates/notices/upgrade-to-elite-notice.php:16
+#: templates/notices/upgrade-to-elite-notice.php:17
+#: templates/notices/upgrade-to-elite-notice.php:18
+#: templates/notices/upgrade-to-elite-notice.php:19
+#: templates/notices/upgrade-to-elite-notice.php:20
+#: templates/notices/upgrade-to-elite-notice.php:21
+msgid "Read more"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:16
+msgid "Solve Googe Shopping price mismatch product disapprovals"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:17
+msgid "Advanced product data manipulation"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:18
+msgid "WPML support - including their currency switcher"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:19
+msgid "Aelia  & Curcy currency switcher support"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:20
+msgid "Polylang support"
+msgstr ""
+
+#: templates/notices/upgrade-to-elite-notice.php:21
+msgid "Facebook pixel feature"
+msgstr ""
+
+#: templates/settings-page.php:57
+#: templates/settings-page.php:61
+#: templates/settings-page.php:91
+msgid "Plugin settings"
+msgstr ""
+
+#: templates/settings-page.php:64
+#: templates/settings-page.php:94
+msgid "Plugin systems check"
+msgstr ""
+
+#: templates/settings-page.php:67
+msgid "Attribute settings"
+msgstr ""
+
+#: templates/settings-page.php:105
+msgid "Plugin setting"
+msgstr ""
+
+#: templates/settings-page.php:106
+msgid "Off / On"
+msgstr ""
+
+#: templates/settings-page.php:114
+msgid "Use parent variable product image for variations"
+msgstr ""
+
+#: templates/settings-page.php:125
+msgid "Add shipping costs for all countries to your feed (Google Shopping / Facebook only)"
+msgstr ""
+
+#: templates/settings-page.php:136
+msgid "Remove all other shipping classes when free shipping criteria are met (Google Shopping / Facebook only)"
+msgstr ""
+
+#: templates/settings-page.php:147
+msgid "Remove the free shipping zone from your feed (Google Shopping / Facebook only)"
+msgstr ""
+
+#: templates/settings-page.php:158
+msgid "Remove the local pickup shipping zone from your feed (Google Shopping / Facebook only)"
+msgstr ""
+
+#: templates/settings-page.php:169
+msgid "Show only basis attributes in field mapping and filter/rule drop-downs"
+msgstr ""
+
+#: templates/settings-page.php:180
+msgid "Enable logging"
+msgstr ""
+
+#: templates/settings-page.php:192
+msgid "Add Facebook Pixel"
+msgstr ""
+
+#: templates/settings-page.php:194
+#: templates/settings-page.php:247
+msgid "Read more about this"
+msgstr ""
+
+#: templates/settings-page.php:207
+msgid "Insert your Facebook Pixel ID"
+msgstr ""
+
+#: templates/settings-page.php:215
+msgid "Content IDS variable products Facebook Pixel"
+msgstr ""
+
+#: templates/settings-page.php:218
+msgid "Variation product ID's"
+msgstr ""
+
+#: templates/settings-page.php:219
+msgid "Variable product ID"
+msgstr ""
+
+#: templates/settings-page.php:225
+msgid "Add Google Dynamic Remarketing Pixel:"
+msgstr ""
+
+#: templates/settings-page.php:236
+msgid "Insert your Dynamic Remarketing Conversion tracking ID:"
+msgstr ""
+
+#: templates/settings-page.php:245
+msgid "Change products per batch number"
+msgstr ""
+
+#: templates/settings-page.php:260
+msgid "Insert batch size:"
+msgstr ""
+
+#: templates/settings-page.php:387
+msgid "System Report"
+msgstr ""
+
+#: templates/settings-page.php:392
+msgid "Copy the below text and paste to the support team when requested to help us debug any systems issues with your feeds."
+msgstr ""
+
+#: templates/settings/other-settings.php:13
+msgid "Other settings"
+msgstr ""

@@ -1,0 +1,156 @@
+
+
+:root {
+	/* General Variables */
+	--fr-color-scheme-transition-time: 150ms;
+
+	/* Toggle Variables */
+	--fr-color-scheme-toggle-width: 40px;
+	--fr-color-scheme-toggle-spacer: 2px;
+	--fr-color-scheme-toggle-roundness: 10px;
+	--fr-color-scheme-toggle-background-color: rgb(48, 41, 41);
+	--fr-color-scheme-toggle-background-color-alt: rgb(201, 188, 188);
+	--fr-color-scheme-toggle-ball-color: rgb(201, 188, 188);
+	--fr-color-scheme-toggle-ball-color-alt: rgb(72, 64, 64);
+	--fr-color-scheme-toggle-icon-color: rgb(72, 64, 64);
+	--fr-color-scheme-toggle-icon-color-alt: rgb(72, 64, 64);
+	--fr-color-scheme-text-label-color-alt: black;
+
+
+
+	/* Simple Mode Variables */
+	--fr-color-scheme-simple-size: 30px;
+	--fr-color-scheme-simple-icon-color: #f1c40f;
+	--fr-color-scheme-simple-icon-color-alt: red;
+	--fr-color-scheme-simple-icon-background-color: inherit;
+	--fr-color-scheme-simple-icon-background-color-alt: inherit;
+}
+
+.fr-color-scheme__checkbox {
+  opacity: 0;
+  position: absolute;
+}
+
+.fr-color-scheme__checkbox-label {
+  background-color: var(--fr-color-scheme-toggle-background-color);
+  width: var(--fr-color-scheme-toggle-width);
+  height: calc(var(--fr-color-scheme-toggle-width) / 2 + 1px);
+  border-radius: var(--fr-color-scheme-toggle-roundness);
+  position: relative;
+  padding: calc(var(--fr-color-scheme-toggle-spacer)*2);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+	transition: all var(--fr-color-scheme-transition-time) linear;
+	margin-bottom: 0;
+}
+
+/*
+calc(var(--fr-color-scheme-toggle-width) / 2 + 1px)
+(var(--fr-color-scheme-toggle-width) / 2 + 1px)
+*/
+
+.fr-color-scheme--toggle:focus-within {
+	outline-style: solid;
+    outline-color: var(--focus-color);
+    outline-width: var(--focus-width);
+    outline-offset: var(--focus-offset);
+}
+
+.fr-color-scheme__toggle-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: calc(var(--fr-color-scheme-toggle-spacer) * 2.5);
+}
+
+.fr-color-scheme__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: calc((var(--fr-color-scheme-toggle-width) / 2 + 1px) - var(--fr-color-scheme-toggle-spacer) * 4);
+}
+
+.fr-color-scheme__icon > * {
+	width: 100%;
+	height: 100%;
+}
+
+.fr-color-scheme__icon > svg {
+	width: auto;
+	height: auto;
+}
+
+.fr-color-scheme__main-icon {
+	color: var(--fr-color-scheme-toggle-icon-color);
+	fill: var(--fr-color-scheme-toggle-icon-color);
+}
+
+.fr-color-scheme__alt-icon {
+	color: var(--fr-color-scheme-toggle-icon-color-alt);
+	fill: var(--fr-color-scheme-toggle-icon-color-alt);
+}
+
+.fr-color-scheme__checkbox.checked + .fr-color-scheme__checkbox-label {
+	background-color: var(--fr-color-scheme-toggle-background-color-alt);
+}
+
+.fr-color-scheme__checkbox.checked + .fr-color-scheme__checkbox-label .ball {
+	background-color: var(--fr-color-scheme-toggle-ball-color-alt);
+}
+
+
+
+.fr-color-scheme__checkbox-label .ball {
+  background-color: var(--fr-color-scheme-toggle-ball-color);
+  width: calc((var(--fr-color-scheme-toggle-width) / 2 + 1px) - var(--fr-color-scheme-toggle-spacer) * 2);
+  height: calc((var(--fr-color-scheme-toggle-width) / 2 + 1px) - var(--fr-color-scheme-toggle-spacer) * 2);
+  position: absolute;
+  left: var(--fr-color-scheme-toggle-spacer);
+  top: var(--fr-color-scheme-toggle-spacer);
+  border-radius: calc(var(--fr-color-scheme-toggle-roundness) / 1.2 );
+  transition: transform var(--fr-color-scheme-transition-time) linear;
+}
+
+.fr-color-scheme__checkbox.checked + .fr-color-scheme__checkbox-label .ball {
+  transform: translateX(calc(var(--fr-color-scheme-toggle-width) - (var(--fr-color-scheme-toggle-width) / 2 + 1px) ));
+}
+
+
+.color-scheme--alt .fr-color-scheme__text-label {
+	color: var(--fr-color-scheme-text-label-color-alt)!important
+}
+
+
+/* Simple */
+
+.fr-color-scheme--simple {
+	background-color: var(--fr-color-scheme-simple-icon-background-color);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	aspect-ratio: 1;
+}
+
+.color-scheme--alt .fr-color-scheme--simple {
+	background-color: var(--fr-color-scheme-simple-icon-background-color-alt);
+}
+
+
+.fr-color-scheme--simple svg{
+	transition: all var(--fr-color-scheme-transition-time) linear;
+	width: var(--fr-color-scheme-simple-size);
+	aspect-ratio: 1;
+}
+
+
+.color-scheme--alt .fr-color-scheme--simple svg {
+	fill: var(--fr-color-scheme-simple-icon-color-alt);
+}
+
+.fr-color-scheme--simple svg {
+	fill: var(--fr-color-scheme-simple-icon-color);
+}

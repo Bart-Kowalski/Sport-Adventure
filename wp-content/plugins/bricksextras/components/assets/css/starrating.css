@@ -1,0 +1,52 @@
+:root {
+    --x-star-empty-color: #ddd;
+    --x-star-color: #363636;
+    --x-star-percentage: var(--x-star-percentage);
+}
+
+.brxe-xstarrating {
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-marked {
+    color: var(--x-star-color);
+    position: relative;
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-half-marked {
+    position: relative;
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star {
+    color: var(--x-star-empty-color);
+    position: relative;
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-half-marked,
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-marked + .x-star-rating_star,
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-marked:last-child {
+    background: -webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(var(--x-star-percentage), var(--x-star-color)), color-stop(var(--x-star-percentage), var(--x-star-empty-color))); /* Older WebKit syntax */
+    background: -o-linear-gradient(90deg, var(--x-star-color) var(--x-star-percentage), var(--x-star-empty-color) var(--x-star-percentage)); /* Older Opera syntax */
+    background: linear-gradient(90deg, var(--x-star-color) var(--x-star-percentage), var(--x-star-empty-color) var(--x-star-percentage)); /* Standard syntax */
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-half-marked > svg {
+    color: var(--x-star-empty-color);
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-half-marked > span:last-child:not(:only-child) svg {
+    color: var(--x-star-color);
+}
+
+.brxe-xstarrating[data-x-icon=color] .x-star-rating_star-half-marked > :last-child:not(:only-child) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--x-star-percentage);
+    overflow: hidden;
+}

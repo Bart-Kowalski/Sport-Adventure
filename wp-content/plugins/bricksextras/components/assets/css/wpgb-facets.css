@@ -1,0 +1,44 @@
+.wpgb-checkbox-facet .wpgb-checkbox,
+.wpgb-radio-facet .wpgb-radio {
+    align-items: center;
+}
+
+.flatpickr-calendar .flatpickr-day,
+.flatpickr-calendar span.flatpickr-weekday,
+.flatpickr-calendar .flatpickr-months .flatpickr-month,
+.flatpickr-calendar .flatpickr-current-month input.cur-year[disabled], 
+.flatpickr-calendar .flatpickr-current-month input.cur-year[disabled]:hover {
+    color: inherit;
+}
+
+.flatpickr-calendar .flatpickr-months .flatpickr-next-month, 
+.flatpickr-calendar .flatpickr-months .flatpickr-prev-month {
+    color: inherit;
+    fill: currentColor;
+}
+
+.wpgb-facet .wpgb-select-placeholder .wpgb-select-values>div.wpgb-select-value button {
+    color: inherit;
+}
+
+.wpgb-facet fieldset .wpgb-selection-facet .wpgb-button-control:before, 
+.wpgb-facet fieldset .wpgb-selection-facet .wpgb-button-control:after {
+    background-color: currentColor;
+}
+
+.wpgb-facet .wpgb-checkbox-facet .wpgb-hierarchical-list li,
+.wpgb-facet .wpgb-radio-facet .wpgb-hierarchical-list li {
+    margin: 0;
+}
+
+.wpgb-facet .wpgb-checkbox-facet .wpgb-hierarchical-list,
+.wpgb-facet .wpgb-radio-facet .wpgb-hierarchical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.wpgb-facet .wpgb-pagination-facet .wpgb-pagination {
+    display: inline-flex;
+}

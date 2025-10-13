@@ -1,0 +1,493 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-24 15:36+0000\n"
+"PO-Revision-Date: 2023-02-11 10:45+0000\n"
+"Last-Translator: Paula Kulcsar <paula.kulcsar@gmail.com>\n"
+"Language-Team: Hungarian <http://trans.trustmate.io/projects/"
+"woocommerce-plugin/main/hu/>\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "TrustMate fiók létrehozása"
+
+msgid "Settings"
+msgstr "Beállítások"
+
+msgid "Widgets"
+msgstr "Widgetek"
+
+# Headers and buttons
+msgid "settings"
+msgstr "beállítások"
+
+msgid "Configure plugin"
+msgstr "Plugin beállítása"
+
+msgid "If you already have TrustMate account"
+msgstr "Ha már rendelkezel TrustMate fiókkal"
+
+msgid "skip this step"
+msgstr "hagyd ki ezt a lépést"
+
+msgid "Save changes"
+msgstr "Módosítások elmentése"
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+"Az értékelések gyűjtésének elkezdésére TrustMate-fiókra van szükséged. Ezt "
+"szerencsére létrehozhatod"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "egy percen belül. A WooCommerce adatait fogjuk használni"
+
+msgid "to make this process very easy"
+msgstr "hogy megkönnyítsük ezt a folyamatot"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr "A vállalat adatai később is frissíthetők a TrustMate panelen"
+
+msgid "By registering I accept"
+msgstr "A regisztrációval elfogadom"
+
+msgid "terms of service"
+msgstr "a szolgáltatási feltételeket"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr ""
+"beleértve a TrustMate ügyfélszolgálatával való kapcsolatfelvételi "
+"hozzájárulást is"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr "Az ügyfelektől e-mailben fogok értékelést kérni"
+
+msgid "I accept"
+msgstr "Elfogadom"
+
+msgid "the data entrustment agreement"
+msgstr "az adatmegbízási megállapodást"
+
+msgid "Configure invitations and widgets"
+msgstr "Meghívók és widgetek konfigurálása"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr ""
+"Ellenőrizd az alábbi űrlapot és kattints a \"TrustMate fiók létrehozása\" "
+"gombra"
+
+msgid "Account data"
+msgstr "Számlaadatok"
+
+msgid "Company registration data"
+msgstr "Cégnyilvántartási adatok"
+
+msgid "Website address"
+msgstr "Honlap címe"
+
+msgid "Owner's e-mail"
+msgstr "Tulajdonos e-mail címe"
+
+msgid "Company name"
+msgstr "Vállalat neve"
+
+msgid "Street"
+msgstr "Utca"
+
+msgid "City"
+msgstr "Város"
+
+msgid "Zip code"
+msgstr "Irányítószám"
+
+msgid "Country"
+msgstr "Ország"
+
+msgid "Tax identification number"
+msgstr "Adóazonosító szám"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Létrehozott fiók"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr ""
+"Kérjük, ellenőrizd az e-mail címedet a TrustMate fiók jelszavának "
+"beállításához"
+
+msgid "Account already exists"
+msgstr "A fiók már létezik"
+
+msgid "Invalid data sent"
+msgstr "Érvénytelen adatokat küldtek"
+
+msgid "Unexpected error"
+msgstr "Nem várt hiba"
+
+msgid "Cannot create account"
+msgstr "Nem lehet fiókot létrehozni"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "A regisztrációs cím a WooCommerce beállításaiban nem teljes"
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Valami rosszul sült el. Kérünk, próbáld meg újra, vagy lépj kapcsolatba a "
+"TrustMate ügyfélszolgálattal"
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+"A widget aktiválása sikertelen. Kérünk, próbáld meg újra, vagy lépj "
+"kapcsolatba a TrustMate ügyfélszolgálattal"
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr ""
+"A TrustMate felhasználói kódod (UUID a TrustMate panelen, az Integráció "
+"szakaszban)"
+
+msgid "Automatic review invitations"
+msgstr "Automatikus meghívó értékelésre"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+"Az ügyfélértékelések gyors összegyűjtésére kapcsold be az automatikus "
+"meghívásokat"
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+"Amíg aktív, a szkript meghívókat küld ügyfeleidnek, melyben értékelést kérnek"
+
+msgid "In TrustMate panel you can"
+msgstr "A TrustMate panelen a következőkre van lehetőséged"
+
+msgid "change invitation sending delay"
+msgstr "megváltoztathatod a meghívók elküldésének késleltetését"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "beállíthatod, hogy hányszor emlékeztesse a vásárlót az értékelésre"
+
+msgid "adjust invitation colors to your brand"
+msgstr "a meghívó színeit a márkádhoz igazíthatod"
+
+msgid "turn on and off product review invitations"
+msgstr "be- és kikapcsolhatod a termékértékelési meghívókat"
+
+msgid "and more!"
+msgstr "és így tovább!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Kérj engedélyt a meghívó elküldésére"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr ""
+"Az értékelési értesítések elküldéséhez az ügyfél beleegyezésére van szükség"
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+"Ha nem te magad gyűjtöd be ezeket a beleegyezéseket (külön jelölőnégyzet "
+"vagy megfelelő szabályozás), akkor aktiváld ezt az opciót"
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+"Ha nem kértél közvetlenül hozzájárulást az ügyféltől a meghívó küldéséhez, "
+"akkor javasoljuk, hogy bővítsd ki a szabályzatodat"
+
+msgid "this file"
+msgstr "ezzel a dokumentummal"
+
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+msgid "After successful order"
+msgstr "A sikeres megrendelés után"
+
+msgid "After successful payment"
+msgstr "A sikeres fizetés után"
+
+msgid "After marked as completed"
+msgstr "Befejezettnek jelölés után"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Értékelések megjelenítése widgetekkel"
+
+msgid "Show badge with shop's grade"
+msgstr "Mutasd a jelvényt a bolt minősítésével"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Mutasd meg a csúszó widgetet a bolt minősítésével"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr "A nem invazív jelvény a képernyő szélére illesztve kis helyet foglal el"
+
+msgid "Click shows a modal with recent reviews"
+msgstr "A gombra kattintva megjelenik egy modal a legújabb értékelésekkel"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Megváltoztathatod a kijelző pozícióját a TrustMate panelen"
+
+msgid "Why use it?"
+msgstr "Miért érdemes használni?"
+
+msgid "sales increase"
+msgstr "értékesítés növelése"
+
+msgid "customers do not leave site searching for reviews"
+msgstr "az ügyfélnek nem kell értékeléseket keresnie az üzleteden kívül"
+
+msgid "can boost your SEO"
+msgstr "növelni tudja a SEO-t"
+
+msgid "can make search engines show stars under your results"
+msgstr "a keresőmotorok csillagokat jeleníthetnek meg a találataid alatt"
+
+msgid "Show badge with products' grade"
+msgstr "Mutassa a jelvényt a termékek minősítésével"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr ""
+"A gombra kattintva megjelenik egy modal a legutóbbi értékelésekkel és a "
+"minősítés eloszlásával"
+
+msgid "Widget is a finishing touch on your product page"
+msgstr "A widget a termék oldalának utolsó simítása"
+
+msgid "product sales increase"
+msgstr "a termékértékesítés növekedése"
+
+msgid "can boost your product SEO"
+msgstr "növelheti a termék SEO-ját"
+
+msgid "can make search engines show stars under product result"
+msgstr "a keresőmotorok csillagokat jeleníthetnek meg a termékeredmény alatt"
+
+msgid "Popping up reviews"
+msgstr "Előugró értékelések"
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+"Társadalmi bizonyíték widget akár háromféle előugró dobozzal, amely "
+"biztosítja ügyfeleidnek a szolgáltatásaid minőségét"
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+"A pozíció konfigurálható. A nem szokványos képeknek és üzeneteknek "
+"köszönhetően nagyon jól észrevehetőek"
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Ha személyre szabott képeket szeretnél használni, írj nekünk a support@"
+"trustmate.io címre"
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"A dobozok nem foglalnak sok helyet, és könnyen bemutathatják az értékeléseket"
+
+msgid "Show grade and reviews on product page"
+msgstr "Minősítés és értékelések megjelenítése a termékoldalon"
+
+msgid "Page-wide reviews similar to popular comments sections showing under your product"
+msgstr ""
+"Az egész oldalra kiterjedő értékelések, hasonlóan a népszerű hozzászólási "
+"szekciókhoz, amelyek a terméked alatt jelennek meg"
+
+msgid "Remember, there are more widgets available"
+msgstr "Ne feledd, több widget is elérhető"
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "A wordpress HTML widgetek segítségével elhelyezheted őket az oldaladon"
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Csak másold ki a kódot a TrustMate panel widget részéből"
+
+msgid "Turn on"
+msgstr "Bekapcsol"
+
+msgid "Click to show widget description"
+msgstr "Kattints a widget leírásának megjelenítéséhez"
+
+# Hornet
+msgid "Small widget that displays the average rating and the number of reviews"
+msgstr ""
+
+msgid "The stars will appear on the product card near the photo and on the product tiles throughout the store"
+msgstr ""
+
+msgid "The widget displays the current number of reviews about the product and the current average rating"
+msgstr ""
+
+msgid "It can be embedded next to the main product description on the product sheet or in product lists in your store"
+msgstr ""
+
+msgid "Benefits"
+msgstr ""
+
+msgid "distinguishes the product by encouraging customers to click on it and make purchases"
+msgstr ""
+
+# Chupacabra
+msgid "Widget social proof (large box)"
+msgstr ""
+
+msgid "Static widget with customer reviews sending a message \"you can trust us\""
+msgstr ""
+
+msgid "Widget includes both company and product reviews"
+msgstr ""
+
+msgid "Anytime you can adjust widget outlook without developer help, even after embedding it on your site"
+msgstr ""
+
+msgid "Microdata"
+msgstr ""
+
+msgid "If you enable microdata, widget will make your reviews understandable for search engines like Google"
+msgstr ""
+
+msgid "Search engine results with your site will be enriched with additional data like average rating, stars, review count"
+msgstr ""
+
+# Ferret
+msgid "Carousel"
+msgstr "Cúszka"
+
+msgid "Dynamic \"carousel\" widget catches the eye of customers presenting up to the last 21 reviews. You set the scrolling speed of the visible ratings yourself"
+msgstr ""
+"A dinamikus \" csúszka\" widget felhívja az ügyfelek figyelmét a legutóbbi "
+"21 értékelés bemutatására. A látható értékelések görgetési sebességét te "
+"magad állíthatod be"
+
+msgid "Using the carousel you increase the attractiveness of your website to search engines, e.g. Google"
+msgstr ""
+"A csúszka használatával növelheted weboldalad vonzerejét a keresőmotorok, "
+"mint például a Google számára"
+
+msgid "Let customers read reviews about your company without leaving your website"
+msgstr ""
+"Hagyd, hogy az ügyfelek értékeléseket olvassanak a cégedről anélkül, hogy "
+"elhagynák a weboldalad"
+
+msgid "The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+"A csúszka reszponzív és alkalmazkodik minden oldalnézethez és mobileszközhöz"
+
+msgid "Product review carousel"
+msgstr "Csúszka termék értékeléséhez"
+
+# Owl
+msgid "Certificate widget"
+msgstr ""
+
+msgid "If you meet the program conditions visible on the main page of the panel, TrustMate will automatically display the badge in your store along with information about the current rating"
+msgstr ""
+
+msgid "This will result in more buying interest from potential customers"
+msgstr ""
+
+# FAQ section
+msgid "FAQ"
+msgstr "GYIK"
+
+msgid "Can I ask only for company reviews"
+msgstr "Kérhetek csak vállalati értékeléseket"
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+"Igen. A vállalati meghívók konfigurációját automatikusnak kell megjelölnöd, "
+"és győződj meg róla, hogy nincs termékmeghívó konfiguráció megjelölve"
+
+msgid "Can I ask only for product reviews"
+msgstr "Kérhetek csak termékértékeléseket"
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+"Igen. A termékmeghívók konfigurációját automatikusnak kell megjelölnöd, és "
+"győződj meg arról, hogy nincs a céges meghívók konfigurációja megjelölve"
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+"Ne feledd, hogy a termékmeghívók működéséhez be kell töltened a TrustMate "
+"beállításaiban az adatállományt"
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Kérhetek cég- és termékértékelést is"
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+"Igen. Mind a céges, mind a termékmeghívó konfigurációkat automatikusnak kell "
+"megjelölnöd"
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+"Ilyen esetben javasoljuk a céges meghívókat legalább néhány nappal a termék "
+"előtt elküldeni"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Ha együtt küldöd el azokat, az csökkentheti a konverziós arányt"
+
+msgid "What is UUID"
+msgstr "Mi az UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "Az UUID kód a TrustMate fiókod egyedi azonosítója"
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "Megtalálod az 1<em>Integráció</em> részben"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Hogyan adhatok hozzá widgetet a minősítésekkel és értékelésekkel"
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+"A képernyő széléhez tapadó widget egy kattintással bekapcsolható a plugin "
+"konfigurációban"
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+"Minden más widget beágyazható a webhelyen a Wordpress funkciók segítségével: "
+"widgetek és témák"
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+"Mikor kell engedélyeznem a \" Engedélykérés az értékelést kérő meghívó "
+"elküldéséhez\" opciót"
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+"Minden olyan esetben, amikor a korábbi tranzakciós lépések során nem kaptál "
+"ilyen hozzájárulást, és a szabálydokumentum nem tárgyalja a kérdést"
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Hogyan tudom elrejteni a WooCommerce termékértékeléseket"
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Ki kell kapcsolnod az alapértelmezett WooCommerce értékeléseket: "
+"<em>WooCommerce → Beállítások → Termékek → Termékértékelések "
+"engedélyezése</em>"
+
+msgid "Do you support WPML?"
+msgstr "Támogatod a WPML-t?"
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+"Igen, de ne feledd, hogy a TrustMate.io panelben használni kívánt összes "
+"nyelvhez hozzá kell adnod a meghívási konfigurációkat"
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Hogyan tudom eldönteni, hogy melyik termék kategóriámat küldjem el a "
+"TrustMate.io-nak?"
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""
+"Ha több kategóriát használsz a termékedhez, az egyetlen módja ennek a Yoast "
+"SEO plugin elsődleges kategória funkciójának használata"

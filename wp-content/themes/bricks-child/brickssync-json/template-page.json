@@ -1,0 +1,33 @@
+{
+    "ID": 65,
+    "post_author": "1",
+    "post_date": "2024-08-25 19:57:24",
+    "post_date_gmt": "2024-08-25 19:57:24",
+    "post_content": "",
+    "post_title": "Page",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "page",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-04-14 01:50:17",
+    "post_modified_gmt": "2025-04-14 00:50:17",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/page/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_template_type": "content",
+        "_bricks_page_content_2": "a:5:{i:0;a:5:{s:2:\"id\";s:6:\"2276f5\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"551859\";}s:8:\"settings\";a:1:{s:11:\"_conditions\";a:1:{i:0;a:1:{i:0;a:4:{s:2:\"id\";s:6:\"bkzokp\";s:3:\"key\";s:12:\"dynamic_data\";s:12:\"dynamic_data\";s:17:\"{echo:has_blocks}\";s:5:\"value\";s:1:\"1\";}}}}}i:1;a:5:{s:2:\"id\";s:6:\"551859\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"2276f5\";s:8:\"children\";a:2:{i:0;s:6:\"802e0e\";i:1;s:6:\"1c5cf3\";}s:8:\"settings\";a:0:{}}i:2;a:5:{s:2:\"id\";s:6:\"802e0e\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"551859\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:4:\"text\";s:12:\"{post_title}\";s:3:\"tag\";s:2:\"h1\";}}i:3;a:6:{s:2:\"id\";s:6:\"1c5cf3\";s:4:\"name\";s:12:\"post-content\";s:6:\"parent\";s:6:\"551859\";s:8:\"children\";a:0:{}s:8:\"settings\";a:1:{s:10:\"dataSource\";s:6:\"editor\";}s:5:\"label\";s:17:\"Wordpress content\";}i:4;a:6:{s:2:\"id\";s:6:\"0c7a65\";s:4:\"name\";s:12:\"post-content\";s:6:\"parent\";i:0;s:8:\"children\";a:0:{}s:8:\"settings\";a:1:{s:10:\"dataSource\";s:6:\"bricks\";}s:5:\"label\";s:14:\"Bricks content\";}}",
+        "_bricks_editor_mode": "bricks",
+        "_bricks_template_settings": "a:1:{s:18:\"templateConditions\";a:4:{i:0;a:3:{s:2:\"id\";s:6:\"oeumpy\";s:4:\"main\";s:8:\"postType\";s:8:\"postType\";a:1:{i:0;s:4:\"page\";}}i:1;a:3:{s:2:\"id\";s:6:\"ewcnpe\";s:4:\"main\";s:8:\"postType\";s:8:\"postType\";a:1:{i:0;s:8:\"polityka\";}}i:2;a:4:{s:2:\"id\";s:6:\"evfaqv\";s:7:\"exclude\";b:1;s:4:\"main\";s:3:\"ids\";s:3:\"ids\";a:3:{i:0;s:3:\"195\";i:1;s:3:\"194\";i:2;s:3:\"197\";}}i:3;a:4:{s:2:\"id\";s:6:\"vccfzk\";s:4:\"main\";s:5:\"terms\";s:5:\"terms\";a:1:{i:0;s:15:\"tag-strony::349\";}s:7:\"exclude\";b:1;}}}",
+        "_edit_lock": "1747926129:3"
+    }
+}

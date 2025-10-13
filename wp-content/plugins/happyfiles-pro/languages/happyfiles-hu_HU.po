@@ -1,0 +1,745 @@
+# Copyright (C) 2023 HappyFiles Internationalisation
+# This file is distributed under the same license as the HappyFiles Internationalisation package.
+msgid ""
+msgstr ""
+"Project-Id-Version: HappyFiles Internationalisation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-11 05:23+0000\n"
+"PO-Revision-Date: 2023-02-11 07:24+0200\n"
+"Last-Translator: Varga Zsolt Iván <vargazsoltivan@gmail.com>\n"
+"Language-Team: Hungarian\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;"
+"_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;"
+"esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Loco-Version: 2.6.3; wp-6.1.1\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: ../includes/actions.php:67
+msgid "No folder name or term ID provided."
+msgstr "Nincs megadva mappanév vagy kifejezés azonosító."
+
+#: ../includes/ajax.php:237, ../includes/setup.php:152
+msgid "Duplicate"
+msgstr "Duplikálás"
+
+#: ../includes/data.php:241, ../includes/admin/settings.php:27
+msgid "All Files"
+msgstr "Minden Fájl"
+
+#: ../includes/data.php:241
+msgid "All %s"
+msgstr "Összes %s"
+
+#: ../includes/data.php:242
+msgid "Files"
+msgstr "Fájlok"
+
+#: ../includes/data.php:234
+msgid "All Plugins"
+msgstr "Minden bővítmény"
+
+#: ../includes/data.php:271, ../includes/pro.php:122,
+#: ../includes/setup.php:241, ../includes/admin/settings.php:28
+msgid "Uncategorized"
+msgstr "Nem kategorizált"
+
+#: ../includes/import.php:158
+msgid "Folders from another media plugin detected to import"
+msgstr "Másik média pluginból származó mappák importálása"
+
+#: ../includes/import.php:159
+msgid "Import/delete folder data"
+msgstr "Mappaadatok importálása/törlése"
+
+#: ../includes/import.php:408
+msgid "Nothing to import"
+msgstr "Nincs mit importálni."
+
+#: ../includes/import.php:472
+msgid "%s folders successfully imported."
+msgstr "%s mappák sikeresen importálva."
+
+#: ../includes/import.php:579, ../includes/import.php:695
+msgid "%s folders imported and %s items categorized."
+msgstr "%s importált mappák és %s kategorizált elemek."
+
+#: ../includes/import.php:582, ../includes/import.php:698
+msgid "View media library"
+msgstr "Médiatár megtekintése"
+
+#: ../includes/pro.php:74, ../includes/pro.php:75, ../includes/setup.php:35,
+#: ../includes/setup.php:36, ../includes/setup.php:138
+msgid "Folder"
+msgstr "Mappa"
+
+#: ../includes/pro.php:76, ../includes/pro.php:78, ../includes/setup.php:37,
+#: ../includes/setup.php:39
+msgid "Add new folder"
+msgstr "Új mappa hozzáadása"
+
+#: ../includes/pro.php:77, ../includes/setup.php:38
+msgid "Edit folder"
+msgstr "Mappa szerkesztése"
+
+#: ../includes/pro.php:79, ../includes/setup.php:40
+msgid "Search folder"
+msgstr "Keresés mappában"
+
+#: ../includes/pro.php:80, ../includes/setup.php:41
+msgid "Folder not found"
+msgstr "Mappa nem található"
+
+#: ../includes/pro.php:81, ../includes/setup.php:42
+msgid "Folder not found in trash"
+msgstr "Mappa nem található a szemetesben"
+
+#: ../includes/pro.php:121
+msgid "All %1$s folders"
+msgstr "Minden %1$s mappa"
+
+#: ../includes/settings.php:25, ../includes/settings.php:184,
+#: ../includes/admin/settings.php:3
+msgid "Settings"
+msgstr "Beállítások"
+
+#: ../includes/settings.php:40
+msgid ""
+"Are you sure you want to delete all your HappyFiles folders, associations, "
+"and settings?"
+msgstr ""
+"Biztos, hogy törölni szeretné az összes HappyFiles mappát, társítást és "
+"beállítást?"
+
+#: ../includes/settings.php:164
+msgid "No HappyFiles data to delete."
+msgstr "Nincs törlendő HappyFiles adat."
+
+#: ../includes/settings.php:160
+msgid "HappyFiles data has been deleted."
+msgstr "A HappyFiles adatok törlésre kerültek."
+
+#: ../includes/setup.php:134
+msgid ""
+"Click the \"+\" button above to create your first folder. Then start "
+"dragging items into it. To remove an item from a folder drag it into the "
+"\"Uncategorized\" folder."
+msgstr ""
+"Kattintson a fenti \"+\" gombra az első mappa létrehozásához. Ezután kezdje "
+"el az elemek áthúzását. Ha el szeretne távolítani egy elemet egy mappából, "
+"húzza azt a \"Nem kategorizált\" mappába."
+
+#: ../includes/setup.php:135
+msgid ""
+"No folders found that match your search criteria. Please try another phrase "
+"or clear your search. Search is case-sensitive."
+msgstr ""
+"Nem találtunk a keresési feltételeknek megfelelő mappákat. Kérjük, "
+"próbálkozzon más kifejezéssel, vagy törölje a keresést. A keresés nagy- és "
+"kisbetű-érzékeny."
+
+#: ../includes/setup.php:136, ../includes/shortcode.php:94
+msgid "Attachment IDs"
+msgstr "Melléklet ID-k"
+
+#: ../includes/setup.php:137
+msgid "Items"
+msgstr "Elemek"
+
+#: ../includes/setup.php:139, ../includes/shortcode.php:100,
+#: ../includes/integrations/bricks-gallery.php:40
+msgid "Folders"
+msgstr "Mappák"
+
+#: ../includes/setup.php:140
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: ../includes/setup.php:141
+msgid "Create"
+msgstr "Létrehoz"
+
+#: ../includes/setup.php:142
+msgid "Cancel"
+msgstr "Mégsem"
+
+#: ../includes/setup.php:143
+msgid "Rename"
+msgstr "Átnevezés"
+
+#: ../includes/setup.php:144
+msgid "Delete"
+msgstr "Törlés"
+
+#: ../includes/setup.php:145
+msgid "Move"
+msgstr "Áthelyezés"
+
+#: ../includes/setup.php:146
+msgid "Search"
+msgstr "Keresés"
+
+#: ../includes/setup.php:147
+msgid "Uploaded"
+msgstr "Feltöltött"
+
+#: ../includes/setup.php:148
+msgid "Sort"
+msgstr "Rendezés"
+
+#: ../includes/setup.php:149
+msgid "Expand"
+msgstr "Kibontás"
+
+#: ../includes/setup.php:150
+msgid "Collapse"
+msgstr "Összezár"
+
+#: ../includes/setup.php:151
+msgid "Details"
+msgstr "Részletek"
+
+#: ../includes/setup.php:153, ../includes/shortcode.php:95
+msgid "Clear"
+msgstr "Törlés"
+
+#: ../includes/setup.php:154
+msgid "Subfolders"
+msgstr "Alkönyvtárak"
+
+#: ../includes/setup.php:155, ../includes/shortcode.php:101
+msgid "Hold down CTRL/CMD to select multiple folders."
+msgstr "Több mappa kiválasztásához tartsa lenyomva a CTRL/CMD billentyűt."
+
+#: ../includes/setup.php:157
+msgid "Delete folders"
+msgstr "Mappák törlése"
+
+#: ../includes/setup.php:158
+msgid "Delete folders & subfolders"
+msgstr "Mappák és almappák törlése"
+
+#: ../includes/setup.php:159
+msgid ""
+"Please confirm how you'd like to delete the HappyFiles folders listed below. "
+"All items inside those folders are safe & won't be deleted!"
+msgstr ""
+"Kérjük, erősítse meg, hogyan szeretné törölni az alább felsorolt HappyFiles "
+"mappákat. Az ezekben a mappákban található összes elem biztonságban van és "
+"nem kerül törlésre!"
+
+#: ../includes/setup.php:160
+msgid "The selected folders have been deleted."
+msgstr "A kiválasztott mappák törlésre kerültek."
+
+#: ../includes/setup.php:161
+msgid ""
+"The selected folder no longer exists. We recommend selecting another folder."
+msgstr ""
+"A kiválasztott mappa már nem létezik. Javasoljuk, hogy válasszon másik "
+"mappát."
+
+#: ../includes/setup.php:163
+msgid "Download"
+msgstr "Letöltés"
+
+#: ../includes/setup.php:166
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: ../includes/setup.php:167
+msgid "Save"
+msgstr "Mentés"
+
+#: ../includes/setup.php:168
+msgid "Color"
+msgstr "Szín"
+
+#: ../includes/setup.php:171
+msgid "Click to copy"
+msgstr "Ide kattintva másolhatja"
+
+#: ../includes/setup.php:172
+msgid "Gallery shortcode"
+msgstr "Galéria rövidkód"
+
+#: ../includes/setup.php:173
+msgid "Default"
+msgstr "Alapértelmezett"
+
+#: ../includes/setup.php:174, ../includes/shortcode.php:96,
+#: ../includes/integrations/bricks-gallery.php:49
+msgid "Columns"
+msgstr "Oszlopok"
+
+#: ../includes/setup.php:175, ../includes/shortcode.php:97,
+#: ../includes/integrations/bricks-gallery.php:65
+msgid "Max items"
+msgstr "Maximális elem"
+
+#: ../includes/setup.php:176, ../includes/shortcode.php:98,
+#: ../includes/integrations/bricks-gallery.php:73
+msgid "Height"
+msgstr "Magasság"
+
+#: ../includes/setup.php:177, ../includes/shortcode.php:99,
+#: ../includes/integrations/bricks-gallery.php:87
+msgid "Spacing"
+msgstr "Térköz"
+
+#: ../includes/setup.php:178, ../includes/shortcode.php:104,
+#: ../includes/integrations/bricks-gallery.php:101
+msgid "Order by"
+msgstr "Rendezés"
+
+#: ../includes/setup.php:179, ../includes/shortcode.php:105,
+#: ../includes/integrations/bricks-gallery.php:122
+msgid "Order"
+msgstr "Rendezés"
+
+#: ../includes/setup.php:180, ../includes/shortcode.php:102,
+#: ../includes/integrations/bricks-gallery.php:134
+msgid "Image size"
+msgstr "Kép mérete"
+
+#: ../includes/setup.php:181, ../includes/shortcode.php:103,
+#: ../includes/integrations/bricks-gallery.php:148
+msgid "Link to"
+msgstr "Linkelés ide:"
+
+#: ../includes/setup.php:182, ../includes/shortcode.php:106,
+#: ../includes/integrations/bricks-gallery.php:161
+msgid "No crop"
+msgstr "Nincs levágás"
+
+#: ../includes/setup.php:183, ../includes/shortcode.php:107,
+#: ../includes/integrations/bricks-gallery.php:167
+msgid "Include subfolder"
+msgstr "Beleértve az almappát"
+
+#: ../includes/setup.php:184, ../includes/setup.php:186,
+#: ../includes/shortcode.php:108, ../includes/shortcode.php:110,
+#: ../includes/integrations/bricks-gallery.php:173,
+#: ../includes/integrations/bricks-gallery.php:185
+msgid "Caption"
+msgstr "Felirat"
+
+#: ../includes/setup.php:185, ../includes/setup.php:186,
+#: ../includes/setup.php:187, ../includes/setup.php:188,
+#: ../includes/setup.php:189, ../includes/shortcode.php:109,
+#: ../includes/shortcode.php:110, ../includes/shortcode.php:111,
+#: ../includes/shortcode.php:112, ../includes/shortcode.php:113,
+#: ../includes/integrations/bricks-gallery.php:179,
+#: ../includes/integrations/bricks-gallery.php:185,
+#: ../includes/integrations/bricks-gallery.php:192,
+#: ../includes/integrations/bricks-gallery.php:199,
+#: ../includes/integrations/bricks-gallery.php:206
+msgid "Lightbox"
+msgstr "Lightbox"
+
+#: ../includes/setup.php:187, ../includes/shortcode.php:111,
+#: ../includes/integrations/bricks-gallery.php:192
+msgid "Fullscreen"
+msgstr "Teljes képernyős"
+
+#: ../includes/setup.php:188, ../includes/shortcode.php:112,
+#: ../includes/integrations/bricks-gallery.php:199
+msgid "Thumbnails"
+msgstr "Miniatűrök"
+
+#: ../includes/setup.php:189, ../includes/shortcode.php:113,
+#: ../includes/integrations/bricks-gallery.php:206
+msgid "Zoom"
+msgstr "Nagyítás"
+
+#: ../includes/setup.php:192
+msgid "Date"
+msgstr "Dátum"
+
+#: ../includes/setup.php:193
+msgid "Author"
+msgstr "Szerző"
+
+#: ../includes/setup.php:194
+msgid "Name"
+msgstr "Név"
+
+#: ../includes/setup.php:195
+msgid "Title"
+msgstr "Titulus"
+
+#: ../includes/setup.php:196
+msgid "Type"
+msgstr "Típus"
+
+#: ../includes/setup.php:197
+msgid "Modified"
+msgstr "Módosítás"
+
+#: ../includes/setup.php:198
+msgid "Random"
+msgstr "Véletlenszerű"
+
+#: ../includes/setup.php:199, ../includes/shortcode.php:148,
+#: ../includes/integrations/bricks-gallery.php:44,
+#: ../includes/integrations/bricks-gallery.php:153,
+#: ../includes/integrations/bricks-gallery.php:156
+msgid "None"
+msgstr "Egyik sem"
+
+#: ../includes/setup.php:200, ../includes/pro/filesizes.php:27
+msgid "File size"
+msgstr "Fájlméret"
+
+#: ../includes/setup.php:203
+msgid "Descending"
+msgstr "Csökkenő"
+
+#: ../includes/setup.php:204
+msgid "Ascending"
+msgstr "Növekvő"
+
+#: ../includes/setup.php:207
+msgid "Attachment"
+msgstr "Melléklet"
+
+#: ../includes/setup.php:208
+msgid "Media"
+msgstr "Média"
+
+#: ../includes/setup.php:235
+msgid "Optional: Assign a folder to your uploaded file(s):"
+msgstr "Választható: Rendeljen mappát a feltöltött fájl(ok)hoz:"
+
+#: ../includes/shortcode.php:91, ../includes/integrations/bricks-gallery.php:14
+msgid "Gallery"
+msgstr "Galéria"
+
+#: ../includes/shortcode.php:92
+msgid "Display your images in a beautiful gallery."
+msgstr "Mutassa meg képeit egy gyönyörű galériában."
+
+#: ../includes/shortcode.php:93
+msgid "Gallery settings"
+msgstr "Galéria beállítások"
+
+#: ../includes/shortcode.php:139,
+#: ../includes/integrations/bricks-gallery.php:137
+msgid "Thumbnail"
+msgstr "Bélyegkép"
+
+#: ../includes/shortcode.php:140,
+#: ../includes/integrations/bricks-gallery.php:138,
+#: ../includes/integrations/bricks-gallery.php:143
+msgid "Medium"
+msgstr "Közepes"
+
+#: ../includes/shortcode.php:141,
+#: ../includes/integrations/bricks-gallery.php:139
+msgid "Large"
+msgstr "Nagy"
+
+#: ../includes/shortcode.php:142,
+#: ../includes/integrations/bricks-gallery.php:140
+msgid "Full size"
+msgstr "Teljes méretű"
+
+#: ../includes/shortcode.php:146,
+#: ../includes/integrations/bricks-gallery.php:151
+msgid "Attachment page"
+msgstr "Csatolmány oldal"
+
+#: ../includes/shortcode.php:147,
+#: ../includes/integrations/bricks-gallery.php:152
+msgid "Media file"
+msgstr "Média fájl"
+
+#: ../includes/shortcode.php:382,
+#: ../includes/integrations/bricks-gallery.php:216
+msgid "No folder selected."
+msgstr "Nincs mappa kiválasztva."
+
+#: ../includes/shortcode.php:409
+msgid "The selected folder has no items."
+msgstr "A kiválasztott mappában nincsenek elemek."
+
+#: ../includes/user.php:120, ../includes/user.php:161,
+#: ../includes/admin/settings.php:111
+msgid "Upload to folder"
+msgstr "Feltöltés mappába"
+
+#: ../includes/user.php:124, ../includes/user.php:162,
+#: ../includes/admin/settings.php:109
+msgid "Full access"
+msgstr "Teljes hozzáférés"
+
+#: ../includes/user.php:128, ../includes/user.php:163,
+#: ../includes/admin/settings.php:112
+msgid "No access"
+msgstr "Nincs hozzáférés"
+
+#: ../includes/user.php:132, ../includes/user.php:160,
+#: ../includes/admin/settings.php:110
+msgid "View folders"
+msgstr "Mappák megtekintése"
+
+#: ../includes/user.php:149, ../includes/user.php:173,
+#: ../includes/pro/settings.php:427
+msgid "Enabled"
+msgstr "Engedélyezve"
+
+#: ../includes/user.php:149, ../includes/user.php:174,
+#: ../includes/pro/settings.php:426
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+#: ../includes/user.php:156, ../includes/admin/settings.php:89
+msgid "Folder access"
+msgstr "Mappa hozzáférés"
+
+#: ../includes/user.php:159, ../includes/user.php:172
+msgid "Inherit"
+msgstr "Örököl"
+
+#: ../includes/user.php:169, ../includes/pro/settings.php:403
+msgid "SVG support"
+msgstr "SVG támogatás"
+
+#: ../includes/admin/settings.php:6
+msgid "General"
+msgstr "Általános"
+
+#: ../includes/admin/settings.php:7
+msgid "Permissions"
+msgstr "Jogosultságok"
+
+#: ../includes/admin/settings.php:8, ../includes/admin/settings.php:178,
+#: ../includes/admin/settings.php:142
+msgid "Import"
+msgstr "Importálás"
+
+#: ../includes/admin/settings.php:8, ../includes/admin/settings.php:144
+msgid "Export"
+msgstr "Exportálás"
+
+#: ../includes/admin/settings.php:23
+msgid "Default open folder"
+msgstr "Alapértelmezett nyitott mappa"
+
+#: ../includes/admin/settings.php:29
+msgid "Last opened folder"
+msgstr "Utoljára megnyitott mappa"
+
+#: ../includes/admin/settings.php:32
+msgid "Set folder you want to open on page load."
+msgstr "Az oldal betöltésekor megnyitandó mappa beállítása."
+
+#: ../includes/admin/settings.php:38, ../includes/admin/settings.php:43
+msgid "Assign multiple folders"
+msgstr "Több mappa hozzárendelése"
+
+#: ../includes/admin/settings.php:46
+msgid ""
+"When enabled you can assign multiple folders to one item. If disabled an "
+"item can only be assigned to one folder."
+msgstr ""
+"Ha engedélyezve van, több mappát is hozzárendelhet egy elemhez. Ha le van "
+"tiltva, egy elemet csak egy mappához lehet hozzárendelni."
+
+#: ../includes/admin/settings.php:52, ../includes/admin/settings.php:57
+msgid "Remove from all folders"
+msgstr "Eltávolítás minden mappából"
+
+#: ../includes/admin/settings.php:60
+msgid ""
+"When enabled removing an item from a folder removes it from all other "
+"folders. If disabled the item will only be removed from the open folder."
+msgstr ""
+"Ha engedélyezve van, egy elem eltávolítása egy mappából az összes többi "
+"mappából is eltávolítja azt. Ha letiltva van, az elem csak a megnyitott "
+"mappából kerül eltávolításra."
+
+#: ../includes/admin/settings.php:66, ../includes/admin/settings.php:71
+msgid "Infinite scrolling"
+msgstr "Végtelen görgetés"
+
+#: ../includes/admin/settings.php:74
+msgid ""
+"When enabled the media library uses infinite scrolling instead of the new "
+"\"Load more\" button (that was introduces in WordPress 5.8)."
+msgstr ""
+"Ha engedélyezve van, a médiatár végtelen görgetést használ az új \"Load more"
+"\" gomb helyett (amelyet a WordPress 5.8-ban vezettek be)."
+
+#: ../includes/admin/settings.php:90
+msgid ""
+"Set folder access level per user role. Set folder access for individual user "
+"on user profile page."
+msgstr ""
+"A mappák hozzáférési szintjének beállítása felhasználói szerepkörönként. A "
+"mappákhoz való hozzáférés beállítása az egyes felhasználók számára a "
+"felhasználói profil oldalon."
+
+#: ../includes/admin/settings.php:181
+msgid "No folders found to import."
+msgstr "Nincs importálandó mappa."
+
+#: ../includes/admin/settings.php:172
+msgid "%s folders with %s associated items found to import."
+msgstr "%s mappák %s kapcsolódó elemekkel, amelyek importálhatók."
+
+#: ../includes/admin/settings.php:179, ../includes/admin/settings.php:195
+msgid "Delete plugin data"
+msgstr "Plugin adatok törlése"
+
+#: ../includes/admin/settings.php:164
+msgid ""
+"Export your HappyFiles folder structure to import & use it in another "
+"installation."
+msgstr ""
+"Exportálja a HappyFiles mappaszerkezetét, hogy importálhassa és használhassa "
+"egy másik telepítésben."
+
+#: ../includes/admin/settings.php:194
+msgid "Save changes"
+msgstr "Változások mentése"
+
+#: ../includes/integrations/bricks-gallery.php:31
+msgid "Images"
+msgstr "Képek"
+
+#: ../includes/pro/quick-edit.php:92
+msgid "Select featured image"
+msgstr "Kiemelt kép kiválasztása"
+
+#: ../includes/pro/quick-edit.php:93
+msgid "Remove featured image"
+msgstr "Kiemelt kép eltávolítása"
+
+#: ../includes/pro/settings.php:87
+msgid "License key deletion failed."
+msgstr "A licenckulcs törlése sikertelen."
+
+#: ../includes/pro/settings.php:85
+msgid "License key has been removed."
+msgstr "A licenckulcs eltávolításra került."
+
+#: ../includes/pro/settings.php:172
+msgid "One click updates"
+msgstr "Frissítések egy kattintással"
+
+#: ../includes/pro/settings.php:188
+msgid ""
+"Paste your license key from your %s in here to enable one-click plugin "
+"updates and notifications."
+msgstr ""
+"Illessze be ide a licenckulcsát a %s-ból, hogy engedélyezze az "
+"egykattintásos plugin-frissítéseket és értesítéseket."
+
+#: ../includes/pro/settings.php:188
+msgid "HappyFiles account"
+msgstr "HappyFiles fiók"
+
+#: ../includes/pro/settings.php:184
+msgid "Deactivate license"
+msgstr "Licenc inaktiválás"
+
+#: ../includes/pro/settings.php:205
+msgid "Post Types"
+msgstr "Bejegyzés típusok"
+
+#: ../includes/pro/settings.php:215
+msgid "Plugins"
+msgstr "Bővítmények"
+
+#: ../includes/pro/settings.php:248, ../includes/pro/settings.php:258
+msgid "Disable in media library"
+msgstr "Letiltás a médiatárban"
+
+#: ../includes/pro/settings.php:278
+msgid "Enforce loading"
+msgstr "Betöltés kikényszerítése"
+
+#: ../includes/pro/settings.php:303
+msgid ""
+"Enforce loading HappyFiles in the wp-admin or frontend (logged-in useres "
+"only), select the loading location above."
+msgstr ""
+"A HappyFiles betöltésének kikényszerítése a wp-adminban vagy a frontendben "
+"(csak bejelentkezett felhasználók), válassza ki a fenti betöltési helyet."
+
+#: ../includes/pro/settings.php:315, ../includes/pro/settings.php:321
+msgid "Sort by file size"
+msgstr "Rendezés fájlméret szerint"
+
+#: ../includes/pro/settings.php:324
+msgid "When enabled you can sort your attachments by file size."
+msgstr "Ha engedélyezve van, a mellékleteket fájlméret szerint rendezheti."
+
+#: ../includes/pro/settings.php:337
+msgid "Regenerate file sizes"
+msgstr "Fájlméretek újragenerálása"
+
+#: ../includes/pro/settings.php:352
+msgid "Featured image"
+msgstr "Kiemelt kép"
+
+#: ../includes/pro/settings.php:358
+msgid "Set featured image via \"Quick edit\""
+msgstr "Kiemelt kép beállítása a \"Gyors szerkesztés\" segítségével"
+
+#: ../includes/pro/settings.php:366
+msgid "Show featured image preview column"
+msgstr "Kiemelt kép előnézet oszlop megjelenítése"
+
+#: ../includes/pro/settings.php:383
+msgid "Miscellaneous"
+msgstr "Vegyes"
+
+#: ../includes/pro/settings.php:388
+msgid "View full folder name on hover"
+msgstr "Teljes mappanév megjelenítése a lebegtetéskor"
+
+#: ../includes/pro/settings.php:405
+msgid ""
+"Enable/disable SVG upload, preview & sanitization per user role. Set SVG "
+"support for individual user on user profile page."
+msgstr ""
+"SVG feltöltés, előnézet és szanálás engedélyezése/tiltása felhasználói "
+"szerepkörönként. SVG-támogatás beállítása az egyes felhasználók számára a "
+"felhasználói profiloldalon."
+
+#: ../includes/pro/settings.php:406
+msgid ""
+"Upload SVG files only from trusted sources as they can contain and execute "
+"malicious XML code."
+msgstr ""
+"Csak megbízható forrásból töltsön fel SVG-fájlokat, mivel ezek rosszindulatú "
+"XML-kódot tartalmazhatnak és hajthatnak végre."
+
+#: ../includes/pro/settings.php:437, ../includes/pro/settings.php:448
+msgid "Disable SVG sanitization"
+msgstr "SVG fertőtlenítés letiltása"
+
+#: ../includes/pro/settings.php:452
+msgid ""
+"Disable built-in SVG sanitization if you experience issues when uploading "
+"SVG files."
+msgstr ""
+"Ha problémákat tapasztal az SVG-fájlok feltöltésekor, kapcsolja ki a "
+"beépített SVG-fertőtlenítést."
+
+#: ../includes/pro/svg.php:150
+msgid ""
+"This file couldn't be sanitized for security reasons and wasn't uploaded."
+msgstr ""
+"Ezt a fájlt biztonsági okokból nem lehetett megtisztítani, és nem lett "
+"feltöltve."

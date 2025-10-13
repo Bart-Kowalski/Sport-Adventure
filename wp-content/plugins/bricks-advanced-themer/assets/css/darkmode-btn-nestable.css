@@ -1,0 +1,58 @@
+.brxe-brxc-darkmode-btn-nestable{
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brxe-brxc-darkmode-btn-nestable .brxc-darkmode-btn-nestable__slot{
+    transition: none;
+  }
+}
+
+.brxe-brxc-darkmode-btn-nestable[data-no-animation='true'] .brxc-darkmode-btn-nestable__slot{
+  transition: none !important;
+}
+
+.brxc-darkmode-btn-nestable__label{
+  margin-bottom: 0;
+}
+
+.brxc-darkmode-btn-nestable__checkbox{
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.brxc-darkmode-btn-nestable__checkbox:focus + label .brxc-darkmode-btn-nestable__slot{
+  outline-width: var(--focus-outline-width);
+  outline-color: var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+  outline-style: solid;
+}
+
+.brxc-darkmode-btn-nestable__slot{
+  box-sizing: initial;
+}
+
+.brxc-darkmode-btn-nestable__light-icon,
+.brxc-darkmode-btn-nestable__dark-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brxc-darkmode-btn-nestable__checkbox + .brxc-darkmode-btn-nestable__label .brxc-darkmode-btn-nestable__dark-icon-wrapper,
+.brxc-darkmode-btn-nestable__checkbox:checked + .brxc-darkmode-btn-nestable__label .brxc-darkmode-btn-nestable__light-icon-wrapper {
+  display: none !important;
+}
+
+.brxc-darkmode-btn-nestable__checkbox:checked + .brxc-darkmode-btn-nestable__label .brxc-darkmode-btn-nestable__dark-icon-wrapper {
+  display: flex !important;
+}
+
+/* .brxc-darkmode-btn-nestable__checkbox:focus + .brxc-darkmode-btn-nestable__label .brxc-darkmode-btn-nestable__slot{
+  border-color: red !important;
+
+} */

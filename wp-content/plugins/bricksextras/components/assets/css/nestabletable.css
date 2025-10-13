@@ -1,0 +1,151 @@
+:root {
+    --x-table-border-color: #e5e7eb;
+}
+
+:where(.brxe-xnestabletable) {
+    display: table;
+    table-layout: fixed;
+}
+
+:where(.brxe-xnestabletable),
+:where(.brxe-xnestabletable thead),
+:where(.brxe-xnestabletable tbody),
+.x-nestable-table {
+    width: 100%;
+}
+
+:where(.brxe-xnestabletable thead) {
+    top: 0;
+}
+
+:where(.admin-bar .brxe-xnestabletable thead) {
+    top: var(--wp-admin--admin-bar--height);
+}
+
+
+
+[data-x-nestable-table],
+[data-x-nestable-table] th,
+[data-x-nestable-table] td {
+    border: 1px solid var(--x-table-border-color);
+    border-collapse: collapse;
+}
+
+[data-x-nestable-table].x-nestable-table_stacked {
+    border: none;
+}
+
+:where(.brxe-xnestabletable thead) th {
+    background-color: #f9fafb;
+    border-top: none;
+    box-sizing: border-box;
+    outline: none;
+    padding: 1em 2em;
+}
+
+:where(.brxe-xnestabletable) td {
+    box-sizing: border-box;
+    outline: none;
+    padding: 1em 2em;
+}
+
+:where(.x-nestable-table_stacked) tbody {
+    gap: 1em;
+}
+
+:where(.brxe-xnestabletable) td:not(:first-child) {
+    border-top: none;
+}
+
+.x-nestable-table_stacked thead{
+    position: absolute;
+    top: 0;
+    left:0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.x-nestable-table_stacked td {
+    position: relative;
+    text-align: end;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline-end: 16px;
+	padding-inline-start: 150px;
+}
+
+.x-nestable-table_stacked.x-nestable-table_no-labels td {
+    padding-inline-start: 16px;
+}
+
+:where(.x-nestable-table_stacked) td:before{
+    content: attr(data-x-mobile-label);
+    position: absolute;
+    left:0;
+    top:0;
+    bottom: 0;
+    min-width: 150px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 16px 16px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    background-color: #f9fafb;
+    box-sizing: border-box;  
+}
+
+:where(.x-nestable-table_stacked.x-nestable-table_no-labels) td:before {
+    content: none;
+}
+
+:where(body.rtl .x-nestable-table_stacked) td:before {
+    left:auto;
+    right: 0;
+}
+
+:where([data-x-nestable-table*=stackLabels].x-nestable-table_stacked) td:before {
+    border-bottom: 1px solid var(--x-table-border-color);
+}
+
+:where(.x-nestable-table_stacked:not([data-x-nestable-table*=stackLabels])) td:before {
+    border-right: 1px solid var(--x-table-border-color);
+}
+
+:where(body.rtl .x-nestable-table_stacked:not([data-x-nestable-table*=stackLabels])) td:before {
+    border-right: none;
+    border-left: 1px solid var(--x-table-border-color);
+}
+
+:where([data-x-nestable-table*=stackLabels].x-nestable-table_stacked) td > span {
+    padding: 14px 24px;
+}
+
+.x-nestable-table_stacked td span {
+    display: block;
+}
+
+.x-nestable-table_stacked tbody {
+    display: flex;
+    flex-direction: column;
+    border: none;
+}
+
+
+:where(.x-nestable-table_stacked) td[data-label="Name"]{
+    order: -1;
+    font-weight: 700;
+}
+
+[data-x-nestable-table*=stackLabels].x-nestable-table_stacked td {
+    padding: 0!important;
+}
+
+[data-x-nestable-table*=stackLabels].x-nestable-table_stacked td:before {
+    display: block;
+    position: static;
+    width: 100%;
+}

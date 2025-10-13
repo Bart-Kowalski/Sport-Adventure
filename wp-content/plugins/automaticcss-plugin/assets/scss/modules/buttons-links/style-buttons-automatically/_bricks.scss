@@ -1,0 +1,65 @@
+// .bricks-button[class*="primary"] {
+// 	@include btn("primary");
+// 	&.btn--outline, &.outline {
+// 		@include btn("primary.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="secondary"] {
+// 	@include btn("secondary");
+// 	&.btn--outline, &.outline {
+// 		@include btn("secondary.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="dark"] {
+// 	@include btn("neutral-dark");
+// 	&.btn--outline, &.outline {
+// 		@include btn("neutral-dark.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="light"] {
+// 	@include btn("neutral-light");
+// 	&.btn--outline, &.outline {
+// 		@include btn("neutral-light.btn--outline");
+// 	}
+// }
+
+// // Status
+// .bricks-button[class*="warning"] {
+// 	@include btn("warning");
+// 	&.btn--outline, &.outline {
+// 		@include btn("warning.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="success"] {
+// 	@include btn("success");
+// 	&.btn--outline, &.outline {
+// 		@include btn("success.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="info"] {
+// 	@include btn("info");
+// 	&.btn--outline, &.outline {
+// 		@include btn("info.btn--outline");
+// 	}
+// }
+// .bricks-button[class*="danger"] {
+// 	@include btn("danger");
+// 	&.btn--outline, &.outline {
+// 		@include btn("danger.btn--outline");
+// 	}
+// }
+
+// // Sizes
+
+// $bricks-button-sizes: (
+// 	sm: s,
+// 	md: m,
+// 	lg: l,
+// 	xl: xl,
+// );
+
+// @each $size, $extension in $bricks-button-sizes {
+// 	.bricks-button.bricks-button.#{$size} {
+// 		font-size: var(--text-#{$extension});
+// 	}
+// }

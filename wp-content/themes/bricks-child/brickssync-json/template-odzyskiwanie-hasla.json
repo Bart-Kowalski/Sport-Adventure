@@ -1,0 +1,30 @@
+{
+    "ID": 10150,
+    "post_author": "1",
+    "post_date": "2025-02-11 00:40:41",
+    "post_date_gmt": "2025-02-10 23:40:41",
+    "post_content": "",
+    "post_title": "Odzyskiwanie hasła",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "odzyskiwanie-hasla",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-02-11 00:40:41",
+    "post_modified_gmt": "2025-02-10 23:40:41",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/odzyskiwanie-hasla/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_template_type": "content",
+        "_bricks_page_content_2": "a:5:{i:0;a:5:{s:2:\"id\";s:6:\"936b13\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"1975b8\";}s:8:\"settings\";a:0:{}}i:1;a:5:{s:2:\"id\";s:6:\"1975b8\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"936b13\";s:8:\"children\";a:1:{i:0;s:6:\"1d89c9\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"johsnl\";}}}i:2;a:6:{s:2:\"id\";s:6:\"1d89c9\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";s:6:\"1975b8\";s:8:\"children\";a:2:{i:0;s:6:\"5f1869\";i:1;s:6:\"d81d03\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"lbfpie\";}}s:5:\"label\";s:9:\"logowanie\";}i:3;a:5:{s:2:\"id\";s:6:\"5f1869\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"1d89c9\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:19:\"Odzyskiwanie hasła\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"jfprxk\";}s:3:\"tag\";s:2:\"h1\";}}i:4;a:6:{s:2:\"id\";s:6:\"d81d03\";s:4:\"name\";s:8:\"xwsforms\";s:6:\"parent\";s:6:\"1d89c9\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:10:\"formSelect\";s:1:\"5\";s:17:\"_cssGlobalClasses\";a:2:{i:0;s:23:\"acss_import_form--light\";i:1;s:6:\"oohfgy\";}}s:11:\"themeStyles\";a:0:{}}}"
+    }
+}

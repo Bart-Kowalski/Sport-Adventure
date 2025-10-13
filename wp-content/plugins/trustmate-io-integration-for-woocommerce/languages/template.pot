@@ -1,0 +1,480 @@
+msgid ""
+msgstr ""
+
+# Menu
+msgid "Create TrustMate account"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Widgets"
+msgstr ""
+
+# Headers and buttons
+msgid "settings"
+msgstr ""
+
+msgid "Configure plugin"
+msgstr ""
+
+msgid "If you already have TrustMate account"
+msgstr ""
+
+msgid "skip this step"
+msgstr ""
+
+msgid "Save changes"
+msgstr ""
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr ""
+
+msgid "to make this process very easy"
+msgstr ""
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr ""
+
+msgid "By registering I accept"
+msgstr ""
+
+msgid "terms of service"
+msgstr ""
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr ""
+
+msgid "I going to ask clients for review by e-mail"
+msgstr ""
+
+msgid "I accept"
+msgstr ""
+
+msgid "the data entrustment agreement"
+msgstr ""
+
+msgid "Configure invitations and widgets"
+msgstr ""
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr ""
+
+msgid "Account data"
+msgstr ""
+
+msgid "Company registration data"
+msgstr ""
+
+msgid "Website address"
+msgstr ""
+
+msgid "Owner's e-mail"
+msgstr ""
+
+msgid "Company name"
+msgstr ""
+
+msgid "Street"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Zip code"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Tax identification number"
+msgstr ""
+
+# API related messages and erros
+msgid "Account created"
+msgstr ""
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr ""
+
+msgid "Account already exists"
+msgstr ""
+
+msgid "Invalid data sent"
+msgstr ""
+
+msgid "Unexpected error"
+msgstr ""
+
+msgid "Cannot create account"
+msgstr ""
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr ""
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr ""
+
+msgid "Additional TrustMate account UUIDs per language"
+msgstr ""
+
+msgid "Use this only if you have multiple TrustMate language accounts"
+msgstr ""
+
+msgid "Currently we only support Polylang for WooCommerce"
+msgstr ""
+
+msgid "Add another"
+msgstr ""
+
+msgid "Automatic review invitations"
+msgstr ""
+
+msgid "Enable instant company review form on thank you page - do not use with After successful order status"
+msgstr ""
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+
+msgid "In TrustMate panel you can"
+msgstr ""
+
+msgid "change invitation sending delay"
+msgstr ""
+
+msgid "set how many times customer is reminded to write a review"
+msgstr ""
+
+msgid "adjust invitation colors to your brand"
+msgstr ""
+
+msgid "turn on and off product review invitations"
+msgstr ""
+
+msgid "and more!"
+msgstr ""
+
+msgid "Ask for permission to send invitation"
+msgstr ""
+
+msgid "In order to send review inviations you need customer consent"
+msgstr ""
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+
+msgid "this file"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "After successful order"
+msgstr ""
+
+msgid "After successful payment"
+msgstr ""
+
+msgid "After marked as completed"
+msgstr ""
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Company"
+msgstr ""
+
+msgid "Product"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Show badge with shop's grade"
+msgstr ""
+
+msgid "Show sliding out widget with shop's grade"
+msgstr ""
+
+msgid "Show badge with products' grade"
+msgstr ""
+
+msgid "Popping up reviews"
+msgstr ""
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+
+msgid "Show grade and reviews on product page"
+msgstr ""
+
+msgid "Remember, there are more widgets available"
+msgstr ""
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr ""
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr ""
+
+msgid "Turn on"
+msgstr ""
+
+msgid "Click to show widget description"
+msgstr ""
+
+# Hornet
+msgid "Widget that displays the rating and reviews"
+msgstr ""
+
+msgid "A minimalistic widget displaying average rating next to a product description."
+msgstr ""
+
+msgid "Hornet allows customers to read reviews."
+msgstr ""
+
+msgid "Simple and effective."
+msgstr ""
+
+# MultiHornet
+
+msgid "Display product average rating on category pages and other product listings."
+msgstr ""
+
+msgid "Create a star constellation in your product lists!"
+msgstr ""
+
+# Chupacabra
+msgid "Social Proof (big box)"
+msgstr ""
+
+msgid "Average rating, recent reviews and customer photos displayed on static cards directly on your website."
+msgstr ""
+
+msgid "Neat and simple."
+msgstr ""
+
+# Ferret2
+
+msgid "Carousel - company reviews"
+msgstr ""
+
+msgid "Catch your customers’ attention with this immersive widget!"
+msgstr ""
+
+msgid "Showcase your average rating and the most recent reviews on auto-scrolling tiles and make your website look even cooler!"
+msgstr ""
+
+# ProductFerret2
+
+msgid "Carousel - product reviews"
+msgstr ""
+
+msgid "Attract your customers’ attention with this dynamic widget."
+msgstr ""
+
+msgid "Average rating, recent reviews, customer images - everything in one place!"
+msgstr ""
+
+msgid "Fits like a glove and works like a dream!"
+msgstr ""
+
+# Dodo2
+msgid "Static box with rating (small / large)"
+msgstr ""
+
+msgid "Showcase your review count and average rating with this simple widget."
+msgstr ""
+
+msgid "No matter if your customers want to read reviews or submit their own - Dodo’s got you covered!"
+msgstr ""
+
+msgid "Not too little, not too much - just perfect!"
+msgstr ""
+
+# Muskrat2
+
+msgid "Badge with the company's rating and grades distribution (edge)"
+msgstr ""
+
+msgid "Amaze your customers with this modern, interactive widget!"
+msgstr ""
+
+msgid "Display your average rating and review count, showcase the most recent reviews and collect new ones with just a few clicks."
+msgstr ""
+
+msgid "Simply and intuitively."
+msgstr ""
+
+# Bee
+msgid "Company rating - top bar"
+msgstr ""
+
+msgid "Show off the number of reviews and display the average rating with this simple widget."
+msgstr ""
+
+msgid "Buyers will know right away that they are dealing with a trustworthy company when they enter your store."
+msgstr ""
+
+# Alpaca
+msgid "Social Proof (pop-up reviews)"
+msgstr ""
+
+msgid "Attention grabber like no other."
+msgstr ""
+
+msgid "Display your average rating, number of reviews and present the most recent ones with this unmissable widget."
+msgstr ""
+
+msgid "Let Alpaca give your website that wow factor!"
+msgstr ""
+
+# Hydra
+msgid "Modular widget - product reviews, expert reviews, Q&A"
+msgstr ""
+
+msgid "Wow your customers with this versatile, modular widget!"
+msgstr ""
+
+msgid "Average rating, results of product surveys, up to 50 recent reviews, expert evaluations, and the Q&A module - Hydra has everything in one place."
+msgstr ""
+
+msgid "Designed for those who want more."
+msgstr ""
+
+# Lemur
+msgid "Sliding out widget with reviews"
+msgstr ""
+
+msgid "Get your reviews noticed with this sliding widget."
+msgstr ""
+
+msgid "Lemur is a perfect way to demonstrate your average rating, and when expanded, also latest reviews and TrustMate-granted badges."
+msgstr ""
+
+msgid "What’s not to love about it?"
+msgstr ""
+
+# Ferret
+msgid "Carousel"
+msgstr ""
+
+msgid "Product review carousel"
+msgstr ""
+
+# Owl
+
+msgid "Widget with badges"
+msgstr ""
+
+msgid "Want to present TrustMate-granted awards in style?"
+msgstr ""
+
+msgid "Owl’s here to help!"
+msgstr ""
+
+# FAQ section
+msgid "FAQ"
+msgstr ""
+
+msgid "Can I ask only for company reviews"
+msgstr ""
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+
+msgid "Can I ask only for product reviews"
+msgstr ""
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+
+msgid "Can I ask for both company and product reviews"
+msgstr ""
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+
+msgid "Sending them together may lower conversion rate"
+msgstr ""
+
+msgid "What is UUID"
+msgstr ""
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr ""
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr ""
+
+msgid "How can I add widget with grades and reviews"
+msgstr ""
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr ""
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+
+msgid "Do you support WPML?"
+msgstr ""
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""

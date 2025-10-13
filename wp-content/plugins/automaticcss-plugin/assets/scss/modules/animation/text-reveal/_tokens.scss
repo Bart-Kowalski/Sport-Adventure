@@ -1,0 +1,7 @@
+@if $option-animation-text-reveal == on {
+	:root {
+		@each $prop, $value in $animation-text-reveal {
+			--#{$prop}: var(--animation-text-reveal-#{$prop});
+		}
+	}
+}

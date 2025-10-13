@@ -1,0 +1,110 @@
+/* Fonts */
+@font-face {
+	font-family: "Outfit";
+	font-style: normal;
+	font-weight: 400;
+	src: url("../fonts/Outfit-Regular.woff") format("woff");
+}
+
+@font-face {
+	font-family: "Outfit";
+	font-style: normal;
+	font-weight: 700;
+	src: url("../fonts/Outfit-Bold.woff") format("woff");
+}
+
+/* Root variables */
+:root {
+	--frames-settings-black: #000;
+	--frames-settings-white: #fff;
+	--frames-settings-base: #0e1011;
+	/* Input Fields Nav Wrapper */
+	--frames-settings-base-100: #eef0f1;
+	/* Panel */
+	--frames-settings-base-200: #e6e9ea;
+	/* Group / Single VAR */
+	--frames-settings-base-300: #dee2e4;
+	/* Accordions */
+	--frames-settings-base-400: #d0d5d8;
+	--frames-settings-base-500: #b4bdc1;
+	/* Unit Fields */
+	--frames-settings-base-600: #485257;
+	--frames-settings-base-700: #31373b;
+	--frames-settings-base-800: #252a2d;
+	--frames-settings-base-900: #1a1d1f;
+	--frames-settings-border-color: rgba(14, 16, 17, 0.08);
+	--frames-settings-border-bottom: none;
+	--frames-settings-nav-divider: #333333;
+	--frames-settings-action: #32a2c1;
+	--frames-settings-action-ultra-dark: #331339;
+	--frames-border-radius: 0.25em;
+	--frames-page-margin: 2rem;
+	--frames-tab-margin: 3.5rem;
+	--frames-space: 0.5rem;
+	--frames-shadow: 2px 2px 20px rgba(0, 0, 0, 0.12);
+	--frames-page-height: calc(100vh - calc(2 * var(--frames-page-margin)) - var(--wp-admin--admin-bar--height, 0));
+	--frames-success-color: #9fc97f;
+	--frames-success-text-color: #475939;
+	--frames-error-color: #be7e7e;
+	--frames-error-text-color: #2f1818;
+	--frames-warning-color: #f7c46c;
+	--frames-warning-text-color: #5a4a2f;
+	--frames-input-bg: #0e1011;
+	--frames-input-unit-bg: #31373b;
+}
+
+/* WP default page stuff */
+.toplevel_page_frames #wpcontent {
+	padding-left: 0;
+}
+
+.toplevel_page_frames #wpbody-content {
+	padding-bottom: 0;
+	background-color: var(--frames-settings-base-200);
+}
+
+.frames-wrapper {
+	min-height: var(--frames-page-height);
+	margin: 2rem;
+	font-family: "Outfit";
+	color: var(--frames-settings-base);
+}
+
+/* License page stuff */
+.frames-license__field-group {
+	margin-top: 15px;
+}
+
+.frames-license__field-group input[type=submit] {
+	margin-right: 5px;
+}
+
+/* Import Export page stuff */
+.frames-settings__message-container {
+	max-width: max-content;
+}
+
+.frames-settings__message-container p {
+	font-size: 1rem;
+	max-width: 100ch;
+	padding: 1em 2em;
+	border-radius: var(--frames-border-radius);
+	margin-right: 2rem;
+	margin-bottom: 2rem;
+	z-index: 99999;
+}
+
+.frames-settings__message-container p.success {
+	background-color: var(--frames-success-color);
+	color: var(--frames-success-text-color);
+}
+
+.frames-settings__message-container p.error {
+	background-color: var(--frames-error-color);
+	color: var(--frames-error-text-color);
+}
+
+.frames-settings__message-container p.warning {
+	background-color: var(--frames-warning-color);
+	color: var(--frames-warning-text-color);
+}

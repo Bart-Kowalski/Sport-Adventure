@@ -1,0 +1,9 @@
+/*!
+ * WP Grid Builder
+ *
+ * @package   WP Grid Builder
+ * @author    Loïc Blascos
+ * @link      https://www.wpgridbuilder.com
+ * @copyright 2019-2025 Loïc Blascos
+ *
+ */*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}h1,h2,h3,h4,h5,h6{color:#2a2a2a}html{overflow-x:hidden}body{color:#656e79;display:block;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;margin:0;min-height:calc(100vh - 32px);padding:0;position:static;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}input,select{height:32px;padding:8px}a:-webkit-any-link{color:inherit;cursor:pointer;text-decoration:none}.wpgb-preview-iframe{min-height:100%;padding:16px}.wpgb-preview-iframe__error{align-items:center;display:flex;justify-content:center;min-height:calc(100vh - 32px)}.wpgb-preview-iframe__error-message{font-size:18px;font-weight:500;margin:auto;text-align:center}.wp-grid-builder{opacity:.01}.wpgb-button.wpgb-edit-card{display:none}body .wpgb-card .wpgb-preview-iframe__edit-button{align-items:center;backface-visibility:hidden;background-color:#fff;border:1px solid #1e1e1e;border-radius:2px;box-shadow:0 8px 20px 0 #0e152f40;color:#fff;cursor:pointer;display:flex;height:36px;justify-content:center;opacity:0;outline:none;position:absolute;right:8px;top:8px;transition:opacity .15s ease-in-out,box-shadow .15s ease-in-out;width:36px;z-index:9999}body .wpgb-card .wpgb-preview-iframe__edit-button:hover span{opacity:1}body .wpgb-card .wpgb-preview-iframe__edit-button span{background:#1e1e1e;border-radius:2px;border-width:0;bottom:-30px;box-shadow:none;color:#f0f0f0;font-size:12px;line-height:1.4;opacity:0;outline:none;padding:4px 8px;pointer-events:none;position:absolute;text-align:center;white-space:nowrap}body .wpgb-card:hover .wpgb-preview-iframe__edit-button{opacity:1}

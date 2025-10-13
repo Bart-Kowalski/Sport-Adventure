@@ -1,0 +1,512 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-23 16:03+0000\n"
+"PO-Revision-Date: 2022-09-09 16:43+0000\n"
+"Last-Translator: Ilian Pavlinov <ilian.pavlinov@gmail.com>\n"
+"Language-Team: Bulgarian <http://trans.trustmate.io/projects/"
+"woocommerce-plugin/main/bg/>\n"
+"Language: bg_BG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "Създайте акаунт в TrustMate"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Widgets"
+msgstr "Джаджи"
+
+# Headers and buttons
+msgid "settings"
+msgstr "Настройки"
+
+msgid "Configure plugin"
+msgstr "Конфигурирайте плъгина"
+
+msgid "If you already have TrustMate account"
+msgstr "Ако вече имате акаунт в TrustMate"
+
+msgid "skip this step"
+msgstr "пропуснете тази стъпка"
+
+msgid "Save changes"
+msgstr "Запазите промените"
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+"За да започнете да събирате отзиви, имате нужда от акаунт в TrustMate. За "
+"щастие можете да го създадете"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "в рамките на една минута. Ще използваме данни от WooCommerce"
+
+msgid "to make this process very easy"
+msgstr "за да направите този процес много лесен"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr ""
+"Данните за компанията могат да бъдат актуализирани по-късно в панела "
+"TrustMate"
+
+msgid "By registering I accept"
+msgstr "С регистрацията приемам"
+
+msgid "terms of service"
+msgstr "условия за ползване"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr ""
+"включително съгласие да се свържете с нас от отдела за обслужване на клиенти "
+"на TrustMate"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr "Ще помоля клиентите за преглед по имейл"
+
+msgid "I accept"
+msgstr "приемам"
+
+msgid "the data entrustment agreement"
+msgstr "споразумението за поверяване на данни"
+
+msgid "Configure invitations and widgets"
+msgstr "Конфигуриране на покани и приспособления"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr ""
+"Потвърдете формуляра по-долу и щракнете върху „Създаване на акаунт в "
+"TrustMate“"
+
+msgid "Account data"
+msgstr "Данни за акаунта"
+
+msgid "Company registration data"
+msgstr "Данни за регистрация на фирма"
+
+msgid "Website address"
+msgstr "Адрес на сайт"
+
+msgid "Owner's e-mail"
+msgstr "Имейл на собственика"
+
+msgid "Company name"
+msgstr "Име на Компанията"
+
+msgid "Street"
+msgstr "улица"
+
+msgid "City"
+msgstr "Град"
+
+msgid "Zip code"
+msgstr "Пощенски код"
+
+msgid "Country"
+msgstr "Държава"
+
+msgid "Tax identification number"
+msgstr "Булстат"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Акаунта е създаден"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr "Моля, проверете имейла си, за да зададете парола за акаунта в TrustMate"
+
+msgid "Account already exists"
+msgstr "Акаунтът вече съществува"
+
+msgid "Invald data sent"
+msgstr "Изпратена е грешна информация"
+
+msgid "Unexpected error"
+msgstr "Неочаквана грешка"
+
+msgid "Cannot create account"
+msgstr "Акаунта не може да бъде създаден"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "Адресът за регистрация в настройките на WooCommerce не е пълен"
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Нещо се обърка. Моля, опитайте отново или се свържете с отдела за обслужване "
+"на клиенти на TrustMate"
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+"Активирането на приспособлението не бе успешно. Моля, опитайте отново или се "
+"свържете с отдела за обслужване на клиенти на TrustMate"
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr ""
+"Вашият потребителски код на TrustMate (UUID от панела TrustMate, раздел "
+"Интеграция)"
+
+msgid "Automatic review invitations"
+msgstr "Покани за автоматичен преглед"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr "За да събирате бързо отзиви от клиенти, включете автоматичните покани"
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+"Докато е активен, скриптът изпраща покани до вашите клиенти с молба за "
+"преглед"
+
+msgid "In TrustMate panel you can"
+msgstr "В панела TrustMate вие можете"
+
+msgid "change invitation sending delay"
+msgstr "промяна на забавянето при изпращане на покана"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "задайте колко пъти клиентът да бъде напомнян да напише рецензия"
+
+msgid "adjust invitation colors to your brand"
+msgstr "коригирайте цветовете на поканата към вашата марка"
+
+msgid "turn on and off product review invitations"
+msgstr "включване и изключване на покани за преглед на продукти"
+
+msgid "and more!"
+msgstr "и още!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Поискайте разрешение за изпращане на покана"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr "За да изпратите покани за преглед, се нуждаете от съгласието на клиента"
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+"Ако не събирате тези съгласия сами (отделно квадратче за отметка или "
+"подходящи разпоредби), включете тази опция"
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+"Ако не поискате директно от клиента съгласие за изпращане на покана, "
+"предлагаме да разширите вашите разпоредби със съдържание от"
+
+msgid "this file"
+msgstr "този файл"
+
+msgid "Disabled"
+msgstr "Отказано"
+
+msgid "After successful order"
+msgstr "След успешна поръчка"
+
+msgid "After successful payment"
+msgstr "След успешно плащане"
+
+msgid "After marked as completed"
+msgstr "След маркиран като завършен"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Показване на рецензии с приспособления"
+
+msgid "Show badge with shop's grade"
+msgstr "Показване на значка с оценка на магазина"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Показване на плъзгаща се джаджа с оценка на магазина"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr "Неинвазивната значка е залепена към ръба на екрана и заема малко място"
+
+msgid "Click shows a modal with recent reviews"
+msgstr "Щракването показва модал със скорошни отзиви"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Можете да промените позицията на дисплея в панела TrustMate"
+
+msgid "Why use it?"
+msgstr "Защо да го използвате?"
+
+msgid "sales increase"
+msgstr "увеличаване на продажбите"
+
+msgid "customers do not leave site searching for reviews"
+msgstr "клиентите не напускат сайта, търсейки отзиви"
+
+msgid "can boost your SEO"
+msgstr "може да подобри вашето SEO"
+
+msgid "can make search engines show stars under your results"
+msgstr "може да накара търсачките да показват звезди под вашите резултати"
+
+msgid "Show badge with products' grade"
+msgstr "Показване на значка с оценка на продуктите"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr ""
+"Щракването показва модал със скорошни прегледи и разпределение на оценките"
+
+msgid "Widget is a finishing touch on your product page"
+msgstr "Widget е завършващ щрих на вашата продуктова страница"
+
+msgid "product sales increase"
+msgstr "увеличаване на продажбите на продукта"
+
+msgid "can boost your product SEO"
+msgstr "може да подобри SEO на вашия продукт"
+
+msgid "can make search engines show stars under product result"
+msgstr ""
+"може да накара търсачките да показват звезди под резултатите от продукта"
+
+msgid "Popping up reviews"
+msgstr "Изскачащи рецензии"
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+"Уиджет за социално доказателство с до три вида изскачащи кутии, които "
+"гарантират на клиентите ви за качеството на вашите услуги"
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+"Позицията може да се конфигурира. Благодарение на нетрадиционните "
+"изображения и послания те са много забележими"
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Ако искате да използвате персонализирани изображения, свържете се с нас на "
+"support@trustmate.io"
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"Кутиите не заемат много място и са лесен начин да представите вашите отзиви"
+
+msgid "Show grade and reviews on product page"
+msgstr "Показване на оценка и отзиви на продуктовата страница"
+
+msgid "Page-wide reviews similar to popular comments sections showing under your product"
+msgstr ""
+"Рецензии в цялата страница, подобни на секциите с популярни коментари, "
+"показващи се под вашия продукт"
+
+msgid "Remember, there are more widgets available"
+msgstr "Не забравяйте, че има още налични джаджи"
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "Можете да ги поставите на сайта си с помощта на WordPress HTML widgets"
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Просто копирайте кода от секцията с джаджи на панела TrustMate"
+
+msgid "Turn on"
+msgstr "Включи"
+
+msgid "Click to show widget description"
+msgstr "Щракнете, за да покажете описанието на джаджата"
+
+# Hornet
+msgid "Small widget that displays the average rating and the number of reviews"
+msgstr "Малка джаджа, която показва средната оценка и броя отзиви"
+
+msgid "The stars will appear on the product card near the photo and on the product tiles throughout the store"
+msgstr ""
+"Звездите ще се появят на продуктовата карта близо до снимката и на "
+"продуктовите плочки в целия магазин"
+
+msgid "The widget displays the current number of reviews about the product and the current average rating"
+msgstr ""
+"Уиджетът показва текущия брой отзиви за продукта и текущата средна оценка"
+
+msgid "It can be embedded next to the main product description on the product sheet or in product lists in your store"
+msgstr ""
+"Може да бъде вграден до основното описание на продукта в продуктовия лист "
+"или в списъците с продукти във вашия магазин"
+
+msgid "Benefits"
+msgstr "Ползи"
+
+msgid "distinguishes the product by encouraging customers to click on it and make purchases"
+msgstr ""
+"отличава продукта, като насърчава клиентите да кликнат върху него и да "
+"направят покупки"
+
+# Chupacabra
+msgid "Widget social proof (large box)"
+msgstr "Widget social proof (голяма кутия)"
+
+msgid "Static widget with customer reviews sending a message \"you can trust us\""
+msgstr ""
+"Статична джаджа с отзиви на клиенти, изпращащи съобщение „можете да ни се "
+"доверите“"
+
+msgid "Widget includes both company and product reviews"
+msgstr "Widget включва както фирмени, така и продуктови отзиви"
+
+msgid "Anytime you can adjust widget outlook without developer help, even after embedding it on your site"
+msgstr ""
+"По всяко време можете да коригирате изгледа на джаджа без помощ от "
+"програмист, дори след като я вградите в сайта си"
+
+msgid "Microdata"
+msgstr "Микроданни"
+
+msgid "If you enable microdata, widget will make your reviews understandable for search engines like Google"
+msgstr ""
+"Ако активирате микроданните, джаджата ще направи отзивите ви разбираеми за "
+"търсачки като Google"
+
+msgid "Search engine results with your site will be enriched with additional data like average rating, stars, review count"
+msgstr ""
+"Резултатите от търсачката с вашия сайт ще бъдат обогатени с допълнителни "
+"данни като среден рейтинг, звезди, брой отзиви"
+
+# Ferret
+msgid "Carousel"
+msgstr "Въртележка"
+
+msgid "Dynamic \"carousel\" widget catches the eye of customers presenting up to the last 21 reviews. You set the scrolling speed of the visible ratings yourself"
+msgstr ""
+"Динамичната джаджа \"въртележка\" привлича окото на клиентите, представящи "
+"до последните 21 отзива. Вие сами задавате скоростта на превъртане на "
+"видимите оценки"
+
+msgid "Using the carousel you increase the attractiveness of your website to search engines, e.g. Google"
+msgstr ""
+"Използвайки въртележката, вие увеличавате привлекателността на уебсайта си "
+"за търсачките, напр. Google"
+
+msgid "Let customers read reviews about your company without leaving your website"
+msgstr ""
+"Позволете на клиентите да четат отзиви за вашата компания, без да напускат "
+"уебсайта ви"
+
+msgid "The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+"Въртележката е отзивчива и се адаптира към всеки преглед на страница и "
+"мобилни устройства"
+
+msgid "Product review carousel"
+msgstr "Въртележка за преглед на продукта"
+
+# Owl
+msgid "Certificate widget"
+msgstr "Джаджа за сертификат"
+
+msgid "If you meet the program conditions visible on the main page of the panel, TrustMate will automatically display the badge in your store along with information about the current rating"
+msgstr ""
+"Ако отговаряте на условията на програмата, видими на главната страница на "
+"панела, TrustMate автоматично ще покаже значката във вашия магазин заедно с "
+"информация за текущия рейтинг"
+
+msgid "This will result in more buying interest from potential customers"
+msgstr "Това ще доведе до по-голям интерес за покупка от потенциални клиенти"
+
+# FAQ section
+msgid "FAQ"
+msgstr "Често задавани въпроси"
+
+msgid "Can I ask only for company reviews"
+msgstr "Мога ли да помоля само за фирмени отзиви"
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+"да Трябва да маркирате конфигурацията на покана за компания като автоматична "
+"и да се уверите, че нито една конфигурация на покана за продукт не е "
+"маркирана като такава"
+
+msgid "Can I ask only for product reviews"
+msgstr "Мога ли да помоля само за отзиви за продукта"
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+"да Трябва да маркирате конфигурацията на покана за продукт като автоматична "
+"и да се уверите, че нито една конфигурация на покана за компания не е "
+"маркирана като такава"
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+"Не забравяйте, че за да работят поканите за продукти, трябва да заредите "
+"продуктова емисия в настройките на TrustMate"
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Мога ли да поискам отзиви както за фирмата, така и за продукта"
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+"да Трябва да маркирате конфигурациите на покани за компания и продукт като "
+"автоматични"
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+"В такъв случай препоръчваме да конфигурирате фирмени покани за изпращане "
+"поне няколко дни преди продукт"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Изпращането им заедно може да понижи процента на реализация"
+
+msgid "What is UUID"
+msgstr "Какво е UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "UUID кодът е уникален идентификатор за вашия акаунт на TrustMate"
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "Ще го намерите в раздела <em> Интеграция </em>"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Как мога да добавя джаджа с оценки и рецензии"
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+"Уиджет, който се придържа към ръба на екрана, може да бъде включен с едно "
+"щракване в конфигурацията на плъгина"
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+"Всички други джаджи, които можете да вградите в сайта си, като използвате "
+"функциите на Wordpress: джаджи и теми"
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+"Кога трябва да активирам „Искане на разрешение за изпращане на покана за "
+"преглед“"
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+"Винаги, когато не получите такова съгласие в предишни стъпки на транзакция и "
+"вашият документ с правила не се справя с проблема"
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Как мога да скрия отзивите за продукти на WooCommerce"
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Трябва да изключите прегледите на WooCommerce по подразбиране в: "
+"<em>WooCommerce → Настройки → Продукти → Активиране на прегледи на "
+"продукти</em>"
+
+msgid "Do you support WPML?"
+msgstr "Поддържате ли WPML?"
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+"Да, но имайте предвид, че трябва да добавите конфигурации на покани за "
+"всички езици, които искате да използвате в панела TrustMate.io"
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Как мога да реша коя от моята продуктова категория се изпраща на TrustMate."
+"io?"
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""
+"Ако използвате няколко категории за вашия продукт, единственият начин е да "
+"използвате функцията за основна категория от приставката за SEO на Yoast"

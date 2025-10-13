@@ -16,13 +16,26 @@ wp-content/blogs.dir/
 wp-content/upgrade/
 wp-content/uploads/
 
-# WordPress Plugins (keep only custom plugins)
-wp-content/plugins/
-!wp-content/plugins/index.php
+# WordPress Plugins (exclude only WordPress.org plugins, keep custom ones)
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
 
-# WordPress Themes (keep only custom themes)
-wp-content/themes/
-!wp-content/themes/index.php
+# WordPress Themes (exclude only default themes, keep custom ones)
+wp-content/themes/twentytwentyfive/
+wp-content/themes/twentytwentyfour/
+wp-content/themes/twentytwentythree/
+wp-content/themes/twentytwentytwo/
+wp-content/themes/twentytwentyone/
+wp-content/themes/twentytwenty/
+wp-content/themes/twentynineteen/
+wp-content/themes/twentyseventeen/
+wp-content/themes/twentysixteen/
+wp-content/themes/twentyfifteen/
+wp-content/themes/twentyfourteen/
+wp-content/themes/twentythirteen/
+wp-content/themes/twentytwelve/
+wp-content/themes/twentyeleven/
+wp-content/themes/twentyten/
 
 # System Files
 .DS_Store

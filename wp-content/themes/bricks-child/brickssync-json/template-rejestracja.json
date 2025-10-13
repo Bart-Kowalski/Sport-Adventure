@@ -1,0 +1,32 @@
+{
+    "ID": 10152,
+    "post_author": "1",
+    "post_date": "2025-02-11 00:40:56",
+    "post_date_gmt": "2025-02-10 23:40:56",
+    "post_content": "",
+    "post_title": "Rejestracja",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "rejestracja",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-02-11 00:42:28",
+    "post_modified_gmt": "2025-02-10 23:42:28",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/rejestracja/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_template_type": "content",
+        "_bricks_page_content_2": "a:8:{i:0;a:5:{s:2:\"id\";s:6:\"8689b9\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"dff84f\";}s:8:\"settings\";a:0:{}}i:1;a:5:{s:2:\"id\";s:6:\"dff84f\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"8689b9\";s:8:\"children\";a:2:{i:0;s:6:\"fd8373\";i:1;s:6:\"2edccd\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"johsnl\";}}}i:2;a:5:{s:2:\"id\";s:6:\"777f4b\";s:4:\"name\";s:8:\"xwsforms\";s:6:\"parent\";s:6:\"fd8373\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:10:\"formSelect\";s:1:\"6\";s:17:\"_cssGlobalClasses\";a:2:{i:0;s:23:\"acss_import_form--light\";i:1;s:6:\"oohfgy\";}}}i:3;a:5:{s:2:\"id\";s:6:\"a233b4\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"fd8373\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:13:\"Utwórz konto\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"jfprxk\";}s:3:\"tag\";s:2:\"h1\";}}i:4;a:6:{s:2:\"id\";s:6:\"fd8373\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";s:6:\"dff84f\";s:8:\"children\";a:2:{i:0;s:6:\"a233b4\";i:1;s:6:\"777f4b\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"lbfpie\";}}s:5:\"label\";s:9:\"logowanie\";}i:5;a:6:{s:2:\"id\";s:6:\"2edccd\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";s:6:\"dff84f\";s:8:\"children\";a:2:{i:0;s:6:\"5c7bd7\";i:1;s:6:\"d5665d\";}s:8:\"settings\";a:7:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"xtishl\";}s:8:\"_display\";s:4:\"flex\";s:10:\"_direction\";s:6:\"column\";s:7:\"_rowGap\";s:14:\"var(--space-s)\";s:11:\"_alignItems\";s:7:\"stretch\";}s:5:\"label\";s:11:\"rejestracja\";}i:6;a:5:{s:2:\"id\";s:6:\"5c7bd7\";s:4:\"name\";s:10:\"text-basic\";s:6:\"parent\";s:6:\"2edccd\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:4:\"text\";s:16:\"Masz już konto?\";s:3:\"tag\";s:1:\"p\";}}i:7;a:5:{s:2:\"id\";s:6:\"d5665d\";s:4:\"name\";s:6:\"button\";s:6:\"parent\";s:6:\"2edccd\";s:8:\"children\";a:0:{}s:8:\"settings\";a:5:{s:4:\"text\";s:12:\"Zaloguj się\";s:3:\"tag\";s:6:\"button\";s:5:\"style\";s:7:\"primary\";s:17:\"_cssGlobalClasses\";a:2:{i:0;s:24:\"acss_import_btn--outline\";i:1;s:6:\"imllgn\";}s:4:\"link\";a:2:{s:4:\"type\";s:8:\"external\";s:3:\"url\";s:10:\"/logowanie\";}}}}",
+        "_bricks_editor_mode": "bricks",
+        "_edit_lock": "1742520021:1"
+    }
+}

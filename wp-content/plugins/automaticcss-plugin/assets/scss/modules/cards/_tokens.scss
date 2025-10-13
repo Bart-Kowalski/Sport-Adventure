@@ -1,0 +1,34 @@
+@if $option-cards == on {
+	:root {
+		@each $prop, $value in $card-styles-global {
+			@if $value != null {
+				--#{$prop}: #{$value};
+			}
+		}
+	}
+	// Include support for color scheme
+	:root, #{$color-scheme-main-selectors}, .color-scheme--alt {
+		@each $prop, $value in $card-styles-light {
+			@if $value != null {
+				--light-#{$prop}: #{$value};
+			}
+		}
+		@each $prop, $value in $card-styles-dark {
+			@if $value != null {
+				--dark-#{$prop}: #{$value};
+			}
+		}
+	}
+	// Deprecated From Frames
+	@if $option-frames == on {
+		:root {
+			--fr-card-padding: var(--card-padding),
+			--fr-card-gap: var(--card-gap),
+			--fr-card-border-size: var(--card-border-width),
+			--fr-card-border-color: var(--card-border-color),
+			--fr-card-border-style: var(--card-border-style),
+			--fr-card-radius: var(--card-radius),
+			--fr-card-avatar-radius: var(--card-avatar-radius),
+		}
+	}
+}

@@ -1,0 +1,8 @@
+[data-x-dynamic-chart] {
+    aspect-ratio: 2/1;
+    width: 800px;
+}
+
+[data-x-dynamic-chart="doughnut"] {
+    aspect-ratio: 1/1;
+}

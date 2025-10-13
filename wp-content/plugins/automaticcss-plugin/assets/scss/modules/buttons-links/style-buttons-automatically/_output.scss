@@ -1,0 +1,12 @@
+// This mixin required to bypass @import scss warnings
+@mixin if-style-buttons-automatically-on {
+	@if $option-style-buttons-automatically == on {
+		@content;
+	}
+}
+
+// @include if-style-buttons-automatically-on {
+// 	@include if-bricks-on {
+// 		@import "bricks";
+// 	}
+// }

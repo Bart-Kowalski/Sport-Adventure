@@ -1,0 +1,5 @@
+/*!
+ * Pintura v8.82.15
+ * (c) 2018-2024 PQINA Inc. - All Rights Reserved
+ * License: https://pqina.nl/pintura/license/
+ */

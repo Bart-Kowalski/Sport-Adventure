@@ -1,0 +1,72 @@
+@mixin icon($theme: #{$icon-default-theme}, $style: #{$icon-default-style}, $size: #{$icon-size}) {
+	// Include styles
+	@if $theme == "light" {
+		@each $prop, $value in $icon-light-styles {
+			--icon-#{$prop}: #{if($value != null, $value, null)};
+		}
+	}
+	@if $theme == "dark" {
+		@each $prop, $value in $icon-dark-styles {
+			--icon-#{$prop}: #{if($value != null, $value, null)};
+		}
+	}
+	// Element list is added via :is() to slightly increase specificity
+	// This is to override builder defaults
+	&:is(svg, i, a) {
+		// Static
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		box-sizing: content-box;
+		// Colors
+		color: var(--icon-color, var(--neutral-dark));
+		// Dimension
+		font-size: var(--icon-size);
+		height: var(--icon-height, var(--icon-size, 24px));
+		width: var(--icon-width, var(--icon-size, 24px));
+		// Transition
+		transition: var(--icon-transition,  var(--transition));
+		// Boxed Styles
+		@if $style == "box" or $style == "Box" or $style == "Boxed" or $style == "boxed" {
+			@include icon-boxed-styles;
+		}
+		// Shadow Styles
+		box-shadow: var(--icon-shadow, none);
+	}
+
+	// Support <i> elements that use pseudos
+	&:is(i)::before {
+		width: 100%;
+		height: 100%;
+		text-align: center;
+		font-size: var(--icon-size);
+	}
+
+	// Override for Bricks default nonsense
+	&.brxe-icon {
+		font-size: var(--icon-size);
+	}
+
+	// Overrides for when icon is also a link
+	svg {
+		color: var(--icon-color);
+	}
+
+	// Support hover when the icon is inside a link
+	&:is(a):hover,
+	[data-icon-hover]:hover, [data-icon-hover]:hover [data-icon] {
+		--icon-background: var(--icon-background-hover);
+		--icon-color: var(--icon-color-hover);
+		--icon-border-color: var(--icon-border-color-hover);
+	}
+}
+
+@mixin icon-boxed-styles {
+	padding: var(--icon-padding, 12px);
+	border-width: var(--icon-border-width, 0);
+	border-style: var(--icon-border-style, solid);
+	border-radius: var(--icon-radius, var(--radius));
+	background: var(--icon-background, var(--neutral-ultra-light));
+	border-color: var(--icon-border-color, transparent);
+}

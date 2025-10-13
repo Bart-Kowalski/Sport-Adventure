@@ -1,0 +1,87 @@
+:root {
+	--fr-switch-disabledColor: #e0e0e0;
+	--fr-switch-indicatorPadding: 0.2em;
+	--fr-switch-enabledColor: #2196f3;
+	--fr-switch-indicatorWidth: 1.5em;
+	--fr-switch-indicatorHeight: 1.5em;
+	--fr-switch-indicatorTransition: all .3s ease;
+}
+
+
+.fr-switch {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	width: 100%;
+	position: relative;
+}
+
+.fr-switch__slider {
+	position: relative;
+	border-radius: 5em;
+}
+
+.fr-switch__slider-indicator {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	border-radius: 50%;
+}
+
+.fr-switch[aria-pressed="false"] .fr-switch__slider-indicator {
+	background-color: var(--fr-switch-disabledColor);
+	left: var(--fr-switch-indicatorPadding);
+}
+
+.fr-switch[aria-pressed="true"] .fr-switch__slider-indicator {
+	background-color: var(--fr-switch-enabledColor);
+	left: 100%;
+	transform: translateY(-50%) translateX(calc(-100% - var(--fr-switch-indicatorPadding)));
+}
+
+.fr-switch__slider-indicator {
+	width: var(--fr-switch-indicatorWidth);
+	height: var(--fr-switch-indicatorHeight);
+	transition: var(--fr-switch-indicatorTransition);
+}
+
+
+.fr-switch-content {
+	position: relative;
+	width: 100%;
+}
+
+:where(.fr-switch-content > *:not(.fr-switch--active)) {
+	z-index: -1;
+	pointer-events: none;
+}
+
+.fr-switch-content > * {
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	visibility: hidden;
+	transition-property: visibility, opacity, transform;
+	transition-duration: 0.3s;
+}
+
+.fr-switch-content > *.fr-switch--active {
+	position: relative;
+	opacity: 1;
+	visibility: visible;
+}
+
+.fr-warning {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	background-color: #fff3cd;
+	color: #856404;
+	padding: 0.75rem 1.25rem;
+	border: 1px solid #ffeeba;
+	border-radius: 0.25rem;
+}

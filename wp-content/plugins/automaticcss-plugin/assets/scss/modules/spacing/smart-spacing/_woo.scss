@@ -1,0 +1,6 @@
+@if $option-smart-spacing == on {
+    // Woo
+    :not(.woocommerce-checkout) [class*="woocommerce"] * + p {
+        @include smart-spacing;
+    }
+}

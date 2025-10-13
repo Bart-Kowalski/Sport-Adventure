@@ -1,0 +1,86 @@
+.brxe-brxc-darkmode-btn{
+  --wrapper-size: 2.5em;
+  --button-outline: 2px;
+  --button-outline-color: #000000;
+  --button-border-radius: 100px;
+  --button-box-shadow: none;
+  --light-icon-color: #000000;
+  --light-icon-size: 100%;
+  --light-bg-color: rgba(39, 32, 32, 0);
+  --dark-icon-color: #ffffff;
+  --dark-icon-size: 120%;
+  --dark-bg-color: #353d4e;
+  aspect-ratio: 1;
+ }
+
+.brxe-brxc-darkmode-btn label{
+  margin-bottom: 0;
+}
+
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox{
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.brxe-brxc-darkmode-btn .brxc-toggle-slot{
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: var(--button-border-radius);
+  background-color: var(--light-bg-color);
+  transition: background-color 250ms;
+  border-color: var(--button-outline-color);
+  border-width: var(--button-outline);
+  border-style: solid;
+  cursor: pointer;
+  justify-content: center;
+  height: var(--wrapper-size);
+  width: var(--wrapper-size);
+  box-sizing: initial;
+  box-shadow: var(--button-box-shadow);
+}
+.brxe-brxc-darkmode-btn.no-animation .brxc-toggle-slot{
+  transition: none;
+}
+
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox:checked ~ label .brxc-toggle-slot {
+  background-color: var(--dark-bg-color);
+}
+
+.brxe-brxc-darkmode-btn .brxc-sun-icon {
+  position: relative;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scale: var(--light-icon-size);
+  fill: var(--light-icon-color);
+  color: var(--light-icon-color);
+}
+
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox ~ label .brxc-toggle-slot .brxc-moon-icon-wrapper,
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox:checked ~ label .brxc-toggle-slot .brxc-sun-icon-wrapper {
+  display: none;
+}
+
+
+.brxe-brxc-darkmode-btn .brxc-moon-icon {
+  fill: var(--dark-icon-color);
+  color: var(--dark-icon-color);
+  scale: var(--dark-icon-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox ~ label .brxc-toggle-slot .brxc-moon-icon-wrapper {
+  height: 2em;
+  display: none;
+}
+.brxe-brxc-darkmode-btn .brxc-toggle-checkbox:checked ~ label .brxc-toggle-slot .brxc-moon-icon-wrapper {
+  display: flex;
+  height: 2em;
+}

@@ -1,0 +1,13 @@
+// Feature Option
+$option-display: on !default;
+
+// Map
+$display-types: (
+	inline: inline,
+	block: block,
+	contents: contents,
+	inline-block: inline-block,
+	inline-flex: inline-flex,
+	list-item: list-item,
+	none: none,
+);

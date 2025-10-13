@@ -1,0 +1,31 @@
+{
+    "ID": 10143,
+    "post_author": "1",
+    "post_date": "2025-02-11 00:32:28",
+    "post_date_gmt": "2025-02-10 23:32:28",
+    "post_content": "",
+    "post_title": "Logowanie",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "logowanie",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-02-11 00:44:18",
+    "post_modified_gmt": "2025-02-10 23:44:18",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/logowanie/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_template_type": "wc_account_form_login",
+        "_bricks_page_content_2": "a:8:{i:0;a:5:{s:2:\"id\";s:6:\"hfvava\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"phlyhs\";}s:8:\"settings\";a:0:{}}i:1;a:5:{s:2:\"id\";s:6:\"phlyhs\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"hfvava\";s:8:\"children\";a:2:{i:0;s:6:\"osrifh\";i:1;s:6:\"bzmjtw\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"johsnl\";}}}i:2;a:6:{s:2:\"id\";s:6:\"osrifh\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";s:6:\"phlyhs\";s:8:\"children\";a:2:{i:0;s:6:\"lczmfy\";i:1;s:6:\"zxssra\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"lbfpie\";}}s:5:\"label\";s:9:\"logowanie\";}i:3;a:5:{s:2:\"id\";s:6:\"lczmfy\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"osrifh\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:12:\"Zaloguj się\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"jfprxk\";}s:3:\"tag\";s:2:\"h1\";}}i:4;a:6:{s:2:\"id\";s:6:\"bzmjtw\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";s:6:\"phlyhs\";s:8:\"children\";a:2:{i:0;s:6:\"gvntso\";i:1;s:6:\"eymnmq\";}s:8:\"settings\";a:3:{s:10:\"taxonomies\";a:2:{i:0;s:8:\"category\";i:1;s:8:\"post_tag\";}s:21:\"extrasCustomQueryCode\";s:103:\"<style>\nh1.my-heading {\n  color: crimson;\n}\n</style>\n\n<h1 class='my-heading'>Just some custom HTML</h1>\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"xtishl\";}}s:5:\"label\";s:11:\"rejestracja\";}i:5;a:5:{s:2:\"id\";s:6:\"gvntso\";s:4:\"name\";s:10:\"text-basic\";s:6:\"parent\";s:6:\"bzmjtw\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:4:\"text\";s:15:\"Nie masz konta?\";s:3:\"tag\";s:1:\"p\";}}i:6;a:5:{s:2:\"id\";s:6:\"eymnmq\";s:4:\"name\";s:6:\"button\";s:6:\"parent\";s:6:\"bzmjtw\";s:8:\"children\";a:0:{}s:8:\"settings\";a:5:{s:4:\"text\";s:16:\"Zarejestruj się\";s:3:\"tag\";s:6:\"button\";s:5:\"style\";s:7:\"primary\";s:17:\"_cssGlobalClasses\";a:2:{i:0;s:24:\"acss_import_btn--outline\";i:1;s:6:\"imllgn\";}s:4:\"link\";a:2:{s:4:\"type\";s:8:\"external\";s:3:\"url\";s:12:\"/rejestracja\";}}}i:7;a:5:{s:2:\"id\";s:6:\"zxssra\";s:4:\"name\";s:12:\"ws-form-form\";s:6:\"parent\";s:6:\"osrifh\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:7:\"form-id\";s:1:\"2\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:23:\"acss_import_form--light\";}}}}",
+        "_bricks_editor_mode": "bricks"
+    }
+}

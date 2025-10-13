@@ -1,0 +1,63 @@
+:root {
+  --fr-slider-progress-bar-color: var(--neutral-ultra-light);
+  --fr-slider-progress-bar-progress-color: var(--neutral-ultra-dark);
+  --fr-slider-progress-bar-height: 1rem;
+  --fr-slider-progress-bar-width: 100%;
+}
+
+
+.fr-slider-custom-navigation{
+  width: 100%;
+}
+/* Progress */
+
+.brxe-fr-slider-controls[data-fr-slider-nav-type="progress"] {
+  height: var(--fr-slider-progress-bar-height);
+}
+
+.fr-slider__progress {
+  background: var(--fr-slider-progress-bar-color);
+  position: relative!important;
+  height: var(--fr-slider-progress-bar-height);
+  overflow: hidden;
+  width: var(--fr-slider-progress-bar-width);
+}
+
+.iframe .fr-slider__progress{
+  min-height: var(--fr-slider-progress-bar-height);
+}
+
+.fr-slider__progress-bar{
+  background: var(--fr-slider-progress-bar-progress-color);
+  transition: width 400ms ease;
+  width: 0;
+  height: 100%;
+}
+
+.iframe .fr-slider__progress-bar{
+  width: 30%!important;
+
+}
+
+.fr-slider__progress-buttons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  height: var(--fr-slider-progress-bar-height);
+  }
+
+.fr-slider__progress-button {
+  flex-grow: 1;
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+}
+
+/* Arrows */
+
+.fr-slider__custom-arrows {
+  display: flex;
+  align-items: flex-start;
+}

@@ -1,0 +1,157 @@
+@mixin f-label-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  background-color: var(#{$prefix}-label-background-color, #{if($theme == 'dark', $f-dark-label-background-color, $f-light-label-background-color)});
+  color: var(#{$prefix}-label-text-color, #{if($theme == 'dark', $f-dark-label-text-color, $f-light-label-text-color)});
+  font-size: var(--f-label-size, --text-m);
+  font-weight: var(--f-label-font-weight, #{$f-label-font-weight});
+  line-height: var(--f-label-line-height, #{$f-label-line-height});
+  margin-block-end: var(--f-label-margin-bottom, #{$f-label-margin-bottom});
+  text-transform: var(--f-label-text-transform, #{$f-label-text-transform});
+  padding: var(--f-label-padding-y, #{$f-label-padding-y}) var(--f-label-padding-x, #{$f-label-padding-x});
+}
+
+@mixin f-input-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  background-color: var(#{$prefix}-input-background, #{if($theme == 'dark', $f-dark-input-background, $f-light-input-background)});
+  border-top-width: var(--f-input-border-top-size, #{$f-input-border-top-size}rem);
+  border-right-width: var(--f-input-border-right-size, #{$f-input-border-right-size}rem);
+  border-bottom-width: var(--f-input-border-bottom-size, #{$f-input-border-bottom-size}rem);
+  border-left-width: var(--f-input-border-left-size, #{$f-input-border-left-size}rem);
+  border-style: var(--f-input-border-style, #{$f-input-border-style});
+  border-color: var(#{$prefix}-input-border-color, #{if($theme == 'dark', $f-dark-input-border-color, $f-light-input-border-color)});
+  border-radius: var(--f-input-border-radius, #{$f-input-border-radius});
+  color: var(#{$prefix}-input-text-color, #{if($theme == 'dark', $f-dark-input-text-color, $f-light-input-text-color)});
+  font-size: var(--f-input-size, --text-m);
+  font-weight: var(--f-input-font-weight, #{$f-input-font-weight});
+  line-height: var(--f-input-line-height, #{$f-input-line-height});
+  padding: var(--f-input-padding-y, #{$f-input-padding-y}) var(--f-input-padding-x, #{$f-input-padding-x});
+  -webkit-border-radius: var(--f-input-border-radius, #{$f-input-border-radius});
+  -moz-border-radius: var(--f-input-border-radius, #{$f-input-border-radius});
+  -ms-border-radius: var(--f-input-border-radius, #{$f-input-border-radius});
+  -o-border-radius: var(--f-input-border-radius, #{$f-input-border-radius});
+	transition: var(--transition-duration) var(--transition-timing) var(--transition-delay);
+
+	&:hover:not([data-wsf-legal]), &:hover:enabled:not(:focus):not([data-wsf-legal]) {
+    background-color: var(#{$prefix}-input-color-background-hover, #{if($theme == 'dark', $f-dark-input-color-background-hover, $f-light-input-color-background-hover)});
+    border-color: var(#{$prefix}-input-border-color-hover, #{if($theme == 'dark', $f-dark-input-border-color-hover, $f-light-input-border-color-hover)});
+    color: var(#{$prefix}-input-text-color-hover, #{if($theme == 'dark', $f-dark-input-text-color-hover, $f-light-input-text-color-hover)});
+  }
+
+
+}
+
+@mixin f-btn-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  background-color: var(#{$prefix}-btn-background, #{if($theme == 'dark', $f-dark-btn-background, $f-light-btn-background)});
+  color: var(#{$prefix}-btn-text-color, #{if($theme == 'dark', $f-dark-btn-text-color, $f-light-btn-text-color)});
+  border-style: var(--f-btn-border-style, #{$f-btn-border-style});
+  border-width: var(--f-btn-border-width, #{$f-btn-border-width});
+  border-color: var(#{$prefix}-btn-border-color, #{if($theme == 'dark', $f-dark-btn-border-color, $f-light-btn-border-color)});
+  border-radius: var(--f-btn-border-radius, #{$f-btn-border-radius});
+  -webkit-border-radius: var(--f-btn-border-radius, #{$f-btn-border-radius});
+  -moz-border-radius: var(--f-btn-border-radius, #{$f-btn-border-radius});
+  -ms-border-radius: var(--f-btn-border-radius, #{$f-btn-border-radius});
+  -o-border-radius: var(--f-btn-border-radius, #{$f-btn-border-radius});
+  font-size: var(--f-btn-text-size, --text-m);
+  font-weight: var(--f-btn-font-weight, #{$f-btn-font-weight});
+  line-height: var(--f-btn-line-height, #{$f-btn-line-height});
+  padding: var(--f-btn-padding-y, #{$f-btn-padding-y}) var(--f-btn-padding-x, #{$f-btn-padding-x});
+  margin-block-start: var(--f-btn-margin-top, #{$f-btn-margin-top});
+  text-align: center;
+  -webkit-text-decoration: var(--f-btn-text-decoration, #{$f-btn-text-decoration});
+  text-decoration: var(--f-btn-text-decoration, #{$f-btn-text-decoration});
+  text-transform: var(--f-btn-text-transform, #{$f-btn-text-transform});
+  transition: all var(--btn-transition-duration) ease;
+
+  &:hover {
+    background-color: var(#{$prefix}-btn-background-hover, #{if($theme == 'dark', $f-dark-btn-background-hover, $f-light-btn-background-hover)});
+    color: var(#{$prefix}-btn-text-color-hover, #{if($theme == 'dark', $f-dark-btn-text-color-hover, $f-light-btn-text-color-hover)});
+    border-color: var(#{$prefix}-btn-border-color-hover, #{if($theme == 'dark', $f-dark-btn-border-color-hover, $f-light-btn-border-color-hover)});
+  }
+}
+
+@mixin f-option-label-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  background-color: var(#{$prefix}-option-background-color, #{if($theme == 'dark', $f-dark-option-background-color, $f-light-option-background-color)});
+  display: inline-block;
+  color: var(#{$prefix}-label-text-color, #{if($theme == 'dark', $f-dark-label-text-color, $f-light-label-text-color)});
+  font-family: inherit;
+  font-size: var(--f-option-label-size, --text-m);
+  font-weight: var(--f-option-label-font-weight, #{$f-option-label-font-weight});
+  line-height: var(--f-option-label-line-height, #{$f-option-label-line-height});
+  margin: 0 0 10px;
+  -webkit-padding-start: 1.75em;
+  padding-inline-start: 1.75em;
+}
+
+@mixin f-focus-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  border-color: var(#{$prefix}-focus-color, #{if($theme == 'dark', $f-dark-focus-color, $f-light-focus-color)});
+  box-shadow: 0 0 0 4px hsl(var(#{$prefix}-focus-hsl, #{if($theme == 'dark', $f-dark-focus-hsl, $f-light-focus-hsl)}) / var(#{$prefix}-focus-color-opacity, #{if($theme == 'dark', $f-dark-focus-color-opacity, $f-light-focus-color-opacity)}));
+  outline: 0;
+
+//@include default-focus-style(shadow);
+
+}
+
+@mixin f-select-arrow-style($theme: 'light') {
+  $prefix: if($theme == 'dark', '--f-dark', '--f-light');
+
+  background-image: linear-gradient(45deg, transparent 50%, var(#{$prefix}-select-arrow-color, #{if($theme == 'dark', $f-dark-select-arrow-color, $f-light-select-arrow-color)}) 0),
+    linear-gradient(135deg, var(#{$prefix}-select-arrow-color, #{if($theme == 'dark', $f-dark-select-arrow-color, $f-light-select-arrow-color)}) 50%, transparent 0);
+  background-position: calc(100% - 20px) calc(50% + 2px), calc(100% - 16px) calc(50% + 2px);
+  background-repeat: no-repeat;
+  background-size: 4px 4px, 4px 4px;
+}
+
+// Fluent Forms → Radio Buttons
+
+@mixin radio-buttons-list {
+  .ff-el-input--content {
+    display: flex;
+		flex-flow: row wrap;
+    gap: var(--f-option-label-spacing, #{$f-option-label-spacing});
+
+    & .ff-el-form-check {
+      margin: 0;
+    }
+  }
+}
+
+@mixin radio-buttons-style($button-style, $button-active-style) {
+  .ff-el-form-check:first-child label>span,
+  .ff-el-form-check label>span,
+  .ff-el-form-check:last-child label>span {
+    @include btn(#{$button-style});
+  }
+
+  .ff-el-form-check.ff_item_selected:first-child label>span,
+  .ff-el-form-check.ff_item_selected label>span {
+    @include btn(#{$button-active-style});
+    box-shadow: none !important;
+  }
+}
+
+@mixin radio-buttons-mobile {
+  @media only screen and (max-width: 768px) {
+    .ff-el-input--content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ff-el-form-check {
+      width: 100%;
+      margin: 0;
+
+      & label > span {
+        border: var(--btn-border-width) var(--btn-border-style) var(--btn-border-color) !important;
+        border-radius: var(--btn-radius) !important;
+      }
+    }
+  }
+}

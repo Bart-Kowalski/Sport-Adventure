@@ -1,0 +1,13 @@
+$option-animation-text-reveal: off !default;
+
+$animation-text-reveal-color-initial: var(--black-trans-20) !default;
+$animation-text-reveal-color-animated: var(--text-dark, var(--black)) !default;
+$animation-text-reveal-offset-start: 75px;
+$animation-text-reveal-offset-end: 75vh;
+
+$animation-text-reveal: (
+	'text-reveal-color-initial': $animation-text-reveal-color-initial,
+	'text-reveal-color-animated': $animation-text-reveal-color-animated,
+	'text-reveal-offset-start': $animation-text-reveal-offset-start,
+	'text-reveal-offset-end': $animation-text-reveal-offset-end,
+);

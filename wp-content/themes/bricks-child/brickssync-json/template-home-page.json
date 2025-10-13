@@ -1,0 +1,33 @@
+{
+    "ID": 21,
+    "post_author": "1",
+    "post_date": "2024-07-05 07:57:43",
+    "post_date_gmt": "2024-07-05 07:57:43",
+    "post_content": "",
+    "post_title": "Home page",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "home-page",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-09-12 14:02:17",
+    "post_modified_gmt": "2025-09-12 12:02:17",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/?post_type=bricks_template&#038;p=21",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_edit_last": "1",
+        "_edit_lock": "1755523373:3",
+        "_bricks_template_type": "content",
+        "_bricks_editor_mode": "bricks",
+        "_brickssync_import_file": "template-home-page.json"
+    }
+}

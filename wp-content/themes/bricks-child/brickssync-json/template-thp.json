@@ -1,0 +1,33 @@
+{
+    "ID": 9120,
+    "post_author": "1",
+    "post_date": "2025-01-08 15:35:54",
+    "post_date_gmt": "2025-01-08 14:35:54",
+    "post_content": "",
+    "post_title": "THP",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "thp",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-03-11 22:35:14",
+    "post_modified_gmt": "2025-03-11 21:35:14",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/?post_type=bricks_template&#038;p=9120",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_edit_last": "1",
+        "_edit_lock": "1736347118:1",
+        "_bricks_template_type": "wc_thankyou",
+        "_bricks_page_content_2": "a:5:{i:0;a:6:{s:2:\"id\";s:6:\"zztfse\";s:4:\"name\";s:3:\"div\";s:6:\"parent\";i:0;s:8:\"children\";a:2:{i:0;s:6:\"gdptht\";i:1;s:6:\"jawyzb\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:11:\"ZhVlgmusijl\";}}s:5:\"label\";s:29:\"Thank you Section Alpha (CSS)\";}i:1;a:6:{s:2:\"id\";s:6:\"gdptht\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"zztfse\";s:8:\"children\";a:1:{i:0;s:6:\"shunvv\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:11:\"ZhVlgkfsrng\";}}s:5:\"label\";s:13:\"Intro Foxtrot\";}i:2;a:6:{s:2:\"id\";s:6:\"shunvv\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"gdptht\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:12:\"Udało się!\";s:3:\"tag\";s:2:\"h1\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:11:\"ZhVlgfs98tf\";}}s:5:\"label\";s:7:\"Heading\";}i:3;a:6:{s:2:\"id\";s:6:\"jawyzb\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"zztfse\";s:8:\"children\";a:1:{i:0;s:6:\"ohvvid\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:11:\"ZhVlgxkppya\";}}s:5:\"label\";s:5:\"Inner\";}i:4;a:5:{s:2:\"id\";s:6:\"ohvvid\";s:4:\"name\";s:9:\"shortcode\";s:6:\"parent\";s:6:\"jawyzb\";s:8:\"children\";a:0:{}s:8:\"settings\";a:1:{s:9:\"shortcode\";s:23:\"[sa_order_confirmation]\";}}}",
+        "_bricks_editor_mode": "bricks"
+    }
+}

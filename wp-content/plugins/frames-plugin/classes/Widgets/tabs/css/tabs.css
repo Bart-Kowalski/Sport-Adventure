@@ -1,0 +1,179 @@
+:root {
+	--animated-color: var(--neutral-ultra-light);
+	--active-tab-bg: var(--neutral-ultra-light);
+}
+
+:where(.fr-tabs) {
+	width: 100%;
+	display: grid;
+}
+
+:where(.fr-tabs__list) {
+	position: relative;
+}
+
+:where(.fr-tabs__link) {
+	position: relative;
+	z-index: 1;
+	cursor: pointer;
+	/* overflow: hidden; */
+}
+
+/* Set Links to full width on Vertical Tab */
+:where(.fr-tabs__list.vertical .fr-tabs__link) {
+	width: 100%;
+}
+
+.fr-tabs__link.brxe-block {
+	width: auto;
+}
+
+/* Set tab link bg to transparent if animated mode is active */
+.fr-tabs__link.fr-tabs__link--trans {
+	background-color: transparent!important;
+}
+
+.fr-tabs__content-item-wrapper {
+	display: none;
+}
+
+/* .fr-tabs__link.active {
+	background-color: var(--active-tab-bg);
+} */
+
+.fr-tabs__content-wrapper.active,
+.fr-tabs__content-item-wrapper.active {
+	display: block;
+}
+
+.fr-tabs__animation {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	width: calc(100% / var(--tabCount));
+	transition-timing-function: ease-in-out;
+	transform: translateX(calc(var(--i) * 100%));
+}
+
+/* TODO im removing this for now, and lets see if eventually there is an isolated case where it might be in use */
+/* TODO this overflow for scroll is actually better to turn into a toggle on bricks builder ?? */
+.fr-tabs__list, .fr-tabs__list.brxe-div  {
+	max-width: 100%;
+	/*overflow-x: scroll;*/
+	flex-direction: row;
+	flex-wrap: nowrap;
+	display: flex;
+}
+
+/* Placeholder styles */
+
+/* .fr-tabs__content-item {
+	padding: var(--space-m);
+	background-color: var(--neutral-light);
+} */
+
+:where(.fr-tabs__content-item-wrapper) {
+	contain: paint;	
+}
+
+/* .fr-tabs__list {
+	visibility: hidden;
+}
+
+.fr-tabs__list.fr-tabs__list--horizontal {
+	flex-direction: row;
+	visibility: visible;
+}
+
+.fr-tabs__list.fr-tabs__list--vertical {
+	flex-direction: column;
+	visibility: visible;
+} */
+
+
+/* FIXES AND OVERWRITES */
+
+/* Fix default list styling */
+.fr-tabs__nav > ul,
+.fr-tabs__content-wrapper > ul,
+.fr-tabs > ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.fr-tabs__nav > li,
+.fr-tabs__content-wrapper > li,
+.fr-tabs > li {
+	list-style-type: none;
+}
+
+
+/* Builder overwrites  */
+
+.fr-tabs .brxe-image.tag {
+	width: 100%;
+}
+
+.fr-tabs__content-item-wrapper.brxe-block {
+	display: none;
+}
+.fr-tabs__content-item-wrapper.brxe-block.active {
+	display: block;
+}
+
+
+/* Hide scrollbar when tabs are smaller than window */
+
+/* TODO im removing this for now, and lets see if eventually there is an isolated case where it might be in use */
+/* is also commented out in JS, but the script is there */
+/*
+.fr-tabs__list.fr-tabs__list--no-scroll {
+	overflow-x: hidden;
+	scrollbar-width: none; /* For Firefox */
+	/*-ms-overflow-style: none; /* For Internet Explorer and Edge */
+/*}
+
+.fr-tabs__list.fr-tabs__list--no-scroll::-webkit-scrollbar {
+	display: none; /* For Chrome, Safari and Opera */
+/*}
+*/
+
+
+/* Accordion way */
+
+.fr-tabs.fr-tabs--accordion .fr-tabs__list {
+	display: flex!important;
+	flex-direction: column!important;
+}
+
+.fr-tabs.fr-tabs--accordion .fr-tabs__animation {
+	display: none!important;
+}
+
+.fr-tabs.fr-tabs--accordion .fr-tabs__content-wrapper {
+	display: none!important;
+}
+
+.fr-tabs.fr-tabs--tabs .fr-tabs__list .fr-tabs__content-item-wrapper {
+	display: none!important;
+}
+
+
+/* Change width to 100% for lists when accordion is active */
+
+.fr-tabs.fr-tabs--accordion .fr-tabs__link {
+	width: 100%;
+}
+
+.fr-builder-preview-content {
+	display: block!important;
+}
+
+.fr-tabs__list.horizontal {
+	flex-direction: row;
+}
+
+.fr-tabs__list.vertical {
+	flex-direction: column;
+}

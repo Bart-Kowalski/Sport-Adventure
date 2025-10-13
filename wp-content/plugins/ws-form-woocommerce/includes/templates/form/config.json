@@ -1,0 +1,126 @@
+{"template_categories": [
+
+	{	
+
+		"id"			:	"woocommerce",
+		"label" 		: 	"WooCommerce",
+		"file_path"		:	"woocommerce/",
+		"templates"		:	[
+
+			{
+				"id"					:	"wsf-form-basic",
+				"label" 				: 	"Basic",
+				"file_json"				:	"wsf-form-basic.json",
+				"pro_required"			:	1
+			},
+
+			{
+				"id"					:	"wsf-form-donate",
+				"label" 				: 	"Donate",
+				"file_json"				:	"wsf-form-donate.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/make-a-donation/"
+			},
+
+			{
+				"id"					:	"wsf-form-calculations",
+				"label" 				: 	"Calculations",
+				"file_json"				:	"wsf-form-calculations.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/calculations/"
+			},
+
+			{
+				"id"					:	"wsf-form-color-swatches",
+				"label" 				: 	"Color Swatches",
+				"file_json"				:	"wsf-form-color-swatches.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/color-swatches/"
+			},
+
+			{
+				"id"					:	"wsf-form-conditional-logic",
+				"label" 				: 	"Conditional Logic",
+				"file_json"				:	"wsf-form-conditional-logic.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/conditional-logic/"
+			},
+
+			{
+				"id"					:	"wsf-form-configurator",
+				"label" 				: 	"Configurator",
+				"file_json"				:	"wsf-form-configurator.json",
+				"pro_required"			:	1
+			},
+
+			{
+				"id"					:	"wsf-form-configurator-cascading",
+				"label" 				: 	"Configurator Cascading",
+				"file_json"				:	"wsf-form-configurator-cascading.json",
+				"pro_required"			:	1
+			},
+
+			{
+				"id"					:	"wsf-form-file-upload",
+				"label" 				: 	"File Upload",
+				"file_json"				:	"wsf-form-file-upload.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/file-upload/"
+			},
+
+			{
+				"id"					:	"wsf-form-hidden-fields",
+				"label" 				: 	"Hidden Fields",
+				"file_json"				:	"wsf-form-hidden-fields.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/file-upload/"
+			},
+
+			{
+				"id"					:	"wsf-form-multi-tab",
+				"label" 				: 	"Multi-Tab",
+				"file_json"				:	"wsf-form-multi-tab.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/multi-tab/"
+			},
+
+			{
+				"id"					:	"wsf-form-personalization",
+				"label" 				: 	"Personalization",
+				"file_json"				:	"wsf-form-personalization.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/t-shirt/"
+			},
+
+			{
+				"id"					:	"wsf-form-repeatable-sections",
+				"label" 				: 	"Repeatable Sections",
+				"file_json"				:	"wsf-form-repeatable-sections.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/repeatable-sections/"
+			},
+
+			{
+				"id"					:	"wsf-form-woocommerce-field-type-demo",
+				"label" 				: 	"Demo: Field Types",
+				"file_json"				:	"wsf-form-woocommerce-field-type-demo.json",
+				"pro_required"			:	1,
+				"preview_url"			:	"https://woocommerce.wsform.com/product/woocommerce-field-types/"
+			},
+
+			{
+				"id"					:	"wsf-form-run-actions-demo",
+				"label" 				: 	"Demo: Run Actions",
+				"file_json"				:	"wsf-form-run-actions-demo.json",
+				"pro_required"			:	1
+			},
+
+			{
+				"id"					:	"wsf-form-variables-demo",
+				"label" 				: 	"Demo: Variables",
+				"file_json"				:	"wsf-form-variables-demo.json",
+				"pro_required"			:	1
+			}
+		]
+	}
+]}

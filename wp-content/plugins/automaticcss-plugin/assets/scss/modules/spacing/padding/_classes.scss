@@ -1,0 +1,24 @@
+@if $option-padding == on {
+	// Padding Classes
+    @each $size, $extension in $sizeExtensions {
+        .padding--#{$extension} {
+            padding: var(--space-#{$extension});
+        }
+    }
+    .padding--none {
+        padding: 0;
+    }
+	// Padding Breakpoint Classes
+	@each $breakpoint, $value in $breakpoints {
+		@include breakpoint($breakpoint) {
+			@each $size, $extension in $sizeExtensions {
+				.padding--#{$breakpoint}-#{$extension} {
+					padding: var(--space-#{$extension});
+				}
+			}
+			.padding--#{$breakpoint}-none {
+				padding: 0;
+			}
+		}
+	}
+}

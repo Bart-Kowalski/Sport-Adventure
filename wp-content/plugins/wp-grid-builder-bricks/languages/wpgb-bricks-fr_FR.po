@@ -1,0 +1,143 @@
+# Loco Gettext template
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Grid Builder - Bricks\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-grid-builder-"
+"bricks\n"
+"POT-Creation-Date: 2024-04-02T12:07:12+00:00\n"
+"PO-Revision-Date: 2024-04-02 14:07+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"POT-Revision-Date: Tue Apr 07 2020 16:32:53 GMT+0200 (heure d’été d’Europe "
+"centrale)\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-KeywordsList: _:1;gettext:1;dgettext:2;ngettext:1,2;dngettext:2,3;"
+"__:1;_e:1;_c:1;_n:1,2;_n_noop:1,2;_nc:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
+"_x:1,2c;_ex:1,2c;_nx:1,2,4c;_nx_noop:1,2,3c;_n_js:1,2;_nx_js:1,2,3c;"
+"esc_attr__:1;esc_html__:1;esc_attr_e:1;esc_html_e:1;esc_attr_x:1,2c;"
+"esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#. Plugin Name of the plugin
+msgid "WP Grid Builder - Bricks"
+msgstr "WP Grid Builder - Bricks"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://www.wpgridbuilder.com"
+msgstr "https://www.wpgridbuilder.com"
+
+#. Description of the plugin
+msgid "Integrate WP Grid Builder with Bricks plugin."
+msgstr "Intégrez WP Grid Builder avec l'extension Bricks."
+
+#. Author of the plugin
+msgid "Loïc Blascos"
+msgstr "Loïc Blascos"
+
+#: includes/class-builder.php:155
+msgid "Please wait, loading content..."
+msgstr "Veuillez patienter, chargement du contenu…"
+
+#: includes/class-builder.php:156
+msgid "No content found in facet."
+msgstr "Aucun contenu trouvé dans la facette."
+
+#: includes/class-extend.php:56
+msgid "WP Grid Builder"
+msgstr "WP Grid Builder"
+
+#: includes/class-extend.php:78
+msgid "Fading Animation"
+msgstr "Animation de fondu"
+
+#: includes/elements/class-facet.php:84
+msgid "Facet"
+msgstr "Facette"
+
+#: includes/elements/class-grid.php:84
+msgid "Grid"
+msgstr "Grille"
+
+#: includes/elements/controls/facet.php:24
+msgid "Select a facet"
+msgstr "Sélectionnez une facette"
+
+#: includes/elements/controls/facet.php:32
+#: includes/elements/controls/facet.php:48
+#: includes/elements/controls/facet.php:66
+#: includes/elements/controls/grid.php:32
+msgid "None"
+msgstr "Aucun"
+
+#: includes/elements/controls/facet.php:40
+msgid "Select a grid or element to filter"
+msgstr "Sélectionnez une grille ou un élément à filtrer"
+
+#: includes/elements/controls/facet.php:58
+msgid "Select a style"
+msgstr "Sélectionnez un style"
+
+#: includes/elements/controls/facet.php:77
+msgid "Or enter an element ID to filter"
+msgstr "Ou saisissez un ID d'élément à filtrer"
+
+#: includes/elements/controls/facet.php:83
+msgid ""
+"Bricks element ID can be found when editing the element in Bricks and starts "
+"with \"#brxe-\"."
+msgstr ""
+"L'ID de l'élément Bricks peut être trouvé lors de l'édition de l'élément "
+"dans Bricks et commence par \"#brxe-\"."
+
+#: includes/elements/controls/facet.php:84
+msgid ""
+"It is mainly used to target an element when editing Popup template in Bricks."
+msgstr ""
+"Il est principalement utilisé pour cibler un élément lors de l'édition du "
+"modèle de Popup dans Bricks."
+
+#: includes/elements/controls/grid.php:24
+msgid "Select a grid"
+msgstr "Sélectionnez une grille"
+
+#: includes/elements/controls/grid.php:40
+msgid "Archive Template"
+msgstr "Modèle d'archive"
+
+#: wp-grid-builder-bricks.php:60
+msgid ""
+"<strong>Gridbuilder ᵂᴾ - Bricks</strong> add-on requires at least "
+"<code>Gridbuilder ᵂᴾ v1.6.8</code>. Please update Gridbuilder ᵂᴾ to use "
+"Bricks add-on."
+msgstr ""
+"Le module <strong>Gridbuilder ᵂᴾ -Bricks</strong> nécessite au moins "
+"<code>Gridbuilder ᵂᴾ v1.6.8</code>. Veuillez mettre à jour Gridbuilder ᵂᴾ "
+"pour utiliser le module Bricks."
+
+#: wp-grid-builder-bricks.php:73
+msgid ""
+"<strong>Gridbuilder ᵂᴾ - Bricks</strong> add-on requires at least "
+"<code>Bricks v1.5.5</code>. Please update and activate Bricks."
+msgstr ""
+"Le module <strong>Gridbuilder ᵂᴾ - Bricks</strong> nécessite au moins "
+"<code>Bricks v1.5.5</code>. Veuillez mettre à jour et activer Bricks."
+
+#~ msgid "No"
+#~ msgstr "Non"
+
+#~ msgid "Yes"
+#~ msgstr "Oui"
+
+#~ msgid "WP Grid Builder facet"
+#~ msgstr "WP Grid Builder facette"
+
+#~ msgid "Settings"
+#~ msgstr "Réglages"

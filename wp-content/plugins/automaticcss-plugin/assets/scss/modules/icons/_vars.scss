@@ -1,0 +1,168 @@
+@import "mixins";
+
+$option-icons: on !default;
+$icon-default-theme: dark !default;
+$icon-data-attribute: data-icon !default;
+$option-boxed-icons: on !default;
+$icon-default-style: null !default;
+@if $option-boxed-icons == on {
+	$icon-default-style: "boxed";
+}
+
+// X-Small
+$icon-size-xs: null !default;
+$icon-padding-xs: null !default;
+
+// Small
+$icon-size-s: null !default;
+$icon-padding-s: null !default;
+
+// Medium
+$icon-size-m: null !default;
+$icon-padding-m: null !default;
+
+// Large
+$icon-size-l: null !default;
+$icon-padding-l: null !default;
+
+// XL
+$icon-size-xl: null !default;
+$icon-padding-xl: null !default;
+
+// XXL
+$icon-size-xxl: null !default;
+$icon-padding-xxl: null !default;
+
+// Default
+$icon-size: $icon-size-m !default;
+$icon-padding: .35em !default;
+$icon-radius: var(--radius) !default;
+$icon-color: null !default;
+$icon-color-hover: null !default;
+$icon-background: null !default;
+$icon-background-hover: null !default;
+$icon-border-color: if($icon-default-theme == dark, var(--icon-dark-border-color), var(--icon-light-border-color));
+$icon-border-color-hover: if($icon-default-theme == dark, var(--icon-dark-border-color-hover), var(--icon-light-border-color-hover));
+$icon-border-width: 0 !default;
+$icon-border-style: 0 !default;
+$icon-shadow: null !default;
+
+// Light
+$icon-light-color: var(--primary-ultra-light) !default;
+$icon-light-color-hover: var(--primary-light) !default;
+$icon-light-background: var(--primary-ultra-dark) !default;
+$icon-light-background-hover: var(--primary-dark) !default;
+/// Light Border Styles
+$icon-light-border-color: var(--primary-ultra-dark) !default;
+$icon-light-border-color-hover: var(--primary-ultra-dark) !default;
+// Light Shadow Styles
+$icon-light-shadow: null !default;
+
+// Dark
+$icon-dark-color: null !default;
+$icon-dark-color-hover: null !default;
+$icon-dark-background: null !default;
+$icon-dark-background-hover: null !default;
+// Dark Border Styles
+$icon-dark-border-color: var(--primary-ultra-dark) !default;
+$icon-dark-border-color-hover: var(--primary-ultra-dark) !default;
+// Dark Shadow Styles
+$icon-dark-shadow: null !default;
+
+@if $icon-default-theme == "dark" {
+	$icon-color: $icon-dark-color;
+	$icon-color-hover: $icon-dark-color-hover;
+	$icon-background: $icon-dark-background;
+	$icon-background-hover: $icon-dark-background-hover;
+	$icon-border-color: $icon-dark-border-color;
+	$icon-border-color-hover: $icon-dark-border-color-hover;
+	$icon-shadow: $icon-dark-shadow;
+} @else {
+	$icon-color: $icon-light-color;
+	$icon-color-hover: $icon-light-color-hover;
+	$icon-background: $icon-light-background;
+	$icon-background-hover: $icon-light-background-hover;
+	$icon-border-color: $icon-light-border-color;
+	$icon-border-color-hover: $icon-light-border-color-hover;
+	$icon-shadow: $icon-light-shadow;
+}
+
+// List Icon Styles
+$option-boxed-list-icons: off !default;
+$icon-list-icon-size: 1em !default;
+$icon-list-gap: null !default;
+$icon-block-offset: null !default;
+$icon-inline-offset: null !default;
+
+// Main icon styles map
+// The tokens loop has "icon" as a fixed prefix, so don't prefix keys here with "icon."
+$icon-styles: (
+	"default": (
+		"size": $icon-size,
+		"padding": $icon-padding,
+		"radius": $icon-radius,
+		"background": $icon-background,
+		"background-hover": $icon-background-hover,
+		"border-color": $icon-border-color,
+		"border-color-hover": $icon-border-color-hover,
+		"border-width": $icon-border-width,
+		"border-style": $icon-border-style,
+		"color": $icon-color,
+		"color-hover": $icon-color-hover,
+		"shadow": $icon-shadow,
+		"list-icon-size": $icon-list-icon-size,
+		"list-gap": $icon-list-gap,
+		"block-offset": $icon-block-offset,
+		"inline-offset": $icon-inline-offset,
+	),
+	"light": (
+		"color": $icon-light-color,
+		"color-hover": $icon-light-color-hover,
+		"background": $icon-light-background,
+		"background-hover": $icon-light-background-hover,
+		"border-color": $icon-light-border-color,
+		"border-color-hover": $icon-light-border-color-hover,
+		"shadow": $icon-light-shadow,
+	),
+	"dark": (
+		"color": $icon-dark-color,
+		"color-hover": $icon-dark-color-hover,
+		"background": $icon-dark-background,
+		"background-hover": $icon-dark-background-hover,
+		"border-color": $icon-dark-border-color,
+		"border-color-hover": $icon-dark-border-color-hover,
+		"shadow": $icon-dark-shadow,
+	),
+);
+
+// Icon sizes map
+$icon-sizes-map: (
+	xs: ($icon-size-xs, $icon-padding-xs),
+	s: ($icon-size-s, $icon-padding-s),
+	m: ($icon-size-m, $icon-padding-m),
+	l: ($icon-size-l, $icon-padding-l),
+	xl: ($icon-size-xl, $icon-padding-xl),
+	xxl: ($icon-size-xxl, $icon-padding-xxl),
+);
+
+// Icon Sizes Options
+$option-expand-icon-sizes: off !default;
+
+@if $option-expand-icon-sizes == off {
+	$icon-sizes-map: map-remove($icon-sizes-map, xs, xl, xxl);
+}
+
+// Breakout icon styles into separate maps
+$icon-default-styles: map-get($icon-styles, default);
+$icon-light-styles: map-get($icon-styles, light);
+$icon-dark-styles: map-get($icon-styles, dark);
+
+// Breakout icon sizes and paddings into separate maps
+$icon-sizes: ();
+@each $key, $value in $icon-sizes-map {
+	$icon-sizes: map-merge($icon-sizes, ($key: nth($value, 1)));
+}
+$icon-paddings: ();
+@each $key, $value in $icon-sizes-map {
+  $icon-paddings: map-merge($icon-paddings, ($key: nth($value, 2)));
+}

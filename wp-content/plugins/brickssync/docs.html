@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BricksSync Plugin Documentation v1.1.0</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; }
+        h1, h2, h3 { color: #333; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px;}
+        code { background-color: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        strong { font-weight: bold; }
+        ul { margin-left: 20px; }
+        li { margin-bottom: 5px; }
+        .warning { color: #a00; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+    <h1>BricksSync Plugin Documentation</h1>
+    <p><strong>Version:</strong> 1.1.1<br>
+    <strong>Author:</strong> Gert Wierbos - BricksSync<br>
+    <strong>License:</strong> GPL-2.0+</p>
+    <h2>Description</h2>
+    <p>BricksSync allows you to synchronize and migrate Bricks Builder global settings and templates between different WordPress installations using Git-friendly JSON files. It provides tools for manual export/import and options for automatic synchronization via WP Cron.</p>
+
+    <h2>What's New in 1.1.1: Multisite Sync Mode Fallback
+    </h2>
+    <ul>
+        <li>Auto-export now respects global/group/site sync mode settings in multisite. Subsites inherit sync mode if not set locally.</li>
+        <li>Fixed require_once path for effective config resolution on multisite.</li>
+        <li>Fully tested with Bricks 2.0.1.</li>
+    </ul>
+    <h2>What's New in 1.1.0: Export Improvements & Bricks Components Support</h2>
+<ul>
+  <li>Skips template export if slug is empty.</li>
+  <li>Added full support for Bricks Components in settings export. Global CSS is already included in Bricks Settings.</li>
+  <li>Documentation and code cleanup.</li>
+  <li>Thoroughly tested with Bricks 2.0-rc2.</li>
+</ul>
+
+<h2>What's New in 1.0.0: Official Release & Compatibility Fixes</h2>
+<ul>
+  <li><strong>Official 1.0 release!</strong></li>
+  <li>Fixed compatibility for <code>get_plugin_data()</code> on older WordPress.</li>
+  <li>Textarea fields (excluded options) now preserve line breaks.</li>
+  <li>General documentation and version bump.</li>
+</ul>
+<h2>What's New in 1.0.0: Multisite & Network Admin Support</h2>
+    <ul>
+      <li><strong>Full WordPress Multisite Compatibility:</strong> BricksSync now works seamlessly on multisite networks. Network admins can centrally manage BricksSync settings across all subsites.</li>
+      <li><strong>Network Admin UI:</strong> A dedicated network admin dashboard features tabs for Global, Group, and Sites & Effective Configuration management.</li>
+      <li><strong>Sites & Effective Configuration Tab:</strong> View all subsites in a single table, showing the effective (inherited or overridden) configuration for each. Easily identify which sites have custom overrides.</li>
+      <li><strong>Site-Specific Overrides:</strong> Set, view, or reset configuration overrides for individual subsites. Overrides are marked with a vertical badge for clarity.</li>
+      <li><strong>Reset Button:</strong> Remove site-specific overrides instantly and revert to inherited settings. The UI refreshes immediately after reset.</li>
+      <li><strong>Group Configuration:</strong> Define groups of sites with shared settings. Inheritance follows: Network > Group > Site.</li>
+      <li><strong>UI/UX Improvements:</strong> Redesigned admin tabs, improved accessibility, and horizontal scrolling for large tables. Override status is visually prominent.</li>
+      <li><strong>Security:</strong> All multisite admin actions are protected by nonce verification and input sanitization.</li>
+      <li><strong>Compatibility:</strong> Multisite features are isolated from single-site installs. Cron and WP CLI work per site; use <code>--url=</code> for WP CLI operations on subsites.</li>
+      <li><strong>Documentation:</strong> All docs and README updated for multisite/network admin features.</li>
+    </ul>
+    <h3>Multisite/Network Admin Usage</h3>
+    <ul>
+      <li>Access BricksSync network admin via <strong>Network Admin > Settings > BricksSync</strong>.</li>
+      <li>Configure global settings, manage groups, and override/revert site-specific settings from the Sites & Effective Configuration tab.</li>
+      <li>Changes made at network or group level cascade down unless a site override is present.</li>
+      <li>Resetting an override instantly removes the custom config for that site and re-applies inherited settings.</li>
+      <li>All changes are immediately reflected in the UI with no page reload required after reset.</li>
+      <li>WP Cron and WP CLI continue to function per site. Use <code>wp --url=site.example.com brickssync ...</code> for CLI on a subsite.</li>
+    </ul>
+
+    <h2>Features</h2>
+    <ul>
+        <li>Export Bricks Builder global settings to a JSON file.</li>
+        <li>Import Bricks Builder global settings from a JSON file.</li>
+        <li>Export Bricks Builder templates (individually or all) to JSON files.</li>
+        <li>Import Bricks Builder templates from JSON files.</li>
+        <li>Configure a storage location for JSON files (Child Theme, Uploads Folder, Custom Path).</li>
+        <li>Different synchronization modes: Manual, Automatic Import, Automatic Export, Full Automatic Sync.</li>
+        <li>WP-CLI integration for automated and advanced workflows.</li>
+        <li>Debug tab with real-time log viewer, log clearing, and logging toggle.</li>
+    </ul>
+    <h2>WP-CLI Usage</h2>
+    <p>BricksSync provides a set of WP-CLI commands for managing Bricks Builder settings and templates from the command line.</p>
+    <h3>Overview</h3>
+    <ul>
+      <li>Export/Import of Bricks Builder settings</li>
+      <li>Export/Import of Bricks templates</li>
+      <li>Configuration management</li>
+      <li>Status checking</li>
+    </ul>
+    <h3>Requirements</h3>
+    <ul>
+      <li>WP CLI must be installed and available</li>
+      <li>Active BricksSync license for most operations</li>
+      <li>Appropriate file permissions for import/export</li>
+    </ul>
+    <h3>Available Commands</h3>
+    <h4>Settings Management</h4>
+    <strong>Export Settings</strong>
+    <pre><code>wp brickssync settings export [--output-file=&lt;path&gt;]</code></pre>
+    <p>Exports all Bricks Builder settings to a JSON file. The file can be saved to a custom location or use the configured path.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--output-file</code>: Path to export the JSON file. If not provided, uses the configured path and filename.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync settings export
+wp brickssync settings export --output-file=/path/to/my-settings.json</code></pre>
+    <strong>Import Settings</strong>
+    <pre><code>wp brickssync settings import [--file=&lt;path&gt;]</code></pre>
+    <p>Imports Bricks Builder settings from a JSON file. The file can be read from a custom location or the configured path.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--file</code>: Path to the JSON file to import. If not provided, uses the configured path and filename.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync settings import
+wp brickssync settings import --file=/path/to/import-settings.json</code></pre>
+    <h4>Template Management</h4>
+    <strong>List Templates</strong>
+    <pre><code>wp brickssync templates list [--format=&lt;format&gt;]</code></pre>
+    <p>Displays a list of all Bricks templates with their details.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--format</code>: Output format (table, json, csv, yaml, count). Default: table.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync templates list
+wp brickssync templates list --format=csv</code></pre>
+    <strong>Export Templates</strong>
+    <pre><code>wp brickssync templates export [--output-dir=&lt;path&gt;] [--templates=&lt;ids&gt;]</code></pre>
+    <p>Exports selected or all Bricks templates to JSON files.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--output-dir</code>: Directory to export templates to. If not provided, uses the configured path.</li>
+        <li><code>--templates</code>: Comma-separated list of template IDs to export. If not provided, exports all templates.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync templates export
+wp brickssync templates export --output-dir=/path/to/templates
+wp brickssync templates export --templates=123,456</code></pre>
+    <strong>Import Templates</strong>
+    <pre><code>wp brickssync templates import [--input-dir=&lt;path&gt;]</code></pre>
+    <p>Imports Bricks templates from JSON files in a directory.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--input-dir</code>: Directory containing template JSON files. If not provided, uses the configured path.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync templates import
+wp brickssync templates import --input-dir=/path/to/templates</code></pre>
+    <h4>Configuration</h4>
+    <strong>Show Configuration</strong>
+    <pre><code>wp brickssync config show [--format=&lt;format&gt;]</code></pre>
+    <p>Displays the current BricksSync configuration settings.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--format</code>: Output format (table, json, yaml). Default: table.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync config show
+wp brickssync config show --format=json</code></pre>
+    <h4>Status</h4>
+    <strong>Check Status</strong>
+    <pre><code>wp brickssync status [--format=&lt;format&gt;]</code></pre>
+    <p>Displays the current status of BricksSync, including license status, storage path validation, and sync status.</p>
+    <strong>Options:</strong>
+    <ul><li><code>--format</code>: Output format (table, json, yaml). Default: table.</li></ul>
+    <strong>Examples:</strong>
+    <pre><code>wp brickssync status
+wp brickssync status --format=json</code></pre>
+    <h3>Features</h3>
+    <ul>
+      <li>Multiple output formats (table, JSON, CSV, YAML)</li>
+      <li>Custom file path support for imports/exports</li>
+      <li>License validation integration</li>
+      <li>Detailed status reporting</li>
+      <li>Error handling and logging</li>
+      <li>Automatic directory creation</li>
+      <li>Permission validation</li>
+      <li>Progress reporting</li>
+    </ul>
+    <h3>Error Handling</h3>
+    <p>All commands include error handling and will display appropriate error messages if:</p>
+    <ul>
+      <li>The license is inactive</li>
+      <li>File permissions are insufficient</li>
+      <li>Required files or directories are missing</li>
+      <li>Invalid parameters are provided</li>
+    </ul>
+    <h3>Notes</h3>
+    <ul>
+      <li>Most commands require an active BricksSync license</li>
+      <li>File paths should be absolute</li>
+      <li>The plugin must be properly configured before using these commands</li>
+      <li>Debug logging can be enabled for troubleshooting</li>
+    </ul>
+    <h2>Requirements</h2>
+    <ul>
+        <li>WordPress (latest version recommended)</li>
+        <li>Bricks Builder Theme (latest version recommended)</li>
+        <li>PHP 8.0 or higher recommended</li>
+    </ul>
+    <h2>Recommended</h2>
+    <ul>
+        <li>Use Child Theme</li>
+    </ul>
+    <h2>Installation</h2>
+    <ol>
+        <li>Download: Obtain the BricksSync plugin .zip file from BricksSync.com</li>
+        <li>Upload:
+            <ul>
+                <li>Log in to your WordPress admin area.</li>
+                <li>Navigate to Plugins &gt; Add New.</li>
+                <li>Click Upload Plugin.</li>
+                <li>Choose the brickssync.zip file you downloaded.</li>
+                <li>Click Install Now.</li>
+            </ul>
+        </li>
+        <li>Activate: Once installed, click Activate Plugin.</li>
+    </ol>
+    <h2>Configuration</h2>
+    <p>After activation, configure BricksSync via <strong>Bricks &gt; BricksSync</strong>.</p>
+    <h3>1. Licensing Tab</h3>
+    <ul>
+        <li>Activate License: Enter your key and click "Activate License".</li>
+        <li>License Status: Shows active license details (masked key and license status).</li>
+        <li>Deactivate License: Button appears if active to remove activation.</li>
+    </ul>
+    <h3>2. Configuration Tab</h3>
+    <ul>
+        <li>JSON Storage Location: Choose Child Theme, Uploads Folder, or Custom Path.</li>
+        <li>File naming &amp; options:
+            <ul>
+                <li>Bricks builder settings filename</li>
+                <li>Bricks templates filename pattern</li>
+                <li>JSON subdirectory name</li>
+                <li>Excluded options (one per line) (e.g., bricks_license_key)</li>
+            </ul>
+        </li>
+        <li>Sync Mode:
+            <ul>
+                <li>Manual Only: No auto actions. (Default)</li>
+                <li>Automatic Import Only: Imports from storage path if files change.</li>
+                <li>Automatic Export Only: Exports current data to storage path.</li>
+                <li>Full Automatic Sync: Imports THEN Exports. (Use with caution!)</li>
+            </ul>
+        </li>
+        <li>Enable settings sync automation: Disabling this option is useful if you want to automate template sync but prefer to manage global Bricks settings manually (for example, to avoid overwriting environment-specific settings)</li>
+    </ul>
+    <h3>3. Settings Tab</h3>
+    <ul>
+        <li>Export Settings: Saves current global settings to defined filename.json in storage path.</li>
+        <li>Import Settings: Loads from defined filename.json in storage path. <span class="warning">WARNING: Overwrites current settings. Backup first!</span></li>
+    </ul>
+    <h3>4. Templates Tab</h3>
+    <ul>
+        <li>Export Templates: Choose All or specific templates. Saves as defined filename.json in defined subfolder of storage path.</li>
+        <li>Import Templates: Scans defined subfolder in storage path for .json files and lets you choose All or specific templates to import. May update existing templates. <span class="warning">Backup first!</span></li>
+    </ul>
+    <h2>Usage Scenario examples</h2>
+    <ul>
+        <li><strong>Manual Development GIT Workflow (Local -&gt; Staging -&gt; Prod):</strong>
+            <ol>
+                <li>Use Child Theme storage.</li>
+                <li>Use Manual Only mode.</li>
+                <li>Export locally.</li>
+                <li>Commit generated JSON files in child theme via Git.</li>
+                <li>Pull on Staging/Prod.</li>
+                <li>Import on Staging/Prod. Test.</li>
+            </ol>
+        </li>
+        <li><strong>Partially Automated GIT Development Workflow (Local -&gt; Staging -&gt; Prod):</strong>
+            <ol>
+                <li>Use Child Theme storage.</li>
+                <li>Use Export Only on Local and Import Only on Staging/Prod.</li>
+                <li>Exports on template saving.</li>
+                <li>Commit generated JSON files in child theme via Git.</li>
+                <li>Pull on Staging/Prod when you are ready.</li>
+                <li>Automated imports on Staging/Prod. Test.</li>
+            </ol>
+        </li>
+        <li><strong>Simple Backup:</strong>
+            <ol>
+                <li>Use Uploads Folder storage.</li>
+                <li>Use Manual or Auto Export mode.</li>
+                <li>Export settings/templates to uploads folder.</li>
+                <li>Restore by importing as needed.</li>
+            </ol>
+        </li>
+        <li><strong>Automatic Sync:</strong>
+            <ol>
+                <li>Use shared custom path or version-controlled theme.</li>
+                <li>Set Automatic Import/Export or Full Sync as needed.</li>
+            </ol>
+        </li>
+    </ul>
+    <h2>WP-CLI</h2>
+    <p>BricksSync includes WP-CLI commands for developers, advanced users and automation (e.g., <code>wp brickssync export settings</code>). Use <code>wp help brickssync</code> for details.</p>
+    <h2>Troubleshooting</h2>
+    <ul>
+        <li>"Error retrieving license details": Check internet connection.</li>
+        <li>"Storage path ...": Check Configuration tab settings. Verify directory exists and web server has read/write permissions.</li>
+        <li>Imports/Exports Failing: Check path permissions. Enable Debug Logging and check PHP error logs.</li>
+        <li>Fatal Errors: Check PHP error logs for details (missing files, conflicts).</li>
+    </ul>
+    <h2>Security: Protecting Your JSON Files</h2>
+    <p>BricksSync stores your settings and template JSON files in a directory you configure (child theme, uploads, or custom path). <strong>It is critical to protect this directory from direct web access to prevent unauthorized downloads.</strong></p>
+    <h3>Apache (Automatic)</h3>
+    <p>BricksSync automatically creates a <code>.htaccess</code> file in your JSON directory with the following rules:</p>
+    <pre>Order allow,deny
+Deny from all
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule></pre>
+    <p>This blocks all direct HTTP access to the JSON files on Apache servers. No further action is needed for most users.</p>
+    <h3>Nginx (Manual Configuration Required)</h3>
+    <p>Nginx does not support <code>.htaccess</code> files. You must add a rule to your main Nginx configuration to block access. Example:</p>
+    <pre>location ^~ /wp-content/your-json-directory/ {
+    deny all;
+    return 403;
+}</pre>
+    <p>Replace <code>/wp-content/your-json-directory/</code> with the actual path to your JSON directory, relative to your web root. After editing your config, reload Nginx.</p>
+    <h3>lighttpd (Manual Configuration Required)</h3>
+    <p>lighttpd also does not support <code>.htaccess</code> files. Add this to your <code>lighttpd.conf</code>:</p>
+    <pre>$HTTP["url"] =~ "^/wp-content/your-json-directory/" {
+    url.access-deny = ( "" )
+}</pre>
+    <p>Again, replace <code>/wp-content/your-json-directory/</code> with the correct path. Restart lighttpd after making changes.</p>
+    <h3>Why?</h3>
+    <ul>
+        <li>These rules prevent anyone from downloading your BricksSync JSON files if they guess or know the URL.</li>
+        <li>Your site and data are safer from leaks or unwanted access.</li>
+    </ul>
+    <h3>Advanced Security</h3>
+    <p>For maximum protection, you may store your JSON files <strong>outside the web root</strong> (not directly accessible via HTTP), and use custom code to serve/import them as needed.</p>
+    <p>If you need help configuring your server, contact your hosting provider or consult the BricksSync documentation/support.</p>
+    <h2>Plugin Updates</h2>
+    <p>If your BricksSync plugin has an active license, updates are delivered through the default WordPress plugin update mechanism. You can update BricksSync manually from the Plugins page, or enable auto-updates to keep your installation up-to-date automatically. This ensures you receive the latest features, improvements, and security fixes as soon as they are released.</p>
+
+</body>
+</html>

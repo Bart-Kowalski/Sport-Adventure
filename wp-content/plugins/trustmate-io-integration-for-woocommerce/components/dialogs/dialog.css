@@ -1,0 +1,67 @@
+.tm-dialog-wrapper {
+  display: none;
+}
+
+.tm-dialog {
+  font-size: 16px;
+  padding: 32px;
+}
+
+.tm-dialog .image-wrapper {
+  display: flex;
+  margin-bottom: 64px;
+  position: relative;
+  width: auto;
+}
+
+.tm-dialog .image-wrapper img {
+  height: auto;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+}
+
+.tm-dialog ul {
+  margin: 4px 0 4px 4px;
+}
+
+.tm-dialog li {
+  list-style-type: disc;
+  margin: 4px 0;
+}
+
+.tm-dialog h2 {
+  margin-top: 0;
+}
+
+.tm-dialog .content {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.tm-dialog p {
+  margin: 0 0 1em;
+}
+
+.tm-dialog p:last-child {
+  margin: 0;
+}
+
+#TB_window {
+  left: 50%;
+  overflow: scroll;
+  overflow-x: hidden;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+  max-height: 80%;
+  max-width: 90%;
+}
+
+#TB_ajaxContent {
+  box-sizing: border-box;
+  height: auto !important;
+  width: 100% !important;
+  max-width: 100%;
+}

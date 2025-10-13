@@ -1,0 +1,31 @@
+{
+    "ID": 9180,
+    "post_author": "1",
+    "post_date": "2025-01-11 13:54:29",
+    "post_date_gmt": "2025-01-11 12:54:29",
+    "post_content": "",
+    "post_title": "Wyprawa - hero gallery",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "wyprawa-hero-gallery",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-01-11 13:54:29",
+    "post_modified_gmt": "2025-01-11 12:54:29",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/wyprawa-hero-gallery/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_page_content_2": "a:3:{i:0;a:5:{s:2:\"id\";s:6:\"f64d1d\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"fc206c\";}s:8:\"settings\";a:2:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"dsmobe\";}s:6:\"_cssId\";s:7:\"zdjecia\";}}i:1;a:5:{s:2:\"id\";s:6:\"fc206c\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"f64d1d\";s:8:\"children\";a:1:{i:0;s:6:\"9b134f\";}s:8:\"settings\";a:2:{s:9:\"_widthMax\";s:15:\"var(--width-xl)\";s:6:\"_width\";s:4:\"100%\";}}i:2;a:5:{s:2:\"id\";s:6:\"9b134f\";s:4:\"name\";s:13:\"image-gallery\";s:6:\"parent\";s:6:\"fc206c\";s:8:\"children\";a:0:{}s:8:\"settings\";a:6:{s:10:\"imageRatio\";s:12:\"ratio-square\";s:17:\"_cssGlobalClasses\";a:3:{i:0;s:11:\"tHBtnazbodi\";i:1;s:11:\"tHBtnkrvglk\";i:2;s:11:\"tHBtnpmlnig\";}s:4:\"link\";s:8:\"lightbox\";s:10:\"_cssCustom\";s:80:\"#brxe-9b134f li div:not(.bricks-image-caption):before{\n  font-family: themify;\n}\";s:21:\"lightboxAnimationType\";s:4:\"fade\";s:5:\"items\";a:2:{s:14:\"useDynamicData\";s:22:\"{acf_wyprawa__galeria}\";s:4:\"size\";s:5:\"large\";}}}}",
+        "_bricks_template_type": "gutenbricks_block",
+        "_edit_lock": "1747926068:3"
+    }
+}

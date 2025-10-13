@@ -1,0 +1,472 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-23 17:39+0000\n"
+"PO-Revision-Date: 2023-09-07 11:46+0000\n"
+"Last-Translator: Damnian Ondraszek <damianondraszek@gmail.com>\n"
+"Language-Team: Czech <http://trans.trustmate.io/projects/woocommerce-plugin/"
+"main/cs_CS/>\n"
+"Language: cs_CS\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Weblate 4.5.3\n"
+
+# Menu
+msgid "Create TrustMate account"
+msgstr "Vytvořit účet TrustMate"
+
+msgid "Settings"
+msgstr "Nastavení"
+
+msgid "Widgets"
+msgstr "Widgety"
+
+# Headers and buttons
+msgid "settings"
+msgstr "nastavení"
+
+msgid "Configure plugin"
+msgstr "Nastavit plugin"
+
+msgid "If you already have TrustMate account"
+msgstr "Pokud již máte TrustMate účet"
+
+msgid "skip this step"
+msgstr "přeskočit tento krok"
+
+msgid "Save changes"
+msgstr "Uložit změny"
+
+# Install
+msgid "To start collecting reviews you need TrustMate account. Fortunetly you can create it"
+msgstr ""
+"Chcete-li začít sbírat recenze, potřebujete účet TrustMate. Naštěstí si ho "
+"můžete vytvořit"
+
+msgid "within one minute. We'll use data from WooCommerce"
+msgstr "během jedné minuty. Použijeme data z WooCommerce"
+
+msgid "to make this process very easy"
+msgstr "pro kompletní zjednodušení tohoto procesu"
+
+msgid "Company details can be updated later in TrustMate panel"
+msgstr "Údaje společnosti budou aktualizovány později v TrustMate panelu"
+
+msgid "By registering I accept"
+msgstr "Registrací přijímám"
+
+msgid "terms of service"
+msgstr "podmínky služby"
+
+msgid "including consent to be contacted by TrustMate customer service"
+msgstr "včetně souhlasu s kontaktováním zákaznickým servisem TrustMate"
+
+msgid "I going to ask clients for review by e-mail"
+msgstr "Chystám se požádat klienty o recenzi e-mailem"
+
+msgid "I accept"
+msgstr "Přijímám"
+
+msgid "the data entrustment agreement"
+msgstr "dohoda o svěření údajů"
+
+msgid "Configure invitations and widgets"
+msgstr "Nastavení pozvánek a widgetů"
+
+msgid "Verify form below and click \"Create TrustMate account\""
+msgstr "Ověřte níže uvedený formulář a klikněte na \"Vytvořit účet TrustMate\""
+
+msgid "Account data"
+msgstr "Data účtu"
+
+msgid "Company registration data"
+msgstr "Registrační data společnosti"
+
+msgid "Website address"
+msgstr "Adresa webové stránky"
+
+msgid "Owner's e-mail"
+msgstr "Email vlastníka"
+
+msgid "Company name"
+msgstr "Název společnosti"
+
+msgid "Street"
+msgstr "Ulice"
+
+msgid "City"
+msgstr "Město"
+
+msgid "Zip code"
+msgstr "PSČ"
+
+msgid "Country"
+msgstr "Stát"
+
+msgid "Tax identification number"
+msgstr "Daňové identifikační číslo"
+
+# API related messages and erros
+msgid "Account created"
+msgstr "Účet vytvořen"
+
+msgid "Please check your e-mail to set password for TrustMate account"
+msgstr "Zkontrolujte prosím svůj e-mail pro nastavení hesla k účtu TrustMate"
+
+msgid "Account already exists"
+msgstr "Účet již existuje"
+
+msgid "Invald data sent"
+msgstr "Poslána neplatná data"
+
+msgid "Unexpected error"
+msgstr "Neočekávaná chyba"
+
+msgid "Cannot create account"
+msgstr "Není možné vytvořit účet"
+
+msgid "Registration address in WooCommerce Settings not complete"
+msgstr "Registrační adresa v nastavení WooCommerce není kompletní"
+
+msgid "Something went wrong. Please try again or contact TrustMate customer service"
+msgstr ""
+"Něco se pokazilo. Zkuste to prosím znovu nebo kontaktujte zákaznický servis "
+"TrustMate"
+
+msgid "Widget activation failed. Please try again or contact TrustMate customer service"
+msgstr ""
+"Aktivace widgetu se nezdařila. Zkuste to prosím znovu nebo kontaktujte "
+"zákaznický servis TrustMate"
+
+# Config form
+msgid "Your TrustMate user code (UUID from TrustMate panel, Integration section)"
+msgstr "Váš kód uživatele TrustMate (UUID z panelu TrustMate, sekce Integrace)"
+
+msgid "Automatic review invitations"
+msgstr "Automatické poznámky hodnocení"
+
+msgid "To quickly collect client reviews turn on automatic invitations"
+msgstr ""
+"Chcete-li rychle shromažďovat hodnocení klientů, zapněte automatické pozvánky"
+
+msgid "While active, script sends invitations to your customers asking for review"
+msgstr ""
+"Jestliže je skript aktivní, odesílá zákazníkům pozvánky s žádostí o recenzi"
+
+msgid "In TrustMate panel you can"
+msgstr "V panelu TrustMate můžete"
+
+msgid "change invitation sending delay"
+msgstr "změnit zpoždění odesílání pozvánek"
+
+msgid "set how many times customer is reminded to write a review"
+msgstr "nastavte, kolikrát má být zákazník upozorněn na napsání recenze"
+
+msgid "adjust invitation colors to your brand"
+msgstr "přizpůsobit barvy pozvánek vaší značce"
+
+msgid "turn on and off product review invitations"
+msgstr "zapnutí a vypnutí pozvánek k recenzi produktu"
+
+msgid "and more!"
+msgstr "a mnohem víc!"
+
+msgid "Ask for permission to send invitation"
+msgstr "Zeptat se na povolení poslat pozvánku"
+
+msgid "In order to send review inviations you need customer consent"
+msgstr "Abyste mohli poslat pozvánku potřebujete souhlas zákazníka"
+
+msgid "If you do not collect those consents by yourself (separate checkbox or proper regulations), turn this option on"
+msgstr ""
+"Pokud tyto souhlasy nesbíráte sami (samostatné zaškrtávací políčko nebo "
+"příslušné předpisy), zapněte tuto možnost"
+
+msgid "If you do not directly ask customer for consent to send invitation, we suggest to extend your regulations with content from"
+msgstr ""
+"Pokud nepožádáte zákazníka přímo o souhlas se zasláním pozvánky, "
+"doporučujeme rozšířit vaše nařízení o obsah z"
+
+msgid "this file"
+msgstr "tento soubor"
+
+msgid "Disabled"
+msgstr "Vypnuté"
+
+msgid "After successful order"
+msgstr "po úspěšné objednávce"
+
+msgid "After successful payment"
+msgstr "po úspěšné platbě"
+
+msgid "After marked as completed"
+msgstr "po označení jako dokončené"
+
+# Widget configuration
+msgid "Show reviews with widgets"
+msgstr "Zobrazit recenze pomocí widgetů"
+
+msgid "Show badge with shop's grade"
+msgstr "Ukaž odznak s hodnocením obchodu"
+
+msgid "Show sliding out widget with shop's grade"
+msgstr "Ukaž vysouvací widget s hodnocením obchodu"
+
+msgid "Non-invasive badge is glued to screen's edge and takes little space"
+msgstr ""
+
+msgid "Click shows a modal with recent reviews"
+msgstr "Kliknutím se zobrazí modální okno s nedávnými recenzemi"
+
+msgid "You can change display position in TrustMate panel"
+msgstr "Pozici zobrazení můžete změnit na panelu TrustMate"
+
+msgid "Why use it?"
+msgstr "Proč to používat?"
+
+msgid "sales increase"
+msgstr ""
+
+msgid "customers do not leave site searching for reviews"
+msgstr "Zákazníci neopouštějí webovou stránku ve snaze najít recenze"
+
+msgid "can boost your SEO"
+msgstr ""
+
+msgid "can make search engines show stars under your results"
+msgstr ""
+
+msgid "Show badge with products' grade"
+msgstr "Ukaž odznak s hodnocením produktu"
+
+msgid "Click shows a modal with recent reviews and grade distribution"
+msgstr ""
+
+msgid "Widget is a finishing touch on your product page"
+msgstr ""
+
+msgid "product sales increase"
+msgstr ""
+
+msgid "can boost your product SEO"
+msgstr ""
+
+msgid "can make search engines show stars under product result"
+msgstr ""
+
+msgid "Popping up reviews"
+msgstr "Vyskakující recenze"
+
+msgid "Social proof widget with up to three types of popping up boxes which ensure your customers about quality of your services"
+msgstr ""
+"Widget zvyšující prodej (sociální důkaz)s až třemi vyskakovacími oknami, "
+"které ujišťují vaše zákazníky o kvalitě vašich služeb."
+
+msgid "Position is configurable. Thanks to unconventional images and messages they are very noticable"
+msgstr ""
+"Pozice je nastavitelná. Díky nekonvenčním obrázkům a zprávám jsou velmi "
+"patrná."
+
+msgid "If you want to use custom images contact us at support@trustmate.io"
+msgstr ""
+"Pokud chcete použít vlastní obrázky, kontaktujte nás na adrese "
+"support@trustmate.io."
+
+msgid "Boxes does not take much space and are easy way to present your reviews"
+msgstr ""
+"Boxy nezabírají moc místa a jsou snadným způsobem, jak zaprezentovat vaše "
+"recenze."
+
+msgid "Show grade and reviews on product page"
+msgstr "Ukaž hodnocení a recenze na stránce produktu."
+
+msgid "Page-wide reviews similar to popular comments sections showing under your product"
+msgstr ""
+
+msgid "Remember, there are more widgets available"
+msgstr "Pamatujte, je více widgetů k dispozici."
+
+msgid "You can put them on your site using wordpress HTML widgets"
+msgstr "Můžete je umístit na svůj web pomocí HTML widgetů WordPress."
+
+msgid "Just copy the code from TrustMate panel widget section"
+msgstr "Stačí zkopírovat kód z části widgetů v panelu TrustMate"
+
+msgid "Turn on"
+msgstr "Zapnout widget"
+
+msgid "Click to show widget description"
+msgstr "Kliknutím zobrazíte popis widgetu"
+
+# Hornet
+msgid "Small widget that displays the average rating and the number of reviews"
+msgstr ""
+
+msgid "The stars will appear on the product card near the photo and on the product tiles throughout the store"
+msgstr ""
+
+msgid "The widget displays the current number of reviews about the product and the current average rating"
+msgstr ""
+
+msgid "It can be embedded next to the main product description on the product sheet or in product lists in your store"
+msgstr ""
+
+msgid "Benefits"
+msgstr ""
+
+msgid "distinguishes the product by encouraging customers to click on it and make purchases"
+msgstr ""
+
+# Chupacabra
+msgid "Widget social proof (large box)"
+msgstr ""
+
+msgid "Static widget with customer reviews sending a message \"you can trust us\""
+msgstr ""
+
+msgid "Widget includes both company and product reviews"
+msgstr ""
+
+msgid "Anytime you can adjust widget outlook without developer help, even after embedding it on your site"
+msgstr ""
+
+msgid "Microdata"
+msgstr ""
+
+msgid "If you enable microdata, widget will make your reviews understandable for search engines like Google"
+msgstr ""
+
+msgid "Search engine results with your site will be enriched with additional data like average rating, stars, review count"
+msgstr ""
+
+# Ferret
+msgid "Carousel"
+msgstr "Widget-kolotoč s recenzemi"
+
+msgid "Dynamic \"carousel\" widget catches the eye of customers presenting up to the last 21 reviews. You set the scrolling speed of the visible ratings yourself"
+msgstr ""
+
+msgid "Using the carousel you increase the attractiveness of your website to search engines, e.g. Google"
+msgstr ""
+
+msgid "Let customers read reviews about your company without leaving your website"
+msgstr ""
+
+msgid "The carousel is responsive and adapts to every page view and mobile devices"
+msgstr ""
+
+msgid "Product review carousel"
+msgstr "Ukaž kolotoč recenzí produktu"
+
+# Owl
+msgid "Certificate widget"
+msgstr ""
+
+msgid "If you meet the program conditions visible on the main page of the panel, TrustMate will automatically display the badge in your store along with information about the current rating"
+msgstr ""
+
+msgid "This will result in more buying interest from potential customers"
+msgstr ""
+
+# FAQ section
+msgid "FAQ"
+msgstr "Časté dotazy"
+
+msgid "Can I ask only for company reviews"
+msgstr "Můžu se zeptat jen na hodnocení firmy?"
+
+msgid "Yes. You need to mark company invitation configuration as automatic and make sure no product invitation configuration is marked as such"
+msgstr ""
+"Ano. Musíte označit konfiguraci pozvánky společnosti s hodnocením 1-5 jako "
+"automatickou a ujistit se, že žádná konfigurace pozvánky produktu tak "
+"označena není."
+
+msgid "Can I ask only for product reviews"
+msgstr "Můžu se zeptat jen na recenze produktu?"
+
+msgid "Yes. You need to mark product invitation configuration as automatic and make sure no company invitation configuration is marked as such"
+msgstr ""
+"Ano. Musíte označit konfiguraci pozvánky produktu 1-5 jako automatickou a "
+"ujistit se, že žádná konfigurace pozvánky společnosti tak označena není."
+
+msgid "Remember, for product invitations to work you need to load product feed in TrustMate settings"
+msgstr ""
+"Pamatujte, že aby pozvánky na produkty fungovaly je třeba načíst produktový "
+"kanál v nastavení TrustMate."
+
+msgid "Can I ask for both company and product reviews"
+msgstr "Můžu poprosit o hodnocení firmy a produktu?"
+
+msgid "Yes. You need to mark both company and product invitation configurations as automatic"
+msgstr ""
+"Ano. Musíte označit konfiguraci pozvánek do firmy s hodnocením 1-5, stejně "
+"tak pozvánek na produkty jako automatickou."
+
+msgid "Is such case we recommend configuring company invitations to send at least couple days befor product"
+msgstr ""
+"V takovém případě doporučujeme skonfigurovat pozvánky pro společnost tak, "
+"aby byly odeslány nejméně pár dní před produktem"
+
+msgid "Sending them together may lower conversion rate"
+msgstr "Poslání je dohromady může snížit konverzní poměr."
+
+msgid "What is UUID"
+msgstr "Co je to kód UUID"
+
+msgid "UUID code is a unique identifier for your TrustMate's account"
+msgstr "UUID kód je unikátní identifikátor pro váš účet TrustMate."
+
+msgid "You will find it in <em>Integration</em> section"
+msgstr "Najdete to v sekci <em>Integrace</em>"
+
+msgid "How can I add widget with grades and reviews"
+msgstr "Jak můžu přidat widget se známkami a recenzemi"
+
+msgid "Widget which stick to screen edge can be turned on with one click in plugin configuration"
+msgstr ""
+"Připnuté widgety k okraji obrazovky lze zapntou jedním kliklnutím v "
+"konfiguraci pluginu."
+
+msgid "All other widget you can embed on your site using Wordpress features: widgets and themes"
+msgstr ""
+"Všechny ostatní widgety můžete na svůj web vložit pomocí funkcí WordPressu: "
+"widgety a motivy."
+
+msgid "When should I enable \"Ask for permission to send review invitation\""
+msgstr ""
+"Kdy bych měl povolit možnost „Požádat o povolení k odeslání pozvánky k "
+"recenzi“"
+
+msgid "Always when you do not collect such consent in previous transaction steps and your rules document do not handle the issue"
+msgstr ""
+"Vždycky, když nezískáte souhlas v předchozích krocích transakce a pravdla "
+"vašeho dokumentu se touto záležitostí nezabývají."
+
+msgid "How can I hide WooCommerce product reviews"
+msgstr "Jak můžu skrýt recenze produktů WooCommerce"
+
+msgid "You need to turn off default WooCommerce reviews in: <em>WooCommerce → Settings → Products → Enable product reviews</em>"
+msgstr ""
+"Potřebujete vypnout výchozí recenze WooCommerce v:<em>WooCommerce → "
+"Nastavení → Produkty → Povolit recenze produktů</em>"
+
+msgid "Do you support WPML?"
+msgstr "Podporujete WPML?"
+
+msgid "Yes, but keep in mind that you need to add invitation configurations for all languages you want to use in TrustMate.io panel"
+msgstr ""
+"Ano, ale pamatujte, že byste měli přidat konfiguraci pozvánek ke každému "
+"jazyku, které chcete použít v panelu TrustMate.io."
+
+msgid "How I can decide which on my product category is sent to TrustMate.io?"
+msgstr ""
+"Jak se můžu rozhodnout, která z mých produktových kategorií bude odeslána do "
+"TrustMate.io?"
+
+msgid "If you use multiple categories for your product the only way is to use primary category feature from Yoast SEO plugin"
+msgstr ""
+"Pokud používáte pro svůj produkt více kategorií, jediným způsobem je využití "
+"funkci hlavní kategorie z pluginu Yoast SEO."

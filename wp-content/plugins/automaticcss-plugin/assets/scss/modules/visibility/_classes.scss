@@ -1,0 +1,17 @@
+@if $option-visibility == on {
+  @each $visibility, $value in $visibilities {
+		.visibility--#{$visibility}.visibility--#{$visibility} {
+			visibility: var(--visibility, #{$value});
+		}
+	}
+
+  @each $breakpoint, $value in $breakpoints {
+    @include breakpoint($breakpoint) {
+      @each $visibility, $value in $visibilities {
+				.visibility--#{$visibility}-#{$breakpoint}.visibility--#{$visibility}-#{$breakpoint} {
+					visibility: var(--visibility, #{$value});
+				}
+			}
+    }
+  }
+}

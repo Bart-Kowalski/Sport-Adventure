@@ -1,0 +1,31 @@
+{
+    "ID": 11498,
+    "post_author": "1",
+    "post_date": "2025-04-08 04:31:46",
+    "post_date_gmt": "2025-04-08 03:31:46",
+    "post_content": "",
+    "post_title": "Cart",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "cart",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2025-09-12 15:15:06",
+    "post_modified_gmt": "2025-09-12 13:15:06",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dev.sportadventure.pl/template/cart/",
+    "menu_order": 0,
+    "post_type": "bricks_template",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "meta": {
+        "_bricks_template_type": "wc_cart",
+        "_bricks_page_content_2": "a:15:{i:0;a:6:{s:2:\"id\";s:6:\"pvprnx\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"jvqsdc\";}s:8:\"settings\";a:2:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"zjifdn\";}s:11:\"_conditions\";a:1:{i:0;a:1:{i:0;a:4:{s:2:\"id\";s:6:\"ifusvo\";s:3:\"key\";s:12:\"x_cart_empty\";s:7:\"compare\";s:2:\"==\";s:5:\"value\";s:9:\"not_empty\";}}}}s:5:\"label\";s:4:\"Cart\";}i:1;a:5:{s:2:\"id\";s:6:\"jvqsdc\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"pvprnx\";s:8:\"children\";a:2:{i:0;s:6:\"bnutmr\";i:1;s:6:\"tsyead\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"pjrbah\";}}}i:2;a:5:{s:2:\"id\";s:6:\"bnutmr\";s:4:\"name\";s:18:\"woocommerce-notice\";s:6:\"parent\";s:6:\"jvqsdc\";s:8:\"children\";a:0:{}s:8:\"settings\";a:1:{s:11:\"previewType\";s:3:\"all\";}}i:3;a:6:{s:2:\"id\";s:6:\"tsyead\";s:4:\"name\";s:5:\"block\";s:6:\"parent\";s:6:\"jvqsdc\";s:8:\"children\";a:1:{i:0;s:6:\"zgjrhy\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"tspgau\";}}s:5:\"label\";s:4:\"Grid\";}i:4;a:6:{s:2:\"id\";s:6:\"zgjrhy\";s:4:\"name\";s:5:\"block\";s:6:\"parent\";s:6:\"tsyead\";s:8:\"children\";a:3:{i:0;s:6:\"zowdtr\";i:1;s:6:\"giywoo\";i:2;s:6:\"tgkdqj\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"hsptdk\";}}s:5:\"label\";s:20:\"Cart items container\";}i:5;a:6:{s:2:\"id\";s:6:\"zowdtr\";s:4:\"name\";s:5:\"block\";s:6:\"parent\";s:6:\"zgjrhy\";s:8:\"children\";a:1:{i:0;s:6:\"azpxda\";}s:8:\"settings\";a:1:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"kdijkg\";}}s:5:\"label\";s:14:\"Container info\";}i:6;a:5:{s:2:\"id\";s:6:\"azpxda\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"zowdtr\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:6:\"Koszyk\";s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"ilzxbe\";}s:3:\"tag\";s:2:\"h1\";}}i:7;a:6:{s:2:\"id\";s:6:\"giywoo\";s:4:\"name\";s:22:\"woocommerce-cart-items\";s:6:\"parent\";s:6:\"zgjrhy\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:17:\"_cssGlobalClasses\";a:1:{i:0;s:6:\"slwebo\";}s:14:\"removePosition\";a:2:{s:3:\"top\";s:4:\"15px\";s:5:\"right\";s:4:\"15px\";}s:10:\"hideCoupon\";b:1;}s:11:\"themeStyles\";a:0:{}}i:8;a:6:{s:2:\"id\";s:6:\"tgkdqj\";s:4:\"name\";s:28:\"woocommerce-cart-collaterals\";s:6:\"parent\";s:6:\"zgjrhy\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:17:\"_cssGlobalClasses\";a:2:{i:0;s:6:\"ydnosi\";i:1;s:23:\"acss_import_form--light\";}s:10:\"buttonText\";s:22:\"Przejdź do rezerwacji\";}s:11:\"themeStyles\";a:0:{}}i:9;a:6:{s:2:\"id\";s:6:\"mrfvtk\";s:4:\"name\";s:7:\"section\";s:6:\"parent\";i:0;s:8:\"children\";a:1:{i:0;s:6:\"fhysmi\";}s:8:\"settings\";a:3:{s:11:\"_background\";a:1:{s:5:\"color\";a:1:{s:3:\"raw\";s:26:\"var(--neutral-ultra-light)\";}}s:10:\"_heightMin\";s:4:\"70vh\";s:11:\"_conditions\";a:1:{i:0;a:1:{i:0;a:4:{s:2:\"id\";s:6:\"qqmbhc\";s:3:\"key\";s:12:\"x_cart_empty\";s:7:\"compare\";s:2:\"==\";s:5:\"value\";s:5:\"empty\";}}}}s:5:\"label\";s:12:\"Main content\";}i:10;a:5:{s:2:\"id\";s:6:\"fhysmi\";s:4:\"name\";s:9:\"container\";s:6:\"parent\";s:6:\"mrfvtk\";s:8:\"children\";a:4:{i:0;s:6:\"ssydxj\";i:1;s:6:\"owcjvk\";i:2;s:6:\"cinccb\";i:3;s:6:\"mrnrfj\";}s:8:\"settings\";a:3:{s:11:\"_typography\";a:1:{s:10:\"text-align\";s:6:\"center\";}s:11:\"_alignItems\";s:6:\"center\";s:7:\"_rowGap\";s:14:\"var(--space-m)\";}}i:11;a:6:{s:2:\"id\";s:6:\"ssydxj\";s:4:\"name\";s:3:\"svg\";s:6:\"parent\";s:6:\"fhysmi\";s:8:\"children\";a:0:{}s:8:\"settings\";a:8:{s:7:\"user_id\";i:1;s:4:\"time\";i:1744120019;s:6:\"height\";s:5:\"12rem\";s:5:\"width\";s:4:\"auto\";s:10:\"_cssCustom\";s:465:\"#brxe-ssydxj path.bt-base-path {\n  fill: var(--text-light);\n}\n\n#brxe-ssydxj path.bt-main-path {\n  fill: var(--primary);\n}\n\n#brxe-ssydxj path.bt-main-path.bt-stroke {\n  stroke: var(--primary);\n}\n\n#brxe-ssydxj path.bt-base-path.bt-stroke {\n  stroke: var(--primary);\n}\n\n#brxe-ssydxj path.bt-secondary-path {\n  fill: var(--primary-ultra-light);\n}\n\n#brxe-ssydxj path.bt-terciary-path {\n  fill: orange;\n}\n\n#brxe-ssydxj path.bt-quarternary-path {\n  fill: var(--neutral);\n}\";s:22:\"height:mobile_portrait\";s:5:\"24rem\";s:9:\"signature\";s:32:\"a49abf9ba6bd56e900053e015a9e09f9\";s:4:\"file\";a:3:{s:2:\"id\";i:11515;s:8:\"filename\";s:14:\"icons8-map.svg\";s:3:\"url\";s:59:\"https://sportadventure.pl/wp-content/uploads/icons8-map.svg\";}}s:11:\"themeStyles\";a:0:{}}i:12;a:5:{s:2:\"id\";s:6:\"owcjvk\";s:4:\"name\";s:7:\"heading\";s:6:\"parent\";s:6:\"fhysmi\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:4:\"text\";s:34:\"Nie masz żadnej wyprawy w koszyku\";s:3:\"tag\";s:2:\"h1\";}}i:13;a:5:{s:2:\"id\";s:6:\"cinccb\";s:4:\"name\";s:10:\"text-basic\";s:6:\"parent\";s:6:\"fhysmi\";s:8:\"children\";a:0:{}s:8:\"settings\";a:2:{s:4:\"text\";s:47:\"Ale inne czekają z plecakiem gotowym do drogi!\";s:3:\"tag\";s:1:\"p\";}}i:14;a:5:{s:2:\"id\";s:6:\"mrnrfj\";s:4:\"name\";s:6:\"button\";s:6:\"parent\";s:6:\"fhysmi\";s:8:\"children\";a:0:{}s:8:\"settings\";a:3:{s:4:\"text\";s:24:\"Zobacz najnowsze wyprawy\";s:4:\"link\";a:2:{s:4:\"type\";s:8:\"internal\";s:6:\"postId\";s:4:\"8883\";}s:17:\"_cssGlobalClasses\";a:1:{i:0;s:24:\"acss_import_btn--primary\";}}}}",
+        "_bricks_editor_mode": "bricks"
+    }
+}

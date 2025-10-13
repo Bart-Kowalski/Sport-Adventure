@@ -1,0 +1,19 @@
+@if $option-cards == on {
+	#{$card-selectors} {
+		@include card;
+		&:where([class*="--alt"]) {
+			@include card(alt, props-only);
+		}
+		&:where([class*="--light"]) {
+			@include card(light, props-only);
+		}
+		&:where([class*="--dark"]) {
+			@include card(dark, props-only);
+		}
+	}
+	@if $option-card-container-queries == on {
+		:has(> :where(#{$card-selectors})) {
+			container: card / inline-size;
+		}
+	}
+}

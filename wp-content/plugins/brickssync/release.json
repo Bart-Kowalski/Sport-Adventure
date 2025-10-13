@@ -1,0 +1,15 @@
+{
+  "name": "BricksSync",
+  "slug": "brickssync",
+  "author": "<a href='https://brickssync.com'>Gert Wierbos - BricksSync.com</a>",
+  "author_profile": "https://brickssync.com",
+  "version": "1.1.1",
+  "requires": "5.6", 
+  "tested": "6.8.2", 
+  "requires_php": "8.0", 
+  "sections": {
+    "description": "Sync and migrate Bricks Builder settings and templates via Git-friendly JSON files.",
+    "changelog": "<h4>1.1.0</h4><ul><li>Skips template export if slug is empty.</li><li>Added full support for Bricks Components in settings export. Global CSS is already included in Bricks Settings.</li><li>Documentation and code cleanup.</li><li>Thoroughly tested with Bricks 2.0-rc2.</li></ul><h4>1.0.0</h4><ul><li><strong>Release:</strong> Official 1.0 release!</li><li>Fixed compatibility for <code>get_plugin_data()</code> on older WordPress.</li><li>Textarea fields (excluded options) now preserve line breaks.</li><li>General documentation and version bump.</li></ul><h4>0.8.0-alpha</h4><ul><li><strong>Added:</strong> Multisite/network admin support, per-site overrides, group config, and major UI improvements.</li></ul><h4>0.7.7-beta</h4><ul><li><strong>Fixed:</strong> WP CLI functionality was fixed and expanded while at it.</li></ul><h4>0.7.6-beta</h4><ul><li><strong>Fixed:</strong> A path error inside the template import function.</li></ul><h4>0.7.5-beta</h4><ul><li><strong>Fixed:</strong> Another Error inside the licensing tab.</li></ul><h4>0.7.4-beta</h4><ul><li><strong>Fixed:</strong> Error inside the licensing tab.</li></ul><h4>0.7.3-beta</h4><ul><li><strong>Added:</strong> Expanded guides for Apache, Nginx, and lighttpd security in documentation.</li><li>Added “Plugin Updates” section to documentation.</li><li>Option to disable licensing checks via constant.</li><li>General documentation and code cleanup.</li></ul><ul><li><strong>Changed:</strong> Unified and modernized the admin UI for all plugin tabs for a consistent user experience.</li><li>Improved error handling and validation for storage path and licensing.</li></ul><ul><li><strong>Fixed:</strong> Syntax and layout issues in the configuration and debug tabs.</li><li>Removal of duplicate or legacy UI remnants in all admin tabs.</li></ul>",
+    "frequently_asked_questions": "<h4>What does this plugin do?</h4><p>BricksSync allows you to synchronize and migrate Bricks Builder global settings and templates between different WordPress installations using Git-friendly JSON files.</p><h4>How do I configure the storage path?</h4><p>Navigate to Bricks > BricksSync > Configuration tab and choose between Child Theme, Uploads Folder, or Custom Path.</p>"
+  }
+}

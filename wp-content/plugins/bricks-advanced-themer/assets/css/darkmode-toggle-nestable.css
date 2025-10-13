@@ -1,0 +1,78 @@
+.brxe-brxc-darkmode-toggle-nestable{
+  --toggle-final-size: calc(var(--toggle-size) - var(--toggle-padding));
+ }
+
+ .brxe-brxc-darkmode-toggle-nestable [class*=brxe-] {
+  max-width: unset;
+}
+
+/* Builder fix in iframe */
+.brxe-brxc-darkmode-toggle-nestable :where(.brx-draggable:empty){
+  min-height: unset;
+  min-width: unset;
+}
+
+.brxc-darkmode-toggle-nestable__label{
+  margin-bottom: 0;
+}
+
+.brxc-darkmode-toggle-nestable__checkbox{
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.brxc-darkmode-toggle-nestable__checkbox:focus + label .brxc-darkmode-toggle-nestable__slot{
+  outline-width: var(--focus-outline-width);
+  outline-color: var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+  outline-style: solid;
+}
+
+.brxc-darkmode-toggle-nestable__slot{
+  box-sizing: initial;
+}
+
+
+.brxc-darkmode-toggle-nestable__floating-button {
+  background-color: var(--light-floating-bg);
+  left: calc(100% - var(--toggle-size) + calc(var(--toggle-padding) / 2));
+  box-shadow: inset 0px 0px 0px var(--light-border-size) var(--light-border-color);
+}
+
+.brxc-darkmode-toggle-nestable__checkbox:checked + label .brxc-darkmode-toggle-nestable__floating-button {
+  background-color: var(--dark-floating-bg);
+  box-shadow: inset 0px 0px 0px var(--dark-border-size) var(--dark-border-color);
+  left: calc(var(--toggle-padding) / 2);
+}
+
+
+.brxc-darkmode-toggle-nestable__checkbox:checked + label .brxc-darkmode-toggle-nestable__light-icon-wrapper{
+  opacity: 0;
+  transform: translate(3em, 2em) !important;
+}
+
+.brxc-darkmode-toggle-nestable__dark-icon{
+  transform-origin: 0% 50%;
+}
+
+.brxc-darkmode-toggle-nestable__checkbox + label .brxc-darkmode-toggle-nestable__dark-icon-wrapper {
+  opacity: 0;
+  transform: translate(0em, 2em) !important;
+}
+.brxc-darkmode-toggle-nestable__checkbox:checked + label .brxc-darkmode-toggle-nestable__dark-icon-wrapper {
+  opacity: 1;
+  transform: translate(0em, 0em) !important;
+}
+/* No animation*/
+.brxe-brxc-darkmode-toggle-nestable[data-no-animation="true"] * {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brxe-brxc-darkmode-toggle-nestable *{
+    transition: none !important;
+  }
+}
