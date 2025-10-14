@@ -78,12 +78,232 @@ function sa_render_sync_months_page() {
         $reset_results = sa_reset_month_terms();
     }
     
+    // Handle sync product taxonomies from variants
+    if (isset($_POST['sync_product_taxonomies']) && check_admin_referer('sync_variant_months')) {
+        $sync_results = sa_sync_product_taxonomies_from_variants();
+        $updated = true;
+    }
+    
+    // Handle fix 2026 terms
+    if (isset($_POST['fix_2026_terms']) && check_admin_referer('sync_variant_months')) {
+        $fix_results = sa_fix_2026_terms();
+        $updated = true;
+    }
+    
+    // Handle clear product taxonomies
+    if (isset($_POST['clear_product_taxonomies']) && check_admin_referer('sync_variant_months')) {
+        $clear_results = sa_clear_product_taxonomies();
+        $updated = true;
+    }
+    
     // Get statistics
     $stats = sa_get_sync_statistics();
     
     ?>
     <div class="wrap">
         <h1>Synchronizacja miesięcy i terminów w wariantach</h1>
+        
+        <!-- DEBUGGER SECTION -->
+        <details style="margin-bottom: 20px;">
+            <summary style="cursor: pointer; font-weight: bold; padding: 15px; background: #f0f0f0; border: 2px solid #0073aa; border-radius: 4px; color: #0073aa;">
+                🔍 Debugger & Weryfikacja 2026 (kliknij aby rozwinąć)
+            </summary>
+        <div class="card" style="background: #f0f0f0; border: 2px solid #0073aa; margin-top: 10px;">
+            <h2 style="color: #0073aa;">2026 Query Test</h2>
+            <?php
+            // Debug 2026 query
+            $terms_2026 = get_terms([
+                'taxonomy' => 'miesiace',
+                'meta_key' => 'rok',
+                'meta_value' => '2026',
+                'fields' => 'ids'
+            ]);
+            
+            $query_args = [
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'posts_per_page' => 100,
+                'orderby' => 'title',
+                'order' => 'ASC',
+                'tax_query' => [
+                    [
+                        'taxonomy' => 'miesiace',
+                        'field' => 'term_id',
+                        'terms' => $terms_2026,
+                        'operator' => 'IN'
+                    ]
+                ]
+            ];
+            
+            $products_2026 = get_posts($query_args);
+            
+            echo "<h3>2026 Terms Found:</h3>";
+            echo "<p><strong>Count:</strong> " . count($terms_2026) . "</p>";
+            echo "<p><strong>Term IDs:</strong> " . (empty($terms_2026) ? 'NONE' : implode(', ', $terms_2026)) . "</p>";
+            
+            if (!empty($terms_2026)) {
+                echo "<h4>Term Details:</h4>";
+                foreach ($terms_2026 as $term_id) {
+                    $term = get_term($term_id);
+                    $rok = get_term_meta($term_id, 'rok', true);
+                    $month_num = get_term_meta($term_id, 'numer_miesiaca', true);
+                    $calc_num = get_term_meta($term_id, 'calculated_number', true);
+                    echo "<p>• {$term->name} (ID: {$term_id}) - Rok: {$rok}, Month: {$month_num}, Calculated: {$calc_num}</p>";
+                }
+            }
+            
+            echo "<h3>2026 Products Found:</h3>";
+            echo "<p><strong>Count:</strong> " . count($products_2026) . "</p>";
+            
+            if (!empty($products_2026)) {
+                echo "<h4>Product Details (showing month taxonomies):</h4>";
+                
+                // Always show products with multiple 2026 months first
+                $products_by_month_count = [];
+                foreach ($products_2026 as $product) {
+                    $month_terms = wp_get_object_terms($product->ID, 'miesiace');
+                    $month_2026_terms = array_filter($month_terms, function($term) {
+                        return strpos($term->name, '2026') !== false;
+                    });
+                    $count_2026 = count($month_2026_terms);
+                    if (!isset($products_by_month_count[$count_2026])) {
+                        $products_by_month_count[$count_2026] = [];
+                    }
+                    $products_by_month_count[$count_2026][] = [
+                        'product' => $product,
+                        'terms' => $month_terms,
+                        'terms_2026' => $month_2026_terms
+                    ];
+                }
+                
+                // Sort by count descending
+                krsort($products_by_month_count);
+                
+                $shown = 0;
+                foreach ($products_by_month_count as $count => $products_data) {
+                    foreach ($products_data as $data) {
+                        if ($shown >= 15) break 2;
+                        $product = $data['product'];
+                        $all_terms = array_map(function($t) { return $t->name; }, $data['terms']);
+                        $terms_2026 = array_map(function($t) { return $t->name; }, $data['terms_2026']);
+                        $month_count = count($all_terms);
+                        $count_2026 = count($terms_2026);
+                        
+                        $display = implode(', ', $all_terms);
+                        if ($count_2026 > 1) {
+                            $display = "<strong style='color: green;'>" . implode(', ', $terms_2026) . "</strong>";
+                            if (count($all_terms) > $count_2026) {
+                                $other_terms = array_diff($all_terms, $terms_2026);
+                                $display .= ", " . implode(', ', $other_terms);
+                            }
+                        }
+                        
+                        echo "<p>• {$product->post_title} (ID: {$product->ID}) - <strong>{$month_count} months</strong> ({$count_2026} in 2026): {$display}</p>";
+                        $shown++;
+                    }
+                }
+                
+                if (count($products_2026) > 15) {
+                    echo "<p>... and " . (count($products_2026) - 15) . " more products</p>";
+                }
+                
+                // Show products with multiple months vs single month (2026 specific)
+                $multi_month_2026 = 0;
+                $single_month_2026 = 0;
+                $multi_month_total = 0;
+                $single_month_total = 0;
+                
+                foreach ($products_2026 as $product) {
+                    $month_terms = wp_get_object_terms($product->ID, 'miesiace');
+                    $month_2026_terms = array_filter($month_terms, function($term) {
+                        return strpos($term->name, '2026') !== false;
+                    });
+                    
+                    // Count 2026 months
+                    if (count($month_2026_terms) > 1) {
+                        $multi_month_2026++;
+                    } else {
+                        $single_month_2026++;
+                    }
+                    
+                    // Count all months
+                    if (count($month_terms) > 1) {
+                        $multi_month_total++;
+                    } else {
+                        $single_month_total++;
+                    }
+                }
+                
+                echo "<h4>Month Distribution:</h4>";
+                echo "<p><strong>Products with multiple 2026 months:</strong> {$multi_month_2026} 🎯</p>";
+                echo "<p><strong>Products with single 2026 month:</strong> {$single_month_2026}</p>";
+                echo "<p><strong>Products with multiple months (any year):</strong> {$multi_month_total}</p>";
+                echo "<p><strong>Products with single month (any year):</strong> {$single_month_total}</p>";
+            }
+            
+            // Debug variants data matching
+            echo "<h3>Variant Data Matching Debug:</h3>";
+            $variants_debug = sa_debug_variants_data_matching();
+            echo "<p><strong>Total Variants Checked:</strong> " . $variants_debug['total_variants'] . "</p>";
+            echo "<p><strong>Variants with Dates:</strong> " . $variants_debug['variants_with_dates'] . "</p>";
+            echo "<p><strong>Variants with 2026 Dates:</strong> " . $variants_debug['variants_2026'] . "</p>";
+            echo "<p><strong>Products with 2026 Variants:</strong> " . $variants_debug['products_with_2026_variants'] . "</p>";
+            
+            if (!empty($variants_debug['products_with_multiple_2026_months'])) {
+                echo "<h4>✅ Products that SHOULD have multiple 2026 months (from variants):</h4>";
+                foreach ($variants_debug['products_with_multiple_2026_months'] as $product_data) {
+                    $product_id = $product_data['product_id'];
+                    $product_title = $product_data['product_title'];
+                    $months = implode(', ', $product_data['months']);
+                    $month_count = count($product_data['months']);
+                    
+                    // Check if product actually has these taxonomies
+                    $actual_terms = wp_get_object_terms($product_id, 'miesiace');
+                    $actual_2026_terms = array_filter($actual_terms, function($term) {
+                        return strpos($term->name, '2026') !== false;
+                    });
+                    $actual_count = count($actual_2026_terms);
+                    
+                    $status = $actual_count == $month_count ? '✅' : '❌';
+                    echo "<p>{$status} Product {$product_id} ({$product_title}): Expected {$month_count} months ({$months}), Has {$actual_count} taxonomies</p>";
+                }
+            }
+            
+            if (!empty($variants_debug['sample_data'])) {
+                echo "<h4>Sample 2026 Variant Data:</h4>";
+                foreach (array_slice($variants_debug['sample_data'], 0, 5) as $sample) {
+                    echo "<p>• Product {$sample['product_id']} ({$sample['product_title']}) - Variant {$sample['variant_id']}: {$sample['start_date']} → {$sample['parsed_date']} (Year: {$sample['year']}, Month: {$sample['month']})</p>";
+                }
+            }
+            
+            // Debug month calculations
+            echo "<h3>Month Calculation Debug:</h3>";
+            $test_cases = [
+                ['year' => 2025, 'month' => 1, 'expected' => 1],
+                ['year' => 2025, 'month' => 12, 'expected' => 12],
+                ['year' => 2026, 'month' => 1, 'expected' => 13],
+                ['year' => 2026, 'month' => 12, 'expected' => 24],
+                ['year' => 2027, 'month' => 1, 'expected' => 25]
+            ];
+            
+            echo "<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>";
+            echo "<tr><th>Year</th><th>Month</th><th>Calculated</th><th>Expected</th><th>Status</th></tr>";
+            
+            foreach ($test_cases as $test) {
+                $calculated = sa_calculate_month_number($test['year'], $test['month']);
+                $status = $calculated == $test['expected'] ? '✅' : '❌';
+                echo "<tr>";
+                echo "<td>{$test['year']}</td>";
+                echo "<td>{$test['month']}</td>";
+                echo "<td>{$calculated}</td>";
+                echo "<td>{$test['expected']}</td>";
+                echo "<td>{$status}</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+            ?>
+        </div>
+        </details><!-- End Debugger Section -->
         
         <?php if ($updated): ?>
             <div class="notice notice-success">
@@ -94,6 +314,32 @@ function sa_render_sync_months_page() {
         <?php if (isset($created) && $created > 0): ?>
             <div class="notice notice-success">
                 <p>Utworzono <?php echo $created; ?> nowych terminów miesięcy.</p>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($sync_results) && $sync_results['updated'] > 0): ?>
+            <div class="notice notice-success">
+                <p>Synchronizacja taxonomii zakończona pomyślnie. Zaktualizowano <?php echo $sync_results['updated']; ?> produktów.</p>
+                <?php if (!empty($sync_results['details'])): ?>
+                    <p><strong>Szczegóły:</strong> <?php echo $sync_results['details']; ?></p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($fix_results)): ?>
+            <div class="notice notice-success">
+                <p><strong>Naprawiono 2026 terms!</strong></p>
+                <p>Zaktualizowano: <?php echo $fix_results['updated']; ?> terminów</p>
+                <?php if (!empty($fix_results['details'])): ?>
+                    <p><strong>Szczegóły:</strong> <?php echo implode('<br>', $fix_results['details']); ?></p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($clear_results)): ?>
+            <div class="notice notice-warning">
+                <p><strong>Wyczyszczono taxonomie produktów!</strong></p>
+                <p>Wyczyszczono: <?php echo $clear_results['cleared']; ?> produktów</p>
             </div>
         <?php endif; ?>
         
@@ -184,10 +430,22 @@ function sa_render_sync_months_page() {
         <?php endif; ?>
         
         <div class="card">
-            <h2>Statystyki</h2>
-            <p>Liczba wariantów bez przypisanego miesiąca: <?php echo $stats['no_month']; ?></p>
-            <p>Liczba wariantów z niezgodnym miesiącem: <?php echo $stats['mismatched']; ?></p>
-            <p>Liczba wszystkich terminów miesięcy: <?php echo $stats['total_terms']; ?></p>
+            <h2>📊 Statystyki Synchronizacji</h2>
+            <p><strong>Liczba wszystkich terminów miesięcy:</strong> <?php echo $stats['total_terms']; ?></p>
+            <p><strong>Produkty zmienne (z wariantami):</strong> <?php echo $stats['total_products']; ?></p>
+            <hr>
+            <p><strong>✅ Produkty w pełni zsynchronizowane:</strong> <?php echo $stats['products_synced']; ?></p>
+            <p><strong>⚠️ Produkty z brakującymi miesiącami:</strong> <?php echo $stats['products_with_missing_months']; ?></p>
+            <p><strong>❌ Produkty bez żadnych miesięcy:</strong> <?php echo $stats['products_without_months']; ?></p>
+            <?php if ($stats['products_without_months'] > 0 || $stats['products_with_missing_months'] > 0): ?>
+                <p style="background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin-top: 10px;">
+                    💡 <strong>Wskazówka:</strong> Kliknij "🔄 Synchronizuj Taxonomie Produktów" aby naprawić problemy z synchronizacją.
+                </p>
+            <?php else: ?>
+                <p style="background: #d4edda; padding: 10px; border-left: 4px solid #28a745; margin-top: 10px;">
+                    ✅ <strong>Wszystko OK!</strong> Wszystkie produkty mają poprawnie przypisane taxonomie miesięcy.
+                </p>
+            <?php endif; ?>
         </div>
         
         <div class="card">
@@ -230,19 +488,35 @@ function sa_render_sync_months_page() {
         
         <form method="post" action="">
             <?php wp_nonce_field('sync_variant_months'); ?>
+            
+            <h3>🚀 Główne Akcje</h3>
             <p class="submit">
-                <input type="submit" name="sync_months" class="button button-primary" value="Synchronizuj miesiące" style="margin-right: 10px;">
-                <input type="submit" name="sync_earliest_dates" class="button button-primary" value="Synchronizuj najwcześniejsze terminy" style="margin-right: 10px;">
-                <input type="submit" name="create_default_months" class="button button-secondary" value="Utwórz domyślne miesiące (2025-2026)" style="margin-right: 10px;">
-                <input type="submit" name="show_debug_logs" class="button button-secondary" value="Pokaż logi debug" style="margin-right: 10px;">
-                <input type="submit" name="test_calculations" class="button button-secondary" value="Testuj obliczenia" style="margin-right: 10px;">
-                <input type="submit" name="test_acf_fields" class="button button-secondary" value="Testuj pola ACF" style="margin-right: 10px;">
-                <input type="submit" name="debug_products" class="button button-secondary" value="Debug Products" style="margin-right: 10px;">
-                <input type="submit" name="debug_taxonomy_counts" class="button button-secondary" value="Debug Taxonomy Counts" style="margin-right: 10px;">
-                <input type="submit" name="debug_acf_fields" class="button button-secondary" value="Debug ACF Fields" style="margin-right: 10px;">
-                <input type="submit" name="cleanup_months" class="button button-secondary" value="Wyczyść miesiące" style="margin-right: 10px;">
-                <input type="submit" name="reset_months" class="button button-secondary" value="Resetuj wszystkie miesiące" style="color: red;" onclick="return confirm('Czy na pewno chcesz usunąć wszystkie miesiące i ich przypisania? Ta operacja jest nieodwracalna!');">
+                <input type="submit" name="sync_product_taxonomies" class="button button-primary button-hero" value="🔄 Synchronizuj Taxonomie Produktów" style="margin-right: 10px;">
+                <input type="submit" name="sync_earliest_dates" class="button button-primary" value="📅 Aktualizuj Najwcześniejsze Terminy" style="margin-right: 10px;">
             </p>
+            
+            <details style="margin-top: 20px;">
+                <summary style="cursor: pointer; font-weight: bold; padding: 10px; background: #f0f0f0; border-radius: 4px;">⚙️ Narzędzia Deweloperskie (kliknij aby rozwinąć)</summary>
+                <div style="margin-top: 10px; padding: 15px; background: #fafafa; border-left: 4px solid #999;">
+                    <p class="submit">
+                        <input type="submit" name="sync_months" class="button button-secondary" value="Synchronizuj miesiące (stara wersja)" style="margin-right: 10px;">
+                        <input type="submit" name="fix_2026_terms" class="button button-secondary" value="🔧 Napraw terminy 2026" style="margin-right: 10px;">
+                        <input type="submit" name="clear_product_taxonomies" class="button button-secondary" value="🗑️ Wyczyść taxonomie" style="margin-right: 10px;" onclick="return confirm('Czy na pewno chcesz wyczyścić wszystkie taxonomie miesięcy?');">
+                        <input type="submit" name="create_default_months" class="button button-secondary" value="Utwórz miesiące 2025-2026" style="margin-right: 10px;">
+                    </p>
+                    <p class="submit">
+                        <input type="submit" name="show_debug_logs" class="button button-secondary" value="Pokaż logi debug" style="margin-right: 10px;">
+                        <input type="submit" name="test_calculations" class="button button-secondary" value="Test obliczeń" style="margin-right: 10px;">
+                        <input type="submit" name="test_acf_fields" class="button button-secondary" value="Test ACF" style="margin-right: 10px;">
+                        <input type="submit" name="debug_products" class="button button-secondary" value="Debug produktów" style="margin-right: 10px;">
+                        <input type="submit" name="debug_taxonomy_counts" class="button button-secondary" value="Debug taxonomii" style="margin-right: 10px;">
+                    </p>
+                    <p class="submit">
+                        <input type="submit" name="cleanup_months" class="button button-secondary" value="Wyczyść puste miesiące" style="margin-right: 10px;">
+                        <input type="submit" name="reset_months" class="button button-secondary" value="⚠️ RESET wszystkich miesięcy" style="margin-right: 10px; color: red;" onclick="return confirm('Czy na pewno chcesz usunąć WSZYSTKIE miesiące? Ta operacja jest nieodwracalna!');">
+                    </p>
+                </div>
+            </details>
         </form>
     </div>
     <?php
@@ -252,10 +526,11 @@ function sa_get_sync_statistics() {
     global $wpdb;
     
     $stats = [
-        'no_month' => 0,
-        'mismatched' => 0,
-        'updated' => 0,
-        'total_terms' => 0
+        'products_without_months' => 0,
+        'products_with_missing_months' => 0,
+        'products_synced' => 0,
+        'total_terms' => 0,
+        'total_products' => 0
     ];
     
     // Get total terms count
@@ -265,66 +540,75 @@ function sa_get_sync_statistics() {
     ]);
     $stats['total_terms'] = !empty($all_terms) ? count($all_terms) : 0;
     
-    // Get all product variations with start dates using ACF (including unpublished)
-    $variations = $wpdb->get_results("
-        SELECT p.ID
-        FROM {$wpdb->posts} p
-        WHERE p.post_type = 'product_variation'
-        AND p.post_status IN ('publish', 'private', 'draft')
-    ");
+    // Get all variable products
+    $products = get_posts([
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'meta_query' => [
+            [
+                'key' => '_product_type',
+                'value' => 'variable',
+                'compare' => '='
+            ]
+        ]
+    ]);
     
-    foreach ($variations as $variation) {
-        // Get parent product ID
-        $parent_product_id = wp_get_post_parent_id($variation->ID);
-        if (!$parent_product_id) {
-            continue;
-        }
+    $stats['total_products'] = count($products);
+    
+    foreach ($products as $product) {
+        // Get all variants for this product
+        $variations = get_posts([
+            'post_type' => 'product_variation',
+            'post_parent' => $product->ID,
+            'posts_per_page' => -1,
+            'post_status' => ['publish', 'private', 'draft']
+        ]);
         
-        // Get current month term on parent product
-        $current_terms = wp_get_object_terms($parent_product_id, 'miesiace', ['fields' => 'ids']);
-        $current_month_id = !empty($current_terms) ? $current_terms[0] : null;
-        
-        // Get expected month from start date using ACF
-        $start_date = get_field('wyprawa-termin__data-poczatkowa', $variation->ID);
-        if (!$start_date) {
-            continue;
-        }
-        
-        // Parse the start date - try different formats
-        $date = null;
-        $date_formats = ['d.m.Y', 'Ymd', 'Y-m-d', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
-        
-        foreach ($date_formats as $format) {
-            $date = DateTime::createFromFormat($format, $start_date);
-            if ($date) {
-                break;
+        // Get expected month terms from variants
+        $expected_term_ids = [];
+        foreach ($variations as $variation) {
+            $start_date = get_field('wyprawa-termin__data-poczatkowa', $variation->ID);
+            if (!$start_date) continue;
+            
+            $date = null;
+            $date_formats = ['d.m.Y', 'Ymd', 'Y-m-d', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
+            
+            foreach ($date_formats as $format) {
+                $date = DateTime::createFromFormat($format, $start_date);
+                if ($date) break;
+            }
+            
+            if (!$date) continue;
+            
+            $year = $date->format('Y');
+            $month_number = $date->format('n');
+            
+            $term = sa_get_month_term($year, $month_number);
+            if ($term) {
+                $expected_term_ids[] = $term->term_id;
             }
         }
         
-        if (!$date) {
-            continue;
+        $expected_term_ids = array_unique($expected_term_ids);
+        
+        if (empty($expected_term_ids)) {
+            continue; // Product has no variants with dates
         }
         
-        // Get the year and month number
-        $year = $date->format('Y');
-        $month_number = $date->format('n');
+        // Get actual terms on product
+        $current_terms = wp_get_object_terms($product->ID, 'miesiace', ['fields' => 'ids']);
         
-        // Get or create the term for this month
-        $expected_term = sa_get_month_term($year, $month_number);
-        
-        if (!$expected_term) {
-            // Create the month term if it doesn't exist
-            $expected_term = sa_create_month_term($year, $month_number);
-        }
-        
-        if (!$expected_term) {
-            continue;
-        }
-        
-        if (!$current_month_id) {
-            $stats['no_month']++;
-        } elseif ($current_month_id != $expected_term->term_id) {
-            $stats['mismatched']++;
+        if (empty($current_terms)) {
+            $stats['products_without_months']++;
+        } else {
+            // Check if product has all expected terms
+            $missing_terms = array_diff($expected_term_ids, $current_terms);
+            if (!empty($missing_terms)) {
+                $stats['products_with_missing_months']++;
+            } else {
+                $stats['products_synced']++;
+            }
         }
     }
     
@@ -416,22 +700,23 @@ function sa_sync_variant_months() {
             
             // Get current terms on parent product
             $current_terms = wp_get_object_terms($parent_product_id, 'miesiace', ['fields' => 'ids']);
-            $current_month_id = !empty($current_terms) ? $current_terms[0] : null;
             
-            $debug_entry .= ", Parent product ID: {$parent_product_id}, Current term ID: " . ($current_month_id ?: 'none');
+            $debug_entry .= ", Parent product ID: {$parent_product_id}, Current terms: " . (empty($current_terms) ? 'none' : implode(',', $current_terms));
             
-            // Update only if different
-            if ($current_month_id != $term->term_id) {
-                $result = wp_set_object_terms($parent_product_id, [$term->term_id], 'miesiace');
+            // Check if this term is already assigned
+            if (!in_array($term->term_id, $current_terms)) {
+                // Append this term to existing terms
+                $all_terms = array_unique(array_merge($current_terms, [$term->term_id]));
+                $result = wp_set_object_terms($parent_product_id, $all_terms, 'miesiace', false);
                 if (!is_wp_error($result)) {
                     $updated++;
                     $variations_processed++;
-                    $debug_entry .= ", UPDATED parent product to term {$term->term_id}";
+                    $debug_entry .= ", ADDED term {$term->term_id} (now has " . count($all_terms) . " terms)";
                 } else {
                     $debug_entry .= ", FAILED to update parent product: " . $result->get_error_message();
                 }
             } else {
-                $debug_entry .= ", No change needed on parent product";
+                $debug_entry .= ", Term {$term->term_id} already assigned";
             }
         } else {
             $debug_entry .= ", No term available";
@@ -491,7 +776,17 @@ function sa_sync_earliest_dates() {
         // Find earliest date among variations
         $earliest_date = null;
         foreach ($variations as $variation) {
-            $date = DateTime::createFromFormat('Ymd', $variation->start_date);
+            // Try multiple date formats
+            $date = null;
+            $date_formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
+            
+            foreach ($date_formats as $format) {
+                $date = DateTime::createFromFormat($format, $variation->start_date);
+                if ($date) {
+                    break;
+                }
+            }
+            
             if (!$date) {
                 continue;
             }
@@ -1187,4 +1482,398 @@ add_action('admin_notices', function() {
         </div>
         <?php
     }
-}); 
+});
+
+/**
+ * Sync product taxonomies from variants
+ * This function assigns month taxonomies to parent products based on their variants' dates
+ */
+function sa_sync_product_taxonomies_from_variants() {
+    global $wpdb;
+    $updated = 0;
+    $debug_log = [];
+    $details = [];
+    
+    $debug_log[] = "Starting product taxonomy sync from variants";
+    
+    // Get all variable products
+    $products = get_posts([
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'meta_query' => [
+            [
+                'key' => '_product_type',
+                'value' => 'variable',
+                'compare' => '='
+            ]
+        ]
+    ]);
+    
+    $debug_log[] = "Found " . count($products) . " variable products to check";
+    
+    foreach ($products as $product) {
+        $product_id = $product->ID;
+        $month_terms = [];
+        $variations_processed = 0;
+        
+        // Get all variations for this product
+        $variations = get_posts([
+            'post_type' => 'product_variation',
+            'post_parent' => $product_id,
+            'posts_per_page' => -1,
+            'post_status' => ['publish', 'private', 'draft']
+        ]);
+        
+        foreach ($variations as $variation) {
+            $start_date = get_field('wyprawa-termin__data-poczatkowa', $variation->ID);
+            if (!$start_date) {
+                continue;
+            }
+            
+            // Parse the start date - try different formats
+            $date = null;
+            $date_formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
+            
+            foreach ($date_formats as $format) {
+                $date = DateTime::createFromFormat($format, $start_date);
+                if ($date) {
+                    break;
+                }
+            }
+            
+            if (!$date) {
+                continue;
+            }
+            
+            $year = $date->format('Y');
+            $month_number = $date->format('n');
+            
+            // Get or create the term for this month
+            $term = sa_get_month_term($year, $month_number);
+            
+            if (!$term) {
+                // Create the month term if it doesn't exist
+                $term = sa_create_month_term($year, $month_number);
+            }
+            
+            if ($term) {
+                $month_terms[] = $term->term_id;
+                $variations_processed++;
+            }
+        }
+        
+        if (!empty($month_terms)) {
+            // Remove duplicates
+            $month_terms = array_unique($month_terms);
+            
+            // Get existing month terms for this product
+            $existing_terms = wp_get_object_terms($product_id, 'miesiace', ['fields' => 'ids']);
+            
+            // Merge with existing terms and remove duplicates
+            $all_terms = array_unique(array_merge($existing_terms, $month_terms));
+            
+            // Assign all month terms to the parent product (append mode)
+            $result = wp_set_object_terms($product_id, $all_terms, 'miesiace', false);
+            
+            if (!is_wp_error($result)) {
+                $updated++;
+                $details[] = "Product {$product_id} ({$product->post_title}): {$variations_processed} variations, " . count($month_terms) . " new terms, " . count($all_terms) . " total terms";
+                $debug_log[] = "Updated product {$product_id}: {$variations_processed} variations, " . count($month_terms) . " new terms, " . count($all_terms) . " total terms (was " . count($existing_terms) . ")";
+            } else {
+                $debug_log[] = "Error updating product {$product_id}: " . $result->get_error_message();
+            }
+        }
+    }
+    
+    $debug_log[] = "Sync completed. Updated {$updated} products";
+    
+    if (sa_is_php_debug_enabled()) {
+        error_log("SA Product Taxonomy Sync: " . implode(" | ", $debug_log));
+    }
+    
+    return [
+        'updated' => $updated,
+        'details' => implode('; ', array_slice($details, 0, 10)) . (count($details) > 10 ? '...' : ''),
+        'debug_log' => $debug_log
+    ];
+}
+
+/**
+ * Daily cron job to sync product taxonomies and earliest dates
+ */
+add_action('sa_daily_product_taxonomy_sync', 'sa_daily_sync_handler');
+function sa_daily_sync_handler() {
+    // Add memory limit and timeout protection
+    @ini_set('memory_limit', '256M');
+    @set_time_limit(300); // 5 minutes max
+    
+    // Check if ACF is active
+    if (!function_exists('get_field')) {
+        error_log('SA Cron Error: ACF plugin not active');
+        return;
+    }
+    
+    try {
+        // Sync product taxonomies from variants
+        sa_sync_product_taxonomies_from_variants();
+        
+        // Update earliest dates
+        sa_sync_earliest_dates();
+        
+        error_log('SA Cron: Daily sync completed successfully');
+    } catch (Exception $e) {
+        error_log('SA Cron Error: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Schedule daily cron job on plugin activation
+ */
+register_activation_hook(plugin_dir_path(__FILE__) . 'sport-adventure-custom.php', 'sa_schedule_daily_taxonomy_sync');
+function sa_schedule_daily_taxonomy_sync() {
+    if (!wp_next_scheduled('sa_daily_product_taxonomy_sync')) {
+        // Schedule to run daily at 2:00 AM
+        wp_schedule_event(strtotime('02:00:00'), 'daily', 'sa_daily_product_taxonomy_sync');
+    }
+}
+
+/**
+ * Unschedule cron job on plugin deactivation
+ */
+register_deactivation_hook(plugin_dir_path(__FILE__) . 'sport-adventure-custom.php', 'sa_unschedule_daily_taxonomy_sync');
+function sa_unschedule_daily_taxonomy_sync() {
+    wp_clear_scheduled_hook('sa_daily_product_taxonomy_sync');
+}
+
+/**
+ * Helper function to query products by year
+ * Usage: sa_get_products_by_year(2026)
+ */
+function sa_get_products_by_year($year) {
+    // Get all month terms for the specified year
+    $month_terms = get_terms([
+        'taxonomy' => 'miesiace',
+        'hide_empty' => false,
+        'meta_query' => [
+            [
+                'key' => 'rok',
+                'value' => $year,
+                'compare' => '='
+            ]
+        ],
+        'fields' => 'ids'
+    ]);
+    
+    if (empty($month_terms)) {
+        return [];
+    }
+    
+    // Query products that have any of these month terms
+    $args = [
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'tax_query' => [
+            [
+                'taxonomy' => 'miesiace',
+                'field' => 'term_id',
+                'terms' => $month_terms,
+                'operator' => 'IN'
+            ]
+        ]
+    ];
+    
+    return get_posts($args);
+}
+
+/**
+ * Clear all month taxonomies from products
+ */
+function sa_clear_product_taxonomies() {
+    $cleared = 0;
+    
+    // Get all products
+    $products = get_posts([
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1
+    ]);
+    
+    foreach ($products as $product) {
+        $terms = wp_get_object_terms($product->ID, 'miesiace', ['fields' => 'ids']);
+        if (!empty($terms)) {
+            wp_set_object_terms($product->ID, [], 'miesiace', false);
+            $cleared++;
+        }
+    }
+    
+    return ['cleared' => $cleared];
+}
+
+/**
+ * Fix 2026 terms with incorrect month numbers
+ */
+function sa_fix_2026_terms() {
+    $updated = 0;
+    $details = [];
+    
+    // Get all 2026 terms
+    $terms_2026 = get_terms([
+        'taxonomy' => 'miesiace',
+        'meta_key' => 'rok',
+        'meta_value' => '2026',
+        'hide_empty' => false
+    ]);
+    
+    $details[] = "Found " . count($terms_2026) . " terms for 2026";
+    
+    foreach ($terms_2026 as $term) {
+        $current_month = get_term_meta($term->term_id, 'numer_miesiaca', true);
+        $rok = get_term_meta($term->term_id, 'rok', true);
+        
+        // Extract correct month number from term name
+        $month_names = [
+            'Styczeń' => 1, 'Luty' => 2, 'Marzec' => 3, 'Kwiecień' => 4,
+            'Maj' => 5, 'Czerwiec' => 6, 'Lipiec' => 7, 'Sierpień' => 8,
+            'Wrzesień' => 9, 'Październik' => 10, 'Listopad' => 11, 'Grudzień' => 12
+        ];
+        
+        $correct_month = null;
+        foreach ($month_names as $name => $num) {
+            if (strpos($term->name, $name) !== false) {
+                $correct_month = $num;
+                break;
+            }
+        }
+        
+        if ($correct_month && $current_month != $correct_month) {
+            // Update month number
+            update_term_meta($term->term_id, 'numer_miesiaca', $correct_month);
+            
+            // Recalculate calculated_number
+            $calculated = sa_calculate_month_number($rok, $correct_month);
+            update_term_meta($term->term_id, 'calculated_number', $calculated);
+            
+            $details[] = "{$term->name} (ID: {$term->term_id}): {$current_month} → {$correct_month} (calculated: {$calculated})";
+            $updated++;
+        }
+    }
+    
+    return [
+        'updated' => $updated,
+        'details' => $details
+    ];
+}
+
+/**
+ * Debug function to check variant data matching
+ */
+function sa_debug_variants_data_matching() {
+    global $wpdb;
+    
+    $debug_data = [
+        'total_variants' => 0,
+        'variants_with_dates' => 0,
+        'variants_2026' => 0,
+        'products_with_2026_variants' => 0,
+        'products_with_multiple_2026_months' => [],
+        'sample_data' => []
+    ];
+    
+    // Get all variants
+    $variants = get_posts([
+        'post_type' => 'product_variation',
+        'post_status' => ['publish', 'private', 'draft'],
+        'posts_per_page' => -1
+    ]);
+    
+    $debug_data['total_variants'] = count($variants);
+    $products_2026_months = []; // Track months per product
+    
+    foreach ($variants as $variation) {
+        $start_date = get_field('wyprawa-termin__data-poczatkowa', $variation->ID);
+        if (!$start_date) {
+            continue;
+        }
+        
+        $debug_data['variants_with_dates']++;
+        
+        // Parse the start date
+        $date = null;
+        $date_formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
+        
+        foreach ($date_formats as $format) {
+            $date = DateTime::createFromFormat($format, $start_date);
+            if ($date) {
+                break;
+            }
+        }
+        
+        if (!$date) {
+            continue;
+        }
+        
+        $year = $date->format('Y');
+        $month = $date->format('n');
+        $parsed_date = $date->format('Y-m-d');
+        
+        if ($year == '2026') {
+            $debug_data['variants_2026']++;
+            
+            $product_id = $variation->post_parent;
+            
+            // Track months per product
+            if (!isset($products_2026_months[$product_id])) {
+                $products_2026_months[$product_id] = [
+                    'months' => [],
+                    'product_title' => ''
+                ];
+            }
+            
+            $month_names = [
+                1 => 'Styczeń', 2 => 'Luty', 3 => 'Marzec', 4 => 'Kwiecień',
+                5 => 'Maj', 6 => 'Czerwiec', 7 => 'Lipiec', 8 => 'Sierpień',
+                9 => 'Wrzesień', 10 => 'Październik', 11 => 'Listopad', 12 => 'Grudzień'
+            ];
+            
+            $month_name = $month_names[$month];
+            if (!in_array($month_name, $products_2026_months[$product_id]['months'])) {
+                $products_2026_months[$product_id]['months'][] = $month_name;
+            }
+            
+            if (!$products_2026_months[$product_id]['product_title']) {
+                $product = get_post($product_id);
+                $products_2026_months[$product_id]['product_title'] = $product ? $product->post_title : 'Unknown';
+            }
+            
+            // Add sample data (limit to 10 samples)
+            if (count($debug_data['sample_data']) < 10) {
+                $debug_data['sample_data'][] = [
+                    'product_id' => $product_id,
+                    'product_title' => $products_2026_months[$product_id]['product_title'],
+                    'variant_id' => $variation->ID,
+                    'start_date' => $start_date,
+                    'parsed_date' => $parsed_date,
+                    'year' => $year,
+                    'month' => $month
+                ];
+            }
+        }
+    }
+    
+    // Find products with multiple 2026 months
+    foreach ($products_2026_months as $product_id => $data) {
+        if (count($data['months']) > 1) {
+            $debug_data['products_with_multiple_2026_months'][] = [
+                'product_id' => $product_id,
+                'product_title' => $data['product_title'],
+                'months' => $data['months']
+            ];
+        }
+    }
+    
+    $debug_data['products_with_2026_variants'] = count($products_2026_months);
+    
+    return $debug_data;
+} 

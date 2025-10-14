@@ -178,7 +178,7 @@ function sa_calculate_year_number($year) {
     return $year - 2025;
 }
 
-// Helper function to calculate month number (year 0, month 1 = 1, year 1, month 1 = 13)
+// Helper function to calculate month number (Jan 2025 = 1, Dec 2025 = 12, Jan 2026 = 13, etc.)
 function sa_calculate_month_number($year, $month) {
     $year_offset = sa_calculate_year_number($year);
     return $year_offset * 12 + $month;
