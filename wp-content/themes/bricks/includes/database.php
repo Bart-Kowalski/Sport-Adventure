@@ -235,6 +235,11 @@ class Database {
 						continue;
 					}
 
+					// STEP: Get global query settings (@since 2.1)
+					if ( isset( $element['settings']['query'] ) ) {
+						$element['settings']['query'] = Helpers::maybe_get_global_query_settings( $element['settings']['query'] ?? [] );
+					}
+
 					// Certain elements 'is_archive_main_query' is not set inside query key
 					if ( isset( $element['settings']['is_archive_main_query'] ) ) {
 						// WooCommerce Products element
@@ -1267,6 +1272,20 @@ class Database {
 			self::$global_data['colorPalette'] = get_option( BRICKS_DB_COLOR_PALETTE, [] );
 		}
 
+		// Global queries (@since 2.1)
+		if ( is_multisite() && BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES ) {
+			self::$global_data['globalQueries'] = get_blog_option( get_main_site_id(), BRICKS_DB_GLOBAL_QUERIES, [] );
+		} else {
+			self::$global_data['globalQueries'] = get_option( BRICKS_DB_GLOBAL_QUERIES, [] );
+		}
+
+		// Global queries categories (@since 2.1)
+		if ( is_multisite() && BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES_CATEGORIES ) {
+			self::$global_data['globalQueriesCategories'] = get_blog_option( get_main_site_id(), BRICKS_DB_GLOBAL_QUERIES_CATEGORIES, [] );
+		} else {
+			self::$global_data['globalQueriesCategories'] = get_option( BRICKS_DB_GLOBAL_QUERIES_CATEGORIES, [] );
+		}
+
 		// Icon sets
 		if ( is_multisite() && BRICKS_MULTISITE_USE_MAIN_SITE_ICON_SETS ) {
 			self::$global_data['iconSets'] = get_blog_option( get_main_site_id(), BRICKS_DB_ICON_SETS, [] );
@@ -1642,6 +1661,7 @@ class Database {
 
 			// Prevent circular references
 			$instance_key = $component_id . '_' . ( $element['id'] ?? '' );
+
 			if ( in_array( $instance_key, $processed_ids, true ) ) {
 				$result[] = $element;
 				continue;
@@ -1682,6 +1702,7 @@ class Database {
 						$element['children'] = $component_element['children'];
 					}
 				}
+
 				// Otherwise, collect for adding later
 				else {
 					$elements_to_add[] = $component_element;

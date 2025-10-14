@@ -11,7 +11,7 @@ $controls['_display'] = [
 	'css'         => [
 		[
 			'property' => 'display',
-			'selector' => '.brxe-div',
+			'selector' => '.brxe-div:where(:not(.brx-dropdown-content))',
 		],
 	],
 	'inline'      => true,

@@ -308,15 +308,18 @@ class Element_Posts extends Custom_Render_Element {
 				'required' => [ 'layout', '=', [ '', 'list', 'grid' ] ],
 			];
 
-			$this->control_options['imageRatio']['custom'] = esc_html__( 'Custom', 'bricks' );
-
 			$this->controls['imageRatio'] = [
 				'tab'         => 'content',
 				'group'       => 'image',
 				'label'       => esc_html__( 'Image ratio', 'bricks' ) . ' (' . esc_html__( 'Grid', 'bricks' ) . ')',
-				'type'        => 'select',
-				'options'     => $this->control_options['imageRatio'],
+				'type'        => 'text',
 				'inline'      => true,
+				'css'         => [
+					[
+						'selector' => '.image',
+						'property' => 'aspect-ratio',
+					],
+				],
 				'placeholder' => esc_html__( 'None', 'bricks' ),
 				'required'    => [ 'layout', '=', [ '', 'grid' ] ],
 			];
@@ -858,10 +861,6 @@ class Element_Posts extends Custom_Render_Element {
 
 		$image_atts = [ 'class' => 'image css-filter' ];
 
-		if ( $layout === 'grid' && ! empty( $settings['imageRatio'] ) ) {
-			$image_atts['class'] .= " bricks-aspect-{$settings['imageRatio']}";
-		}
-
 		if ( $this->lazy_load() ) {
 			$image_atts['class'] .= ' bricks-lazy-hidden';
 			$image_atts['class'] .= ' bricks-lazy-load-isotope';
@@ -1038,8 +1037,8 @@ class Element_Posts extends Custom_Render_Element {
 			echo $query->maybe_add_loop_marker( $no_result_content );
 		}
 
-		// Add infinite scroll information to isotope sizer
-		$this->render_query_loop_trail( $posts_query, 'item-sizer' );
+		// Add infinite scroll information to isotope sizer (Use $query which is the Bricks Query object @since 2.0.2)
+		$this->render_query_loop_trail( $query, 'item-sizer' );
 
 		// Skip rendering wrappers if this is a load more request
 		if ( ! $is_load_more_request ) {

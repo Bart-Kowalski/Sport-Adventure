@@ -379,6 +379,21 @@ class Setup {
 		}
 
 		/**
+		 * Overwrite custom styles for Gutenberg blocks
+		 *
+		 * For Bricks elements: Image, Image gallery
+		 *
+		 * @since 2.1
+		 */
+		add_action(
+			'wp_enqueue_scripts',
+			function () {
+				wp_add_inline_style( 'wp-block-library', ':where(figure) { margin: 0; }' );
+			},
+			20
+		);
+
+		/**
 		 * Scripts
 		 */
 
@@ -411,12 +426,21 @@ class Setup {
 			wp_register_script( 'bricks-hcaptcha', 'https://hcaptcha.com/1/api.js', null, true );
 		}
 
-		// Element Form (setting: enableTurnstile)
+		// Form element (setting: enableTurnstile)
 		$turnstile_api_key = Database::$global_settings['apiKeyTurnstile'] ?? false;
 
 		if ( ! bricks_is_builder() && $turnstile_api_key ) {
 			wp_register_script( 'bricks-turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js', null, true );
 		}
+
+		// Map element
+		if ( ! empty( Database::$global_settings['apiKeyGoogleMaps'] ) ) {
+			wp_register_script( 'bricks-google-maps', 'https://maps.googleapis.com/maps/api/js?callback=bricksMap&v=3.exp&key={' . Database::$global_settings['apiKeyGoogleMaps'] . '}', [ 'bricks-scripts' ], null, true );
+			wp_register_script( 'bricks-google-maps-infobox', BRICKS_URL_ASSETS . 'js/libs/infobox.min.js', [ 'bricks-google-maps' ], null, true );
+		}
+
+		// Map element: Leaflet (@since 2.1)
+		wp_register_script( 'bricks-leaflet', BRICKS_URL_ASSETS . 'js/libs/leaflet.js', [], '1.9.4', true );
 
 		// STEP: Register scripts
 		wp_register_script( 'bricks-flatpickr', BRICKS_URL_ASSETS . 'js/libs/flatpickr.min.js', [ 'bricks-scripts' ], '4.5.2', true );
@@ -436,13 +460,18 @@ class Setup {
 		wp_register_script( 'bricks-typed', BRICKS_URL_ASSETS . 'js/libs/typed.min.js', [ 'bricks-scripts' ], '2.0.9', true );
 		wp_register_script( 'bricks-tocbot', BRICKS_URL_ASSETS . 'js/libs/tocbot.min.js', [ 'bricks-scripts' ], '4.21.0', true ); // @since 1.8.5
 
+		wp_register_script( 'bricks-tinymce8', BRICKS_URL_ASSETS . 'js/libs/tinymce/tinymce.min.js', [ 'bricks-scripts' ], '8.0.2', true ); // @since 2.1
+		wp_register_script( 'bricks-tinymce8-builder', BRICKS_URL_ASSETS . 'js/libs/tinymce/tinymce8.bundle.min.js', [ 'bricks-scripts' ], '8.0.2', true ); // @since 2.1
+
 		// STEP: Register styles
 		if ( ! Database::get_setting( 'disableBricksCascadeLayer' ) ) { // @since 2.0
 			wp_register_style( 'bricks-splide', BRICKS_URL_ASSETS . 'css/libs/splide-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/splide-layer.min.css' ) );
 			wp_register_style( 'bricks-animate', BRICKS_URL_ASSETS . 'css/libs/animate-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/animate-layer.min.css' ) );
 			wp_register_style( 'bricks-flatpickr', BRICKS_URL_ASSETS . 'css/libs/flatpickr-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/flatpickr-layer.min.css' ) );
 			wp_register_style( 'bricks-isotope', BRICKS_URL_ASSETS . 'css/libs/isotope-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/isotope-layer.min.css' ) );
-			wp_register_style( 'bricks-photoswipe', BRICKS_URL_ASSETS . 'css/libs/photoswipe-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/photoswipe-layer.min.css' ) );
+			// NOTE: Conflicts with WooCommerce lightbox if using photoswipe-layer.min.css (@since 2.1)
+			// wp_register_style( 'bricks-photoswipe', BRICKS_URL_ASSETS . 'css/libs/photoswipe-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/photoswipe-layer.min.css' ) );
+			wp_register_style( 'bricks-photoswipe', BRICKS_URL_ASSETS . 'css/libs/photoswipe.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/photoswipe.min.css' ) );
 			wp_register_style( 'bricks-prettify', BRICKS_URL_ASSETS . 'css/libs/prettify-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/prettify-layer.min.css' ) );
 			wp_register_style( 'bricks-swiper', BRICKS_URL_ASSETS . 'css/libs/swiper-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/swiper-layer.min.css' ) );
 			wp_register_style( 'bricks-tooltips', BRICKS_URL_ASSETS . 'css/libs/tooltips-layer.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/tooltips-layer.min.css' ) );
@@ -458,6 +487,9 @@ class Setup {
 			wp_register_style( 'bricks-tooltips', BRICKS_URL_ASSETS . 'css/libs/tooltips.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/tooltips.min.css' ) );
 			wp_register_style( 'bricks-ajax-loader', BRICKS_URL_ASSETS . 'css/libs/loading-animation.min.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/loading-animation.min.css' ) );
 		}
+
+		// Map element: Leaflet (@since 2.1)
+		wp_register_style( 'bricks-leaflet', BRICKS_URL_ASSETS . 'css/libs/leaflet/leaflet.css', [ 'bricks-frontend' ], filemtime( BRICKS_PATH_ASSETS . 'css/libs/leaflet/leaflet.css' ) );
 
 		// Icon fonts
 		if ( ! Database::get_setting( 'disableBricksCascadeLayer' ) ) { // @since 2.0
@@ -1022,12 +1054,6 @@ class Setup {
 				'right' => esc_html__( 'Right', 'bricks' ),
 			];
 
-			$control_options['imageRatio'] = [
-				'ratio-square' => esc_html__( 'Square', 'bricks' ),
-				'ratio-16-9'   => '16:9',
-				'ratio-4-3'    => '4:3',
-			];
-
 			$control_options['objectFit'] = [
 				'contain'    => esc_html__( 'Contain', 'bricks' ),
 				'cover'      => esc_html__( 'Cover', 'bricks' ),
@@ -1047,7 +1073,8 @@ class Setup {
 			$control_options['queryTypes'] = [
 				'post' => esc_html__( 'Posts', 'bricks' ),
 				'term' => esc_html__( 'Terms', 'bricks' ),
-				'user' => esc_html__( 'Users', 'bricks' )
+				'user' => esc_html__( 'Users', 'bricks' ),
+				'api'  => 'API', // (@since 2.1)
 			];
 
 			$control_options['queryOrder'] = [

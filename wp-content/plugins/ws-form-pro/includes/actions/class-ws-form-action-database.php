@@ -23,12 +23,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Database', 'ws-form');
-
-			// Set label for actions pull down
-			$this->label_action = __('Save Submission', 'ws-form');
-
 			// Events
 			$this->events = array('save', 'submit');
 
@@ -43,6 +37,18 @@
 
 				wp_schedule_event(time(), 'hourly', 'ws_form_wp_cron_action_database');
 			}
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Database', 'ws-form');
+
+			// Set label for actions pull down
+			$this->label_action = __('Save Submission', 'ws-form');
 
 			// Register action
 			parent::register($this);

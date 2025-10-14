@@ -27,7 +27,7 @@
 
 		public function name() {
 
-			return __('Form', 'ws-form');
+			return __('WS Form', 'ws-form');
 		}
 
 		public function slug() {
@@ -55,7 +55,7 @@
 					// Create public instance
 					$ws_form_public = new WS_Form_Public();
 
-					// Set visual builder scripts to enqueue
+					// Visual builder enqueues
 					do_action('wsf_enqueue_visual_builder');
 
 					// Enqueue scripts
@@ -101,8 +101,7 @@
 ?>
 <div class="wsf_oxygen_no_form_id">
 <?php
-
-	echo WS_Form_Config::get_logo_svg();	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		WS_Form_Common::echo_logo();
 ?>
 <p>Please select a form, then click 'Apply Params'.</p>
 </div>

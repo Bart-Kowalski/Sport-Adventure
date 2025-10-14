@@ -86,16 +86,8 @@
 					echo "<div {$this->render_attributes('_root')}>";	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 				}
 
-				// Bricks iframe?
-				$bricks_iframe = (
-
-					(function_exists('bricks_is_builder_preview') && bricks_is_builder_preview()) ||
-					(function_exists('bricks_is_builder_iframe') && bricks_is_builder_iframe()) ||
-					(function_exists('bricks_is_builder_call') && bricks_is_builder_call())
-				);
-
 				// Show shortcode
-				$shortcode = sprintf('[ws_form id="%u"%s%s]', $form_id, ($form_element_id != '') ? sprintf(' element_id="%s"', esc_attr($form_element_id)) : '', (($bricks_iframe || bricks_is_ajax_call()) ? ' visual_builder="true"' : ''));
+				$shortcode = sprintf('[ws_form id="%u"%s%s]', $form_id, ($form_element_id != '') ? sprintf(' element_id="%s"', esc_attr($form_element_id)) : '', (bricks_is_builder() ? ' visual_builder="true"' : ''));
 				echo do_shortcode($shortcode);	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 				// End wrapper

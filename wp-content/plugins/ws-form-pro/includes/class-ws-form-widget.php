@@ -13,7 +13,12 @@
 				WS_FORM_NAME_PRESENTABLE,
 
 				array(
-					'description' => sprintf(__('Displays a form created with %s.', 'ws-form'), WS_FORM_NAME_PRESENTABLE),
+					'description' => sprintf(
+
+						/* translators: %s: Presentable plugin name, e.g. WS Form PRO */
+						__('Displays a form created with %s.', 'ws-form'),
+						WS_FORM_NAME_PRESENTABLE
+					),
 					'customize_selective_refresh' => true,
 				)
 			);
@@ -33,7 +38,7 @@
 			extract(wp_parse_args((array) $instance, $defaults ));
 
 			// Get forms from API
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 			$forms = $ws_form_form->db_read_all('', 'NOT status="trash"', 'label', '', '', false);
 
 			if($forms) {
@@ -49,7 +54,13 @@
 				foreach($forms as $form) {
 
 ?><option value="<?php WS_Form_Common::echo_esc_attr($form['id']); ?>"<?php if($form['id'] == $form_id) { ?> selected<?php } ?>><?php
-					WS_Form_Common::echo_esc_html(sprintf('%s (ID: %u)', $form['label'], $form['id']));
+					WS_Form_Common::echo_esc_html(sprintf(
+
+						'%s (%s: %u)',
+						$form['label'],
+						__('ID', 'ws-form'),
+						$form['id']
+					));
 ?></option>
 <?php
 				}
@@ -59,7 +70,7 @@
 			} else {
 ?>
 <p><?php esc_html_e("You haven't created any forms yet.", 'ws-form'); ?></p>
-<p><a href="<?php WS_Form_Common::echo_esc_attr(WS_Form_Common::get_admin_url('ws-form-add')); ?>"><?php esc_html_e('Click here to create a form', 'ws-form'); ?></a></p>
+<p><a href="<?php WS_Form_Common::echo_esc_url(WS_Form_Common::get_admin_url('ws-form-add')); ?>"><?php esc_html_e('Click here to create a form', 'ws-form'); ?></a></p>
 <?php
 			}
 		}
@@ -100,7 +111,6 @@
 			// WordPress core after_widget hook (always include)
 			echo $after_widget;		// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		}
-
 	}
 
 	// Register the widget

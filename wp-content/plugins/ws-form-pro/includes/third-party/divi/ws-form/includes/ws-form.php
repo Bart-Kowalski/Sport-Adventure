@@ -29,8 +29,8 @@
 
 			} else {
 
-				// Enqueue all WS Form scripts
-				do_action('wsf_enqueue_core');
+				// Core enqueues
+				do_action('wsf_enqueue_visual_builder');
 			}
 		}
 	}

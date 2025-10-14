@@ -416,7 +416,7 @@ class Interactions {
 				],
 
 				'conditionsSep'                 => [
-					'label'       => esc_html__( 'Interaction conditions', 'bricks' ),
+					'label'       => esc_html__( 'Conditions', 'bricks' ),
 					'description' => esc_html__( 'Run this interaction if the following conditions are met.', 'bricks' ),
 					'type'        => 'separator',
 				],

@@ -48,7 +48,7 @@ class Element_Svg extends Element {
 			'label'    => esc_html__( 'Dynamic data', 'bricks' ),
 			'type'     => 'text',
 			'inline'   => true,
-			'desc'     => esc_html__( 'Supported field types', 'bricks' ) . ': ' . esc_html__( 'File', 'bricks' ) . ', ' . esc_html__( 'Image', 'bricks' ) . ', ' . esc_html__( 'SVG code', 'bricks' ),
+			'desc'     => esc_html__( 'Supported field types', 'bricks' ) . ': ' . esc_html__( 'File', 'bricks' ) . ', ' . esc_html__( 'Image', 'bricks' ) . ', ' . esc_html__( 'SVG code', 'bricks' ) . ', URL', // 'URL' (@since 2.0.2)
 			'required' => [ 'source', '=', 'dynamicData' ],
 		];
 
@@ -193,6 +193,10 @@ class Element_Svg extends Element {
 				$svg = $file;
 			}
 
+			// STEP: Check if file is a valid SVG file path (@since 2.0.2)
+			elseif ( ! $svg && self::is_valid_svg_url( $file ) ) {
+				$svg = self::get_svg_from_url( $file ) ?? '';
+			}
 		}
 
 		// STEP: Get SVG HTML from Code element
@@ -284,5 +288,57 @@ class Element_Svg extends Element {
 		}
 
 		echo $output;
+	}
+
+	/**
+	 * Check if URL is valid and points to an SVG file
+	 *
+	 * @param string $url The URL to validate
+	 * @return bool True if valid SVG URL, false otherwise
+	 *
+	 * @since 2.0.2
+	 */
+	private function is_valid_svg_url( $url ) {
+			// Validate URL format using WordPress function
+		if ( ! wp_http_validate_url( $url ) ) {
+				return false;
+		}
+
+		// Check and return if URL ends with .svg
+		return preg_match( '/\.svg$/i', $url );
+	}
+
+	/**
+	 * Fetch SVG content from URL
+	 *
+	 * @param string $url The SVG URL to fetch (should be a valid SVG file URL)
+	 * @param array  $args Optional arguments for the request
+	 * @return string|false SVG content on success, false on failure
+	 *
+	 * @since 2.0.2
+	 */
+	private function get_svg_from_url( $url ) {
+		// Make the request
+		$response = \Bricks\Helpers::remote_get( $url );
+
+		// Check for errors
+		if ( is_wp_error( $response ) ) {
+			return false;
+		}
+
+		// Check HTTP status code
+		$status_code = wp_remote_retrieve_response_code( $response );
+		if ( $status_code !== 200 ) {
+			return false;
+		}
+
+		$svg_content = wp_remote_retrieve_body( $response );
+
+		// Validate SVG content
+		if ( ! Helpers::is_valid_svg( $svg_content ) ) {
+			return false;
+		}
+
+		return $svg_content;
 	}
 }

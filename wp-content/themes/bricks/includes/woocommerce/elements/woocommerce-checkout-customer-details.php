@@ -290,6 +290,11 @@ class Woocommerce_Checkout_Customer_Details extends Element {
 	 */
 	public function builder_needs_shipping( $needs ) {
 		if ( bricks_is_builder_call() ) {
+			// Check if Force shipping to the customer billing address is enabled (@since 2.1)
+			if ( function_exists( 'wc_ship_to_billing_address_only' ) && wc_ship_to_billing_address_only() ) {
+				return false;
+			}
+
 			return true;
 		}
 

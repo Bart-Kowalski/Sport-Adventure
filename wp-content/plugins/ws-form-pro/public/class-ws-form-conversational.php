@@ -34,11 +34,14 @@
 				$this->preview = true;
 			}
 
-			// Skin filter
-			add_filter('wsf_css_skin_id', function($skin_id) { return 'ws_form_conv'; }, 99999, 1);
+			if(WS_Form_Common::customizer_enabled()) {
+
+				// Skin filter
+				add_filter('wsf_css_skin_id', function($skin_id) { return 'ws_form_conv'; }, 99999, 1);
+			}
 
 			// Load form
-			$this->ws_form_form = New WS_Form_Form();
+			$this->ws_form_form = new WS_Form_Form();
 			$this->ws_form_form->id = $this->form_id;
 
 			try {

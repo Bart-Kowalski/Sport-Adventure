@@ -52,29 +52,13 @@ class AT__Init {
         --------------------------------------*/
         add_action( 'init', 'Advanced_Themer_Bricks\AT__Conversion::convert_clamp_settings', 20);
         add_action( 'init', 'Advanced_Themer_Bricks\AT__Conversion::convert_grid_utility_classes', 25);
-        add_action( 'init', 'Advanced_Themer_Bricks\AT__Conversion::convert_global_css_variables', 30);
         add_action( 'init', 'Advanced_Themer_Bricks\AT__Conversion::convert_global_colors_prefix', 35);
-        add_action( 'init', 'Advanced_Themer_Bricks\AT__Global_Colors::convert_color_palette_options', 35);
         add_action( 'init', 'Advanced_Themer_Bricks\AT__ACF::load_global_acf_variable', 2 );
-
-        // To be checked
-        add_action( 'save_post', 'Advanced_Themer_Bricks\AT__ACF::save_inline_css_in_db', 40);
-        add_action( 'trashed_post', 'Advanced_Themer_Bricks\AT__ACF::save_inline_css_in_db', 40);
-        add_action( 'transition_post_status', 'Advanced_Themer_Bricks\AT__ACF::save_inline_css_in_db', 40, 9999);
-        add_action( 'shutdown', 'Advanced_Themer_Bricks\AT__ACF::save_inline_css_in_db');
-        add_action( 'init', 'Advanced_Themer_Bricks\AT__Global_Colors::load_global_color_variable' );
-        
-        /*--------------------------------------
-        Create Color Palette CPT 
-        --------------------------------------*/
-
-        add_action( 'init', 'Advanced_Themer_Bricks\AT__Admin::color_palette_cpt_init', 2 , 10 );
         
         /*--------------------------------------
         Load Custom data in ACF fields
         --------------------------------------*/
         add_filter( 'acf/load_field/key=field_6388e73289b6a', 'Advanced_Themer_Bricks\AT__ACF::load_user_roles_inside_select_field');
-        add_filter( 'acf/load_field/key=field_63899284664e9', 'Advanced_Themer_Bricks\AT__ACF::load_post_types_inside_select_field' );
         add_filter( 'acf/load_value/key=field_63882c3ffbgc1', 'Advanced_Themer_Bricks\AT__ACF::load_human_readable_text_value', 10, 3);
         add_filter( 'acf/load_value/key=field_64018efb660fb', 'Advanced_Themer_Bricks\AT__ACF::load_openai_password', 10, 3);
         add_action( 'acf/save_post', 'Advanced_Themer_Bricks\AT__ACF::save_openai_password', 5, 1 );
@@ -89,6 +73,7 @@ class AT__Init {
         add_action( 'wp_enqueue_scripts', 'Advanced_Themer_Bricks\AT__Admin::enqueue_theme_variables');
         add_action( 'admin_enqueue_scripts', 'Advanced_Themer_Bricks\AT__Admin::admin_enqueue_scripts' );
         add_action( 'get_footer', 'Advanced_Themer_Bricks\AT__Admin::enqueue_builder_scripts' );
+        add_action( 'get_footer', 'Advanced_Themer_Bricks\AT__Admin::enqueue_builder_scripts_strict_editor' );
         add_action( 'acf/input/admin_enqueue_scripts', 'Advanced_Themer_Bricks\AT__ACF::acf_admin_enqueue_scripts' );
         
         /*--------------------------------------
@@ -114,7 +99,6 @@ class AT__Init {
         --------------------------------------*/
         add_action( 'init', 'Advanced_Themer_Bricks\AT__Builder::populate_imported_classes' );
         add_action( 'wp_footer', 'Advanced_Themer_Bricks\AT__Builder::add_modal_after_body_wrapper' );
-        add_action( 'wp_footer', 'Advanced_Themer_Bricks\AT__Builder::add_modal_after_body_wrapper_editor' );
 
         /*--------------------------------------
         Register New Bricks Elements
@@ -245,7 +229,7 @@ class AT__Init {
         /*--------------------------------------
         ATF
         --------------------------------------*/
-        add_filter( 'bricks/element/render_attributes', 'Advanced_Themer_Bricks\AT__Frontend::manage_stagger_class', 10, 3);
+        add_filter( 'bricks/element/render_attributes', 'Advanced_Themer_Bricks\AT__Framework::manage_stagger_class', 10, 3);
     }
     
 }

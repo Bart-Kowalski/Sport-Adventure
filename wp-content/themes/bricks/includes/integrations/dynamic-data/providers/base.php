@@ -239,11 +239,6 @@ abstract class Base implements Provider_Interface {
 	 * @return string|array
 	 */
 	public function format_value_for_context( $value, $tag, $post_id, $filters, $context = 'text' ) {
-		// Return unparsed DD tag (@since 1.6)
-		if ( isset( $filters['raw'] ) ) {
-			return '{' . $tag . '}';
-		}
-
 		$object_type = ! empty( $filters['object_type'] ) ? $filters['object_type'] : '';
 
 		switch ( $context ) {

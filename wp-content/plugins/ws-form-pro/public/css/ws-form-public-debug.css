@@ -1,48 +1,46 @@
-/* Debug */
-#wsf-debug {
-  --background-color-default: #ffffff;
-  --color-default: #000000;
-  --color-default-light: #a3a3a3;
-  --color-default-lighter: #cccccc;
-  --color-default-lightest: #f3f3f3;
-  --background-color-success: #f4fdf7;
-  --color-success: #0c3614;
-  --background-color-information: #edf1f8;
-  --color-information: #124477;
-  --background-color-warning: #fffce6;
-  --color-warning: #5d3c00;
-  --background-color-danger: #fff0f0;
-  --color-danger: #ff0000;
-  --tab-background-color: #e5e5e5;
-  --tab-color: #5a5a5a;
-  --tab-active-color: #333333;
-  --table-border-color: #dadada;
+:root {
+  --wsf-debug-color-background: #FFFFFF;
+  --wsf-debug-color: #000000;
+  --wsf-debug-color-light: #A3A3A3;
+  --wsf-debug-color-lighter: #CCCCCC;
+  --wsf-debug-color-lightest: #F3F3F3;
+  --wsf-debug-color-background-success: #F4FDF7;
+  --wsf-debug-color-success: #0C3614;
+  --wsf-debug-color-background-information: #EDF1F8;
+  --wsf-debug-color-information: #124477;
+  --wsf-debug-color-background-warning: #FFFCE6;
+  --wsf-debug-color-warning: #5D3C00;
+  --wsf-debug-color-background-danger: #FFF0F0;
+  --wsf-debug-color-danger: #FF0000;
+  --wsf-debug-tab-color-background: #E5E5E5;
+  --wsf-debug-tab-color: #5A5A5A;
+  --wsf-debug-tab-active-color: #333333;
+  --wsf-debug-table-border-color: #DADADA;
 }
 
 @media (prefers-color-scheme: dark) {
-  #wsf-debug {
-    --background-color-default: #242424;
-    --color-default: #ababab;
-    --color-default-light: #a3a3a3;
-    --color-default-lighter: #3d3d3d;
-    --color-default-lightest: #333333;
-    --background-color-success: #0c3614;
-    --color-success: #f4fdf7;
-    --background-color-information: #124477;
-    --color-information: #edf1f8;
-    --background-color-warning: #332b00;
-    --color-warning: #ffde9f;
-    --background-color-danger: #290000;
-    --color-danger: #ff8180;
-    --tab-background-color: #000000;
-    --tab-color: #a5a5a5;
-    --tab-active-color: #eaeaea;
-    --table-border-color: #3a3a3a;
+  :root {
+    --wsf-debug-color-background: #242424;
+    --wsf-debug-color: #ABABAB;
+    --wsf-debug-color-light: #A3A3A3;
+    --wsf-debug-color-lighter: #3D3D3D;
+    --wsf-debug-color-lightest: #333333;
+    --wsf-debug-color-background-success: #0C3614;
+    --wsf-debug-color-success: #F4FDF7;
+    --wsf-debug-color-background-information: #124477;
+    --wsf-debug-color-information: #EDF1F8;
+    --wsf-debug-color-background-warning: #332B00;
+    --wsf-debug-color-warning: #FFDE9F;
+    --wsf-debug-color-background-danger: #290000;
+    --wsf-debug-color-danger: #FF8180;
+    --wsf-debug-tab-color-background: #000000;
+    --wsf-debug-tab-color: #A5A5A5;
+    --wsf-debug-tab-active-color: #EAEAEA;
+    --wsf-debug-table-border-color: #3A3A3A;
   }
 }
-
 .wsf-form-identify {
-  outline: 2px dashed var(--color-information);
+  outline: 1px dashed var(--wsf-debug-color-information);
 }
 
 #wsf-debug div, #wsf-debug span, #wsf-debug applet, #wsf-debug object, #wsf-debug iframe,
@@ -72,39 +70,34 @@
   text-transform: inherit;
   vertical-align: inherit;
 }
-
 #wsf-debug article, #wsf-debug aside, #wsf-debug details, #wsf-debug figcaption, #wsf-debug figure,
 #wsf-debug footer, #wsf-debug header, #wsf-debug hgroup, #wsf-debug menu, #wsf-debug nav, #wsf-debug section {
   display: block;
 }
-
 #wsf-debug ol, #wsf-debug ul {
   list-style: none;
 }
-
 #wsf-debug blockquote, #wsf-debug q {
   quotes: none;
 }
-
-#wsf-debug blockquote:before, #wsf-debug blockquote:after,
-#wsf-debug q:before, #wsf-debug q:after {
-  content: '';
+#wsf-debug blockquote::before, #wsf-debug blockquote::after,
+#wsf-debug q::before, #wsf-debug q::after {
+  content: "";
   content: none;
 }
-
 #wsf-debug table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-
 #wsf-debug {
-  background-color: var(--background-color-default);
+  background-color: var(--wsf-debug-color-background);
   bottom: 0;
-  color: var(--color-default);
+  color: var(--wsf-debug-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 12px;
   font-variant: normal;
   font-weight: 400;
+  height: var(--wsf-debug-height);
   letter-spacing: normal;
   line-height: 1.2;
   left: 0;
@@ -112,147 +105,132 @@
   text-decoration: none;
   text-transform: none;
   width: 100%;
-  z-index: 9999999;
+  z-index: 9999998;
 }
-
-#wsf-debug *, #wsf-debug *:before, #wsf-debug *:after {
+#wsf-debug *, #wsf-debug *::before, #wsf-debug *::after {
   box-sizing: border-box;
 }
-
 #wsf-debug i {
   font-style: italic;
 }
-
 #wsf-debug strong {
   font-weight: bold;
 }
-
 #wsf-debug a:focus {
   outline: 0;
 }
-
 #wsf-debug ul {
   font-size: 12px;
 }
-
 #wsf-debug table {
   border-collapse: collapse;
   border-spacing: 0;
   border: none;
-  border-bottom: 1px solid var(--table-border-color);
+  border-bottom: 1px solid var(--wsf-debug-table-border-color);
   width: 100%;
 }
-
-#wsf-debug table tr th, #wsf-debug table tr td {
-  font-family: Menlo, monospace;
-  font-size: 11px;
-  text-align: left;
-}
-
-#wsf-debug thead {
-  background-color: var(--color-default-lightest);
+#wsf-debug table thead {
+  background-color: var(--wsf-debug-color-lightest);
   border: none;
   left: 0;
   position: fixed;
   width: 100%;
   z-index: 100;
 }
-
-#wsf-debug thead + tbody:before {
-  content: '';
+#wsf-debug table thead + tbody::before {
+  content: "";
   display: block;
   height: 19px;
 }
-
-#wsf-debug tr.wsf-audit-text td,
-#wsf-debug tr.wsf-audit-calc td,
-#wsf-debug tr.wsf-audit-conditional td {
-  background-color: var(--background-color-warning);
-  color: var(--color-warning);
+#wsf-debug table tr + tr th, #wsf-debug table tr + tr td {
+  border-top: 1px solid var(--wsf-debug-table-border-color);
 }
-
-#wsf-debug tr.wsf-audit-analytics td,
-#wsf-debug tr.wsf-audit-payment td,
-#wsf-debug tr.wsf-audit-ecommerce td,
-#wsf-debug tr.wsf-audit-duplicate-protect td,
-#wsf-debug tr.wsf-audit-spam-protect td,
-#wsf-debug tr.wsf-audit-action td {
-  background-color: var(--background-color-success);
-  color: var(--color-success);
-}
-
-#wsf-debug tr.wsf-audit-event td {
-  background-color: var(--background-color-information);
-  color: var(--color-information);
-}
-
-#wsf-debug tr.wsf-audit-error-parse-variables td,
-#wsf-debug tr.wsf-audit-error-ecommerce td {
-  background-color: var(--background-color-danger);
-  color: var(--color-danger);
-}
-
-#wsf-debug th, #wsf-debug td {
+#wsf-debug table tr th, #wsf-debug table tr td {
+  border-left: 1px solid var(--wsf-debug-table-border-color);
+  color: var(--wsf-debug-color);
+  font-family: monospace;
+  font-size: 11px;
   padding: 3px;
-}
-
-#wsf-debug th {
-  background-color: var(--color-default-lightest);
-  border-left: 1px solid var(--table-border-color);
   text-align: left;
 }
-
-#wsf-debug th:first-child {
+#wsf-debug table tr th:first-child, #wsf-debug table tr td:first-child {
+  min-width: 180px;
   width: 180px;
 }
-
-#wsf-debug th:last-child {
+#wsf-debug table tr th:last-child, #wsf-debug table tr td:last-child {
+  min-width: calc(100% - 180px);
   width: calc(100% - 180px);
 }
-
-#wsf-debug td {
-  background-color: var(--background-color-default);
-  border-left: 1px solid var(--table-border-color);
+#wsf-debug table tr th {
+  background-color: var(--wsf-debug-color-lightest);
 }
-
-#wsf-debug td:first-child {
-  width: 180px;
+#wsf-debug table tr td {
+  background-color: var(--wsf-debug-color-background);
 }
-
-#wsf-debug tr + tr th, #wsf-debug tr + tr td {
-  border-top: 1px solid var(--table-border-color);
+#wsf-debug table tr td pre {
+  background-color: var(--wsf-debug-color-lightest);
+  color: var(--wsf-debug-color);
+  font-family: monospace;
+  font-size: 11px;
+  padding: 3px;
 }
-
+#wsf-debug table tr.wsf-audit-text td, #wsf-debug table tr.wsf-audit-calc td, #wsf-debug table tr.wsf-audit-conditional td {
+  background-color: var(--wsf-debug-color-background-warning);
+  color: var(--wsf-debug-color-warning);
+}
+#wsf-debug table tr.wsf-audit-text td pre, #wsf-debug table tr.wsf-audit-calc td pre, #wsf-debug table tr.wsf-audit-conditional td pre {
+  background-color: var(--wsf-debug-color-background-warning);
+  color: var(--wsf-debug-color-warning);
+}
+#wsf-debug table tr.wsf-audit-analytics td, #wsf-debug table tr.wsf-audit-payment td, #wsf-debug table tr.wsf-audit-ecommerce td, #wsf-debug table tr.wsf-audit-duplicate-protect td, #wsf-debug table tr.wsf-audit-spam-protect td, #wsf-debug table tr.wsf-audit-action td {
+  background-color: var(--wsf-debug-color-background-success);
+  color: var(--wsf-debug-color-success);
+}
+#wsf-debug table tr.wsf-audit-analytics td pre, #wsf-debug table tr.wsf-audit-payment td pre, #wsf-debug table tr.wsf-audit-ecommerce td pre, #wsf-debug table tr.wsf-audit-duplicate-protect td pre, #wsf-debug table tr.wsf-audit-spam-protect td pre, #wsf-debug table tr.wsf-audit-action td pre {
+  background-color: var(--wsf-debug-color-background-success);
+  color: var(--wsf-debug-color-success);
+}
+#wsf-debug table tr.wsf-audit-event td, #wsf-debug table tr.wsf-audit-google-maps-js-api td {
+  background-color: var(--wsf-debug-color-background-information);
+  color: var(--wsf-debug-color-information);
+}
+#wsf-debug table tr.wsf-audit-event td pre, #wsf-debug table tr.wsf-audit-google-maps-js-api td pre {
+  background-color: var(--wsf-debug-color-background-information);
+  color: var(--wsf-debug-color-information);
+}
+#wsf-debug table tr.wsf-audit-error-parse-variables td, #wsf-debug table tr.wsf-audit-error-ecommerce td, #wsf-debug table tr.wsf-audit-error-google-maps-js-api td {
+  background-color: var(--wsf-debug-color-background-danger);
+  color: var(--wsf-debug-color-danger);
+}
+#wsf-debug table tr.wsf-audit-error-parse-variables td pre, #wsf-debug table tr.wsf-audit-error-ecommerce td pre, #wsf-debug table tr.wsf-audit-error-google-maps-js-api td pre {
+  background-color: var(--wsf-debug-color-background-danger);
+  color: var(--wsf-debug-color-danger);
+}
 #wsf-debug .wsf-debug-table-full table {
   width: 100%;
 }
-
 #wsf-debug .wsf-debug-table-full th:first-child {
   width: 160px;
 }
-
 #wsf-debug .wsf-debug-publish-pending {
   background-color: #3D7DD5;
   border-radius: 0;
-  color: var(--background-color-default);
+  color: var(--wsf-debug-color-background);
   font-size: 10px;
   padding: 1px 4px;
 }
-
 #wsf-debug #wsf-debug-nav-wrapper {
-  background-color: var(--color-default-lightest);
-  border-bottom: 1px solid var(--color-default-lighter);
-  border-top: 1px solid var(--color-default-lighter);
+  background-color: var(--wsf-debug-color-lightest);
+  border-bottom: 1px solid var(--wsf-debug-color-lighter);
+  border-top: 1px solid var(--wsf-debug-color-lighter);
   cursor: ns-resize;
 }
-
 #wsf-debug #wsf-debug-nav {
   display: inline-block;
   line-height: 28px;
   margin: 0 0 0 69px;
   height: 28px;
 }
-
 #wsf-debug #wsf-debug-nav li {
   display: inline-block;
   cursor: pointer;
@@ -263,9 +241,8 @@
       -ms-user-select: none;
           user-select: none;
 }
-
 #wsf-debug #wsf-debug-nav li a {
-  color: var(--tab-color);
+  color: var(--wsf-debug-tab-color);
   cursor: pointer;
   display: block;
   height: 28px;
@@ -274,18 +251,15 @@
   text-decoration: none;
   transition: none;
 }
-
 #wsf-debug #wsf-debug-nav li:hover a {
-  background-color: var(--tab-background-color);
-  color: var(--tab-active-color);
+  background-color: var(--wsf-debug-tab-color-background);
+  color: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug #wsf-debug-nav li.wsf-tab-active a {
-  background-color: var(--tab-background-color);
-  border-bottom: 2px solid var(--color-information);
-  color: var(--tab-active-color);
+  background-color: var(--wsf-debug-tab-color-background);
+  border-bottom: 1px solid var(--wsf-debug-color-information);
+  color: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-logo {
   display: block;
   left: 0;
@@ -293,75 +267,61 @@
   position: absolute;
   top: 0;
 }
-
 #wsf-debug .wsf-debug-logo svg {
   height: 15px;
   width: 53px;
 }
-
 @media (prefers-color-scheme: dark) {
   #wsf-debug .wsf-debug-logo svg path {
     fill: #FFFFFF;
   }
 }
-
 #wsf-debug .wsf-debug-minimize {
   cursor: pointer;
   position: absolute;
   right: 44px;
   top: 6px;
 }
-
 #wsf-debug .wsf-debug-minimize path {
-  fill: var(--tab-color);
+  fill: var(--wsf-debug-tab-color);
 }
-
 #wsf-debug .wsf-debug-minimize:hover path {
-  fill: var(--tab-active-color);
+  fill: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-restore {
   cursor: pointer;
   position: absolute;
   right: 24px;
   top: 6px;
 }
-
 #wsf-debug .wsf-debug-restore path {
-  fill: var(--tab-color);
+  fill: var(--wsf-debug-tab-color);
 }
-
 #wsf-debug .wsf-debug-restore:hover path {
-  fill: var(--tab-active-color);
+  fill: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-close {
   cursor: pointer;
   position: absolute;
   right: 4px;
   top: 6px;
 }
-
 #wsf-debug .wsf-debug-close path {
-  fill: var(--tab-color);
+  fill: var(--wsf-debug-tab-color);
 }
-
 #wsf-debug .wsf-debug-close:hover path {
-  fill: var(--tab-active-color);
+  fill: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-instance-helpers li {
   display: inline-block;
 }
-
 #wsf-debug .wsf-debug-nav-sub {
-  background-color: var(--color-default-lightest);
-  border-bottom: 1px solid var(--color-default-lighter);
+  background-color: var(--wsf-debug-color-lightest);
+  border-bottom: 1px solid var(--wsf-debug-color-lighter);
   height: 28px;
   line-height: 26px;
   padding-top: 2px;
 }
-
 #wsf-debug .wsf-debug-nav-sub li {
   cursor: pointer;
   display: inline-block;
@@ -372,9 +332,8 @@
       -ms-user-select: none;
           user-select: none;
 }
-
 #wsf-debug .wsf-debug-nav-sub li a {
-  color: var(--tab-color);
+  color: var(--wsf-debug-tab-color);
   cursor: pointer;
   display: block;
   height: 24px;
@@ -383,27 +342,23 @@
   text-decoration: none;
   transition: none;
 }
-
 #wsf-debug .wsf-debug-nav-sub li:hover a {
-  background-color: var(--tab-background-color);
-  color: var(--tab-active-color);
+  background-color: var(--wsf-debug-tab-color-background);
+  color: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-nav-sub li.wsf-tab-active a {
-  background-color: var(--background-color-default);
-  border-left: 1px solid var(--color-default-lighter);
-  border-right: 1px solid var(--color-default-lighter);
-  border-top: 1px solid var(--color-default-lighter);
-  color: var(--tab-active-color);
+  background-color: var(--wsf-debug-color-background);
+  border-left: 1px solid var(--wsf-debug-color-lighter);
+  border-right: 1px solid var(--wsf-debug-color-lighter);
+  border-top: 1px solid var(--wsf-debug-color-lighter);
+  color: var(--wsf-debug-tab-active-color);
   height: 26px;
   padding: 0 9px;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar {
-  border-bottom: 1px solid var(--table-border-color);
+  border-bottom: 1px solid var(--wsf-debug-table-border-color);
   overflow: hidden;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li {
   cursor: pointer;
   display: inline-block;
@@ -413,7 +368,6 @@
       -ms-user-select: none;
           user-select: none;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li svg {
   cursor: pointer;
   height: 16px;
@@ -421,43 +375,75 @@
   width: 16px;
   display: inline-block;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li a,
 #wsf-debug .wsf-debug-instance-toolbar li [data-action] {
-  color: var(--tab-color);
+  color: var(--wsf-debug-tab-color);
   transition: none;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li a:hover,
 #wsf-debug .wsf-debug-instance-toolbar li [data-action]:hover {
-  color: var(--tab-active-color);
+  color: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-instance-info-action {
   display: inline-block;
   margin-left: 5px;
 }
-
 #wsf-debug .wsf-debug-instance-info-action svg {
   cursor: pointer;
   height: 12px;
   vertical-align: text-top;
   width: 12px;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li svg path,
 #wsf-debug .wsf-debug-instance-info-action svg path {
-  fill: var(--tab-color);
+  fill: var(--wsf-debug-tab-color);
   transition: none;
 }
-
 #wsf-debug .wsf-debug-instance-toolbar li:hover svg path,
 #wsf-debug .wsf-debug-instance-info-action:hover svg path {
-  fill: var(--tab-active-color);
+  fill: var(--wsf-debug-tab-active-color);
 }
-
 #wsf-debug .wsf-debug-instance-panel {
   overflow-y: scroll;
+}
+#wsf-debug.wsf-debug-rtl {
+  left: auto;
+  right: 0;
+}
+#wsf-debug.wsf-debug-rtl table tr th, #wsf-debug.wsf-debug-rtl table tr td {
+  text-align: right;
+}
+#wsf-debug.wsf-debug-rtl thead {
+  left: auto;
+  right: 0;
+}
+#wsf-debug.wsf-debug-rtl th {
+  border-left: none;
+  border-right: 1px solid var(--wsf-debug-table-border-color);
+  text-align: right;
+}
+#wsf-debug.wsf-debug-rtl td {
+  border-left: none;
+  border-right: 1px solid var(--wsf-debug-table-border-color);
+}
+#wsf-debug.wsf-debug-rtl #wsf-debug-nav {
+  margin: 0 69px 0 0;
+}
+#wsf-debug.wsf-debug-rtl .wsf-debug-logo {
+  left: auto;
+  right: 0;
+}
+#wsf-debug.wsf-debug-rtl .wsf-debug-minimize {
+  left: 24px;
+  right: auto;
+}
+#wsf-debug.wsf-debug-rtl .wsf-debug-restore {
+  left: 4px;
+  right: auto;
+}
+#wsf-debug.wsf-debug-rtl .wsf-debug-instance-info-action {
+  margin-left: 0;
+  margin-right: 5px;
 }
 
 .wsf-debug-scroll-lock {

@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @since 1.0
  */
-define( 'BRICKS_VERSION', '2.0.1' );
+define( 'BRICKS_VERSION', '2.1.2' );
 define( 'BRICKS_NAME', 'Bricks' );
 define( 'BRICKS_TEMP_DIR', 'bricks-temp' ); // Template import/export (JSON & ZIP)
 define( 'BRICKS_TEMPLATE_SCREENSHOTS_DIR', 'bricks/template-screenshots' ); // Template screenshots (@since 1.10)
@@ -14,8 +14,7 @@ define( 'BRICKS_PATH', trailingslashit( get_template_directory() ) );    // requ
 define( 'BRICKS_PATH_ASSETS', trailingslashit( BRICKS_PATH . 'assets' ) );
 define( 'BRICKS_URL', trailingslashit( get_template_directory_uri() ) ); // WP enqueue files
 define( 'BRICKS_URL_ASSETS', trailingslashit( BRICKS_URL . 'assets' ) );
-define( 'BRICKS_REMOTE_URL', 'https://bricksbuilder.io/' );
-define( 'BRICKS_REMOTE_ACCOUNT', BRICKS_REMOTE_URL . 'account/' );
+define( 'BRICKS_REMOTE_URL', 'https://my.bricksbuilder.io/' );
 
 define( 'BRICKS_BUILDER_PARAM', 'bricks' );
 define( 'BRICKS_BUILDER_IFRAME_PARAM', 'brickspreview' );
@@ -29,6 +28,8 @@ define( 'BRICKS_DB_BUILDER_WIDTH_LOCKED', 'bricks_builder_width_locked' );
 define( 'BRICKS_DB_COMPONENTS', 'bricks_components' );
 define( 'BRICKS_DB_COLOR_PALETTE', 'bricks_color_palette' );
 define( 'BRICKS_DB_BREAKPOINTS', 'bricks_breakpoints' );
+define( 'BRICKS_DB_GLOBAL_QUERIES', 'bricks_global_queries' );
+define( 'BRICKS_DB_GLOBAL_QUERIES_CATEGORIES', 'bricks_global_queries_categories' );
 define( 'BRICKS_DB_GLOBAL_SETTINGS', 'bricks_global_settings' );
 define( 'BRICKS_DB_GLOBAL_ELEMENTS', 'bricks_global_elements' );
 define( 'BRICKS_DB_GLOBAL_CLASSES', 'bricks_global_classes' );
@@ -123,6 +124,16 @@ if ( ! defined( 'BRICKS_MULTISITE_USE_MAIN_SITE_COMPONENTS' ) ) {
 // Global data: Color palette
 if ( ! defined( 'BRICKS_MULTISITE_USE_MAIN_SITE_COLOR_PALETTE' ) ) {
 	define( 'BRICKS_MULTISITE_USE_MAIN_SITE_COLOR_PALETTE', false );
+}
+
+// Global data: Global queries (@since 2.1)
+if ( ! defined( 'BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES' ) ) {
+	define( 'BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES', false );
+}
+
+// Global data: Global queries categories (@since 2.1)
+if ( ! defined( 'BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES_CATEGORIES' ) ) {
+	define( 'BRICKS_MULTISITE_USE_MAIN_SITE_GLOBAL_QUERIES_CATEGORIES', false );
 }
 
 // Global data: Global classes

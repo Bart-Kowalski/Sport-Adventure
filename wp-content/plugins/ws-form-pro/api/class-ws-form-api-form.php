@@ -14,9 +14,6 @@
 			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->id = self::api_get_id($parameters);
 
-			// Check if this is coming from the admin
-			$is_admin = (WS_Form_Common::get_query_var_nonce('wsf_fia', 'false', $parameters) == 'true');
-
 			// Check if form_parse should be called
 			$form_parse = (WS_Form_Common::get_query_var_nonce('wsf_fp', 'false', $parameters) == 'true');
 
@@ -30,9 +27,10 @@
 				parent::api_throw_error($e->getMessage());
 			}
 
-			if($is_admin) {
+			// Check if this is coming from the admin
+			if(WS_Form_Common::get_query_var_nonce('wsf_fia', 'false', $parameters) == 'true') {
 
-				// Describe transaction for history
+				// Describe transaction for undo history
 				$history = array(
 
 					'object'		=>	'form',
@@ -116,7 +114,7 @@
 			try {
 
 				// Get form object from file
-				$form_object = WS_Form_Common::get_form_object_from_post_file();
+				$form_object = WS_Form_Common::get_object_from_post_file();
 
 				// Reset form
 				$ws_form_form->db_import_reset();
@@ -135,6 +133,9 @@
 				// Update checksum
 				$ws_form_form->db_checksum();
 
+				// Resolve styles (Fixes older imports that don't have the style_id meta key set)
+				$ws_form_form->db_style_resolve();
+
 				// Describe transaction for history
 				$history = ($form_id > 0) ? array(
 
@@ -150,7 +151,7 @@
 			}
 
 			// Send JSON response (By passing form ID, it will get returned in default JSON response)
-			parent::api_json_response([], $form_id, $history, true);
+			parent::api_json_response(array('id' => $ws_form_form->id), $form_id, $history, true);
 		}
 
 		// API - POST - Download - JSON
@@ -181,7 +182,7 @@
 
 			try {
 
-				// Put form as array
+				// Put form as object
 				$ws_form_form->db_update_from_object($form_object, false);
 
 				// Describe transaction for history
@@ -217,7 +218,7 @@
 
 			try {
 
-				// Put form as array
+				// Put form as object
 				// 4th 'true' attribute ensures existing meta data is replaced otherwise old meta data such as breakpoints may remain
 				$ws_form_form->db_update_from_object($form_object, true, false, true);
 

@@ -9,20 +9,20 @@
 	 * Plugin Name:       WS Form PRO - User Management
 	 * Plugin URI:        https://wsform.com/knowledgebase/user-management/
 	 * Description:       User Management add-on for WS Form PRO
-	 * Version:           1.5.16
-	 * Requires at least: 5.2
+	 * Version:           1.6.8
+	 * Requires at least: 5.4
 	 * Requires PHP:      5.6
 	 * License:           GPLv3 or later
 	 * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
- 	 * Author:            WS Form
-  	 * Author URI:        https://wsform.com/
+	 * Author:            WS Form
+	 * Author URI:        https://wsform.com/
 	 * Text Domain:       ws-form-user
 	 * Domain Path:       /languages
 	 */
 
 	define('WS_FORM_USER_PLUGIN_ROOT_FILE', __FILE__);
 	define('WS_FORM_USER_PLUGIN_BASENAME', plugin_basename(__FILE__));
-	define('WS_FORM_USER_VERSION', '1.5.16');
+	define('WS_FORM_USER_VERSION', '1.6.8');
 
 	Class WS_Form_Add_On_User {
 
@@ -42,14 +42,6 @@
 		}
 
 		function plugins_loaded() {
-
-			// Load plugin text domain
-			load_plugin_textdomain(
-
-				'ws-form-user',
-				false,
-				dirname(plugin_basename(__FILE__)) . '/languages'
-			);
 
 			// Initialize plugin
 			if(self::is_dependency_ok()) {
@@ -110,7 +102,51 @@
 
 	register_activation_hook(__FILE__, array($wsf_add_on_constant_contact, 'activate'));
 
+	// This gets fired by WS Form when it is ready to register add-ons
 	add_action('wsf_plugins_loaded', function() {
 
+		// Post
 		include 'includes/classes/class-ws-form-action-user.php';
+
+		// ACF
+		if(class_exists('WS_Form_ACF')) {
+
+			include 'includes/third-party/class-ws-form-action-user-acf.php';
+		}
+
+		// ACPT
+		if(class_exists('WS_Form_ACPT')) {
+
+			include 'includes/third-party/class-ws-form-action-user-acpt.php';
+		}
+
+		// JetEngine
+		if(class_exists('WS_Form_JetEngine')) {
+
+			include 'includes/third-party/class-ws-form-action-user-jetengine.php';
+		}
+
+		// Meta Box
+		if(class_exists('WS_Form_Meta_Box')) {
+
+			include 'includes/third-party/class-ws-form-action-user-meta-box.php';
+		}
+
+		// Pods
+		if(class_exists('WS_Form_Pods')) {
+
+			include 'includes/third-party/class-ws-form-action-user-pods.php';
+		}
+
+		// Toolset
+		if(class_exists('WS_Form_Toolset')) {
+
+			include 'includes/third-party/class-ws-form-action-user-toolset.php';
+		}
+
+		// WooCommerce
+		if(class_exists('WS_Form_WooCommerce')) {
+
+			include 'includes/third-party/class-ws-form-action-user-woocommerce.php';
+		}
 	});

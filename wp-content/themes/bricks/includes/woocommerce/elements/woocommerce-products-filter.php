@@ -1080,7 +1080,6 @@ class Woocommerce_Products_Filters extends Element {
 	 * @return array
 	 */
 	public function get_terms_include( $taxonomy ) {
-
 		// STEP: Find the products filter element page/template data
 		$element_data = Helpers::get_element_data( $this->post_id, $this->id );
 

@@ -186,12 +186,8 @@ class Element_Team_Members extends Element {
 
 		$swiper_controls = self::get_swiper_controls();
 
-		$this->controls['imageRatio']                = $swiper_controls['imageRatio'];
-		$this->controls['imageRatio']['group']       = 'image';
-		$this->controls['imageRatio']['clearable']   = true;
-		$this->controls['imageRatio']['reset']       = true;
-		$this->controls['imageRatio']['placeholder'] = esc_html__( 'Square', 'bricks' );
-		unset( $this->controls['imageRatio']['default'] );
+		$this->controls['imageRatio']          = $swiper_controls['imageRatio'];
+		$this->controls['imageRatio']['group'] = 'image';
 
 		$this->controls['imageWidth'] = [
 			'tab'   => 'content',

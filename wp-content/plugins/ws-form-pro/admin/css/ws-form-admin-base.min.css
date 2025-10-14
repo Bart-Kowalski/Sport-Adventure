@@ -1,1 +1,11 @@
-:root{--wsf-sidebar-width: 340px;--wsf-sidebar-margin: calc(var(--wsf-sidebar-width) + 1px);--wp-sidebar-width: 160px;--wp-sidebar-width-folded: 36px;--wp-sidebar-width-mobile: 190px}
+:root {
+  --wsf-admin-sidebar-width: 340px;
+  --wsf-admin-sidebar-margin: calc(var(--wsf-admin-sidebar-width) + 1px);
+  --wsf-admin-sidebar-resize-height: 80px;
+  --wsf-admin-sidebar-resize-width: 8px;
+  --wsf-admin-sidebar-width-expanded: calc(var(--wsf-admin-body-width) - var(--wsf-admin-menu-width));
+  --wsf-admin-layout-editor-width: calc(var(--wsf-admin-body-width) - var(--wsf-admin-menu-width) - var(--wsf-admin-sidebar-width));
+  --wsf-admin-popup-progress-inner-width: 298px;
+  --wsf-admin-popup-progress-inner-height: 343px;
+  --wsf-admin-popup-progress-inner-left: calc(var(--wsf-admin-menu-width) + ((var(--wsf-admin-body-width) - var(--wsf-admin-menu-width)) / 2) - (var(--wsf-admin-popup-progress-inner-width) / 2));
+}

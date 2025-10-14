@@ -19,11 +19,6 @@
 
 				'init_js'					=>	"if(typeof($(document).foundation) === 'function') { $(document).foundation('tab', 'reflow'); }",
 
-				'minicolors_args'			=>	array(
-
-					'theme' 					=> 'foundation'
-				),
-
 				'columns'					=>	array(
 
 					'column_class'				=>	'#id-#size',

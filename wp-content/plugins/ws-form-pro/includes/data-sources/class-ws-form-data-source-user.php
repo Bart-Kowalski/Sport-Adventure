@@ -14,17 +14,8 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Users', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving Users...', 'ws-form');
-
 			// ACF
 			$this->acf_activated = class_exists('ACF');
-
-			// Register action
-			parent::register($this);
 
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
@@ -34,6 +25,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Users', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving Users...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -106,7 +112,7 @@
 				'url',
 				'post_count'
 
-			))) { return self::error(__('Invalid order by method'), $field_id, $this, $api_request); }
+			))) { return self::error(__('Invalid order by method', 'ws-form'), $field_id, $this, $api_request); }
 
 			// Columns
 			$columns = array();
@@ -587,8 +593,7 @@
 						(object) array('data_source_' . $this->id . '_column' => 'id'),
 						(object) array('data_source_' . $this->id . '_column' => 'display_name'),
 						(object) array('data_source_' . $this->id . '_column' => 'nicename'),
-						(object) array('data_source_' . $this->id . '_column' => 'login'),
-						(object) array('data_source_' . $this->id . '_column' => 'email')
+						(object) array('data_source_' . $this->id . '_column' => 'login')
 					)
 				),
 
@@ -668,7 +673,7 @@
 					'label'						=>	__('ACF Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	$options_acf,
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 

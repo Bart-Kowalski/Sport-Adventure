@@ -123,7 +123,7 @@
 			try {
 
 				// Get form object from file
-				$form_object = WS_Form_Common::get_form_object_from_post_file();
+				$form_object = WS_Form_Common::get_object_from_post_file();
 
 				// Update group
 				$label = $ws_form_group->db_create_from_form_object($form_object);
@@ -246,7 +246,12 @@
 				$ws_form_group->sort_index = $ws_form_group->db_object_sort_index_get($ws_form_group->table_name, 'form_id', $ws_form_group->form_id, $next_sibling_id);
 
 				// Rename
-				$ws_form_group->label = sprintf(__('%s (Copy)', 'ws-form'), $ws_form_group->label);
+				$ws_form_group->label = sprintf(
+
+					'%s (%s)',
+					$ws_form_group->label,
+					__('Copy', 'ws-form')
+				);
 
 				// Clone
 				$ws_form_group->id = $ws_form_group->db_clone();

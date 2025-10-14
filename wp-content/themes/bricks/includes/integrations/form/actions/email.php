@@ -204,7 +204,6 @@ class Email extends Base {
 		$line_break = isset( $form_settings['htmlEmail'] ) ? '<br>' : "\n";
 		$message    = '';
 
-		// @since 1.9.2 (#86bvxzgfc)
 		foreach ( $form_settings['fields'] as $field ) {
 			$field_label = $field['label'] ?? '';
 			$field_id    = $field['id'] ?? '';

@@ -373,12 +373,11 @@
 		public function api_ws_form_css_admin() {
 
 			// Output HTTP header
-			self::api_css_header();
+			parent::api_css_header();
 
 			// Output CSS
 			$ws_form_css = new WS_Form_CSS();
-			echo $ws_form_css->get_admin();	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
+			WS_Form_Common::echo_esc_css($ws_form_css->get_admin());
 			exit;
 		}
 
@@ -386,7 +385,7 @@
 		public function api_ws_form_css() {
 
 			// Output HTTP header
-			self::api_css_header();
+			parent::api_css_header();
 
 			// Check for block editor
 			if(WS_Form_Common::is_block_editor()) {
@@ -397,7 +396,7 @@
 
 			// Output CSS
 			$ws_form_css = new WS_Form_CSS();
-			echo $ws_form_css->get_layout(null, false, is_rtl());	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			WS_Form_Common::echo_esc_css($ws_form_css->get_layout(null, false, is_rtl()));
 
 			exit;
 		}
@@ -406,11 +405,11 @@
 		public function api_ws_form_css_skin() {
 
 			// Output HTTP header
-			self::api_css_header();
+			parent::api_css_header();
 
 			// Output CSS
 			$ws_form_css = new WS_Form_CSS();
-			echo $ws_form_css->get_skin(null, false, is_rtl());	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			WS_Form_Common::echo_esc_css($ws_form_css->get_skin(null, false, is_rtl()));
 
 			exit;
 		}
@@ -419,11 +418,11 @@
 		public function api_ws_form_css_conversational() {
 
 			// Output HTTP header
-			self::api_css_header();
+			parent::api_css_header();
 
 			// Output CSS
 			$ws_form_css = new WS_Form_CSS();
-			echo $ws_form_css->get_conversational(null, false, is_rtl());	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			WS_Form_Common::echo_esc_css($ws_form_css->get_conversational(null, false, is_rtl()));
 
 			exit;
 		}
@@ -432,26 +431,13 @@
 		public function api_css_email() {
 
 			// Output HTTP header
-			self::api_css_header();
+			parent::api_css_header();
 
 			// Output CSS
 			$ws_form_css = new WS_Form_CSS();
-			echo $ws_form_css->get_email();	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-
+			WS_Form_Common::echo_esc_css($ws_form_css->get_email());
+			
 			exit;
-		}
-
-		// API - CSS Cache Header
-		public function api_css_header() {
-
-			// Content type
-			header("Content-type: text/css; charset: UTF-8");
-
-			// Caching
-			$css_cache_duration = 	WS_Form_Common::option_get('css_cache_duration', 86400);
-			header("Pragma: public");
-			header("Cache-Control: maxage=" . $css_cache_duration);
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $css_cache_duration) . ' GMT');
 		}
 
 		// API - File download
@@ -482,7 +468,7 @@
 
 			} catch (Exception $e) {
 
-				wp_die($e->getMessage());
+				wp_die(esc_html($e->getMessage()));
 			}
 
 			// Get field
@@ -519,7 +505,7 @@
 			// Check file exists
 			if(!file_exists($file_path_full)) {
 
-				wp_die(__('File not found'));
+				wp_die(__('File not found', 'ws-form'));
 			}
 
 			// Set HTTP headers
@@ -625,6 +611,12 @@
 				],
 
 				[
+					'hint' 			=> sprintf('<strong>%s</strong><br />%s', __('Style', 'ws-form'), __('Click this to style your form in your website theme. You can change the style used in the form settings.', 'ws-form')),
+					'element' 		=> '[data-action="wsf-style"]',
+					'button_url'	=> WS_Form_Common::get_plugin_website_url('/knowledgebase/styler/')
+				],
+
+				[
 					'hint' 			=> sprintf('<strong>%s</strong><br />%s', __('Submissions', 'ws-form'), __('To view your form submissions, click here. You can edit, export and print submissions.', 'ws-form')),
 					'element' 		=> '[data-action="wsf-submission"]',
 					'button_url'	=> WS_Form_Common::get_plugin_website_url('/knowledgebase/submissions/')
@@ -712,6 +704,23 @@
 
 			// Set debug console state
 			WS_Form_Common::option_set('helper_debug', $parameters['helper_debug']);
+
+			return array('error' => false);
+		}
+
+		// API - Styler
+		public function api_styler($parameters) {
+
+			// Check supplied debug styler state
+			if(
+				!isset($parameters['helper_styler']) ||
+				!in_array($parameters['helper_styler'], array('off', 'administrator', 'on'))
+			) {
+				return array('error' => true, 'error_message' => __('Invalid styler state', 'ws-form'));
+			}
+
+			// Set styler console state
+			WS_Form_Common::option_set('helper_styler', $parameters['helper_styler']);
 
 			return array('error' => false);
 		}

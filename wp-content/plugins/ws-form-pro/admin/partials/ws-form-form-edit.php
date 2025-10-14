@@ -26,13 +26,20 @@
 
 	// Preview
 ?>
-<a data-action="wsf-preview" class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_attr(WS_Form_Common::get_preview_url($form_id)); ?>" target="wsf-preview-<?php WS_Form_Common::echo_esc_attr($form_id); ?>"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview', 'ws-form'); ?></a>
+<a data-action="wsf-preview" class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_url(WS_Form_Common::get_preview_url($form_id)); ?>" target="wsf-preview-<?php WS_Form_Common::echo_esc_attr($form_id); ?>"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview', 'ws-form'); ?></a>
 <?php
+
+	// Style
+	if(WS_Form_Common::styler_visible_admin()) {
+?>
+<a data-action="wsf-style" class="wsf-button wsf-button-small" href="#" target="wsf-style-<?php WS_Form_Common::echo_esc_attr($form_id); ?>"><?php WS_Form_Common::render_icon_16_svg('style'); ?> <?php esc_html_e('Style', 'ws-form'); ?></a>
+<?php
+	}
 
 	// Submissions
 	if(WS_Form_Common::can_user('read_submission')) {
 ?>
-<a data-action="wsf-submission" class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_attr(admin_url('admin.php?page=ws-form-submit&id=' . $form_id)); ?>"><?php WS_Form_Common::render_icon_16_svg('table'); ?> <?php esc_html_e('Submissions', 'ws-form'); ?></a>
+<a data-action="wsf-submission" class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_url(admin_url('admin.php?page=ws-form-submit&id=' . $form_id)); ?>"><?php WS_Form_Common::render_icon_16_svg('table'); ?> <?php esc_html_e('Submissions', 'ws-form'); ?></a>
 <?php
 	}
 
@@ -86,7 +93,7 @@
 
 <label class="screen-reader-text" id="title-prompt-text" for="title"><?php esc_html_e('Form Label', 'ws-form'); ?></label>
 <input type="text" id="title" class="wsf-field" placeholder="<?php esc_html_e('Form Label', 'ws-form'); ?>" data-action="wsf-form-label" name="form_label" size="30" value="" spellcheck="true" autocomplete="off" />
-<button data-action="wsf-label-save" class="wsf-button wsf-button-small wsf-button-information"><?php esc_html_e('Save', 'ws-form'); ?></button>
+<button data-action="wsf-label-save" class="wsf-button wsf-button-small wsf-button-primary"><?php esc_html_e('Save', 'ws-form'); ?></button>
 
 </div>
 </div>
@@ -132,11 +139,11 @@
 
 <div class="wsf-modal-title"><?php
 
-	echo WS_Form_Common::get_admin_icon('#002e5f', false);	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	WS_Form_Common::echo_get_admin_icon('#002e5f', false);	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 ?><h2><?php
 
-	echo __('Variables', 'ws-form');	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	WS_Form_Common::echo_esc_html(__('Variables', 'ws-form'));	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 ?></h2></div>
 
@@ -153,7 +160,7 @@
 
 <input id="wsf-variable-helper-search-input" class="wsf-field" type="search" placeholder="<?php
 
-	echo __('Variable search...', 'ws-form');	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	WS_Form_Common::echo_esc_html(__('Variable search...', 'ws-form'));	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 ?>" />
 
@@ -165,7 +172,7 @@
 	
 <p><?php
 
-	echo __('No results', 'ws-form');	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+	WS_Form_Common::echo_esc_html(__('No results', 'ws-form'));	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 
 ?>
 </div>
@@ -187,26 +194,10 @@
 
 <?php
 
-	// Get config
-	$json_config = WS_Form_Config::get_config(false, array(), true);
-?>
-	// Embed config
-	var wsf_form_json_config = {};
-<?php
-
-	// Split up config (Fixes HTTP2 error on certain hosting providers that can't handle the full JSON string)
-	foreach($json_config as $key => $config) {
-
-?>	wsf_form_json_config.<?php WS_Form_Common::echo_esc_html($key); ?> = <?php WS_Form_Common::echo_wp_json_encode($config); ?>;
-<?php
-	}
-
-	$json_config = null;
-
 	// Get form data
 	try {
 
-		$ws_form_form = New WS_Form_Form();
+		$ws_form_form = new WS_Form_Form();
 		$ws_form_form->id = $form_id;
 		$form_object = $ws_form_form->db_read(true, true);
 		$json_form = wp_json_encode($form_object);
@@ -238,20 +229,17 @@
 		// On load
 		$(function() {
 
-			// Manually inject language strings (Avoids having to call the full config)
-			$.WS_Form.settings_form = [];
-			$.WS_Form.settings_form.language = [];
-			$.WS_Form.settings_form.language['error_server'] = '<?php esc_html_e('500 Server error response from server.', 'ws-form'); ?>';
-
 			// Initialize WS Form
 			var wsf_obj = new $.WS_Form();
 
+			// Highlight menu item
 			wsf_obj.menu_highlight();
 
+			// Render form
 			wsf_obj.render({
 
-				'obj' : 	'#wsf-form',
-				'form_id':	<?php WS_Form_Common::echo_esc_attr($form_id); ?>
+				'obj': '#wsf-form',
+				'form_id': <?php WS_Form_Common::echo_esc_attr($form_id); ?>
 			});
 		});
 

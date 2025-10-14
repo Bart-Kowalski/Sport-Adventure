@@ -10,6 +10,7 @@ class Builder {
 	public static $preview_texts   = []; // (@since 2.0)
 	public static $looping_html    = []; // (@since 2.0)
 	public static $templates_data  = []; // (@since 2.0)
+	public static $query_api_cache = []; // Cached data for query API results (@since 2.1)
 
 	public function __construct() {
 		// Builder: Add login form to page
@@ -248,8 +249,8 @@ class Builder {
 			}
 		}
 
-		// Load Adobe fonts file (@since 1.7.1)
-		// NOTE: Enqueue in the main frame for the font manager (@since 2.0)
+		// Load Adobe fonts file
+		// NOTE: Enqueue in main window for Font manager (@since 2.0)
 		$adobe_fonts_project_id = ! empty( Database::get_setting( 'adobeFontsProjectId' ) ) ? Database::get_setting( 'adobeFontsProjectId' ) : false;
 
 		if ( $adobe_fonts_project_id ) {
@@ -257,7 +258,6 @@ class Builder {
 		}
 
 		if ( bricks_is_builder_iframe() ) {
-
 			// Enqueue Dashicons for ACF icon picker (@since 2.0)
 			wp_enqueue_style( 'bricks-dashicons', includes_url( '/css/dashicons.min.css' ), [], null );
 
@@ -269,6 +269,9 @@ class Builder {
 			wp_enqueue_script( 'bricks-swiper' );
 			wp_enqueue_script( 'bricks-typed' );
 			wp_enqueue_script( 'bricks-tocbot' );
+
+			// Form element richtext field TinyMCE 8 (@since 2.1)
+			wp_enqueue_script( 'bricks-tinymce8-builder' );
 
 			wp_enqueue_script( 'bricks-builder', BRICKS_URL_ASSETS . 'js/iframe.min.js', [ 'bricks-scripts', 'jquery' ], filemtime( BRICKS_PATH_ASSETS . 'js/iframe.min.js' ), true );
 		}
@@ -349,6 +352,7 @@ class Builder {
 				'builderCodeVim'                    => Database::get_setting( 'builderCodeVim', false ),
 				'builderCloudflareRocketLoader'     => self::cloudflare_rocket_loader_disabled(),
 				'builderCheckForCorruptData'        => Database::get_setting( 'builderCheckForCorruptData', false ),
+				'bricksComponentsInBlockEditor'     => Database::get_setting( 'bricksComponentsInBlockEditor', false ),
 				'autosave'                          => [
 					'disabled' => Database::get_setting( 'builderAutosaveDisabled', false ),
 					'interval' => Database::get_setting( 'builderAutosaveInterval', 60 ),
@@ -382,6 +386,7 @@ class Builder {
 					'interactions'      => 'https://academy.bricksbuilder.io/article/interactions/',
 					'popups'            => 'https://academy.bricksbuilder.io/article/popup-builder/',
 					'capabilities'      => 'https://academy.bricksbuilder.io/article/builder-access/',
+					'fluidTypography'   => 'https://academy.bricksbuilder.io/article/fluid-typography/'
 				],
 
 				'version'                           => BRICKS_VERSION,
@@ -1206,7 +1211,7 @@ class Builder {
 			'elementManager'       => Elements::$manager,
 			'codeExecutionEnabled' => Helpers::code_execution_enabled(),
 			'currentUserId'        => get_current_user_id(),
-			'maxQueryResults'      => self::get_query_max_results(),
+			'queryMaxResults'      => self::get_query_max_results(),
 			'userCan'              => [
 				'executeCode'  => Capabilities::current_user_can_execute_code(),
 				'uploadSvg'    => Capabilities::current_user_can_upload_svg(),
@@ -1219,7 +1224,7 @@ class Builder {
 		// Components
 		if ( ! empty( $global_data['components'] ) ) {
 			// STEP: Upgrade components to use latest data structure and add to load_data
-			$load_data['components'] = Components::upgrade_components( $global_data['components'] );
+			$load_data['components'] = Components::upgrade_components( $global_data['components'], false );
 		}
 
 		// Add color palettes to load_data
@@ -1227,6 +1232,16 @@ class Builder {
 			$load_data['colorPalette'] = $global_data['colorPalette'];
 		} else {
 			$load_data['colorPalette'] = self::default_color_palette();
+		}
+
+		// Add global queries to load_data (@since 2.1)
+		if ( ! empty( $global_data['globalQueries'] ) && is_array( $global_data['globalQueries'] ) ) {
+			$load_data['globalQueries'] = $global_data['globalQueries'];
+		}
+
+		// Add global queries categories to load_data (@since 2.1)
+		if ( ! empty( $global_data['globalQueriesCategories'] ) && is_array( $global_data['globalQueriesCategories'] ) ) {
+			$load_data['globalQueriesCategories'] = $global_data['globalQueriesCategories'];
 		}
 
 		// Add font favorites to load_data
@@ -1444,6 +1459,7 @@ class Builder {
 		// New rendering mode: Collect HTML strings for all elements start (@since 2.0)
 		add_filter( 'bricks/frontend/render_element', [ __CLASS__, 'collect_elements_html' ], 10, 2 );
 		add_filter( 'bricks/frontend/render_loop', [ __CLASS__, 'collect_looping_html' ], 10, 3 );
+		add_action( 'bricks/query/query_api_response', [ __CLASS__, 'collect_query_api_results' ], 10, 2 );
 
 		// Header
 		if ( $template_type === 'header' && isset( $load_data['header'] ) && is_array( $load_data['header'] ) ) {
@@ -1463,12 +1479,14 @@ class Builder {
 		remove_filter( 'bricks/frontend/render_loop', [ __CLASS__, 'collect_looping_html' ], 10, 3 );
 		// Collect HTML strings for all elements end (@since 2.0)
 		remove_filter( 'bricks/frontend/render_element', [ __CLASS__, 'collect_elements_html' ], 10, 2 );
+		remove_action( 'bricks/query/query_api_response', [ __CLASS__, 'collect_query_api_results' ], 10, 2 );
 
 		// Set collected HTML strings for all elements for fast initial render, reduce API calls (@since 2.0)
 		$load_data['elementsHtml']  = self::$elements_html;
 		$load_data['previewTexts']  = self::$preview_texts;
 		$load_data['loopingHtml']   = self::$looping_html;
 		$load_data['templatesData'] = self::$templates_data;
+		$load_data['queryApiCache'] = self::$query_api_cache;
 
 		/**
 		 * STEP: Pre-populate dynamic data to minimize AJAX requests on builder load
@@ -1602,7 +1620,8 @@ class Builder {
 		if ( Query::is_any_looping() && ! $instance->nestable ) {
 			if ( ! isset( self::$preview_texts[ $element_id ] ) ) {
 				// Manually run bricks_render_dynamic_data as bricks/frontend/render_data not yet triggered (#86c3reqnt)
-				self::$preview_texts[ $element_id ] = bricks_render_dynamic_data( wp_strip_all_tags( $html ) );
+				// Do not wp_strip_all_tags so first loop node can render complete HTML (#86c5hj7au; @since 2.1)
+				self::$preview_texts[ $element_id ] = bricks_render_dynamic_data( $html );
 			}
 		}
 
@@ -1630,6 +1649,27 @@ class Builder {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Collect query results for API calls
+	 *
+	 * Used in PopupQueryApi.vue
+	 *
+	 * @since 2.1
+	 */
+	public static function collect_query_api_results( $results, $element_id ) {
+		// Collect query results for external API calls
+		if ( isset( self::$query_api_cache[ $element_id ] ) ) {
+			return;
+		}
+
+		// Do not cache if it's error
+		if ( isset( $results['error'] ) && ! empty( $results['error'] ) ) {
+			return;
+		}
+		// Add results to cache
+		self::$query_api_cache[ $element_id ] = $results;
 	}
 
 	/**

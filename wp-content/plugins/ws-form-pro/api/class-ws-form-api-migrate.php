@@ -124,6 +124,9 @@
 			// Get field types
 			$field_types = WS_Form_Config::get_field_types_flat();
 
+			// Get meta keys
+			$meta_keys = WS_Form_Config::get_meta_keys();
+
 			// Assign fields to each group
 			foreach($groups as $group_id => $group) {
 
@@ -161,6 +164,18 @@
 						if(!isset($field['section_id'])) { continue; }
 						$field_section_id = $field['section_id'];
 						if($field_section_id != $section_id) { continue; }
+
+						// Check meta data is valid for each field type
+						if(
+							isset($field['meta']) &&
+							is_array($field['meta'])
+						) {
+							$field['meta'] = array_intersect_key(
+
+								$field['meta'],
+								WS_Form_Common::get_field_type_config_meta_keys($field_types[$field['type']], $meta_keys)
+							);
+						}
 
 						// Build fields
 						$form['groups'][$group_id]['sections'][$section_id]['fields'][$field_id] = $field;

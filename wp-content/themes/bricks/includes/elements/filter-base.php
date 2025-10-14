@@ -95,7 +95,7 @@ class Filter_Element extends Element {
 		 *
 		 * @since 1.11
 		 */
-		$this->query_settings = Query::get_query_by_element_id( $query_id )->settings['query'] ?? [];
+		$this->query_settings = Helpers::get_query_object_from_history_or_init( $query_id, $this->post_id )->settings['query'] ?? []; // Init query object if not found in history (Maybe currently rendering in builder via render_element API) (@since 2.0.2)
 
 		// Get filtered data from index
 		$this->filtered_source = apply_filters( 'bricks/filter_element/filtered_source', Query_Filters::get_filtered_data_from_index( $this->id, Query_Filters::get_filter_object_ids( $query_id ) ), $this );
@@ -306,6 +306,9 @@ class Filter_Element extends Element {
 			case 'post':
 			case 'user':
 			case 'term':
+				// Use choices source
+				$choices_source = $this->choices_source ?? [];
+
 				if ( $field_type === 'post' ) {
 					$selected_field = $settings['wpPostField'] ?? false;
 
@@ -323,6 +326,20 @@ class Filter_Element extends Element {
 						return;
 					}
 
+					if ( $selected_field === 'user_role' ) {
+						// If target filter has set role__in, should only include selected user roles. Otherwise, irrelevant user roles will be displayed as option if 1 user has multiple roles (#86c44rghg @since 2.0)
+						$query_role_in = $this->query_settings['role__in'] ?? [];
+
+						if ( ! empty( $query_role_in ) ) {
+							$choices_source = array_filter(
+								$choices_source,
+								function( $choice ) use ( $query_role_in ) {
+									return in_array( $choice['filter_value'], $query_role_in, true );
+								}
+							);
+						}
+					}
+
 					$selected_field_label = $this->controls['wpUserField']['options'][ $selected_field ] ?? esc_html__( 'Option', 'bricks' );
 				}
 
@@ -335,9 +352,6 @@ class Filter_Element extends Element {
 
 					$selected_field_label = $this->controls['wpTermField']['options'][ $selected_field ] ?? esc_html__( 'Option', 'bricks' );
 				}
-
-				// Use choices source
-				$choices_source = $this->choices_source ?? [];
 
 				// Set a placeholder option if this is a select input
 				if ( $this->filter_type === 'select' ) {
@@ -548,7 +562,7 @@ class Filter_Element extends Element {
 			$data_source = $flattened_source;
 		}
 
-		// STEP: Get count source for each option (@since 1.11)
+		// STEP: Get count source for each option
 		if ( ! empty( $active_filters ) || ! empty( $page_filters ) ) {
 			// Get all active filters that will affect the count
 			$filters_affecting_count = array_filter(
@@ -766,6 +780,62 @@ class Filter_Element extends Element {
 		}
 
 		$this->populated_options = $options;
+	}
+
+	/**
+	 * Get populated options
+	 * Only used for filter-select, filter-radio, filter-checkbox
+	 *
+	 * @since 2.0.2
+	 */
+	public function get_populated_options() {
+		$populated_options = $this->populated_options ?? [];
+
+		$settings       = $this->settings;
+		$filter_action  = $settings['filterAction'] ?? 'filter';
+		$filter_source  = $settings['filterSource'] ?? false;
+		$option_orderby = $settings['populatedOptionsOrderBy'] ?? 'value';
+		$option_order   = $settings['populatedOptionsOrder'] ?? 'asc';
+
+		// Modify the populated options order if needed
+		if ( $filter_action === 'filter' && $filter_source !== 'taxonomy' && in_array( $this->name, [ 'filter-select', 'filter-radio', 'filter-checkbox' ], true ) && ! empty( $populated_options ) ) {
+
+			// STEP: Always place is_all and is_placeholder options at the top
+			$top_options   = [];
+			$other_options = [];
+
+			foreach ( $populated_options as $option ) {
+				if ( ! empty( $option['is_all'] ) || ! empty( $option['is_placeholder'] ) ) {
+					$top_options[] = $option;
+				} else {
+					$other_options[] = $option;
+				}
+			}
+
+			// STEP: Sort other_options based on the orderby and order settings
+			if ( $option_orderby === 'value' ) {
+				usort(
+					$other_options,
+					function( $a, $b ) use ( $option_order ) {
+						return self::smart_compare( $a['value'], $b['value'], $option_order );
+					}
+				);
+			} elseif ( $option_orderby === 'label' ) {
+				usort(
+					$other_options,
+					function( $a, $b ) use ( $option_order ) {
+						return self::smart_compare( $a['text'], $b['text'], $option_order );
+					}
+				);
+			}
+
+			// STEP: Merge top options and other options
+			$populated_options = array_merge( $top_options, $other_options );
+
+		}
+
+		// Return the populated options @see https://academy.bricksbuilder.io/article/filter-bricks-filter_element-populated_options/ (@since 2.0.2)
+		return apply_filters( 'bricks/filter_element/populated_options', $populated_options, $this );
 	}
 
 	/**
@@ -1171,25 +1241,24 @@ class Filter_Element extends Element {
 				'type'          => 'select',
 				'label'         => esc_html__( 'Taxonomy', 'bricks' ),
 				'inline'        => true,
-				'options'       => Setup::get_taxonomies_options(),
+				'options'       => Setup::$control_options['taxonomies'],
 				'placeholder'   => esc_html__( 'Select', 'bricks' ),
 				'required'      => [
 					[ 'filterQueryId', '!=', '' ],
 					[ 'filterAction', '=', [ '', 'filter' ] ],
 					[ 'filterSource', '=', 'taxonomy' ],
 				],
-				'clearOnChange' => [  // @since 1.11
+				'clearOnChange' => [
 					'filterTermInclude',
 					'filterTermExclude',
 				],
 			];
 
-			// @since 1.11
 			$controls['filterTaxonomyOrderBy'] = [
 				'type'        => 'select',
 				'label'       => esc_html__( 'Order by', 'bricks' ),
 				'inline'      => true,
-				'options'     => Setup::get_control_options( 'termsOrderBy' ),
+				'options'     => Setup::$control_options['termsOrderBy'],
 				'placeholder' => esc_html__( 'Name', 'bricks' ),
 				'required'    => [
 					[ 'filterQueryId', '!=', '' ],
@@ -1198,7 +1267,6 @@ class Filter_Element extends Element {
 				],
 			];
 
-			// @since 1.12.2
 			$controls['filterTaxonomyOrderMetaKey'] = [
 				'type'           => 'text',
 				'label'          => esc_html__( 'Order meta key', 'bricks' ),
@@ -1227,7 +1295,7 @@ class Filter_Element extends Element {
 				],
 			];
 
-			// Include terms (@since 1.11)
+			// Include terms
 			$controls['filterTermInclude'] = [
 				'type'        => 'select',
 				'label'       => esc_html__( 'Terms', 'bricks' ) . ': ' . esc_html__( 'Include', 'bricks' ),
@@ -1248,7 +1316,7 @@ class Filter_Element extends Element {
 				'placeholder' => esc_html__( 'None', 'bricks' ),
 			];
 
-			// Exclude terms (@since 1.11)
+			// Exclude terms
 			$controls['filterTermExclude'] = [
 				'type'        => 'select',
 				'label'       => esc_html__( 'Terms', 'bricks' ) . ': ' . esc_html__( 'Exclude', 'bricks' ),
@@ -1269,7 +1337,7 @@ class Filter_Element extends Element {
 				'placeholder' => esc_html__( 'None', 'bricks' ),
 			];
 
-			// Top level terms only (@since 1.11)
+			// Top level terms only
 			$controls['filterTermTopLevel'] = [
 				'type'     => 'checkbox',
 				'label'    => esc_html__( 'Top level terms only', 'bricks' ),
@@ -1389,6 +1457,7 @@ class Filter_Element extends Element {
 					'options'     => Integrations\Query_Filters\Fields::get_active_provider_list(),
 					'required'    => [
 						[ 'filterQueryId', '!=', '' ],
+						[ 'filterAction', '=', [ '', 'filter' ] ],
 						[ 'filterSource', '=', 'customField' ],
 					],
 					'placeholder' => 'WordPress',
@@ -1399,6 +1468,7 @@ class Filter_Element extends Element {
 					'content'  => esc_html__( 'Use the dynamic picker in the "Meta key" control below to select the desired custom field. The dynamic data tag is used to retrieves the field settings, it is not parsed.', 'bricks' ),
 					'required' => [
 						[ 'filterQueryId', '!=', '' ],
+						[ 'filterAction', '=', [ '', 'filter' ] ],
 						[ 'filterSource', '=', 'customField' ],
 						[ 'fieldProvider', '!=', [ '', 'none' ] ],
 					],
@@ -1412,6 +1482,7 @@ class Filter_Element extends Element {
 				'hasDynamicData' => false,
 				'required'       => [
 					[ 'filterQueryId', '!=', '' ],
+					[ 'filterAction', '=', [ '', 'filter' ] ],
 					[ 'filterSource', '=', 'customField' ],
 				],
 			];
@@ -1456,7 +1527,18 @@ class Filter_Element extends Element {
 				];
 			}
 
-			// Radio Hide "All" option (@since 1.11)
+			// Options (@since 2.0.2)
+			$controls['optionSep'] = [
+				'label'    => esc_html__( 'Options', 'bricks' ),
+				'type'     => 'separator',
+				'required' => [
+					[ 'filterQueryId', '!=', '' ],
+					[ 'filterAction', '=', [ '', 'filter' ] ],
+					[ 'filterSource', '!=', '' ],
+				],
+			];
+
+			// Radio Hide "All" option
 			if ( $this->name === 'filter-radio' ) {
 				$controls['filterHideAllOption'] = [
 					'type'     => 'checkbox',
@@ -1480,7 +1562,7 @@ class Filter_Element extends Element {
 						[ 'filterQueryId', '!=', '' ],
 						[ 'filterAction', '=', [ '', 'filter' ] ],
 						[ 'filterSource', '!=', '' ],
-						[ 'filterHideAllOption', '!=', true ], // Hide All option for radio (@since 1.11)
+						[ 'filterHideAllOption', '!=', true ], // Hide All option for radio
 					],
 				];
 			}
@@ -1528,6 +1610,51 @@ class Filter_Element extends Element {
 					[ 'labelMapping', '=', 'custom' ],
 				],
 			];
+
+			// Populated options order by & order, exclude taxonomy source (@since 2.0.2)
+			if ( in_array( $this->name, [ 'filter-radio', 'filter-select','filter-checkbox' ], true ) ) {
+				$controls['populatedOptionsOrderBy'] = [
+					'type'        => 'select',
+					'label'       => esc_html__( 'Order by', 'bricks' ),
+					'inline'      => true,
+					'options'     => [
+						'value' => esc_html__( 'Value', 'bricks' ),
+						'label' => esc_html__( 'Label', 'bricks' ),
+					],
+					'placeholder' => esc_html__( 'Value', 'bricks' ),
+					'required'    => [
+						[ 'filterQueryId', '!=', '' ],
+						[ 'filterAction', '=', [ '', 'filter' ] ],
+						[ 'filterSource', '=', [ 'customField', 'wpField', 'wcField' ] ],
+					],
+				];
+
+				$controls['populatedOptionsOrder'] = [
+					'type'        => 'select',
+					'label'       => esc_html__( 'Order', 'bricks' ),
+					'inline'      => true,
+					'options'     => [
+						'asc'  => esc_html__( 'Ascending', 'bricks' ),
+						'desc' => esc_html__( 'Descending', 'bricks' ),
+					],
+					'placeholder' => esc_html__( 'Ascending', 'bricks' ),
+					'required'    => [
+						[ 'filterQueryId', '!=', '' ],
+						[ 'filterAction', '=', [ '', 'filter' ] ],
+						[ 'filterSource', '=', [ 'customField', 'wpField', 'wcField' ] ],
+					],
+				];
+
+				$controls['populatedOptionsInfo'] = [
+					'type'     => 'info',
+					'content'  => esc_html__( 'Filter', 'bricks' ) . ': ' . Helpers::article_link( 'filter-bricks-filter_element-populated_options', '<code>bricks/filter_element/populated_options</code>' ),
+					'required' => [
+						[ 'filterQueryId', '!=', '' ],
+						[ 'filterAction', '=', [ '', 'filter' ] ],
+						[ 'filterSource', '=', [ 'customField', 'wpField', 'wcField' ] ],
+					],
+				];
+			}
 
 			// NOTE: Necessary to save & reload builder to generate filter index and populate options correctly
 			$controls['filterApply'] = [
@@ -1837,5 +1964,49 @@ class Filter_Element extends Element {
 		}
 
 		return $fomatted_value;
+	}
+
+	/**
+	 * Smart comparison function that handles both numeric and alphanumeric sorting
+	 *
+	 * @param string $a First value to compare
+	 * @param string $b Second value to compare
+	 * @param string $order Sort order ('asc' or 'desc')
+	 * @return int -1, 0, or 1 for sorting
+	 */
+	public static function smart_compare( $a, $b, $order = 'asc' ) {
+		// Handle empty values
+		if ( empty( $a ) && empty( $b ) ) {
+			return 0;
+		}
+		if ( empty( $a ) ) {
+			return $order === 'asc' ? -1 : 1;
+		}
+		if ( empty( $b ) ) {
+			return $order === 'asc' ? 1 : -1;
+		}
+
+		// Check if both values are numeric
+		$a_is_numeric = is_numeric( $a );
+		$b_is_numeric = is_numeric( $b );
+
+		// Both are numeric: compare as numbers
+		if ( $a_is_numeric && $b_is_numeric ) {
+			$result = (float) $a <=> (float) $b;
+		}
+		// Mixed types: numeric values come first in ascending order
+		elseif ( $a_is_numeric && ! $b_is_numeric ) {
+			$result = $order === 'asc' ? -1 : 1;
+		}
+		elseif ( ! $a_is_numeric && $b_is_numeric ) {
+			$result = $order === 'asc' ? 1 : -1;
+		}
+		// Both are non-numeric: use natural string comparison
+		else {
+			$result = strnatcasecmp( $a, $b );
+		}
+
+		// Reverse result for descending order
+		return $order === 'desc' ? -$result : $result;
 	}
 }

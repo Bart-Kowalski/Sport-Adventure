@@ -102,6 +102,16 @@
 				var field_obj_id = $(this).attr('id');
 				var field_multiple = (typeof($(this).attr('multiple')) !== 'undefined');
 
+				// Dictionary
+				var dict_invalid_file_type = ws_this.get_object_meta_value(field, 'dropzonejs_dict_invalid_file_type', '');
+				var dict_max_file_count = ws_this.get_object_meta_value(field, 'dropzonejs_dict_max_file_count', '');
+				var dict_max_file_size = ws_this.get_object_meta_value(field, 'dropzonejs_dict_max_file_size', '');
+				var dict_cancel_upload = ws_this.get_object_meta_value(field, 'dropzonejs_dict_cancel_upload', '');
+				var dict_cancel_upload_confirm = ws_this.get_object_meta_value(field, 'dropzonejs_dict_cancel_upload_confirm', '');
+				var dict_cancel_upload_done = ws_this.get_object_meta_value(field, 'dropzonejs_dict_cancel_upload_done', '');
+				var dict_remove_file = ws_this.get_object_meta_value(field, 'dropzonejs_dict_remove_file', '');
+				var dict_remove_file_confirm = ws_this.get_object_meta_value(field, 'dropzonejs_dict_remove_file_confirm', '');
+
 				// Progress
 				var progress_objs = $('[data-source="post_progress"]', this.form_canvas_obj);
 
@@ -196,7 +206,7 @@
 
 				// Remove
 				mask_values_help['attributes'] = '';
-				mask_values_help['help'] = '<a href="#" data-dz-remove>' + ws_this.language('dropzonejs_remove') + '</a>';
+				mask_values_help['help'] = '<a href="#" data-dz-remove>' + (dict_remove_file ? dict_remove_file : ws_this.language('dropzonejs_remove')) + '</a>';
 				var preview_template_remove = ws_this.mask_parse(mask_help, mask_values_help);
 
 				// Preview template
@@ -233,7 +243,7 @@
 							this.element.classList.add('dz-started');
 						}
 
-						this.ajax_complete = function() {
+						this.ajax_complete = function(file) {
 
 							if(ws_this.dropzonejs_processes > 0) {
 
@@ -249,6 +259,8 @@
 									ws_this.form_progress_set_value($(this), 0);
 								});
 							}
+
+							$('[data-dz-remove]', $(file.previewTemplate)).html(dict_remove_file ? dict_remove_file : ws_this.language('dropzonejs_remove'));
 						};
 
 						this.input_update = function() {
@@ -281,6 +293,8 @@
 						this.on('addedfile', function(file) {
 
 							this.element.classList.add('dz-started');
+
+							$('[data-dz-remove]', $(file.previewTemplate)).html(dict_cancel_upload ? dict_cancel_upload : ws_this.language('dropzonejs_cancel'));
 
 							ws_this.dropzonejs_processes++;
 						});
@@ -327,11 +341,24 @@
 				var file_timeout = parseInt(ws_this.get_object_meta_value(field, 'file_timeout', ''), 10);
 				if(file_timeout > 0) { args.timeout = file_timeout; }
 
+				// Dictionary
+				if(dict_invalid_file_type) { args.dictInvalidFileType = dict_invalid_file_type; }
+				if(dict_max_file_count) { args.dictMaxFilesExceeded = dict_max_file_count; }
+				if(dict_max_file_size) { args.dictFileTooBig = dict_max_file_size; }
+				if(dict_cancel_upload) { args.dictCancelUpload = dict_cancel_upload; }
+				if(dict_cancel_upload_confirm) { args.dictCancelUploadConfirmation = dict_cancel_upload_confirm; }
+				if(dict_cancel_upload_done) { args.dictUploadCanceled = dict_cancel_upload_done; }
+				if(dict_remove_file) { args.dictRemoveFile = dict_remove_file; }
+				if(dict_remove_file_confirm) { args.dictRemoveFileConfirmation = dict_remove_file_confirm; }
+
+				var dropzonejs_element_id = '#' + field_obj_id + '-dropzonejs';
+				if($(dropzonejs_element_id).length === 0) { return; }
+
 				// Create DropzoneJS
-				var dropzonejs_obj = new Dropzone('#' + field_obj_id + '-dropzonejs', args);
+				var dropzonejs_obj = new Dropzone(dropzonejs_element_id, args);
 
 				// Event handling (Pass through to input field)
-				$('#' + field_obj_id + '-dropzonejs').on('click mousedown mouseup mouseover mouseout touchstart touchend touchmove touchcancel', function(e) {
+				$(dropzonejs_element_id).on('click mousedown mouseup mouseover mouseout touchstart touchend touchmove touchcancel', function(e) {
 
 					$('#' + field_obj_id).trigger(e.type);
 				});
@@ -342,7 +369,7 @@
 					ws_this.get_object_meta_value(field, 'dropzonejs_sortable', 'on')
 				) {
 
-					$('#' + field_obj_id + '-dropzonejs').sortable({
+					$(dropzonejs_element_id).sortable({
 
 						items: '.wsf-dropzonejs-preview',
 						cursor: 'move',
@@ -510,16 +537,16 @@
 					}
 				});
 
-				dropzonejs_obj.on('complete', function() { this.ajax_complete(); });
+				dropzonejs_obj.on('complete', function(file) { this.ajax_complete(file); });
 
-				dropzonejs_obj.on('canceled', function() { this.ajax_complete(); });
+				dropzonejs_obj.on('canceled', function(file) { this.ajax_complete(file); });
 
 				dropzonejs_obj.on('removedfile', function(file) {
 
 					// Push to field value
 					this.input_update();
 
-					this.ajax_complete();
+					this.ajax_complete(file);
 				});
 
 				dropzonejs_obj.on('error', function(file, response) {

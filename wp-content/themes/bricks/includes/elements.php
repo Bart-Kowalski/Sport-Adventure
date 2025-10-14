@@ -64,6 +64,7 @@ class Elements {
 			'tabs-nested', // @since 1.5
 			'form',
 			'map',
+			'map-leaflet', // @since 2.1
 			'map-connector', // @since 2.0
 			'alert',
 			'animated-typing',
@@ -150,7 +151,7 @@ class Elements {
 		 *
 		 * @since 2.0
 		 */
-		self::$manager = get_option( BRICKS_DB_ELEMENT_MANAGER, [] );
+		self::$manager = self::manager();
 
 		foreach ( $element_names as $element_name ) {
 			// Skip if element is disabled and we aren't on the Bricks > Elements page (@since 2.0)
@@ -171,6 +172,39 @@ class Elements {
 			// Register all elements in builder & frontend
 			self::register_element( $file, $element_name, $class_name );
 		}
+	}
+
+	/**
+	 * Get mandatory elements
+	 *
+	 * @since 2.0.2
+	 */
+	public static function mandatory_elements() {
+		return [
+			'container',
+			'posts',
+			'post-comments',
+		];
+	}
+
+	/**
+	 * Get element manager data
+	 *
+	 * @since 2.0.2
+	 */
+	public static function manager() {
+		$manager = get_option( BRICKS_DB_ELEMENT_MANAGER, [] );
+
+		// Rectify element status in case user disabled it in previous version (@since 2.0.2)
+		$mandatory_elements = self::mandatory_elements();
+		foreach ( $mandatory_elements as $element_name ) {
+			if ( isset( $manager[ $element_name ]['status'] ) && $manager[ $element_name ]['status'] !== 'active' ) {
+				// Set mandatory element status to 'active'
+				$manager[ $element_name ]['status'] = 'active';
+			}
+		}
+
+		return $manager;
 	}
 
 	/**

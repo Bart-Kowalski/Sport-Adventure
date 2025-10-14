@@ -4,7 +4,7 @@
 
 	$(function() {
 
-		$('.wsf-admin-bar-debug-console').on('click', function(e) {
+		$('.wsf-admin-bar-debug-console').on('click', function(e) {	// , .wsf-admin-bar-styler
 
 			// Prevent default
 			e.preventDefault();
@@ -13,25 +13,28 @@
 			var href = $('a', $(this)).attr('href');
 
 			// Remove #
-			var helper_debug = href.substring(1);
+			var hash = href.substring(1);
 
 			// Check debug console state
-			if(['off', 'administrator', 'on'].indexOf(helper_debug) === -1) { return; }
+			if(['debug-off', 'debug-administrator', 'debug-on'].indexOf(hash) !== -1) {
 
-			// Make AJAX request
-			$.ajax({
+				var helper_debug = hash.substring(6);
 
-				url: ws_form_toolbar.api_url + helper_debug + '/',
-				type: 'POST',
-				beforeSend: function(xhr) {
+				// Make AJAX request
+				$.ajax({
 
-					xhr.setRequestHeader('X-WP-Nonce', ws_form_toolbar.x_wp_nonce);
-				},
-				complete: function(data){
+					url: ws_form_toolbar.api_url_debug + helper_debug + '/',
+					type: 'POST',
+					beforeSend: function(xhr) {
 
-					location.reload();
-				}
-			});
+						xhr.setRequestHeader('X-WP-Nonce', ws_form_toolbar.x_wp_nonce);
+					},
+					complete: function(data){
+
+						location.reload();
+					}
+				});
+			}
 		});
 	});
 

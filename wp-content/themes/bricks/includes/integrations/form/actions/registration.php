@@ -1,6 +1,8 @@
 <?php
 namespace Bricks\Integrations\Form\Actions;
 
+use Bricks\Database;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Registration extends Base {
@@ -104,7 +106,8 @@ class Registration extends Base {
 		}
 
 		// Auto log in user
-		if ( isset( $form_settings['registrationAutoLogin'] ) ) {
+		// Only if user activation is disabled (@since 2.1)
+		if ( isset( $form_settings['registrationAutoLogin'] ) && ! Database::get_setting( 'userActivationEnabled' ) ) {
 			wp_set_current_user( $user_id );
 			wp_set_auth_cookie( $user_id, false, is_ssl() );
 		}

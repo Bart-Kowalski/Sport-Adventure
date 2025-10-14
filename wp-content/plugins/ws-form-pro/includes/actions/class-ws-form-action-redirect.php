@@ -21,11 +21,29 @@
 		public $post_id;
 		public $qsp;
 		public $exclude_blank_parameters;
+		public $fallback;
+		public $fallback_url;
+		public $fallback_url_conditions;
 
 		// Constants
 		const MAX_PAGE_SEARCH_RESULTS = 10;
 
 		public function __construct() {
+
+			// Events
+			$this->events = array('submit');
+
+			// Register config filters
+			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// API
+			add_action( 'rest_api_init', array( $this, 'rest_api_init' ), 10, 0 );
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
 
 			// Set label
 			$this->label = __('Redirect', 'ws-form');
@@ -33,17 +51,8 @@
 			// Set label for actions pull down
 			$this->label_action = __('Redirect', 'ws-form');
 
-			// Events
-			$this->events = array('submit');
-
 			// Register action
 			parent::register($this);
-
-			// Register config filters
-			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
-
-			// API
-			add_action( 'rest_api_init', array( $this, 'rest_api_init' ), 10, 0 );
 		}
 
 		public function post($form, &$submit, $config) {
@@ -89,45 +98,139 @@
 					$url = $this->url;
 			}
 
-			// Check URL
+			// Parse URL
 			if($url !== '') {
 
 				$url = WS_Form_Common::parse_variables_process($url, $form, $submit, 'text/plain');
+			}
 
-				// Check for query string parameters
-				if(!empty($this->qsp)) {
+			// Fallback URL
+			if(
+				($this->fallback) &&
+				($this->fallback_url != '')
+			) {
+				// Check fallback conditions
+				foreach($this->fallback_url_conditions as $fallback_url_condition) {
 
-					foreach($this->qsp as $qsp) {
+					// Get condition
+					$condition = $fallback_url_condition['action_' . $this->id . '_fallback_url_condition'];
 
-						// Read field
-						if(!isset($qsp['action_' . $this->id . '_qsp_field'])) { continue; }
-						$qsp_field = $qsp['action_' . $this->id . '_qsp_field'];
-						if($qsp_field == '') { continue; }
+					// Get value
+					$value = $fallback_url_condition['action_' . $this->id . '_fallback_url_value'];
+					$value = WS_Form_Common::parse_variables_process($value, $form, $submit, 'text/plain');
+					$value = sanitize_text_field($value);
 
-						// Read value
-						if(!isset($qsp['action_' . $this->id . '_qsp_value'])) { continue; }
-						$qsp_value = $qsp['action_' . $this->id . '_qsp_value'];
-						if($qsp_value == '') { continue; }
+					$condition_result = false;
 
-						// Parse field and value
-						$qsp_field = WS_Form_Common::parse_variables_process($qsp_field, $form, $submit, 'text/plain');
-						$qsp_value = WS_Form_Common::parse_variables_process($qsp_value, $form, $submit, 'text/plain');
+					switch($condition) {
 
-						// Exclude blank parameters
-						if(
-							$this->exclude_blank_parameters &&
-							($qsp_value == '')
-						) {
-							continue;
-						}
+						case 'equals' :
+						case 'equals_not' :
 
-						// Santize and add to URL
-						$url = add_query_arg(urlencode($qsp_field), urlencode($qsp_value), $url);
+							$condition_result = ($value == $url);
+							if($condition == 'equals_not') { $condition_result = !$condition_result; }
+							break;
+
+						case 'contains' :
+						case 'contains_not' :
+
+							$condition_result = (strpos($url, $value) !== false);
+							if($condition == 'contains_not') { $condition_result = !$condition_result; }
+							break;
+
+						case 'starts' :
+						case 'starts_not' :
+
+							$condition_result = (strpos($url, $value) === 0);
+							if($condition == 'starts_not') { $condition_result = !$condition_result; }
+							break;
+
+						case 'ends' :
+						case 'ends_not' :
+
+							$value_length = strlen($value);
+							$condition_result = substr($url, -$value_length) === $value;
+							if($condition == 'ends_not') { $condition_result = !$condition_result; }
+							break;
+
+						case 'regex' :
+						case 'regex_not' :
+
+							$condition_result = preg_match($value, $url);
+							if($condition == 'regex_not') { $condition_result = !$condition_result; }
+							break;
+
+						case 'blank' :
+
+							$condition_result = ($url == '');
+							break;
+
+						default :
+
+							continue 2;
+					}
+
+					if($condition_result) {
+
+						break;
 					}
 				}
 
+				// If a condition matched, set the URL to the fallback URL
+				if($condition_result) {
+
+					$url = $this->fallback_url;
+
+					// Parse fallback URL
+					if($url !== '') {
+
+						$url = WS_Form_Common::parse_variables_process($url, $form, $submit, 'text/plain');
+					}
+				}
+			}
+
+			// Add query string parameters
+			if($url !== '') {
+
+				foreach($this->qsp as $qsp) {
+
+					// Read field
+					if(!isset($qsp['action_' . $this->id . '_qsp_field'])) { continue; }
+					$qsp_field = $qsp['action_' . $this->id . '_qsp_field'];
+					$qsp_field = WS_Form_Common::parse_variables_process($qsp_field, $form, $submit, 'text/plain');
+					if($qsp_field == '') { continue; }
+
+					// Read value
+					if(!isset($qsp['action_' . $this->id . '_qsp_value'])) { continue; }
+					$qsp_value = $qsp['action_' . $this->id . '_qsp_value'];
+					$qsp_value = WS_Form_Common::parse_variables_process($qsp_value, $form, $submit, 'text/plain');
+
+					// Exclude blank parameters
+					if(
+						$this->exclude_blank_parameters &&
+						($qsp_value == '')
+					) {
+						continue;
+					}
+
+					// Santize and add to URL
+					$url = add_query_arg(urlencode($qsp_field), urlencode($qsp_value), $url);
+				}
+			}
+
+			// Filter hook
+			$url = apply_filters('wsf_action_' . $this->id . '_url', $url, $form, $submit, $config);
+
+			if($url !== '') {
+
 				// Redirect to URL
-				parent::success(sprintf(__('Redirect added to queue: %s', 'ws-form'), $url), array(
+				parent::success(sprintf(
+
+					/* translators: %s: URL */
+					__('Redirect added to queue: %s', 'ws-form')
+					, $url
+
+				), array(
 
 					array(
 
@@ -139,7 +242,7 @@
 			} else {
 
 				// Invalid redirect URL
-				parent::error(__('No redirect URL in action configuration', 'ws-form'));
+				parent::error(__('Redirect URL is blank', 'ws-form'));
 			}
 		}
 
@@ -150,8 +253,12 @@
 			$this->page = parent::get_config($config, 'action_' . $this->id . '_page');
 			$this->post_id = parent::get_config($config, 'action_' . $this->id . '_post_id');
 			$this->qsp = parent::get_config($config, 'action_' . $this->id . '_qsp');
-			if(!$this->qsp) { $this->qsp = array(); }
+			if(!is_array($this->qsp)) { $this->qsp = array(); }
 			$this->exclude_blank_parameters = parent::get_config($config, 'action_' . $this->id . '_exclude_blank_parameters');
+			$this->fallback = (parent::get_config($config, 'action_' . $this->id . '_fallback', '') == 'on');
+			$this->fallback_url = parent::get_config($config, 'action_' . $this->id . '_fallback_url');
+			$this->fallback_url_conditions = parent::get_config($config, 'action_' . $this->id . '_fallback_url_conditions', array());
+			if(!is_array($this->fallback_url_conditions)) { $this->fallback_url_conditions = array(); }
 		}
 
 		// Get settings
@@ -166,7 +273,10 @@
 					'action_' . $this->id . '_page',
 					'action_' . $this->id . '_post_id',
 					'action_' . $this->id . '_qsp',
-					'action_' . $this->id . '_exclude_blank_parameters'
+					'action_' . $this->id . '_exclude_blank_parameters',
+					'action_' . $this->id . '_fallback',
+					'action_' . $this->id . '_fallback_url_conditions',
+					'action_' . $this->id . '_fallback_url'
 				)
 			);
 
@@ -302,6 +412,98 @@
 					'label'			=>	__('Exclude Blank Parameters', 'ws-form'),
 					'type'			=>	'checkbox',
 					'help'			=>	__('If checked, any rows above that have a blank value will be excluded from the query string.', 'ws-form'),
+				),
+
+				// Fallback
+				'action_' . $this->id . '_fallback'	=> array(
+
+					'label'				=>	__('Enable Fallback URL', 'ws-form'),
+					'type'				=>	'checkbox',
+					'help'				=>	__('If enabled, WS Form checks the URL and redirects to a fallback if conditions are met. Ideal for dynamic URLs like #tracking_referrer in login forms.', 'ws-form'),
+					'default'			=>	'',
+				),
+
+				// Fallback - URL - Conditions
+				'action_' . $this->id . '_fallback_url_conditions' => array(
+
+					'label'						=>	__('Fallback URL Conditions', 'ws-form'),
+					'type'						=>	'repeater',
+					'help'						=>	__('The fallback URL will be used if these conditions are met.', 'ws-form'),
+					'meta_keys'					=>	array(
+
+						'action_' . $this->id . '_fallback_url_condition',
+						'action_' . $this->id . '_fallback_url_value',
+					),
+					'condition'			=>	array(
+
+						array(
+
+							'logic'          => '==',
+							'meta_key'       => 'action_' . $this->id . '_type',
+							'meta_value'     => ''
+						),
+
+						array(
+
+							'logic'          => '==',
+							'meta_key'       => 'action_' . $this->id . '_fallback',
+							'meta_value'     => 'on'
+						)
+					)
+				),
+
+				// Fallback - URL - Conditions - Condition
+				'action_' . $this->id . '_fallback_url_condition' => array(
+
+					'label'						=>	__('If URL', 'ws-form'),
+					'type'						=>	'select',
+					'options'					=>	array(
+
+						array('value' => 'equals', 'text' => __('Equals', 'ws-form')),
+						array('value' => 'equals_not', 'text' => __('Does not equal', 'ws-form')),
+						array('value' => 'contains', 'text' => __('Contains', 'ws-form')),
+						array('value' => 'contains_not', 'text' => __('Does not contain', 'ws-form')),
+						array('value' => 'starts', 'text' => __('Starts with', 'ws-form')),
+						array('value' => 'starts_not', 'text' => __('Does not start with', 'ws-form')),
+						array('value' => 'ends', 'text' => __('Ends with', 'ws-form')),
+						array('value' => 'ends_not', 'text' => __('Does not end with', 'ws-form')),
+						array('value' => 'regex', 'text' => __('Matches regex', 'ws-form')),
+						array('value' => 'regex_not', 'text' => __('Does not match regex', 'ws-form')),
+						array('value' => 'blank', 'text' => __('Is blank', 'ws-form'))
+					)
+				),
+
+				// Fallback - URL - Conditions - Value
+				'action_' . $this->id . '_fallback_url_value' => array(
+
+					'label'						=>	__('Value', 'ws-form'),
+					'type'						=>	'text',
+				),
+
+				// Fallback - URL
+				'action_' . $this->id . '_fallback_url'	=> array(
+
+					'label'				=>	__('Fallback URL', 'ws-form'),
+					'type'				=>	'text',
+					'help'				=>	__('The URL to redirect to if the above conditions are met.', 'ws-form'),
+					'default'			=>	'/',
+					'variable_helper'	=>	true,
+					'condition'			=>	array(
+
+						array(
+
+							'logic'          => '==',
+							'meta_key'       => 'action_' . $this->id . '_type',
+							'meta_value'     => ''
+						),
+
+						array(
+
+							'logic'          => '==',
+							'meta_key'       => 'action_' . $this->id . '_fallback',
+							'meta_value'     => 'on'
+						)
+					)
 				)
 			);
 
@@ -341,7 +543,13 @@
 
 			foreach ($posts as $post) {
 
-				$results[] = array('id' => $post->ID, 'text' => sprintf('%s (ID: %u)', $post->post_title, $post->ID));
+				$results[] = array('id' => $post->ID, 'text' => sprintf(
+
+					'%s (%s: %u)',
+					$post->post_title,
+					__('ID', 'ws-form'),
+					$post->ID
+				));
 			}
 
 			return array('results' => $results);

@@ -24,10 +24,6 @@ body.admin-bar #bricks-structure {
    top: calc(40px + var(--wp-admin--admin-bar--height));
 }
 
-body #bricks-breakpoints {
-   z-index: 1004;
-}
-
 body.admin-bar .bricks-panel,  body.admin-bar #bricks-preview,  body.admin-bar #bricks-structure {
    height: calc(100vh - 40px - var(--wp-admin--admin-bar--height));
 }
@@ -777,7 +773,7 @@ body.filterable-structure #bricks-structure #bricks-panel-header{
 Contextual menu
 --------------------------------------*/
 .brxc-context-menu[data-type="structure"]{
-   --at-menu-width: 360px;
+   --at-menu-width:680px;
 }
 .brxc-context-menu[data-type="control-group"] {
     --at-menu-width: fit-content;
@@ -1001,13 +997,13 @@ span.bricks-svg-wrapper.arrow {
    left: -21px;
 }
 
-body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .element-classes li{
+body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .active-classes li{
    background-color: #11b76b4d;
 }
-body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .element-classes li[data-locked="true"]{
+body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .active-classes li[data-locked="true"]{
    background-color: #fa43625c;
 }
-body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .element-classes li .name{
+body.at-locked-classes #bricks-panel-element #bricks-panel-element-classes .active-classes li .name{
    color: var(--builder-color);
 }
  /*--------------------------------------
@@ -1999,7 +1995,9 @@ Speech to Text
  /*--------------------------------------
  Autocomplete css variables
  --------------------------------------*/
- 
+ body .autocomplete-active + .variable-picker-button.open + .expand[data-control="select"]{
+   display: none;
+ }
  .autocomplete-items.bricks-control-popup.bottom {
     box-shadow: 0 6px 12px 0 rgb(0 0 0 / 50%);
     max-width: 100%;
@@ -3276,7 +3274,8 @@ body.at-zoom-out main > * *{
  }
  #bricks-panel-element-classes .active-class .actions,
 #bricks-panel-element-classes .active-selector .actions,
-#bricks-panel-element-classes .active-selector .actions-wrapper .clear {
+#bricks-panel-element-classes .active-selector .actions-wrapper .clear,
+#bricks-panel-element-classes .active-selector .actions-wrapper .lock {
    z-index: 1;
 }
 #bricks-panel-element-classes .active-selector .at-icon{
@@ -3821,6 +3820,11 @@ body.at-expand-spacing #bricks-panel-element [data-control=number].has-variables
 #bricks-panel #bricks-panel-header .brxc-header-icon i{
    fill: var(--builder-color);
 }
+
+#bricks-panel #bricks-panel-header.bricks-bulk-edit .brxc-header-icon svg,
+#bricks-panel #bricks-panel-header.bricks-bulk-edit .brxc-header-icon i{
+   fill: var(--builder-color-info)!important;
+}
 #bricks-panel-header .actions li.highlight i  {
    opacity: .66;
 }
@@ -3925,6 +3929,32 @@ html body .class-contextual-menu-icon:hover {
    visibility: visible;
    z-index: 100000!important
 }
+.brxc-context-menu .col-2 {
+   gap: 0px;
+   display: grid;
+   grid-template-columns: 320px 1fr;
+   gap: 0px;
+}
+.brxc-context-menu .col-2 > ul:first-child{
+   border-right: 1px solid var(--builder-color);
+}
+.brxc-context-menu .col-2 > ul {
+   break-inside: avoid-column;
+}
+
+.brxc-context-menu .brxc-context-menu__block:not(:first-child) .title{
+    margin-top: 15px;
+}
+
+.brxc-context-menu .title {
+   color: var(--builder-color-accent-inverse);
+    opacity: 0.3;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 12px;
+    display: block;
+    padding: 4px 10px;
+}
 
 .brxc-context-menu ul {
    list-style-type: none;
@@ -3950,7 +3980,7 @@ html body .class-contextual-menu-icon:hover {
    opacity: .5;
 }
 
-.brxc-context-menu ul li:first-child {
+/* .brxc-context-menu ul li:first-child {
    border-top-left-radius: var(--builder-border-radius);
    border-top-right-radius: var(--builder-border-radius)
 }
@@ -3958,7 +3988,7 @@ html body .class-contextual-menu-icon:hover {
 .brxc-context-menu ul li:last-child {
    border-bottom-left-radius: var(--builder-border-radius);
    border-bottom-right-radius: var(--builder-border-radius)
-}
+} */
 
 .brxc-context-menu ul li:hover:not(.convert) {
    background-color: var(--builder-gray-3);
@@ -3996,6 +4026,12 @@ html body .class-contextual-menu-icon:hover {
    color: inherit;
    display: inline-block;
    position: relative
+}
+.brxc-context-menu ul li span.error {
+   color: var(--builder-color-danger);
+}
+.brxc-context-menu ul li span.success {
+   color: var(--builder-color-success);
 }
 .brxc-context-menu ul li > span:first-child {
    display: flex;
@@ -7508,7 +7544,7 @@ Query Manager
     flex-direction: column;
 }
 
-#bricks-panel-element [data-controlkey="query"] [controlkey="query"]{
+#bricks-panel-element [data-controlkey="query"] [data-control="query"]{
    display: flex;
    flex-direction: row-reverse;
    align-items: center;
@@ -7517,7 +7553,7 @@ Query Manager
    min-width: 90px;
    margin-left: 0;
 }
-#bricks-panel-element [data-controlkey="query"] [controlkey="query"] .bricks-control-preview {
+#bricks-panel-element [data-controlkey="query"] [data-control="query"] .bricks-control-preview {
    margin-left: 0;
 }
 .brxc-global-query-loops {
@@ -7528,7 +7564,7 @@ Query Manager
 }
 .brxc-global-query-loops .icon{
    background-color: var(--builder-bg-2);
-   border-radius: 99vw;
+   border-radius: var(--builder-border-radius);
    padding: 5px;
    cursor: pointer;
    height: 28px;

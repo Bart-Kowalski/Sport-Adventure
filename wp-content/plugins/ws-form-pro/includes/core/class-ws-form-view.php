@@ -11,6 +11,10 @@
 		public $value;
 		public $status;
 
+		public $decimals;
+		public $thousand_separator;
+		public $decimal_separator;
+
 		public $count_submit = 0;
 		public $count_save = 0;
 		public $count_view = 0;
@@ -66,25 +70,27 @@
 
 				'percentage',
 				'percent',
-				'count'
+				'count',
+				'sum',
+				'average',
 
 			))) {
 
-				throw new Exception(__('Invalid type specified', 'ws-form'));
+				throw new Exception(esc_html__('Invalid type (WS_Form_View)', 'ws-form'));
 			}
 
 			// Get form ID
 			if(isset($atts['form_id'])) {
 
 				$this->form_id = absint($atts['form_id']);
-				if($this->form_id == 0) { throw new Exception(__('Invalid form ID specified', 'ws-form')); }
+				if($this->form_id == 0) { throw new Exception(esc_html__('Invalid form ID (WS_Form_View)', 'ws-form')); }
 			}
 
 			// Get field ID
 			if(isset($atts['field_id'])) {
 
 				$this->field_id = absint($atts['field_id']);
-				if($this->field_id == 0) { throw new Exception(__('Invalid field ID specified', 'ws-form')); }
+				if($this->field_id == 0) { throw new Exception(esc_html__('Invalid field ID (WS_Form_View)', 'ws-form')); }
 			}
 
 			// Get decimals
@@ -137,6 +143,7 @@
 
 		public function get_formatted_number($count) {
 
+			if(!is_numeric($count)) { $count = 0; }
 
 			return number_format(
 
@@ -256,13 +263,31 @@
 
 						break;
 
-					case 'average' :
-					case 'mean' :
+					case 'sum' :
 
-						// Get total submission records
+						// Get sum
 						$sql = $wpdb->prepare(
 
-							"SELECT AVG({$this->table_name_meta}.id), {$this->table_name_meta}.meta_value FROM {$this->table_name_meta} RIGHT JOIN {$this->table_name} ON {$this->table_name_meta}.parent_id = {$this->table_name}.id WHERE {$this->table_name_meta}.field_id = %d$where_sql GROUP BY meta_value;",
+							"SELECT SUM({$this->table_name_meta}.meta_value) FROM {$this->table_name_meta} RIGHT JOIN {$this->table_name} ON {$this->table_name_meta}.parent_id = {$this->table_name}.id WHERE {$this->table_name_meta}.field_id = %d$where_sql;",
+
+							$this->field_id
+						);
+
+						$sum = $wpdb->get_var($sql);
+
+						if($wpdb->last_error) {
+
+							throw new Exception($wpdb->last_error);
+						}
+
+						break;
+
+					case 'average' :
+
+						// Get average
+						$sql = $wpdb->prepare(
+
+							"SELECT AVG({$this->table_name_meta}.meta_value) FROM {$this->table_name_meta} RIGHT JOIN {$this->table_name} ON {$this->table_name_meta}.parent_id = {$this->table_name}.id WHERE {$this->table_name_meta}.field_id = %d$where_sql;",
 
 							$this->field_id
 						);
@@ -289,8 +314,11 @@
 
 					return self::get_formatted_number(($total > 0) ? (($count / $total) * 100) : 0) . '%';
 
+				case 'sum' :
+
+					return self::get_formatted_number($sum);
+
 				case 'average' :
-				case 'mean' :
 
 					return self::get_formatted_number($average);
 			}

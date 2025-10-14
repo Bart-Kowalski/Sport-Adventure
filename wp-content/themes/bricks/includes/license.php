@@ -225,7 +225,7 @@ class License {
 			}
 		}
 
-		// Activate license
+		// Send HTTP request to activate license
 		$response = Helpers::remote_post(
 			self::$remote_base_url . 'license/activate_license',
 			[
@@ -260,7 +260,15 @@ class License {
 			// Handle CloudFlare 403 "Forbidden" response
 			if ( $response_code === 403 ) {
 				$license_status = 'active';
-			} elseif ( $is_ajax ) {
+			}
+
+			// Handle Imunify360 415 "Unsupported Media Type" response (@since 2.0.2)
+			elseif ( $response_code === 415 ) {
+				$license_status = 'active';
+			}
+
+			// Return error
+			elseif ( $is_ajax ) {
 				wp_send_json_error(
 					[
 						'code'     => $response_code,

@@ -113,6 +113,7 @@
 			switch(obj_parent_type) {
 
 				case 'text' :
+				case 'email' :
 				case 'number' :
 				case 'rating' :
 				case 'range' :
@@ -131,6 +132,9 @@
 			obj_parent.on(obj_parent_event, function() {
 
 				ws_this.form_cascade_process(cascade_parent, cascade_child, obj_child_field);
+
+				// Process form bypass
+				ws_this.form_bypass();
 			});
 
 			// Initial process
@@ -288,6 +292,9 @@
 
 					// Call API
 					this.api_call_handle[obj_child_id] = this.api_call('field/' + obj_child_id + '/cascade/', 'GET', form_data, function(response) {
+
+						// Clear handle
+						ws_this.api_call_handle[obj_child_id] = false;
 
 						if(!response.data) { return; }
 
@@ -546,6 +553,9 @@
 
 					$(this).prop('checked', true).trigger('change');
 				});
+
+				// Trigger change event
+				$('input[type="checkbox"]', obj_child).first().trigger('change');
 
 				break;
 		}

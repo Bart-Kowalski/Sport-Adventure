@@ -259,9 +259,10 @@ class Filter_Range extends Filter_Element {
 			'required'    => [ 'displayMode', '!=', 'input' ],
 		];
 
+		// Bar
 		$this->controls['sliderBarHeight'] = [
 			'group'       => 'slider',
-			'label'       => esc_html__( 'Bar Height', 'bricks' ),
+			'label'       => esc_html__( 'Bar', 'bricks' ) . ':' . ' ' . esc_html__( 'Height', 'bricks' ),
 			'type'        => 'number',
 			'units'       => true,
 			'css'         => [
@@ -280,7 +281,7 @@ class Filter_Range extends Filter_Element {
 
 		$this->controls['sliderBarColor'] = [
 			'group'    => 'slider',
-			'label'    => esc_html__( 'Bar color', 'bricks' ),
+			'label'    => esc_html__( 'Bar', 'bricks' ) . ':' . ' ' . esc_html__( 'Color', 'bricks' ),
 			'type'     => 'color',
 			'css'      => [
 				[
@@ -293,7 +294,7 @@ class Filter_Range extends Filter_Element {
 
 		$this->controls['sliderBarColorActive'] = [
 			'group'    => 'slider',
-			'label'    => esc_html__( 'Bar color', 'bricks' ) . ' (' . esc_html__( 'Active', 'bricks' ) . ')',
+			'label'    => esc_html__( 'Bar', 'bricks' ) . ':' . ' ' . esc_html__( 'Color', 'bricks' ) . ' (' . esc_html__( 'Active', 'bricks' ) . ')',
 			'type'     => 'color',
 			'css'      => [
 				[
@@ -312,30 +313,10 @@ class Filter_Range extends Filter_Element {
 			'required' => [ 'displayMode', '!=', 'input' ],
 		];
 
-		$this->controls['sliderThumbColor'] = [
-			'group'    => 'slider',
-			'label'    => esc_html__( 'Thumb color', 'bricks' ),
-			'type'     => 'color',
-			'css'      => [
-				[
-					'property' => 'border-color',
-					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
-				],
-				[
-					'property' => 'border-color',
-					'selector' => '.double-slider-wrap input[type="range"]::-webkit-slider-thumb',
-				],
-				[
-					'property' => 'border-color',
-					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
-				],
-			],
-			'required' => [ 'displayMode', '!=', 'input' ],
-		];
-
+		// Thumb
 		$this->controls['sliderThumbSize'] = [
 			'group'       => 'slider',
-			'label'       => esc_html__( 'Thumb size', 'bricks' ),
+			'label'       => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Size', 'bricks' ),
 			'type'        => 'number',
 			'units'       => true,
 			'css'         => [
@@ -368,9 +349,46 @@ class Filter_Range extends Filter_Element {
 			'required'    => [ 'displayMode', '!=', 'input' ],
 		];
 
+		// @since 2.1
+		$this->controls['sliderThumbBackgroundColor'] = [
+			'group'    => 'slider',
+			'label'    => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Background color', 'bricks' ),
+			'type'     => 'color',
+			'css'      => [
+				[
+					'property' => 'background-color',
+					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
+				],
+				[
+					'property' => 'background-color',
+					'selector' => '.double-slider-wrap input[type="range"]::-webkit-slider-thumb',
+				],
+			],
+			'required' => [ 'displayMode', '!=', 'input' ],
+		];
+
+		// @since 2.1
+		$this->controls['sliderThumbBorderFull'] = [
+			'group'    => 'slider',
+			'label'    => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Border', 'bricks' ),
+			'type'     => 'border',
+			'css'      => [
+				[
+					'property' => 'border',
+					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
+				],
+				[
+					'property' => 'border',
+					'selector' => '.double-slider-wrap input[type="range"]::-webkit-slider-thumb',
+				],
+			],
+			'required' => [ 'displayMode', '!=', 'input' ],
+		];
+
 		$this->controls['sliderThumbBorder'] = [
+			'deprecated'  => '2.1',
 			'group'       => 'slider',
-			'label'       => esc_html__( 'Thumb border width', 'bricks' ),
+			'label'       => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Border width', 'bricks' ),
 			'type'        => 'number',
 			'units'       => true,
 			'css'         => [
@@ -385,6 +403,46 @@ class Filter_Range extends Filter_Element {
 			],
 			'placeholder' => '2px',
 			'required'    => [ 'displayMode', '!=', 'input' ],
+		];
+
+		$this->controls['sliderThumbColor'] = [
+			'deprecated' => '2.1',
+			'group'      => 'slider',
+			'label'      => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Border color', 'bricks' ),
+			'type'       => 'color',
+			'css'        => [
+				[
+					'property' => 'border-color',
+					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
+				],
+				[
+					'property' => 'border-color',
+					'selector' => '.double-slider-wrap input[type="range"]::-webkit-slider-thumb',
+				],
+				[
+					'property' => 'border-color',
+					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
+				],
+			],
+			'required'   => [ 'displayMode', '!=', 'input' ],
+		];
+
+		// @since 2.1
+		$this->controls['sliderThumbBoxShadow'] = [
+			'group'    => 'slider',
+			'label'    => esc_html__( 'Thumb', 'bricks' ) . ': ' . esc_html__( 'Box shadow', 'bricks' ),
+			'type'     => 'box-shadow',
+			'css'      => [
+				[
+					'property' => 'box-shadow',
+					'selector' => '.double-slider-wrap input[type="range"]::-moz-range-thumb',
+				],
+				[
+					'property' => 'box-shadow',
+					'selector' => '.double-slider-wrap input[type="range"]::-webkit-slider-thumb',
+				],
+			],
+			'required' => [ 'displayMode', '!=', 'input' ],
 		];
 	}
 

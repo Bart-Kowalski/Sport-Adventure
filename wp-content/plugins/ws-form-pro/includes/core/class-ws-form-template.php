@@ -8,8 +8,8 @@
 		public $file_config = false;
 		public $index = false;
 		public $category_index = false;
-		public $form_json = '';
-		public $form_object = false;
+		public $json = '';
+		public $object = false;
 		public $svg = '';
 
 		public $pro_required = false;
@@ -28,12 +28,12 @@
 		}
 
 		// Read template
-		public function read($include_file_paths = true, $get_svg = false, $svg_width = false, $svg_height = false, $get_form_object = true) {
+		public function read($include_file_paths = true, $get_svg = false, $svg_width = false, $svg_height = false, $get_object = true) {
 
 			self::db_check_id();
 
-			$templates = self::read_all(false, $include_file_paths, $get_svg, $svg_width, $svg_height, $get_form_object, $this->id);
-	
+			$templates = self::read_all(false, $include_file_paths, $get_svg, $svg_width, $svg_height, $get_object, $this->id);
+
 			if(isset($templates[$this->id])) {
 
 				$template = $templates[$this->id];
@@ -57,23 +57,24 @@
 					$this->svg = $template->svg;
 				}
 
-				// Get form object
-				if($get_form_object) {
+				// Get object
+				if($get_object) {
 
-					$this->form_object = $template->form_object;
-					$this->form_json = $template->form_json;
+					$this->object = $template->object;
+					$this->json = $template->json;
 				}
 
 				return $this;
 			}
 
+			/* translators: %s: Template ID */
 			self::db_throw_error(sprintf(__('Template not found: %s', 'ws-form'), $this->id));
 		}
 
 		// Get templates (read_config flattened)
-		public function read_all($config_files = false, $include_file_paths = true, $get_svg = true, $svg_width = false, $svg_height = false, $get_form_object = false, $template_id_filter = false) {
+		public function read_all($config_files = false, $include_file_paths = true, $get_svg = true, $svg_width = false, $svg_height = false, $get_object = false, $template_id_filter = false) {
 
-			$config = self::read_config($config_files, $include_file_paths, $get_svg, $svg_width, $svg_height, $get_form_object, $template_id_filter);
+			$config = self::read_config($config_files, $include_file_paths, $get_svg, $svg_width, $svg_height, $get_object, $template_id_filter);
 
 			$templates = array();
 
@@ -89,13 +90,16 @@
 		}
 
 		// Read config
-		public function read_config($config_files = false, $include_file_paths = true, $get_svg = true, $svg_width = false, $svg_height = false, $get_form_object = false, $template_id_filter = false, $get_hook = false) {
-
-			if($svg_width === false) { $svg_width = self::get_default_svg_width(); }
-			if($svg_height === false) { $svg_height = self::get_default_svg_height(); }
+		public function read_config($config_files = false, $include_file_paths = true, $get_svg = true, $svg_width = false, $svg_height = false, $get_object = false, $template_id_filter = false, $get_hook = false) {
 
 			// Check type
 			self::db_check_type();
+
+			$ws_form_form = new WS_Form_Form();
+
+			// Get SVG dimensions
+			if($svg_width === false) { $svg_width = self::get_default_svg_width(); }
+			if($svg_height === false) { $svg_height = self::get_default_svg_height(); }
 
 			// Reset full config
 			$this->config_full = array();
@@ -126,10 +130,14 @@
 
 				// Read config file
 				$config_file_string = file_get_contents($config_file);
+
+				/* translators: %s: Config file path */
 				if($config_file_string === false) { self::db_throw_error(sprintf(__('Unable to read template config file: %s', 'ws-form'), $config_file)); }
 
 				// JSON decode
 				$config_object = json_decode($config_file_string);
+
+				/* translators: %s: Config file path */
 				if(is_null($config_object)) { self::db_throw_error(sprintf(__('Unable to JSON decode template config file: %s', 'ws-form'), $config_file)); }
 
 				// Legacy
@@ -141,7 +149,7 @@
 
 				foreach($config_object->template_categories as $template_category_index => $template_category) {
 
-					// Legacy
+					// Get templates
 					if(isset($config_object->template_categories[$template_category_index]->wizards)) {
 
 						$config_object->template_categories[$template_category_index]->templates = $config_object->template_categories[$template_category_index]->wizards;
@@ -163,13 +171,18 @@
 					}
 
 					// Sort templates
-					usort($template_category->templates, function($a, $b) {
+					$sort_templates = isset($template_category->sort) ? $template_category->sort : true;
 
-						$a_label = strtolower($a->label);
-						$b_label = strtolower($b->label);
+					if($sort_templates) {
+						
+						usort($template_category->templates, function($a, $b) {
 
-						return ($a_label === $b_label) ? 0 : (($a_label < $b_label) ? -1 : 1);
-					});
+							$a_label = strtolower($a->label);
+							$b_label = strtolower($b->label);
+
+							return ($a_label === $b_label) ? 0 : (($a_label < $b_label) ? -1 : 1);
+						});
+					}
 
 					foreach($template_category->templates as $template_index => $template) {
 
@@ -218,79 +231,141 @@
 						// Form object
 						$form_object = null;
 
-						if($get_svg || $get_form_object) {
+						switch($this->type) {
 
-							if($file_json !== false) {
+							case 'form' :
+							case 'section' :
+							case 'preview' :
 
-								if(!file_exists($file_json)) { self::db_throw_error(sprintf(__('Unable to read template JSON file: %s', 'ws-form'), $file_json)); }
+								if($get_svg || $get_object) {
 
-								$form_json = file_get_contents($file_json);
+									if($file_json !== false) {
 
-							} else {
+										/* translators: %s: Template JSON file path */
+										if(!file_exists($file_json)) { self::db_throw_error(sprintf(__('Unable to read template JSON file: %s', 'ws-form'), $file_json)); }
 
-								$form_json = false;
-							}
+										$json = file_get_contents($file_json);
 
-							$config_object->template_categories[$template_category_index]->templates[$template_index]->form_json = $form_json;
+									} else {
 
-							if(!empty($form_json)) {
+										$json = false;
+									}
 
-								$form_object = WS_Form_Common::get_form_object_from_json($form_json);
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->json = $json;
 
-								$config_object->template_categories[$template_category_index]->templates[$template_index]->form_object = $form_object;
+									if(!empty($json)) {
 
-								// Checksum repair
-								if(
-									WS_FORM_TEMPLATE_CHECKSUM_REPAIR &&
-									!WS_Form_Common::form_object_checksum_check($form_object)
-								) {
+										// Get form object
+										$object = WS_Form_Common::get_object_from_json($json);
 
-									unset($form_object->checksum);
-									$checksum = md5(wp_json_encode($form_object));
-									$form_object->checksum = $checksum;
-									file_put_contents($file_json, wp_json_encode($form_object));
+										// Apply accessibility checks
+//										$object = $ws_form_form->form_accessibility($object);
+
+										// Checksum repair
+										if(
+											WS_FORM_TEMPLATE_CHECKSUM_REPAIR &&
+											!WS_Form_Common::object_checksum_check($object)
+										) {
+
+											unset($object->checksum);
+											$checksum = md5(wp_json_encode($object));
+											$object->checksum = $checksum;
+
+											file_put_contents($file_json, wp_json_encode($object));
+										}
+
+										// Set object
+										$config_object->template_categories[$template_category_index]->templates[$template_index]->object = $object;
+									}
 								}
-							}
-						}
 
-						// SVG
-						if($get_svg) {
+								// SVG
+								if($get_svg) {
 
-							$svg = '';
+									$svg = '';
 
-							if(isset($template->svg_icon)) {
+									if(isset($template->svg_icon)) {
 
-								$svg = self::get_svg_icon(
+										$svg = self::get_svg_icon(
 
-									$template->svg_icon,
-									isset($template->svg_sub_title) ? $template->svg_sub_title : false
-								);
+											$template->svg_icon,
+											isset($template->svg_sub_title) ? $template->svg_sub_title : false
+										);
 
-							} else {
+									} else {
 
-								$ws_form_form = new WS_Form_Form();
-								$svg = $ws_form_form->get_svg_from_form_object($form_object, false, $svg_width, $svg_height);
-							}
+										$svg = $ws_form_form->get_svg_from_form_object($object, false, $svg_width, $svg_height);
+									}
 
-							// Parse SVG
-							$svg = str_replace('#label', htmlentities($template->label), $svg);
+									// Parse SVG
+									$svg = str_replace('#label', esc_html($template->label), $svg);
 
-							// Set SVG
-							$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = $svg;
+									// Set SVG
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = $svg;
 
-							// Release memory
-							$svg = $ws_form_form = null;
+									// Release memory
+									$svg = null;
 
-						} else {
+								} else {
 
-							$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = '';
-						}
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = '';
+								}
 
-						// Remove form object if it is only required for the SVG
-						if($get_svg && !$get_form_object) {
+								// Remove form object if it is only required for the SVG
+								if($get_svg && !$get_object) {
 
-							unset($config_object->template_categories[$template_category_index]->templates[$template_index]->form_object);
-							unset($config_object->template_categories[$template_category_index]->templates[$template_index]->form_json);
+									unset($config_object->template_categories[$template_category_index]->templates[$template_index]->object);
+									unset($config_object->template_categories[$template_category_index]->templates[$template_index]->json);
+								}
+
+								break;
+
+							case 'style' :
+
+								if($get_svg || $get_object) {
+
+									if($file_json !== false) {
+
+										/* translators: %s: Template JSON file path */
+										if(!file_exists($file_json)) { self::db_throw_error(sprintf(__('Unable to read template JSON file: %s', 'ws-form'), $file_json)); }
+
+										$json = file_get_contents($file_json);
+
+									} else {
+
+										$json = false;
+									}
+
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->json = $json;
+
+									if(!empty($json)) {
+
+										$object = WS_Form_Common::get_object_from_json($json);
+
+										$config_object->template_categories[$template_category_index]->templates[$template_index]->object = $object;
+									}
+								}
+
+								if($get_svg) {
+
+									$ws_form_style = new WS_Form_Style();
+									$svg = $ws_form_style->get_svg_from_style_object($object, false, $svg_width, $svg_height);
+
+									// Parse SVG
+									$svg = str_replace('#label', esc_html($template->label), $svg);
+
+									// Set SVG
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = $svg;
+
+									// Release memory
+									$svg = $ws_form_style = null;
+
+								} else {
+
+									$config_object->template_categories[$template_category_index]->templates[$template_index]->svg = '';
+								}
+
+								break;
 						}
 
 						$form_object = null;
@@ -428,6 +503,7 @@
 			// Load config file
 			if(!file_exists($file_config)) {
 
+				/* translators: %s: Config file name */
 				parent::db_throw_error(sprintf(__('Unable to open config.json file: %s', 'ws-form'), $file_config));
 			}
 			$config_file_json = file_get_contents($file_config);
@@ -436,6 +512,7 @@
 			$config_object = json_decode($config_file_json);
 			if(is_null($config_object)) {
 
+				/* translators: %s: Config file name */
 				parent::db_throw_error(sprintf(__('Unable to decode config.json file: %s', 'ws-form'), $file_config));
 			}
 
@@ -481,6 +558,7 @@
 			// Write config file
 			if(file_put_contents($file_config, wp_json_encode($config_object)) === false) {
 
+				/* translators: %s: Config file name */
 				parent::db_throw_error(sprintf(__('Unable to write config.json file: %s', 'ws-form'), $file_config));
 			}
 
@@ -489,6 +567,7 @@
 
 			if(file_put_contents($template_file_name, wp_json_encode($form_object)) === false) {
 
+				/* translators: %s: Template file path */
 				parent::db_throw_error(sprintf(__('Unable to write template file: %s', 'ws-form'), $template_file_name));
 			}
 		}
@@ -648,13 +727,24 @@
 			$svg_width = WS_FORM_TEMPLATE_SVG_WIDTH_FORM;
 			$svg_height = WS_FORM_TEMPLATE_SVG_HEIGHT_FORM;
 
-			// Colors
-			$color_form_background = WS_Form_Common::option_get('skin_color_form_background');
-			if($color_form_background == '') { $color_form_background = '#ffffff'; }
+			if(WS_Form_Common::styler_enabled()) {
 
-			$color_default = WS_Form_Common::option_get('skin_color_default');
-			$color_default_inverted = WS_Form_Common::option_get('skin_color_default_inverted');
-			$color_default_lighter = WS_Form_Common::option_get('skin_color_default_lighter');
+				// Colors
+				$color_form_background = WS_Form_Color::get_color_base_contrast();
+				$color_default = WS_Form_Color::get_color_base();
+				$color_default_inverted = WS_Form_Color::get_color_base_contrast();
+
+			} else {
+
+				// Colors
+				$color_form_background = WS_Form_Common::option_get('skin_color_form_background');
+				if($color_form_background == '') { $color_form_background = '#ffffff'; }
+
+				$color_default = WS_Form_Common::option_get('skin_color_default');
+				$color_default_inverted = WS_Form_Common::option_get('skin_color_default_inverted');
+			}
+
+			if($this->type !== 'style') {
 ?>
 <!-- Blank -->
 <li>
@@ -667,6 +757,8 @@
 </li>
 <!-- /Blank -->
 <?php
+			}
+
 			if(isset($template_category->templates)) {
 
 				// Loop through templates
@@ -682,7 +774,7 @@
 <?php
 					if($template->pro_required) {
 ?>
-	<a class="wsf-button wsf-button-primary wsf-button-full" href="<?php WS_Form_Common::echo_esc_attr(WS_Form_Common::get_plugin_website_url('', 'add_form')); ?>" target="_blank"><?php esc_html_e('Upgrade to PRO', 'ws-form'); ?></a>
+	<a class="wsf-button wsf-button-primary wsf-button-full" href="<?php WS_Form_Common::echo_esc_url(WS_Form_Common::get_plugin_website_url('', 'add_form')); ?>" target="_blank"><?php esc_html_e('Upgrade to PRO', 'ws-form'); ?></a>
 <?php
 					} else {
 
@@ -703,7 +795,7 @@
 
 					if($template->preview_url !== false) {
 ?>
-	<a class="wsf-preview" href="<?php WS_Form_Common::echo_esc_attr($template->preview_url); ?>" target="_blank"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview Template', 'ws-form'); ?></a>
+	<a class="wsf-preview" href="<?php WS_Form_Common::echo_esc_url($template->preview_url); ?>" target="_blank"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview Template', 'ws-form'); ?></a>
 <?php
 					}
 ?>
@@ -902,7 +994,7 @@
 		// Check type
 		public function db_check_type() {
 
-			if(!in_array($this->type, array('form', 'section'))) { parent::db_throw_error(__('Invalid template type', 'ws-form')); }
+			if(!in_array($this->type, array('form', 'section', 'preview', 'style'))) { parent::db_throw_error(__('Invalid template type', 'ws-form')); }
 			return true;
 		}
 

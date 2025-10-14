@@ -29,7 +29,14 @@ class Fields {
 	 * @since 1.12.2
 	 */
 	public function register_providers() {
-		$providers = [ 'acf', 'metabox' ];
+		// bricks/query_filters_cf_integration/register_providers Undocumented (@since 2.0.2)
+		$providers = apply_filters(
+			'bricks/query_filters_cf_integration/register_providers',
+			[
+				'acf',
+				'metabox'
+			]
+		);
 
 		foreach ( $providers as $provider ) {
 			$provider_class = 'Bricks\Integrations\Query_Filters\Field_' . ucfirst( $provider );

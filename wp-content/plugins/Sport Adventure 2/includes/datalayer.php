@@ -149,8 +149,14 @@ function sa_get_standardized_product_data($product, $variation_data = null, $acf
     }
 
     // Get trip dates based on product type
-    if ($base_product->is_type('variable')) {
-        // For variable products, get all variation dates
+    if ($product->is_type('variation')) {
+        // For variations, just get its own termin
+        $termin = $product->get_attribute('pa_termin');
+        if ($termin) {
+            $data['trip_dates'] = array($termin);
+        }
+    } elseif ($base_product->is_type('variable')) {
+        // For variable products, get all variation dates (only when not in cart context)
         $variations = $base_product->get_available_variations();
         $trip_dates = array();
         foreach ($variations as $variation) {
@@ -159,12 +165,6 @@ function sa_get_standardized_product_data($product, $variation_data = null, $acf
             }
         }
         $data['trip_dates'] = array_values(array_unique($trip_dates));
-    } elseif ($product->is_type('variation')) {
-        // For variations, just get its own termin
-        $termin = $product->get_attribute('pa_termin');
-        if ($termin) {
-            $data['trip_dates'] = array($termin);
-        }
     }
 
     // Get price and currency from ACF fields

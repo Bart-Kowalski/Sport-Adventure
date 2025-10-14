@@ -8,7 +8,7 @@ class Element_Form extends Element {
 	public $name     = 'form';
 	public $icon     = 'ti-layout-cta-left';
 	public $tag      = 'form';
-	public $scripts  = [ 'bricksForm' ];
+	public $scripts  = [ 'bricksForm', 'bricksTinyMCE' ];
 
 	public function get_label() {
 		return esc_html__( 'Form', 'bricks' );
@@ -45,6 +45,21 @@ class Element_Form extends Element {
 					if ( $l10n ) {
 						// Hosted locally (@since 2.0)
 						wp_enqueue_script( 'bricks-flatpickr-l10n', BRICKS_URL_ASSETS . "js/libs/flatpickr-l10n/$l10n.min.js", [ 'bricks-flatpickr' ], null );
+					}
+				}
+
+				// Rich text editor: TinyMCE (@since 2.1)
+				if ( $field['type'] === 'richtext' ) {
+					if ( ! bricks_is_builder() ) {
+						wp_enqueue_script( 'bricks-tinymce8' );
+						wp_enqueue_media(); // "Add media" button to open media modal
+					}
+				}
+
+				// Image. Enqueue media (updatePostId) (@since 2.1)
+				if ( $field['type'] === 'image' ) {
+					if ( ! bricks_is_builder() ) {
+						wp_enqueue_media();
 					}
 				}
 			}
@@ -118,7 +133,16 @@ class Element_Form extends Element {
 			'required' => [ 'actions', '=', 'reset-password' ],
 		];
 
-		// @since 1.9.2
+		$this->control_groups['createPost'] = [
+			'title'    => esc_html__( 'Create post', 'bricks' ),
+			'required' => [ 'actions', '=', 'create-post' ],
+		];
+
+		$this->control_groups['updatePost'] = [
+			'title'    => esc_html__( 'Update post', 'bricks' ),
+			'required' => [ 'actions', '=', 'update-post' ],
+		];
+
 		if ( \Bricks\Database::get_setting( 'saveFormSubmissions', false ) ) {
 			$this->control_groups['save-submission'] = [
 				'title'    => esc_html__( 'Save submission', 'bricks' ),
@@ -126,7 +150,6 @@ class Element_Form extends Element {
 			];
 		}
 
-		// @since 1.11.1
 		$this->control_groups['unlock-password-protection'] = [
 			'title'    => esc_html__( 'Unlock password protection', 'bricks' ),
 			'required' => [ 'actions', '=', 'unlock-password-protection' ],
@@ -157,9 +180,12 @@ class Element_Form extends Element {
 						'email'      => esc_html__( 'Email', 'bricks' ),
 						'text'       => esc_html__( 'Text', 'bricks' ),
 						'textarea'   => esc_html__( 'Textarea', 'bricks' ),
-						'tel'        => esc_html__( 'Tel', 'bricks' ),
+						'richtext'   => esc_html__( 'Rich text', 'bricks' ),
+						'tel'        => esc_html__( 'Telephone', 'bricks' ),
 						'number'     => esc_html__( 'Number', 'bricks' ),
-						'url'        => esc_html__( 'URL', 'bricks' ),
+						'url'        => 'URL',
+						'image'      => esc_html__( 'Image', 'bricks' ) . ' (' . esc_html__( 'Media library', 'bricks' ) . ')',
+						'gallery'    => esc_html__( 'Gallery', 'bricks' ) . ' (' . esc_html__( 'Media library', 'bricks' ) . ')',
 						'checkbox'   => esc_html__( 'Checkbox', 'bricks' ),
 						'select'     => esc_html__( 'Select', 'bricks' ),
 						'radio'      => esc_html__( 'Radio', 'bricks' ),
@@ -352,12 +378,39 @@ class Element_Form extends Element {
 					],
 				],
 
-				// @since 1.9.9
 				'spellcheck'                 => [
 					'label'    => esc_html__( 'Attribute', 'bricks' ) . ': ' . esc_html__( 'Spellcheck', 'bricks' ),
 					'type'     => 'text',
 					'info'     => 'off, etc.',
 					'required' => [ 'type', '=', [ 'text', 'textarea', 'email', 'url' ] ],
+				],
+
+				// @since 2.0.2
+				'pattern'                    => [
+					'label'    => esc_html__( 'Attribute', 'bricks' ) . ': ' . esc_html__( 'Pattern', 'bricks' ),
+					'type'     => 'text',
+					'info'     => esc_html__( 'Regular expression to validate the input.', 'bricks' ),
+					'required' => [ 'type', '=', [ 'text', 'tel', 'email', 'url', 'password', 'search' ] ],
+					'desc'     => sprintf(
+						'%s: ^[a-zA-Z0-9]+$ (%s). %s',
+						esc_html__( 'Example', 'bricks' ),
+						esc_html__( 'alphanumeric characters only', 'bricks' ),
+						Helpers::article_link( 'form-element/#pattern-validation', esc_html__( 'Learn more', 'bricks' ) )
+					),
+				],
+
+				// @since 2.0.2 (title attribute, used for pattern, but can be added to any input field)
+				'title'                      => [
+					'label'    => esc_html__( 'Attribute', 'bricks' ) . ': ' . esc_html__( 'Title', 'bricks' ),
+					'type'     => 'text',
+					'info'     => esc_html__( 'Text to display when hovering over the field.', 'bricks' ),
+					'required' => [ 'type', '!=', [ 'hidden', 'radio', 'checkbox', 'files', 'html', 'rememberme' ] ],
+				],
+
+				'titleInfo'                  => [
+					'content'  => esc_html__( 'You can use the title attribute to provide a description of the expected input value to meet the "pattern" requirement set above.', 'bricks' ),
+					'type'     => 'info',
+					'required' => [ 'pattern', '!=', '' ]
 				],
 
 				'errorMessage'               => [
@@ -487,8 +540,7 @@ class Element_Form extends Element {
 						],
 					],
 					'required'    => [
-						[ 'type', '!=', 'hidden' ],
-						// [ 'columns', '=', '' ],
+						[ 'type', '!=', [ 'hidden', 'richtext' ] ],
 					],
 				],
 
@@ -608,6 +660,103 @@ class Element_Form extends Element {
 						'<a href="https://developer.wordpress.org/reference/functions/wp_kses_post/" target="_blank">wp_kses_post</a>'
 					),
 					'required'     => [ 'type', '=', [ 'html' ] ],
+				],
+
+				// Rich text - TinyMCE (@since 2.1)
+				'tinyMceShowMenuBar'         => [
+					'label'    => esc_html__( 'Menu bar', 'bricks' ),
+					'type'     => 'checkbox',
+					'required' => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceShowStatusBar'       => [
+					'label'    => esc_html__( 'Status bar', 'bricks' ),
+					'type'     => 'checkbox',
+					'required' => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceHighlightOnFocus'    => [
+					'label'    => esc_html__( 'Highlight on focus', 'bricks' ),
+					'type'     => 'checkbox',
+					'default'  => false,
+					'required' => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceToolbarSticky'       => [
+					'label'    => esc_html__( 'Toolbar', 'bricks' ) . ': ' . esc_html__( 'Sticky', 'bricks' ),
+					'type'     => 'checkbox',
+					'required' => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceToolbarLocation'     => [
+					'label'       => esc_html__( 'Toolbar', 'bricks' ) . ': ' . esc_html__( 'Location', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'top'    => esc_html__( 'Top', 'bricks' ),
+						'bottom' => esc_html__( 'Bottom', 'bricks' ),
+						'auto'   => esc_html__( 'Auto', 'bricks' ),
+					],
+					'placeholder' => esc_html__( 'Top', 'bricks' ),
+					'required'    => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceSkin'                => [
+					'label'       => esc_html__( 'Skin', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'oxide'      => 'Oxide light',
+						'oxide-dark' => 'Oxide dark',
+					],
+					'placeholder' => 'Oxide light',
+					'required'    => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceContentCss'          => [
+					'label'       => esc_html__( 'Content', 'bricks' ) . ': ' . esc_html__( 'Style', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'default'        => esc_html__( 'Light', 'bricks' ),
+						'dark'           => esc_html__( 'Dark', 'bricks' ),
+						'document'       => 'Document',
+						'writer'         => 'Writer',
+						'tinymce-5'      => 'TinyMCE 5',
+						'tinymce-5-dark' => 'TinyMCE 5 Dark',
+					],
+					'placeholder' => esc_html__( 'Light', 'bricks' ),
+					'required'    => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceResize'              => [
+					'label'       => esc_html__( 'Resize', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'both'       => esc_html__( 'Horizontal', 'bricks' ) . ' & ' . esc_html__( 'Vertical', 'bricks' ),
+						'vertically' => esc_html__( 'Vertical', 'bricks' ),
+						'disabled'   => esc_html__( 'Disabled', 'bricks' ),
+					],
+					'placeholder' => esc_html__( 'Horizontal', 'bricks' ) . ' & ' . esc_html__( 'Vertical', 'bricks' ),
+					'required'    => [ [ 'tinyMceShowStatusBar', '=', true ], [ 'type', '=', 'richtext' ] ],
+				],
+
+				'tinyMceImagesFileTypes'     => [
+					'label'       => esc_html__( 'Images file types', 'bricks' ),
+					'type'        => 'text',
+					'placeholder' => 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp',
+					'required'    => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceHeight'              => [
+					'label'    => esc_html__( 'Height', 'bricks' ),
+					'type'     => 'text',
+					'inline'   => true,
+					'required' => [ 'type', '=', 'richtext' ],
+				],
+
+				'tinyMceWidth'               => [
+					'label'    => esc_html__( 'Width', 'bricks' ),
+					'type'     => 'text',
+					'inline'   => true,
+					'required' => [ 'type', '=', 'richtext' ],
 				],
 			],
 
@@ -1439,7 +1588,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Email', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [], // NOTE: Auto-populate with form fields
 			'map_fields'  => true, // NOTE: Undocumented
 			'required'    => [ 'apiKeyMailchimp', '!=', '', 'globalSettings' ],
 		];
@@ -1450,7 +1599,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'First name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 			'required'    => [ 'apiKeyMailchimp', '!=', '', 'globalSettings' ],
 		];
@@ -1461,7 +1610,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Last name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 			'required'    => [ 'apiKeyMailchimp', '!=', '', 'globalSettings' ],
 		];
@@ -1514,8 +1663,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Email', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 			'required'    => [ 'apiKeySendgrid', '!=', '', 'globalSettings' ],
 		];
 
@@ -1525,7 +1674,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'First name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 			'required'    => [ 'apiKeySendgrid', '!=', '', 'globalSettings' ],
 		];
@@ -1536,7 +1685,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Last name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 			'required'    => [ 'apiKeySendgrid', '!=', '', 'globalSettings' ],
 		];
@@ -1570,8 +1719,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Login', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 		];
 
 		$this->controls['loginPassword'] = [
@@ -1580,8 +1729,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Password', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 		];
 
 		$this->controls['loginRemember'] = [
@@ -1590,7 +1739,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Remember me', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 		];
 
@@ -1610,8 +1759,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Email', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 		];
 
 		$this->controls['registrationPassword'] = [
@@ -1620,8 +1769,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Password', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 			'description' => esc_html__( 'Autogenerated if no password is required/submitted.', 'bricks' ),
 		];
 
@@ -1638,8 +1787,8 @@ class Element_Form extends Element {
 			'group'       => 'registration',
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'User name', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'description' => esc_html__( 'Auto-generated if form only requires email address for registration.', 'bricks' ),
 		];
@@ -1650,7 +1799,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'First name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 		];
 
@@ -1660,7 +1809,7 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Last name', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
+			'options'     => [],
 			'map_fields'  => true,
 		];
 
@@ -1688,13 +1837,16 @@ class Element_Form extends Element {
 			'placeholder' => $role_names[ $default_user_role ] ?? '',
 		];
 
-		$this->controls['registrationAutoLogin'] = [
-			'tab'         => 'content',
-			'group'       => 'registration',
-			'label'       => esc_html__( 'Auto log in user', 'bricks' ),
-			'type'        => 'checkbox',
-			'description' => esc_html__( 'Log in user after successful registration. Tip: Set action "Redirect" to redirect user to the account/admin area.', 'bricks' ),
-		];
+		// Only show if user activation is disabled (@since 2.1)
+		if ( ! Database::get_setting( 'userActivationEnabled' ) ) {
+			$this->controls['registrationAutoLogin'] = [
+				'tab'         => 'content',
+				'group'       => 'registration',
+				'label'       => esc_html__( 'Auto log in user', 'bricks' ),
+				'type'        => 'checkbox',
+				'description' => esc_html__( 'Log in user after successful registration. Tip: Set action "Redirect" to redirect user to the account/admin area.', 'bricks' ),
+			];
+		}
 
 		// Send WordPress notification (@since 1.12.2)
 		$this->controls['registrationWPNotification'] = [
@@ -1716,8 +1868,8 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Email or username', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 		];
 
 		// Group: Reset password
@@ -1728,8 +1880,376 @@ class Element_Form extends Element {
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Password', 'bricks' ),
 			'placeholder' => esc_html__( 'Select', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
+		];
+
+		// Group: Create post (@since 2.1)
+
+		// Fetch all custom post types
+		$all_post_types    = bricks_is_builder() ? get_post_types( [ 'public' => true ], 'objects' ) : [];
+		$post_type_options = [];
+		foreach ( $all_post_types as $post_type ) {
+			$post_type_options[ $post_type->name ] = $post_type->labels->singular_name;
+		}
+
+		// Fetch all post statuses
+		$post_statuses       = bricks_is_builder() ? get_post_stati( [], 'objects' ) : [];
+		$post_status_options = [];
+		foreach ( $post_statuses as $status ) {
+			// Exclude internal statuses like 'auto-draft' and 'inherit' if not needed
+			if ( ! in_array( $status->name, [ 'auto-draft', 'inherit' ], true ) ) {
+				$post_status_options[ $status->name ] = $status->label;
+			}
+		}
+
+		$this->controls['createPostType'] = [
+			'tab'     => 'content',
+			'group'   => 'createPost',
+			'label'   => esc_html__( 'Post type', 'bricks' ),
+			'type'    => 'select',
+			'options' => $post_type_options,
+		];
+
+		// Capability check info
+		$this->controls['createPostCapabilityCheck'] = [
+			'tab'      => 'content',
+			'group'    => 'createPost',
+			'type'     => 'info',
+			'content'  => esc_html__( 'The form is not rendered if the current user is lacking the required capability.', 'bricks' ),
+			'required' => [ 'createPostDisableCapabilityCheck', '=', false ],
+		];
+
+		// Error message if user can't create the post
+		$this->controls['createPostErrorMessage'] = [
+			'tab'      => 'content',
+			'group'    => 'createPost',
+			'label'    => esc_html__( 'Error message', 'bricks' ),
+			'desc'     => esc_html__( 'Custom error message to display when the current user does not have the required capability to create the post.', 'bricks' ),
+			'type'     => 'text',
+			'required' => [
+				[ 'createPostType', '!=', '' ],
+				[ 'createPostDisableCapabilityCheck', '=', false ],
+			],
+		];
+
+		// Disable capability checks
+		$this->controls['createPostDisableCapabilityCheck'] = [
+			'tab'      => 'content',
+			'group'    => 'createPost',
+			'label'    => esc_html__( 'Disable capability checks', 'bricks' ),
+			'type'     => 'checkbox',
+			'required' => [ 'createPostType', '!=', '' ],
+		];
+
+		// Security warning
+		$this->controls['createPostSecurityWarning'] = [
+			'tab'      => 'content',
+			'group'    => 'createPost',
+			'type'     => 'info',
+			'error'    => true,
+			'content'  => '<strong>' . esc_html__( 'Security warning', 'bricks' ) . '</strong>: ' . esc_html__( 'You have disabled the capability checks. Now anyone, including non-logged-in visitors, can create posts through this form. This can lead to unauthorized content creation, spam and malicious posts, database pollution, and potential security breaches. Only use this setting if you have alternative security measures in place, the form is on a protected page, or you fully understand the security implications.', 'bricks' ),
+			'required' => [ 'createPostDisableCapabilityCheck', '=', true ],
+		];
+
+		// Info control about mapping the fields to the post data
+		$this->controls['createPostSep'] = [
+			'tab'   => 'content',
+			'group' => 'createPost',
+			'type'  => 'separator',
+			'label' => esc_html__( 'Field mapping', 'bricks' ),
+			'desc'  => esc_html__( 'Connect the form fields to the post data that you want to create on form submit.', 'bricks' ),
+		];
+
+		$this->controls['createPostTitle'] = [
+			'tab'         => 'content',
+			'group'       => 'createPost',
+			'label'       => esc_html__( 'Post title', 'bricks' ),
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'required'    => [ 'createPostType', '!=', '' ],
+		];
+
+		$this->controls['createPostContent'] = [
+			'tab'         => 'content',
+			'group'       => 'createPost',
+			'label'       => esc_html__( 'Post content', 'bricks' ),
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'required'    => [ 'createPostType', '!=', '' ],
+		];
+
+		$this->controls['createPostExcerpt'] = [
+			'tab'         => 'content',
+			'group'       => 'createPost',
+			'label'       => esc_html__( 'Post excerpt', 'bricks' ),
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'required'    => [ 'createPostType', '!=', '' ],
+		];
+
+		$this->controls['createPostFeaturedImage'] = [
+			'tab'         => 'content',
+			'group'       => 'createPost',
+			'label'       => esc_html__( 'Featured image', 'bricks' ),
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => [ 'type' => 'image' ],
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'required'    => [ 'createPostType', '!=', '' ],
+		];
+
+		$this->controls['createPostStatus'] = [
+			'tab'         => 'content',
+			'group'       => 'createPost',
+			'label'       => esc_html__( 'Post status', 'bricks' ),
+			'placeholder' => esc_html__( 'Draft', 'bricks' ),
+			'type'        => 'select',
+			'options'     => $post_status_options,
+			'required'    => [ 'createPostType', '!=', '' ],
+		];
+
+		// Post meta
+
+		$this->controls['createPostMeta'] = [
+			'tab'           => 'content',
+			'group'         => 'createPost',
+			'label'         => esc_html__( 'Post meta', 'bricks' ),
+			'type'          => 'repeater',
+			'titleProperty' => 'metaKey',
+			'fields'        => [
+				'metaKey'            => [
+					'label' => esc_html__( 'Meta key', 'bricks' ),
+					'type'  => 'text',
+				],
+
+				'metaValue'          => [
+					'label'       => esc_html__( 'Meta value', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [],
+					'map_fields'  => true,
+					'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+				],
+				'sanitizationMethod' => [
+					'label'       => esc_html__( 'Sanitization method', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'sanitize_text_field' => esc_html__( 'Text', 'bricks' ) . ' (sanitize_text_field)',
+						'intval'              => esc_html__( 'Integer', 'bricks' ) . ' (intval)',
+						'floatval'            => esc_html__( 'Float', 'bricks' ) . ' (floatval)',
+						'sanitize_email'      => esc_html__( 'Email', 'bricks' ) . ' (sanitize_email)',
+						'esc_url'             => esc_html__( 'URL', 'bricks' ) . ' (esc_url)',
+						'wp_kses_post'        => esc_html__( 'Post', 'bricks' ) . ' (wp_kses_post)',
+					],
+					'placeholder' => esc_html__( 'Text', 'bricks' ) . ' (sanitize_text_field)',
+				]
+			],
+			'required'      => [ 'createPostType', '!=', '' ],
+		];
+
+		// Taxonomies
+
+		$this->controls['createPostTaxonomies'] = [
+			'tab'           => 'content',
+			'group'         => 'createPost',
+			'label'         => esc_html__( 'Taxonomies', 'bricks' ),
+			'type'          => 'repeater',
+			'titleProperty' => 'taxonomy',
+			'fields'        => [
+				'taxonomy' => [
+					'label'       => esc_html__( 'Taxonomy', 'bricks' ),
+					'type'        => 'select',
+					'options'     => Setup::$control_options['taxonomies'],
+					'placeholder' => esc_html__( 'Select', 'bricks' ),
+				],
+				'fieldId'  => [
+					'label'       => esc_html__( 'Field', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [],
+					'map_fields'  => true,
+					'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+				],
+			],
+			'required'      => [ 'createPostType', '!=', '' ],
+		];
+
+		// Group: Update post (@since 2.1)
+
+		$this->controls['updatePostId'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Post to update', 'bricks' ),
+			'type'        => 'select',
+			'optionsAjax' => [
+				'action'   => 'bricks_get_posts',
+				'postType' => 'any',
+			],
+			'searchable'  => true,
+			'placeholder' => esc_html__( 'Select post/page', 'bricks' ),
+			'desc'        => esc_html__( 'Leave empty to update the current post.', 'bricks' ),
+		];
+
+		// Capability check info
+		$this->controls['updatePostCapabilityCheck'] = [
+			'tab'      => 'content',
+			'group'    => 'updatePost',
+			'type'     => 'info',
+			'content'  => esc_html__( 'The form is not rendered if the current user is lacking the required capability.', 'bricks' ),
+			'required' => [ 'updatePostDisableCapabilityCheck', '=', false ],
+		];
+
+		// Error message if user can't edit the post
+		$this->controls['updatePostErrorMessage'] = [
+			'tab'   => 'content',
+			'group' => 'updatePost',
+			'label' => esc_html__( 'Error message', 'bricks' ),
+			'desc'  => esc_html__( 'Custom error message to display when the current user does not have the required capability to edit the post.', 'bricks' ),
+			'type'  => 'text',
+		];
+
+		// Disable capability checks
+		$this->controls['updatePostDisableCapabilityCheck'] = [
+			'tab'   => 'content',
+			'group' => 'updatePost',
+			'label' => esc_html__( 'Disable capability checks', 'bricks' ),
+			'type'  => 'checkbox',
+		];
+
+		// Security warning
+		$this->controls['updatePostSecurityWarning'] = [
+			'tab'      => 'content',
+			'group'    => 'updatePost',
+			'type'     => 'info',
+			'error'    => true,
+			'content'  => '<strong>' . esc_html__( 'Security warning', 'bricks' ) . '</strong>: ' . esc_html__( 'You have disabled the capability checks. Now anyone, including non-logged-in visitors, can edit the post through this form. This can lead to unauthorized content creation, spam and malicious posts, database pollution, and potential security breaches. Only use this setting if you have alternative security measures in place, the form is on a protected page, or you fully understand the security implications.', 'bricks' ),
+			'required' => [ 'updatePostDisableCapabilityCheck', '=', true ],
+		];
+
+		// Info control about mapping the fields to the post data
+
+		$this->controls['updatePostSep'] = [
+			'tab'   => 'content',
+			'group' => 'updatePost',
+			'type'  => 'separator',
+			'label' => esc_html__( 'Field mapping', 'bricks' ),
+			'desc'  => esc_html__( 'Connect the form fields to the post data that you want to update on form submit.', 'bricks' ),
+		];
+
+		$this->controls['updatePostTitle'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Post title', 'bricks' ),
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+		];
+
+		$this->controls['updatePostContent'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Post content', 'bricks' ),
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+		];
+
+		$this->controls['updatePostExcerpt'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Post excerpt', 'bricks' ),
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => true,
+		];
+
+		$this->controls['updatePostFeaturedImage'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Featured image', 'bricks' ),
+			'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+			'type'        => 'select',
+			'options'     => [],
+			'map_fields'  => [ 'type' => 'image' ],
+		];
+
+		$this->controls['updatePostStatus'] = [
+			'tab'         => 'content',
+			'group'       => 'updatePost',
+			'label'       => esc_html__( 'Post status', 'bricks' ),
+			'placeholder' => esc_html__( 'Current', 'bricks' ),
+			'type'        => 'select',
+			'options'     => $post_status_options,
+		];
+
+		// Post meta
+
+		$this->controls['updatePostMeta'] = [
+			'tab'           => 'content',
+			'group'         => 'updatePost',
+			'label'         => esc_html__( 'Post meta', 'bricks' ),
+			'type'          => 'repeater',
+			'titleProperty' => 'metaKey',
+			'fields'        => [
+				'metaKey'            => [
+					'label' => esc_html__( 'Meta key', 'bricks' ),
+					'type'  => 'text',
+				],
+				'metaValue'          => [
+					'label'       => esc_html__( 'Meta value', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [],
+					'map_fields'  => true,
+					'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+				],
+				'sanitizationMethod' => [
+					'label'       => esc_html__( 'Sanitization method', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [
+						'sanitize_text_field' => esc_html__( 'Text', 'bricks' ) . ' (sanitize_text_field)',
+						'intval'              => esc_html__( 'Integer', 'bricks' ) . ' (intval)',
+						'floatval'            => esc_html__( 'Float', 'bricks' ) . ' (floatval)',
+						'sanitize_email'      => esc_html__( 'Email', 'bricks' ) . ' (sanitize_email)',
+						'esc_url'             => esc_html__( 'URL', 'bricks' ) . ' (esc_url)',
+						'wp_kses_post'        => esc_html__( 'Post', 'bricks' ) . ' (wp_kses_post)',
+						'none'                => esc_html__( 'None', 'bricks' ),
+					],
+					'placeholder' => esc_html__( 'Text', 'bricks' ) . ' (sanitize_text_field)',
+				],
+			],
+		];
+
+		// Taxonomies
+
+		$this->controls['updatePostTaxonomies'] = [
+			'tab'           => 'content',
+			'group'         => 'updatePost',
+			'label'         => esc_html__( 'Taxonomies', 'bricks' ),
+			'type'          => 'repeater',
+			'titleProperty' => 'taxonomy',
+			'fields'        => [
+				'taxonomy' => [
+					'label'       => esc_html__( 'Taxonomy', 'bricks' ),
+					'type'        => 'select',
+					'options'     => Setup::$control_options['taxonomies'],
+					'placeholder' => esc_html__( 'Select', 'bricks' ),
+				],
+				'fieldId'  => [
+					'label'       => esc_html__( 'Field', 'bricks' ),
+					'type'        => 'select',
+					'options'     => [],
+					'map_fields'  => true,
+					'placeholder' => esc_html__( 'Select', 'bricks' ) . ' (' . esc_html__( 'Field', 'bricks' ) . ')',
+				],
+			],
 		];
 
 		// Group: Spam Protection
@@ -1991,14 +2511,14 @@ class Element_Form extends Element {
 			];
 		}
 
-		// Password protection (@since 1.11.1)
+		// Password protection
 		$this->controls['passwordProtectionPassword'] = [
 			'tab'         => 'content',
 			'group'       => 'unlock-password-protection',
 			'label'       => esc_html__( 'Field', 'bricks' ) . ': ' . esc_html__( 'Password', 'bricks' ),
 			'type'        => 'select',
-			'options'     => [], // Auto-populate with form fields
-			'map_fields'  => true, // NOTE: Undocumented
+			'options'     => [],
+			'map_fields'  => true,
 			'description' => esc_html__( 'If no form field is selected, the first password field in the form is used.', 'bricks' ),
 		];
 
@@ -2011,8 +2531,58 @@ class Element_Form extends Element {
 	}
 
 	public function render() {
-		$settings = $this->settings;
-		$fields   = $settings['fields'] ?? [];
+		$settings                   = $this->settings;
+		$fields                     = $settings['fields'] ?? [];
+		$actions                    = $settings['actions'] ?? [];
+		$create_post_type           = $settings['createPostType'] ?? null;
+		$create_post_meta           = $settings['createPostMeta'] ?? null;
+		$update_post_id             = $settings['updatePostId'] ?? null;
+		$update_post_title          = $settings['updatePostTitle'] ?? null;
+		$update_post_excerpt        = $settings['updatePostExcerpt'] ?? null;
+		$update_post_content        = $settings['updatePostContent'] ?? null;
+		$update_post_featured_image = $settings['updatePostFeaturedImage'] ?? null;
+		$current_term_ids           = [];
+
+		// Check: Update current post (@since 2.1)
+		if ( ! $update_post_id && in_array( 'update-post', $actions ) ) {
+			$update_post_id = get_the_ID();
+		}
+
+		// Post meta: Create/update post (@since 2.1)
+		$update_post_meta = $settings['updatePostMeta'] ?? null;
+		if ( ! empty( $create_post_meta ) ) {
+			$update_post_meta = $create_post_meta;
+		}
+
+		// Return: Current user is not allowed to create posts of this type
+		if ( $create_post_type && empty( $settings['createPostDisableCapabilityCheck'] ) ) {
+			$post_type_object = get_post_type_object( $create_post_type );
+
+			if ( ! $post_type_object || ! current_user_can( $post_type_object->cap->edit_posts ) ) {
+				// Create post: Show error message, if set
+				if ( ! empty( $settings['createPostErrorMessage'] ) ) {
+					echo '<p>' . esc_html( $settings['createPostErrorMessage'] ) . '</p>';
+				}
+
+				return;
+			}
+		}
+
+		// Return: Current user is not allowed to update this post
+		if ( $update_post_id && empty( $settings['updatePostDisableCapabilityCheck'] ) && ! current_user_can( 'edit_post', $update_post_id ) ) {
+			// Update post: Show error message, if set
+			if ( ! empty( $settings['updatePostErrorMessage'] ) ) {
+				echo '<p>' . esc_html( $settings['updatePostErrorMessage'] ) . '</p>';
+			}
+
+			return;
+		}
+
+		// Post taxonomies: Create/update post (@since 2.1)
+		$update_post_taxonomies = $settings['updatePostTaxonomies'] ?? null;
+		if ( ! empty( $settings['createPostTaxonomies'] ) ) {
+			$update_post_taxonomies = $settings['createPostTaxonomies'];
+		}
 
 		if ( empty( $fields ) ) {
 			return $this->render_element_placeholder(
@@ -2061,6 +2631,11 @@ class Element_Form extends Element {
 		// Use form element ID to get element settings in form submit logic
 		$this->set_attribute( '_root', 'data-element-id', $this->id );
 
+		// Add component ID for easier data retrieve in form submission (@since 2.1)
+		if ( ! empty( $this->element['cid'] ) ) {
+			$this->set_attribute( '_root', 'data-component-id', $this->element['cid'] );
+		}
+
 		// Form inside loop: Store the loop object ID, so we can use it in the form submit logic (@since 1.11)
 
 		// NOTE: Will be 0, if we are in a popup AJAX call
@@ -2087,7 +2662,7 @@ class Element_Form extends Element {
 		// Check if this form is for password protection
 		$is_password_protection_form = false;
 
-		if ( isset( $settings['actions'] ) && in_array( 'unlock-password-protection', $settings['actions'], true ) ) {
+		if ( in_array( 'unlock-password-protection', $actions, true ) ) {
 			$password_protection_template_id = \Bricks\Database::$active_templates['password_protection'] ?? 0;
 
 			if ( isset( $password_protection_template_id ) ) {
@@ -2119,8 +2694,13 @@ class Element_Form extends Element {
 		// Append suffix for unique label HTML attributes inside a loop (@since 1.8)
 		$field_suffix = Query::is_any_looping() ? '-' . Query::is_any_looping() . '-' . Query::get_loop_index() : '';
 
-		// Generate unique ID for each field (@since 1.12.2)
-		// We need to generate them before main loop below, so we can use it for Honeypot style generation
+		/**
+		 * Generate unique ID for each field
+		 *
+		 * We need to generate them before main loop below, so we can use it for Honeypot style generation.
+		 *
+		 * @since 1.12.2
+		 */
 		$fields = array_map(
 			function( $field ) use ( $field_suffix ) {
 				$field['unique_id'] = Helpers::generate_random_id( false ) . $field_suffix;
@@ -2148,9 +2728,12 @@ class Element_Form extends Element {
 				$this->set_attribute( "field-wrapper-$index", 'class', [ 'form-group', $field['type'] === 'file' ? 'file' : '' ] );
 			}
 
-			// Honeypot field: Set attributes (@since 1.12.2)
+			/**
+			 * Honeypot field: Set attributes
+			 *
+			 * @since 1.12.2
+			 */
 			if ( isset( $field['isHoneypot'] ) ) {
-
 				// Set autocomplete attribute to "off" #86c368e99 (@since 2.0)
 				// Note: "nope" was used @pre 2.0, but was causing accessibility issues
 				$field['autocomplete'] = 'off';
@@ -2176,6 +2759,12 @@ class Element_Form extends Element {
 				$this->set_attribute( "label-$index", 'for', "form-field-{$input_unique_id}" );
 			}
 
+			// Field title (@since 2.0.2)
+			if ( isset( $field['title'] ) && ! empty( $field['title'] ) ) {
+				$this->set_attribute( "field-$index", 'title', esc_attr( $field['title'] ) );
+			}
+
+			// File
 			if ( $field['type'] === 'file' ) {
 				if ( ! isset( $field['fileUploadLimit'] ) || $field['fileUploadLimit'] > 1 ) {
 					$this->set_attribute( "field-$index", 'multiple' );
@@ -2271,11 +2860,11 @@ class Element_Form extends Element {
 
 			$this->set_attribute( "field-$index", 'id', "form-field-{$input_unique_id}" );
 
-			// Set 'name' attribute value (@since 1.9.2)
+			// Set 'name' attribute value
 			$field_name = isset( $field['name'] ) ? $field['name'] : "form-field-{$field_id}";
 			$this->set_attribute( "field-$index", 'name', esc_attr( $field_name ) );
 
-			// Add custom error message attributes (@since 1.9.2)
+			// Add custom error message attributes
 			if ( ! empty( $field['errorMessage'] ) ) {
 				$error_message = esc_attr( $field['errorMessage'] );
 
@@ -2289,12 +2878,12 @@ class Element_Form extends Element {
 				$this->set_attribute( "field-$index", 'aria-label', $field['label'] );
 			}
 
-			// Text default (@since 1.9.9)
+			// Text default
 			if ( $field['type'] === 'text' && ! isset( $field['spellcheck'] ) ) {
 				$this->set_attribute( "field-$index", 'spellcheck', 'false' );
 			}
 
-			// Textarea default (@since 1.9.9)
+			// Textarea default
 			if ( $field['type'] === 'textarea' ) {
 				if ( ! empty( $field['autocomplete'] ) ) {
 					$this->set_attribute( "field-$index", 'autocomplete', esc_attr( $field['autocomplete'] ) );
@@ -2303,18 +2892,23 @@ class Element_Form extends Element {
 				$this->set_attribute( "field-$index", 'spellcheck', ! empty( $field['spellcheck'] ) ? esc_attr( $field['spellcheck'] ) : 'false' );
 			}
 
+			// Check: "pattern" attribute (@since 2.0.2)
+			if ( ! empty( $field['pattern'] ) ) {
+				$this->set_attribute( "field-$index", 'pattern', esc_attr( $field['pattern'] ) );
+			}
+
 			// Input types type & value
 			if ( in_array( $field['type'], $input_types ) ) {
 				$field_type = $field['type'] == 'datepicker' ? 'text' : $field['type'];
 
 				$this->set_attribute( "field-$index", 'type', $field_type );
 
-				// Attribute: autocomplete (@since 1.9.9)
+				// Attribute: autocomplete
 				if ( ! empty( $field['autocomplete'] ) ) {
 					$this->set_attribute( "field-$index", 'autocomplete', esc_attr( $field['autocomplete'] ) );
 				}
 
-				// Attribute: spellcheck (@since 1.9.9)
+				// Attribute: spellcheck
 				if ( ! empty( $field['spellcheck'] ) ) {
 					$this->set_attribute( "field-$index", 'spellcheck', esc_attr( $field['spellcheck'] ) );
 				}
@@ -2327,6 +2921,7 @@ class Element_Form extends Element {
 				 * @since 1.9.2
 				 */
 				$attr_value = isset( $field['value'] ) && $field['type'] !== 'file' ? $this->render_dynamic_data( $field['value'] ) : '';
+
 				$this->set_attribute( "field-$index", 'value', $attr_value );
 			}
 
@@ -2414,20 +3009,48 @@ class Element_Form extends Element {
 
 		$this->set_attribute( 'submit-button', 'class', $submit_button_classes );
 
-		/**
-		 * Render
-		 */
+		// STEP: Render
 		?>
 		<form <?php echo $this->render_attributes( '_root' ); ?>>
 			<?php
-
 			// If this is the password protection form, render the hidden input
 			if ( $is_password_protection_form ) {
-					echo '<input ' . $this->render_attributes( 'password_protection_template_id' ) . '>';
+				echo '<input ' . $this->render_attributes( 'password_protection_template_id' ) . '>';
 			}
 
 			foreach ( $fields as $index => $field ) {
-				$field_value = isset( $field['value'] ) ? $this->render_dynamic_data( $field['value'] ) : ''; // @since 1.9.3
+				$field_value = isset( $field['value'] ) ? $this->render_dynamic_data( $field['value'] ) : '';
+
+				/**
+				 * Action: Update post
+				 *
+				 * Populate post_title & post meta.
+				 *
+				 * @since 2.1
+				 */
+				if ( ! $field_value && in_array( 'update-post', $actions ) && $update_post_id ) {
+					if ( $update_post_title && $update_post_title === $field['id'] ) {
+						$field_value = get_post_field( 'post_title', $update_post_id );
+					}
+
+					// Get post_excerpt
+					elseif ( $update_post_excerpt && $update_post_excerpt === $field['id'] ) {
+						$field_value = get_post_field( 'post_excerpt', $update_post_id );
+					}
+
+					// Update post meta key
+					elseif ( ! empty( $update_post_meta ) ) {
+						foreach ( $update_post_meta as $post_meta ) {
+							if ( ! empty( $post_meta['metaKey'] ) && ! empty( $post_meta['metaValue'] ) && $post_meta['metaValue'] === $field['id'] ) {
+								$field_value = get_post_meta( $update_post_id, $post_meta['metaKey'], true );
+							}
+						}
+					}
+
+					if ( $field_value !== null ) {
+						$this->set_attribute( "field-$index", 'value', $field_value );
+					}
+				}
 
 				// Using field's unique_id (@since 1.12.2)
 				$checkbox_radio_unique_id = $field['unique_id'];
@@ -2456,8 +3079,236 @@ class Element_Form extends Element {
 
 				// Group label for checkbox or radio input using a <div> instead of <label> (@since 1.9.6)
 				elseif ( isset( $settings['showLabels'] ) && ! empty( $field['label'] ) && in_array( $field['type'], [ 'checkbox', 'radio' ] ) ) {
+					/**
+					 * We need to render attributes with render_attributes,
+					 * so that "required" class will also be added, if the field is required.
+					 *
+					 * @since 2.0.2
+					 */
+					$this->set_attribute( "label-$index", 'class', 'label' );
+					$this->set_attribute( "label-$index", 'id', "label-{$checkbox_radio_unique_id}" );
+
 					// Changed label to unique ID so it's unique if we duplicate the form (@since 1.12)
-					echo "<div class=\"label\" id=\"label-{$checkbox_radio_unique_id}\">{$field['label']}</div>";
+					echo "<div {$this->render_attributes( "label-$index" )} >{$field['label']}</div>";
+				}
+
+				/**
+				 * Post taxonomies
+				 *
+				 * Field types: checkbox, radio, select
+				 *
+				 * @since 2.1
+				 */
+				if ( $update_post_taxonomies && empty( $field['options'] ) ) {
+					// Populate $select_options with terms
+					$field['options'] = [];
+
+					foreach ( $update_post_taxonomies as $taxonomy ) {
+						if ( ! empty( $taxonomy['taxonomy'] ) && ! empty( $taxonomy['fieldId'] ) && $taxonomy['fieldId'] === $field['id'] ) {
+							$terms = get_terms(
+								[
+									'taxonomy'   => $taxonomy['taxonomy'],
+									'hide_empty' => false,
+								]
+							);
+
+							if ( ! is_wp_error( $terms ) && ! empty( $terms ) && is_array( $terms ) ) {
+								foreach ( $terms as $term ) {
+									$field['options'][] = "$term->term_id:{$term->name}";
+								}
+							}
+
+							$current_terms    = wp_get_post_terms( $update_post_id, $taxonomy['taxonomy'] );
+							$current_term_ids = wp_list_pluck( $current_terms, 'term_id' );
+						}
+					}
+
+					// Convert array to string value, separated by new line
+					$field['options'] = implode( "\n", $field['options'] );
+
+					$field['valueLabelOptions'] = true;
+				}
+
+				/**
+				 * Create/update post: Get select, checkbox, radio options from ACF or Meta Box field (if no options are set)
+				 *
+				 * @since 2.1
+				 */
+				if ( ( $create_post_type || $update_post_id ) && in_array( $field['type'], [ 'select', 'checkbox', 'radio' ] ) && empty( $field['options'] ) ) {
+					$meta_key = '';
+
+					// Get metaKey from $update_post_meta array by checking against field['id]
+					foreach ( $update_post_meta as $post_meta ) {
+						if ( ! empty( $post_meta['metaKey'] ) && ! empty( $post_meta['metaValue'] ) && $post_meta['metaValue'] === $field['id'] ) {
+							$meta_key = $post_meta['metaKey'];
+							break;
+						}
+					}
+
+					// Check: ACF
+					$acf_field_key = \Bricks\Integrations\Form\Init::get_acf_field_key_from_meta_key( $meta_key, $update_post_id, $create_post_type );
+					if ( function_exists( 'get_field_object' ) && ! empty( $acf_field_key ) ) {
+						$acf_field = get_field_object( $acf_field_key );
+						if ( $acf_field && ! empty( $acf_field['choices'] ) ) {
+							$select_options = [];
+							foreach ( $acf_field['choices'] as $key => $label ) {
+								$select_options[] = "$key:$label";
+							}
+
+							$field['options'] = implode( "\n", $select_options );
+
+							$field['valueLabelOptions'] = true;
+
+							// Get current value(s) for update post
+							if ( $update_post_id ) {
+								$meta_value = get_post_meta( $update_post_id, $meta_key, true );
+								if ( ! empty( $meta_value ) ) {
+									$field_value = $meta_value;
+								}
+							}
+						}
+					}
+
+					// Check: Meta Box
+					$mb_field_id = \Bricks\Integrations\Form\Init::get_meta_box_field_key_from_meta_key( $meta_key, $update_post_id, $create_post_type );
+					if ( function_exists( 'rwmb_get_field_settings' ) && ! empty( $mb_field_id ) ) {
+						$mb_field = rwmb_get_field_settings( $mb_field_id, [], $update_post_id );
+
+						if ( ! empty( $mb_field ) && ! empty( $mb_field['options'] ) ) {
+							$select_options = [];
+							foreach ( $mb_field['options'] as $key => $label ) {
+								$select_options[] = "$key:$label";
+							}
+						}
+					}
+
+					// Set the field options
+					if ( ! empty( $select_options ) ) {
+						$field['options']           = implode( "\n", $select_options );
+						$field['valueLabelOptions'] = true;
+
+						// Get current value(s) for update post
+						if ( $update_post_id ) {
+							$meta_value = get_post_meta( $update_post_id, $meta_key, true );
+							if ( ! empty( $meta_value ) ) {
+								$field_value = $meta_value;
+							}
+						}
+					}
+				}
+
+				/**
+				 * Gallery (media library)
+				 *
+				 * @since 2.1
+				 */
+				if ( $field['type'] === 'gallery' ) {
+					echo '<div class="gallery-preview">';
+
+					$image_ids     = [];
+					$post_meta_key = '';
+
+					// Get postmeta key to map field to
+					foreach ( $update_post_meta as $post_meta ) {
+						if ( ! empty( $post_meta['metaKey'] ) && ! empty( $post_meta['metaValue'] ) && $post_meta['metaValue'] === $field['id'] ) {
+							$post_meta_key = $post_meta['metaKey'];
+							break;
+						}
+					}
+
+					// Get images from post meta
+					if ( $update_post_id && $post_meta_key ) {
+						$field_value = get_post_meta( $update_post_id, $post_meta_key, true );
+						if ( ! empty( $field_value ) ) {
+							if ( is_array( $field_value ) ) {
+								$image_ids = array_map( 'intval', $field_value );
+							} elseif ( is_string( $field_value ) ) {
+								$image_ids = array_map( 'intval', explode( ',', $field_value ) );
+							}
+
+							$this->set_attribute( "field-$index", 'value', implode( ',', $image_ids ) );
+						}
+					}
+
+					// Render image HTML
+					foreach ( $image_ids as $image_id ) {
+						echo '<div class="image-preview">';
+						$image_tag = wp_get_attachment_image( $image_id, 'thumbnail', false, [ 'data-attachment-id' => $image_id ] );
+						echo $image_tag;
+						echo '<button type="button" class="choose-files remove" data-action="media-library" data-attachment-id="' . esc_attr( $image_id ) . '">' . esc_html__( 'Remove', 'bricks' ) . '</button>';
+						echo '</div>';
+					}
+
+					echo '</div>';
+
+					// Show "Select image" button to open media modal (wp.media)
+					$image_placeholder = $field['placeholder'] ?? esc_html__( 'Select images', 'bricks' );
+					echo '<button type="button" class="choose-files image multiple" data-action="media-library">' . $image_placeholder . '</button>';
+
+					// Hidden input to store image ID
+					$this->set_attribute( "field-$index", 'type', 'hidden' );
+					echo '<input ' . $this->render_attributes( "field-$index" ) . '>';
+				}
+
+				/**
+				 * Image (media library)
+				 *
+				 * @since 2.1
+				 */
+				if ( $field['type'] === 'image' ) {
+					echo '<div class="image-preview">';
+					$image_id  = 0;
+					$image_tag = '';
+
+					// Get current featured image
+					if ( $update_post_featured_image && $update_post_featured_image === $field['id'] ) {
+						$image_id = get_post_thumbnail_id( $update_post_id ?? get_the_ID() );
+					}
+
+					// Get non-featured image by ID
+					else {
+						// Get postmeta key to map field to
+						$post_meta_key = '';
+
+						foreach ( $update_post_meta as $post_meta ) {
+							if ( ! empty( $post_meta['metaKey'] ) && ! empty( $post_meta['metaValue'] ) && $post_meta['metaValue'] === $field['id'] ) {
+								$post_meta_key = $post_meta['metaKey'];
+								break;
+							}
+						}
+
+						$field_value = get_post_meta( $update_post_id ?? get_the_ID(), $post_meta_key, true );
+						$image_id    = ! empty( $field_value ) ? intval( $field_value ) : 0;
+
+						if ( $image_id ) {
+							$this->set_attribute( "field-$index", 'value', $image_id );
+						}
+					}
+
+					// Show image & "remove" button
+					if ( $image_id ) {
+						if ( $image_id ) {
+							$this->set_attribute( "field-$index", 'value', $image_id );
+						}
+
+						$image_tag = wp_get_attachment_image( $image_id, 'thumbnail', false, [ 'data-attachment-id' => $image_id ] );
+					}
+
+					if ( $image_tag ) {
+						echo $image_tag;
+					}
+
+					echo '<button type="button" class="choose-files remove" data-action="media-library" data-attachment-id="' . esc_attr( $image_id ) . '">' . esc_html__( 'Remove', 'bricks' ) . '</button>';
+
+					echo '</div>';
+
+					// Show "Select image" button to open media modal (wp.media)
+					$image_placeholder = $field['placeholder'] ?? esc_html__( 'Select image', 'bricks' );
+					echo '<button type="button" class="choose-files image" data-action="media-library">' . $image_placeholder . '</button>';
+
+					// Hidden input to store image ID
+					$this->set_attribute( "field-$index", 'type', 'hidden' );
+					echo '<input ' . $this->render_attributes( "field-$index" ) . '>';
 				}
 
 				/**
@@ -2481,6 +3332,110 @@ class Element_Form extends Element {
 					if ( ! empty( $field['html'] ) ) {
 						echo wp_kses_post( $field['html'] );
 					}
+				}
+
+				/**
+				 * Field type: richtext
+				 *
+				 * @since 2.1
+				 */
+				if ( $field['type'] === 'richtext' ) {
+					$tinymce_toolbar = 'styles | bold italic link | bullist numlist | alignleft aligncenter alignright | outdent indent | code | undo redo';
+
+					// Add 'bricks_add_media' to toolbar (if user has upload_files capability)
+					if ( current_user_can( 'upload_files' ) ) {
+						$tinymce_toolbar = 'styles bricks_add_media | bold italic link | bullist numlist | alignleft aligncenter alignright | outdent indent | code | undo redo';
+					} else {
+						$tinymce_toolbar = 'styles image | bold italic link | bullist numlist | alignleft aligncenter alignright | outdent indent | code | undo redo';
+					}
+
+					// Default TinyMCE settings
+					$default_tinymce_settings = [
+						// Styling
+						'skin'               => $field['tinyMceSkin'] ?? 'oxide',
+						'content_css'        => $field['tinyMceContentCss'] ?? 'default',
+						'statusbar'          => $field['tinyMceShowStatusBar'] ?? false,
+						'highlight_on_focus' => $field['tinyMceHighlightOnFocus'] ?? false,
+						'branding'           => false,
+						'promotion'          => false,
+						'placeholder'        => $field['placeholder'] ?? '',
+
+						'images_file_types'  => $field['tinyMceImagesFileTypes'] ?? 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp', // Default: https://www.tiny.cloud/docs/tinymce/6/file-image-upload/#images_file_types
+						'file_picker_types'  => 'file image media',
+						'image_uploadtab'    => false, // Upload through WordPress Media Library (see: bricks_add_media button)
+
+						// URL handling
+						'relative_urls'      => false,
+						'remove_script_host' => false,
+
+						// Dimensions
+						'height'             => ! empty( $field['tinyMceHeight'] ) ? intval( $field['tinyMceHeight'] ) : null,
+						'width'              => ! empty( $field['tinyMceWidth'] ) ? intval( $field['tinyMceWidth'] ) : null,
+						'resize'             => $field['tinyMceResize'] ?? 'both',
+
+						// Toolbar & menu & plugins
+						'menubar'            => $field['tinyMceShowMenuBar'] ?? false,
+						'plugins'            => 'lists code link autolink image table',
+
+						// https://www.tiny.cloud/docs/tinymce/latest/available-toolbar-buttons/
+						'toolbar'            => $tinymce_toolbar,
+						'toolbar_location'   => $field['tinyMceToolbarLocation'] ?? 'top',
+						'toolbar_sticky'     => $field['tinyMceToolbarSticky'] ?? false,
+						'menu'               => [
+							'file'   => [
+								'title' => esc_html__( 'File', 'bricks' ),
+								'items' => 'print'
+							],
+							'edit'   => [
+								'title' => esc_html__( 'Edit', 'bricks' ),
+								'items' => 'undo redo | cut copy paste pastetext | selectall | searchreplace'
+							],
+							'view'   => [
+								'title' => esc_html__( 'View', 'bricks' ),
+								'items' => 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments'
+							],
+							'insert' => [
+								'title' => esc_html__( 'Insert', 'bricks' ),
+								'items' => 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+							],
+							'format' => [
+								'title' => esc_html__( 'Format', 'bricks' ),
+								'items' => 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat'
+							],
+							'table'  => [
+								'title' => esc_html__( 'Table', 'bricks' ),
+								'items' => 'inserttable | cell row column | advtablesort | tableprops deletetable'
+							],
+						]
+					];
+
+					// Allow users to override the default settings via a filter hook
+					$tinymce_settings = apply_filters( 'bricks/form/tinymce_settings', $default_tinymce_settings );
+
+					// JSON encode the settings
+					$json_tinymce_settings = wp_json_encode( $tinymce_settings );
+
+					// Class to identify and init the TinyMCE instance
+					$this->set_attribute( "field-$index", 'class', 'form-field-richtext' );
+
+					// Add the TinyMCE settings to the field
+					$this->set_attribute( "field-$index", 'data-tinymce-settings', $json_tinymce_settings );
+
+					/**
+					 * Action: Update post
+					 *
+					 * Populate post_content
+					 *
+					 * @since 2.1
+					 */
+					if ( empty( $field['value'] ) && in_array( 'update-post', $actions ) && $update_post_id ) {
+						if ( $update_post_content && $update_post_content === $field['id'] ) {
+							$field_value = get_post_field( 'post_content', $update_post_id );
+						}
+					}
+
+					// Render richtext (@since 2.1)
+					echo '<textarea ' . $this->render_attributes( "field-$index" ) . '>' . esc_textarea( $field_value ) . '</textarea>';
 				}
 
 				if ( in_array( $field['type'], $input_types, true ) ) {
@@ -2537,7 +3492,7 @@ class Element_Form extends Element {
 				<?php if ( $field['type'] === 'select' && ! empty( $field['options'] ) ) { ?>
 				<select <?php echo $this->render_attributes( "field-$index" ); ?>>
 					<?php
-					$select_options     = Helpers::parse_textarea_options( $field['options'] );
+					$select_options     = ! empty( $field['options'] ) ? Helpers::parse_textarea_options( $field['options'] ) : [];
 					$select_placeholder = false;
 
 					if ( isset( $field['placeholder'] ) ) {
@@ -2550,6 +3505,7 @@ class Element_Form extends Element {
 						echo '<option value="" class="placeholder">' . $select_placeholder . '</option>';
 					}
 					?>
+
 					<?php
 					foreach ( $select_options as $select_option ) {
 						$field_key   = trim( $select_option );
@@ -2561,6 +3517,15 @@ class Element_Form extends Element {
 							$field_key   = $parts['key'];
 							$field_label = $parts['value'];
 						}
+
+						if ( ! empty( $current_term_ids ) && in_array( (int) $field_key, $current_term_ids, true ) ) {
+							$field_value = $field_key;
+						}
+
+						// Get first value if multiple values are stored (e.g. from ACF multi-select checkbox)
+						if ( ! empty( $field_value ) && is_array( $field_value ) ) {
+							$field_value = reset( $field_value );
+						}
 						?>
 
 					<option value="<?php echo esc_attr( strip_tags( $field_key ) ); ?>" <?php selected( $field_value ?? '', $field_key ); ?>><?php echo strip_tags( $field_label ); ?></option>
@@ -2570,7 +3535,17 @@ class Element_Form extends Element {
 
 				<?php
 				if ( ( $field['type'] === 'checkbox' || $field['type'] === 'radio' ) && ! empty( $field['options'] ) ) {
-					$checked_values = array_map( 'trim', explode( ',', $field_value ?? '' ) );
+					// Handle both array and string values for checkbox/radio autopopulation
+					if ( is_array( $field_value ?? '' ) ) {
+						$checked_values = array_map( 'trim', $field_value );
+					} else {
+						$checked_values = array_map( 'trim', explode( ',', $field_value ?? '' ) );
+					}
+
+					// Update post: Use current post terms (@since 2.1)
+					if ( ! empty( $current_term_ids ) ) {
+						$checked_values = $current_term_ids;
+					}
 					?>
 				<ul class="options-wrapper" <?php echo $this->render_attributes( "options-wrapper-$index" ); ?>>
 					<?php $options = Helpers::parse_textarea_options( $field['options'] ); ?>
@@ -2598,6 +3573,7 @@ class Element_Form extends Element {
 						// Even if it's a single value like a radio button (for backwards compatibility)
 						$field_name .= '[]';
 						?>
+
 					<li>
 						<input
 							type="<?php echo esc_attr( $field['type'] ); ?>"
@@ -2613,11 +3589,11 @@ class Element_Form extends Element {
 								echo 'tabindex="-1"';
 							}
 
-							if ( $field['type'] === 'checkbox' && is_array( $checked_values ) && in_array( $field_key, $checked_values, true ) ) {
+							if ( ( $field['type'] === 'checkbox' || $field['type'] === 'radio' ) && is_array( $checked_values ) && in_array( $field_key, $checked_values, $update_post_taxonomies ? false : true ) ) {
 								echo esc_attr( 'checked' );
 							}
 
-							if ( $field['type'] === 'radio' && $field_key === $field_value ) {
+							if ( $field['type'] === 'radio' && ! is_array( $checked_values ) && $field_key === $field_value ) {
 								echo esc_attr( 'checked' );
 							}
 							?>
@@ -2636,10 +3612,7 @@ class Element_Form extends Element {
 			 *
 			 * @since 1.10.2: Render hidden fields last to prevent nth-child CSS issues
 			 */
-			if ( isset( $settings['resetPasswordNew'], $settings['actions'] ) &&
-				is_array( $settings['actions'] ) &&
-				in_array( 'reset-password', $settings['actions'] )
-			) {
+			if ( isset( $settings['resetPasswordNew'] ) && in_array( 'reset-password', $actions ) ) {
 				?>
 				<input type="hidden" name="form-field-key" value="<?php echo esc_attr( $_GET['key'] ?? '' ); ?>">
 				<input type="hidden" name="form-field-login" value="<?php echo esc_attr( $_GET['login'] ?? '' ); ?>">
@@ -2652,7 +3625,7 @@ class Element_Form extends Element {
 			 * @since 1.9.4
 			 * @since 1.11: Make sure there's a login action in the form settings
 			 */
-			if ( isset( $settings['actions'] ) && is_array( $settings['actions'] ) && in_array( 'login', $settings['actions'] ) && isset( $_GET['redirect_to'] ) ) {
+			if ( in_array( 'login', $actions ) && isset( $_GET['redirect_to'] ) ) {
 				$redirect_to = esc_url_raw( $_GET['redirect_to'] );
 
 				// Add hidden field for 'redirect_to'
@@ -2681,7 +3654,7 @@ class Element_Form extends Element {
 			}
 			?>
 
-		  <div <?php echo $this->render_attributes( 'submit-wrapper' ); ?>>
+			<div <?php echo $this->render_attributes( 'submit-wrapper' ); ?>>
 				<button type="submit" <?php echo $this->render_attributes( 'submit-button' ); ?>>
 					<?php
 					if ( $submit_button_icon && $submit_button_icon_position === 'left' ) {
@@ -2838,6 +3811,8 @@ class Element_Form extends Element {
 		$this->set_attribute( 'turnstile', 'id', 'turnstile-' . esc_attr( $this->id ) );
 		$this->set_attribute( 'turnstile', 'class', 'cf-turnstile' );
 		$this->set_attribute( 'turnstile', 'data-sitekey', Database::$global_settings['apiKeyTurnstile'] );
+		$this->set_attribute( 'turnstile', 'data-callback', 'bricksTurnstileCallback' );
+		$this->set_attribute( 'turnstile', 'data-error-callback', 'bricksTurnstileErrorCallback' );
 
 		return "<div {$this->render_attributes( 'turnstile' )}></div>";
 	}

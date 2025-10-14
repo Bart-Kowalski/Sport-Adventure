@@ -120,20 +120,20 @@ class Breadcrumbs extends Element {
 		];
 
 		// HOME
-		$this->controls['homeLabel'] = [
-			'group'       => 'home',
-			'label'       => esc_html__( 'Label', 'bricks' ),
-			'type'        => 'text',
-			'inline'      => true,
-			'placeholder' => esc_html__( 'Home', 'bricks' ),
-		];
-
 		$this->controls['homeURL'] = [
 			'group'       => 'home',
-			'label'       => esc_html__( 'URL', 'bricks' ),
+			'label'       => 'URL',
 			'type'        => 'text',
 			'inline'      => true,
 			'placeholder' => esc_url( home_url() ),
+		];
+
+		$this->controls['homeLabel'] = [
+			'group'       => 'home',
+			'label'       => esc_html__( 'Text', 'bricks' ),
+			'type'        => 'text',
+			'inline'      => true,
+			'placeholder' => esc_html__( 'Home', 'bricks' ),
 		];
 
 		$this->controls['homeIcon'] = [
@@ -142,16 +142,24 @@ class Breadcrumbs extends Element {
 			'type'  => 'icon',
 		];
 
-		$this->controls['hideHomeLabel'] = [
+		// @since 2.1 - new control to set gap between icon and label
+		$this->controls['hideIconGap'] = [
 			'group'    => 'home',
-			'label'    => esc_html__( 'Hide label', 'bricks' ),
-			'type'     => 'checkbox',
+			'label'    => esc_html__( 'Icon', 'bricks' ) . ': ' . esc_html__( 'Gap', 'bricks' ),
+			'type'     => 'number',
+			'units'    => true,
+			'css'      => [
+				[
+					'selector' => '.item:has(> svg), .item:has(> i)',
+					'property' => 'gap',
+				],
+			],
 			'required' => [ 'homeIcon', '!=', '' ],
 		];
 
 		$this->controls['homeIconPosition'] = [
 			'group'       => 'home',
-			'label'       => esc_html__( 'Icon position', 'bricks' ),
+			'label'       => esc_html__( 'Icon', 'bricks' ) . ': ' . esc_html__( 'Position', 'bricks' ),
 			'type'        => 'select',
 			'options'     => [
 				'before' => esc_html__( 'Before', 'bricks' ),
@@ -160,6 +168,13 @@ class Breadcrumbs extends Element {
 			'inline'      => true,
 			'placeholder' => esc_html__( 'Before', 'bricks' ),
 			'required'    => [ 'homeIcon', '!=', '' ],
+		];
+
+		$this->controls['hideHomeLabel'] = [
+			'group'    => 'home',
+			'label'    => esc_html__( 'Hide label', 'bricks' ),
+			'type'     => 'checkbox',
+			'required' => [ 'homeIcon', '!=', '' ],
 		];
 
 		// SEPERATOR

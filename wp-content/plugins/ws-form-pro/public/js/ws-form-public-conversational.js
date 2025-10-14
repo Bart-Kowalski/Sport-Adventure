@@ -272,9 +272,11 @@
 
 			var conversational_section_obj = $(this).closest('.wsf-section');
 
-			if(conversational_section_obj[0] !== ws_this.conversational_section_obj_focus[0]) {
-
-				$(this).minicolors('hide');
+			if(
+				(typeof(Coloris) !== 'undefined') &&
+				(conversational_section_obj[0] !== ws_this.conversational_section_obj_focus[0])
+			) {
+				Coloris.close();
 			}
 		});
 

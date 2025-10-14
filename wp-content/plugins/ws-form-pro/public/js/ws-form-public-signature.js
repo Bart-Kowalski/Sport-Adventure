@@ -17,8 +17,8 @@
 		}
 
 		// Get current framework
-		var framework_groups = this.framework['groups']['public'];
-		var class_active = typeof(framework_groups['class_active']) ? framework_groups['class_active'] : false;
+		var framework_groups = this.framework.groups.public;
+		var class_active = typeof(framework_groups.class_active) ? framework_groups.class_active : false;
 
 		// Process each signature
 		signature_objects.each(function() {

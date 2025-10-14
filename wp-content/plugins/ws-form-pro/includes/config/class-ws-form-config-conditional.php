@@ -52,7 +52,7 @@
 							'touchstart'		=> array('text' => __('Touch start', 'ws-form'), 'values' => false, 'event' => 'touchstart', 'group' => 'event'),
 							'touchend'		=> array('text' => __('Touch end', 'ws-form'), 'values' => false, 'event' => 'touchend', 'group' => 'event'),
 							'touchmove'		=> array('text' => __('Touch move', 'ws-form'), 'values' => false, 'event' => 'touchmove', 'group' => 'event'),
-							'touchcancel'		=> array('text' => __('Touch cancel', 'ws-form'), 'values' => false, 'event' => 'touchcancel', 'case_sensitive' => false, 'group' => 'event'),
+							'touchcancel'		=> array('text' => __('Touch cancel', 'ws-form'), 'values' => false, 'event' => 'touchcancel', 'group' => 'event'),
 						),
 						'action' => array(
 
@@ -125,12 +125,12 @@
 							'validate_not'	=> array('text' => __('Not validated', 'ws-form'), 'values' => false, 'event' => 'wsf-validate-silent', 'group' => 'validate'),
 
 							// Section repeatable count
-							'r=='					=> array('text' => __('Row count equals', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
-							'r!='					=> array('text' => __('Row count does not equal', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
-							'r>'					=> array('text' => __('Row count greater than', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
-							'r<'					=> array('text' => __('Row count less than', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
-							'r>='					=> array('text' => __('Row count greater than or equal to', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
-							'r<='					=> array('text' => __('Row count less than or equal to', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'case_sensitive' => false, 'group' => 'rs'),
+							'r=='					=> array('text' => __('Row count equals', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
+							'r!='					=> array('text' => __('Row count does not equal', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
+							'r>'					=> array('text' => __('Row count greater than', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
+							'r<'					=> array('text' => __('Row count less than', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
+							'r>='					=> array('text' => __('Row count greater than or equal to', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
+							'r<='					=> array('text' => __('Row count less than or equal to', 'ws-form'), 'type' => 'number', 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
 							'section_repeatable'	=> array('text' => __('Row count changes', 'ws-form'), 'values' => false, 'event' => 'wsf-section-repeatable', 'group' => 'rs'),
 						),
 						'action' => array(
@@ -166,118 +166,156 @@
 						'logic' => array(
 
 							// Numeric
-							'=='					=> array('text' => __('Equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'!='					=> array('text' => __('Does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'>'						=> array('text' => __('Greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'<'						=> array('text' => __('Less than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'>='					=> array('text' => __('Greater than or equal to', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'<='					=> array('text' => __('Less than or equal to', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
+							'=='					=> array('text' => __('Equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'!='					=> array('text' => __('Does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'>'						=> array('text' => __('Greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'<'						=> array('text' => __('Less than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'>='					=> array('text' => __('Greater than or equal to', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'<='					=> array('text' => __('Less than or equal to', 'ws-form'), 'type' => 'number', 'group' => 'value'),
 
 							// Strings
-							'equals'				=> array('text' => __('Equals', 'ws-form'), 'group' => 'value'),
-							'equals_not' 			=> array('text' => __('Does not equal', 'ws-form'), 'group' => 'value'),
-							'contains'				=> array('text' => __('Contains', 'ws-form'), 'group' => 'value'),
-							'contains_not'			=> array('text' => __('Does not contain', 'ws-form'), 'group' => 'value'),
-							'starts'				=> array('text' => __('Starts with', 'ws-form'), 'group' => 'value'),
-							'starts_not'			=> array('text' => __('Does not start with', 'ws-form'), 'group' => 'value'),
-							'ends'					=> array('text' => __('Ends with', 'ws-form'), 'group' => 'value'),
-							'ends_not'				=> array('text' => __('Does not end with', 'ws-form'), 'group' => 'value'),
-							'blank'					=> array('text' => __('Is blank', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'blank_not'				=> array('text' => __('Is not blank', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'regex'					=> array('text' => __('Matches JS regex', 'ws-form'), 'case_sensitive' => false, 'group' => 'value'),
-							'regex_not'				=> array('text' => __('Does not match JS regex', 'ws-form'), 'case_sensitive' => false, 'group' => 'value'),
+							'equals'				=> array('text' => __('Equals', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'equals_not' 			=> array('text' => __('Does not equal', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'contains'				=> array('text' => __('Contains', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'contains_not'			=> array('text' => __('Does not contain', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'starts'				=> array('text' => __('Starts with', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'starts_not'			=> array('text' => __('Does not start with', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'ends'					=> array('text' => __('Ends with', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'ends_not'				=> array('text' => __('Does not end with', 'ws-form'), 'group' => 'value', 'case_sensitive' => true),
+							'blank'					=> array('text' => __('Is blank', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'blank_not'				=> array('text' => __('Is not blank', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'regex'					=> array('text' => __('Matches JS regex', 'ws-form'), 'group' => 'value'),
+							'regex_not'				=> array('text' => __('Does not match JS regex', 'ws-form'), 'group' => 'value'),
 
 							// Select
-							'selected'				=> array('text' => __('Row(s) selected', 'ws-form'), 'values' => false, 'rows' => true, 'case_sensitive' => false, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
-							'selected_not'			=> array('text' => __('Row(s) not selected', 'ws-form'), 'values' => false, 'rows' => true, 'case_sensitive' => false, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
+							'selected'				=> array('text' => __('Row(s) selected', 'ws-form'), 'values' => false, 'rows' => true, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
+							'selected_not'			=> array('text' => __('Row(s) not selected', 'ws-form'), 'values' => false, 'rows' => true, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
 							'selected_any'			=> array('text' => __('Any row selected', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'selected_any_not'		=> array('text' => __('No row selected', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'selected_all'			=> array('text' => __('All rows selected', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'selected_all_not'		=> array('text' => __('Not all rows selected', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'selected_value_equals'	=> array('text' => __('Selected value equals', 'ws-form'), 'group' => 'value'),
 							'selected_value_equals_not'	=> array('text' => __('Selected value does not equal', 'ws-form'), 'group' => 'value'),
-							'rs=='					=> array('text' => __('Selected count equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rs!='					=> array('text' => __('Selected count does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rs>'					=> array('text' => __('Selected count greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rs<'					=> array('text' => __('Selected count less than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
+							'rs=='					=> array('text' => __('Selected count equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rs!='					=> array('text' => __('Selected count does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rs>'					=> array('text' => __('Selected count greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rs<'					=> array('text' => __('Selected count less than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
 
 							// Checkbox / Radio
-							'checked'				=> array('text' => __('Row(s) checked', 'ws-form'), 'values' => false, 'rows' => true, 'case_sensitive' => false, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
-							'checked_not'			=> array('text' => __('Row(s) not checked', 'ws-form'), 'values' => false, 'rows' => true, 'case_sensitive' => false, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
+							'checked'				=> array('text' => __('Row(s) checked', 'ws-form'), 'values' => false, 'rows' => true, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
+							'checked_not'			=> array('text' => __('Row(s) not checked', 'ws-form'), 'values' => false, 'rows' => true, 'data_source_exclude' => true, 'group' => 'value', 'multiple' => true),
 							'checked_any'			=> array('text' => __('Any row checked', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'checked_any_not'		=> array('text' => __('No row checked', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'checked_all'			=> array('text' => __('All rows checked', 'ws-form'), 'values' => false, 'group' => 'value'),
 							'checked_all_not'		=> array('text' => __('Not all rows checked', 'ws-form'), 'values' => false, 'group' => 'value'),
-							'rc=='					=> array('text' => __('Checked count equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rc!='					=> array('text' => __('Checked count does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rc>'					=> array('text' => __('Checked count greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'rc<'					=> array('text' => __('Checked count less than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
+							'rc=='					=> array('text' => __('Checked count equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rc!='					=> array('text' => __('Checked count does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rc>'					=> array('text' => __('Checked count greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'rc<'					=> array('text' => __('Checked count less than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
 							'checked_value_equals'	=> array('text' => __('Checked value equals', 'ws-form'), 'group' => 'value'),
 							'checked_value_equals_not'	=> array('text' => __('Checked value does not equal', 'ws-form'), 'group' => 'value'),
 
 							// Email
-							'regex_email'			=> array('text' => __('Is valid email address', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'regex_email_not'		=> array('text' => __('Is not a valid email address', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
+							'regex_email'			=> array('text' => __('Is valid email address', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'regex_email_not'		=> array('text' => __('Is not a valid email address', 'ws-form'), 'values' => false, 'group' => 'value'),
 
 							// URL
-							'regex_url'				=> array('text' => __('Is valid URL', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'regex_url_not'			=> array('text' => __('Is not a valid URL', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
+							'regex_url'				=> array('text' => __('Is valid URL', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'regex_url_not'			=> array('text' => __('Is not a valid URL', 'ws-form'), 'values' => false, 'group' => 'value'),
 
 							// Match field
-							'field_match' 			=> array('text' => __('Matches field', 'ws-form'), 'values' => 'fields', 'group' => 'value'),
-							'field_match_not'		=> array('text' => __('Does not match field', 'ws-form'), 'values' => 'fields', 'group' => 'value'),
+							'field_match' 			=> array('text' => __('Matches field', 'ws-form'), 'values' => 'fields', 'group' => 'value', 'case_sensitive' => true),
+							'field_match_not'		=> array('text' => __('Does not match field', 'ws-form'), 'values' => 'fields', 'group' => 'value', 'case_sensitive' => true),
 
 							// Date/Time
-							'd=='					=> array('text' => __('Equals', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
-							'd!='					=> array('text' => __('Does not equal', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
-							'd>'					=> array('text' => __('Greater than', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
-							'd<'					=> array('text' => __('Less than', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
-							'd>='					=> array('text' => __('Greater than or equal to', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
-							'd<='					=> array('text' => __('Less than or equal to', 'ws-form'), 'type' => 'datetime', 'case_sensitive' => false, 'group' => 'value'),
+							'd=='					=> array('text' => __('Equals', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
+							'd!='					=> array('text' => __('Does not equal', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
+							'd>'					=> array('text' => __('Greater than', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
+							'd<'					=> array('text' => __('Less than', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
+							'd>='					=> array('text' => __('Greater than or equal to', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
+							'd<='					=> array('text' => __('Less than or equal to', 'ws-form'), 'type' => 'datetime', 'group' => 'value'),
 
 							// Color
-							'c==' 					=> array('text' => __('Equals (#RRGGBB)', 'ws-form'), 'type' => 'text', 'case_sensitive' => false, 'group' => 'value'),
-							'c!=' 					=> array('text' => __('Does not equal (#RRGGBB)', 'ws-form'), 'type' => 'text', 'case_sensitive' => false, 'group' => 'value'),
-							'ch>'					=> array('text' => __('Hue greater than', 'ws-form'), 'type' =>	'number', 'min' => 0, 'max' => 360, 'unit' => '&#176;', 'case_sensitive' => false, 'group' => 'value'),
-							'ch<' 					=> array('text' => __('Hue less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 360, 'unit' => '&#176;', 'case_sensitive' => false, 'group' => 'value'),
-							'cs>'					=> array('text' => __('Saturation greater than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'case_sensitive' => false, 'group' => 'value'),
-							'cs<'					=> array('text' => __('Saturation less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'case_sensitive' => false, 'group' => 'value'),
-							'cl>'					=> array('text' => __('Lightness greater than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'case_sensitive' => false, 'group' => 'value'),
-							'cl<'					=> array('text' => __('Lightness less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'case_sensitive' => false, 'group' => 'value'),
+							'c==' 					=> array('text' => __('Equals', 'ws-form'), 'type' => 'text', 'group' => 'value'),
+							'c!=' 					=> array('text' => __('Does not equal', 'ws-form'), 'type' => 'text', 'group' => 'value'),
+							'ch>'					=> array('text' => __('Hue greater than', 'ws-form'), 'type' =>	'number', 'min' => 0, 'max' => 360, 'unit' => '&#176;', 'group' => 'value'),
+							'ch<' 					=> array('text' => __('Hue less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 360, 'unit' => '&#176;', 'group' => 'value'),
+							'cs>'					=> array('text' => __('Saturation greater than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'group' => 'value'),
+							'cs<'					=> array('text' => __('Saturation less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'group' => 'value'),
+							'cl>'					=> array('text' => __('Lightness greater than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'group' => 'value'),
+							'cl<'					=> array('text' => __('Lightness less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%', 'group' => 'value'),
+							'ca>'					=> array('text' => __('Alpha greater than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 1, 'unit' => '%', 'group' => 'value'),
+							'ca<'					=> array('text' => __('Alpha less than', 'ws-form'), 'type' => 'number', 'min' => 0, 'max' => 1, 'unit' => '%', 'group' => 'value'),
 
 							// File
-							'file' 					=> array('text' => __('File selected', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'file_not'				=> array('text' => __('No file selected', 'ws-form'), 'values' => false, 'case_sensitive' => false, 'group' => 'value'),
-							'f==' 					=> array('text' => __('File count equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'f!=' 					=> array('text' => __('File count does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'f>' 					=> array('text' => __('File count greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'f<' 					=> array('text' => __('File count less than', 'ws-form'), 'type' =>	'number', 'case_sensitive' => false, 'group' => 'value'),
+							'file' 					=> array('text' => __('File selected', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'file_not'				=> array('text' => __('No file selected', 'ws-form'), 'values' => false, 'group' => 'value'),
+							'f==' 					=> array('text' => __('File count equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'f!=' 					=> array('text' => __('File count does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'f>' 					=> array('text' => __('File count greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'f<' 					=> array('text' => __('File count less than', 'ws-form'), 'type' =>	'number', 'group' => 'value'),
 
 							// Character and word count
-							'cc==' 					=> array('text' => __('Character count equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cc!=' 					=> array('text' => __('Character count does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cc>' 					=> array('text' => __('Character count greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cc<' 					=> array('text' => __('Character count less than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cw==' 					=> array('text' => __('Word count equals', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cw!=' 					=> array('text' => __('Word count does not equal', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cw>' 					=> array('text' => __('Word count greater than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
-							'cw<' 					=> array('text' => __('Word count less than', 'ws-form'), 'type' => 'number', 'case_sensitive' => false, 'group' => 'value'),
+							'cc==' 					=> array('text' => __('Character count equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cc!=' 					=> array('text' => __('Character count does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cc>' 					=> array('text' => __('Character count greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cc<' 					=> array('text' => __('Character count less than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cw==' 					=> array('text' => __('Word count equals', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cw!=' 					=> array('text' => __('Word count does not equal', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cw>' 					=> array('text' => __('Word count greater than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
+							'cw<' 					=> array('text' => __('Word count less than', 'ws-form'), 'type' => 'number', 'group' => 'value'),
 
 							// Validation
 							'validate'			=> array('text' => __('Is validated', 'ws-form'), 'values' => false, 'event' => 'wsf-validate-silent', 'group' => 'validate'),
 							'validate_not'		=> array('text' => __('Is not validated', 'ws-form'), 'values' => false, 'event' => 'wsf-validate-silent', 'group' => 'validate'),
 
 							// reCAPTCHA
-							'recaptcha' 		=> array('text' => __('reCAPTCHA valid', 'ws-form'), 'values' => false, 'group' => 'validate'),
-							'recaptcha_not' 	=> array('text' => __('reCAPTCHA invalid', 'ws-form'), 'values' => false, 'group' => 'validate'),
+							'recaptcha' 		=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s valid', 'ws-form'),
+								'reCAPTCHA'
+
+							), 'values' => false, 'group' => 'validate'),
+							'recaptcha_not' 	=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s valid', 'ws-form'),
+								'Turnstile'
+
+							), 'values' => false, 'group' => 'validate'),
 
 							// hCaptcha
-							'hcaptcha' 			=> array('text' => __('hCaptcha valid', 'ws-form'), 'values' => false, 'group' => 'validate'),
-							'hcaptcha_not' 		=> array('text' => __('hCaptcha invalid', 'ws-form'), 'values' => false, 'group' => 'validate'),
+							'hcaptcha' 			=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s valid', 'ws-form'),
+								'hCaptcha'
+
+							), 'values' => false, 'group' => 'validate'),
+							'hcaptcha_not' 		=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s valid', 'ws-form'),
+								'hCaptcha'
+
+							), 'values' => false, 'group' => 'validate'),
 
 							// Turnstile
-							'turnstile' 		=> array('text' => __('Turnstile valid', 'ws-form'), 'values' => false, 'group' => 'validate'),
-							'turnstile_not' 	=> array('text' => __('Turnstile invalid', 'ws-form'), 'values' => false, 'group' => 'validate'),
+							'turnstile' 		=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s valid', 'ws-form'),
+								'Turnstile'
+
+							), 'values' => false, 'group' => 'validate'),
+							'turnstile_not' 	=> array('text' => sprintf(
+
+								/* translators: %s: Brand name */
+								__('%s invalid', 'ws-form'),
+								'Turnstile'
+
+							), 'values' => false, 'group' => 'validate'),
 
 							// Signature
 							'signature' 		=> array('text' => __('Signed', 'ws-form'), 'values' => false, 'group' => 'validate'),
@@ -461,6 +499,9 @@
 
 							// Google address - Geolocate
 							'google_address_auto_complete'		=> array('text' => __('Geolocate', 'ws-form'), 'values' => false),
+
+							// Copy to clipboard
+							'copy_to_clipboard'		=> array('text' => __('Copy to clipboard', 'ws-form'), 'values' => false),
 						)
 					),
 
@@ -573,8 +614,11 @@
 					$conditional['objects']['user']['logic']['user_role_not']['values'][] = array('value' => esc_attr($role), 'text' => esc_html(translate_user_role($role_config['name'])));
 
 					// If capabilities are specified, add them to the capabilities array
-					if(isset($role_config['capabilities'])) {
-
+					if(
+						isset($role_config['capabilities']) &&
+						is_array($role_config['capabilities']) &&
+						(count($role_config['capabilities']) > 0)
+					) {
 						$capabilities = array_merge($capabilities, array_keys($role_config['capabilities']));
 					}
 				}

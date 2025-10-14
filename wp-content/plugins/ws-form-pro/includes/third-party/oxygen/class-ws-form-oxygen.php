@@ -25,4 +25,5 @@
 			do_action("oxygen_add_plus_" . $this->section_slug . "_other");
 		}
 	}
+
 	new WS_Form_Oxygen();

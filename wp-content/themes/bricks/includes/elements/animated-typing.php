@@ -157,7 +157,12 @@ class Element_Animated_Typing extends Element {
 		if ( ! empty( $settings['strings'] ) && is_array( $settings['strings'] ) ) {
 			foreach ( $settings['strings'] as $string ) {
 				if ( isset( $string['text'] ) && $string['text'] != '' ) {
-					$strings[] = $string['text'];
+					// Support dynamic data (@since 2.1)
+					$text = bricks_render_dynamic_data( trim( $string['text'] ) );
+
+					// Normalize HTML entities to handle mixed content (eg. &amp; converting to &), then frontend JS will re-encode to &amp; for proper HTML output (@since 2.1)
+					$text      = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+					$strings[] = $text;
 				}
 			}
 		}

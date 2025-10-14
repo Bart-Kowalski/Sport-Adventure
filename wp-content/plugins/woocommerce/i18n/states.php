@@ -839,7 +839,7 @@ return array(
 		'DN' => __( 'Dadra and Nagar Haveli', 'woocommerce' ),
 		'DD' => __( 'Daman and Diu', 'woocommerce' ),
 		'DL' => __( 'Delhi', 'woocommerce' ),
-		'LD' => __( 'Lakshadeep', 'woocommerce' ),
+		'LD' => __( 'Lakshadweep', 'woocommerce' ),
 		'PY' => __( 'Pondicherry (Puducherry)', 'woocommerce' ),
 	),
 	'IR' => array( // Iranian states.
@@ -1451,7 +1451,7 @@ return array(
 		'TKI' => __( 'Taranaki', 'woocommerce' ),
 		'GIS' => __( 'Gisborne', 'woocommerce' ),
 		'HKB' => __( 'Hawke’s Bay', 'woocommerce' ),
-		'MWT' => __( 'Manawatu-Wanganui', 'woocommerce' ),
+		'MWT' => __( 'Manawatu-Whanganui', 'woocommerce' ),
 		'WGN' => __( 'Wellington', 'woocommerce' ),
 		'NSN' => __( 'Nelson', 'woocommerce' ),
 		'MBH' => __( 'Marlborough', 'woocommerce' ),

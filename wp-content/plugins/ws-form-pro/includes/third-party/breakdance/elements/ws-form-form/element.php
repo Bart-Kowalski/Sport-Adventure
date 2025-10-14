@@ -282,11 +282,7 @@ class WS_Form_Form extends \Breakdance\Elements\Element
         return [
             'onMountedElement' => [
                 [
-                    'script' => <<<JS
-                        (function () {
-                        	wsf_form_init(true);
-                        } ());
-                    JS,
+                    'script' => '(function () { wsf_form_init(true); }());',
                 ],
             ],
         ];

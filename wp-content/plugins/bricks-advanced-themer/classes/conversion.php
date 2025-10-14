@@ -16,18 +16,6 @@ class AT__Conversion{
         update_option('bricks_advanced_themer_builder_settings', $option);
     }
 
-    private static function set_grid_utility_classes_as_converted(){
-        $option = get_option('bricks_advanced_themer_builder_settings', []);
-
-        if( !AT__Helpers::is_array($option, 'converted') ){
-            $option['converted'] = [];
-        }
-
-        $option['converted']['grid_utility_classes'] = 1;
-
-        update_option('bricks_advanced_themer_builder_settings', $option);
-    }
-
     private static function has_entry_with_name($array, $name) {
         if(AT__Helpers::is_array($array)){
             foreach ($array as $entry) {
@@ -235,385 +223,6 @@ class AT__Conversion{
         self::set_option_as_converted('clamp_settings');
     }    
 
-    public static function convert_global_css_variables(){
-
-        // Skip if already converted
-        if(defined(BRICKS_ADVANCED_THEMER_CSS_VARIABLES_CONVERTED) && BRICKS_ADVANCED_THEMER_CSS_VARIABLES_CONVERTED === true) return;
-
-        // CSS Variables are disabled inside the theme settings
-        if(!AT__helpers::is_css_variables_category_activated()){
-            self::set_option_as_converted('global_css_variables');
-            return;
-        }
-
-        global $brxc_acf_fields;
-        global $wpdb;
-
-        $prefix = strtolower($brxc_acf_fields['global_prefix']);
-        $categories = get_option('bricks_global_variables_categories', []);
-        $variables = get_option('bricks_global_variables', []);
-        $themesArray = get_option('bricks_theme_styles', []);
-
-        foreach ($themesArray as &$theme) {
-            if (($theme['settings']['general']['_cssVariables'] ?? null) !== null) {
-                foreach ($theme['settings']['general']['_cssVariables'] as &$variable) {
-                    
-                    // Add prefix
-                    if (AT__Helpers::is_value($variable, 'name') && is_string($variable['name']) ){ 
-                        $name_final = $prefix !== '' ? $prefix . '-' . $variable['name'] : $variable['name'];
-                        $variable['name'] = $name_final;
-                    }
-
-                    // Convert group name into group id
-                    if (AT__Helpers::is_value($variable, 'group') && is_string($variable['group'])) {
-
-                        // Category
-                        $entry = self::has_entry_with_name($categories, $variable['group']);
-
-                        if($entry === false){
-                            $category_id = AT__Helpers::generate_unique_string(6);
-                            $categories[] = [
-                                'id'    => $category_id,
-                                'name'  => $variable['group']
-                            ];
-                        } else {
-                            $category_id = $entry['id'];
-                        }
-
-                        $variable['category'] = $category_id;
-                        unset($variable['group']);
-                    }
-                    // Remove "order" property
-                    if (isset($variable['order'])) {
-                        unset($variable['order']); 
-                    }
-
-                    // Convert Clamp Values
-                    if(isset($variable['type']) && $variable['type'] === "clamp" && isset($variable['min']) && isset($variable['max'])){
-                        $variable['value'] = AT__Helpers::clamp_builder((float) $variable['min'], (float) $variable['max']);
-                    }
-                }
-            }
-        }
-        if(is_array($themesArray) && !empty($themesArray)){
-            update_option( 'bricks_theme_styles', $themesArray );
-        }
-
-        // Convert Global Variables saved in ACF
-        if ( have_rows( 'field_6445ab9f3d498', 'bricks-advanced-themer' ) ) :
-            while ( have_rows( 'field_6445ab9f3d498', 'bricks-advanced-themer' ) ) :
-                the_row();
-
-                // Typography
-                if (  AT__Helpers::is_typography_tab_activated() && have_rows( 'field_63a6a58831bbe', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'typography');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'typography'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variables
-                    while ( have_rows( 'field_63a6a58831bbe', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $label = get_sub_field('brxc_typography_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $min_value = get_sub_field('brxc_typography_min_value', 'bricks-advanced-themer' );
-                        $max_value = get_sub_field('brxc_typography_max_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'        => AT__Helpers::generate_unique_string(6),
-                            'name'      => $label_final,
-                            'category'  => $category_id,
-                            'type'      => 'clamp',
-                            'min'       => $min_value,
-                            'max'       => $max_value,
-                            'value'     => AT__Helpers::clamp_builder((float) $min_value, (float) $max_value),
-                        ];
-                        
-                    endwhile;
-                endif;
-    
-                // Spacing
-                if ( AT__Helpers::is_spacing_tab_activated() && have_rows( 'field_63a6a51731bbb', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'spacing');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'spacing'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variables
-                    while ( have_rows( 'field_63a6a51731bbb', 'bricks-advanced-themer' ) ) :
-                        the_row();
-    
-                        $label = get_sub_field('brxc_spacing_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $min_value = get_sub_field('brxc_spacing_min_value', 'bricks-advanced-themer' );
-                        $max_value = get_sub_field('brxc_spacing_max_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'        => AT__Helpers::generate_unique_string(6),
-                            'name'      => $label_final,
-                            'category'  => $category_id,
-                            'type'      => 'clamp',
-                            'min'       => $min_value,
-                            'max'       => $max_value,
-                            'value'     => AT__Helpers::clamp_builder((float) $min_value, (float) $max_value),
-                        ];
-                        
-                    endwhile;
-                endif;
-
-                // Border-radius
-                if ( AT__Helpers::is_border_radius_tab_activated() && have_rows( 'field_63c8f17f5e2ed', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'border-radius');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'border-radius'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variables
-                    while ( have_rows( 'field_63c8f17f5e2ed', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $label = get_sub_field('brxc_border_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $min_value = get_sub_field('brxc_border_min_value', 'bricks-advanced-themer' );
-                        $max_value = get_sub_field('brxc_border_max_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'        => AT__Helpers::generate_unique_string(6),
-                            'name'      => $label_final,
-                            'category'  => $category_id,
-                            'type'      => 'clamp',
-                            'min'       => $min_value,
-                            'max'       => $max_value,
-                            'value'     => AT__Helpers::clamp_builder((float) $min_value, (float) $max_value),
-                        ];
-                        
-                    endwhile; 
-                endif;
-
-                // Border
-                if ( AT__Helpers::is_border_tab_activated() && have_rows( 'field_63c8f17ytr545', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'border');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'border'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variablies
-                    while ( have_rows( 'field_63c8f17ytr545', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $label = get_sub_field('brxc_border_simple_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $value = get_sub_field('brxc_border_simple_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'        => AT__Helpers::generate_unique_string(6),
-                            'name'      => $label_final,
-                            'category'  => $category_id,
-                            'type'      => 'static',
-                            'value'     => $value,
-                        ];
-                        
-                    endwhile;
-                endif;
-
-                // Box-shadow
-                if ( AT__Helpers::is_box_shadow_tab_activated() && have_rows( 'field_63c8f17s4stt6', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'box-shadow');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'box-shadow'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variables
-                    while ( have_rows( 'field_63c8f17s4stt6', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $label = get_sub_field('brxc_box_shadow_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $value = get_sub_field('brxc_box_shadow_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'     => AT__Helpers::generate_unique_string(6),
-                            'name'   => $label_final,
-                            'category'  => $category_id,
-                            'type'   => 'static',
-                            'value'  => $value,
-                        ];
-                        
-                    endwhile;
-                endif;
-
-                // Width
-                if ( AT__Helpers::is_width_tab_activated() && have_rows( 'field_63c8f17ppo69i', 'bricks-advanced-themer' ) ) :
-
-                    // Category
-                    $entry = self::has_entry_with_name($categories, 'width');
-
-                    if($entry === false){
-                        $category_id = AT__Helpers::generate_unique_string(6);
-                        $categories[] = [
-                            'id'    => $category_id,
-                            'name'  => 'width'
-                        ];
-                    } else {
-                        $category_id = $entry['id'];
-                    }
-
-                    // Variables
-                    while ( have_rows( 'field_63c8f17ppo69i', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $label = get_sub_field('brxc_width_label', 'bricks-advanced-themer' );
-                        $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                        $min_value = get_sub_field('brxc_width_min_value', 'bricks-advanced-themer' );
-                        $max_value = get_sub_field('brxc_width_max_value', 'bricks-advanced-themer' );
-                        $variables[] = [
-                            'id'        => AT__Helpers::generate_unique_string(6),
-                            'name'      => $label_final,
-                            'category'  => $category_id,
-                            'type'      => 'clamp',
-                            'min'       => $min_value,
-                            'max'       => $max_value,
-                            'value'     => AT__Helpers::clamp_builder((float) $min_value, (float) $max_value),
-                        ];
-                        
-                    endwhile;
-                endif;
-
-                // Custom Variables
-
-                if ( AT__Helpers::is_custom_variables_tab_activated() && have_rows( 'field_64066a105f7ec', 'bricks-advanced-themer' ) ) :
-                    while ( have_rows( 'field_64066a105f7ec', 'bricks-advanced-themer' ) ) :
-                        the_row();
-
-                        $group = get_sub_field('brxc_misc_category_label', 'bricks-advanced-themer');
-                        // Flexible Content
-                        
-                        if( have_rows('field_63dd12891d1d9', 'bricks-advanced-themer') ):
-
-                            // Category
-                            $entry = self::has_entry_with_name($categories, $group);
-
-                            if($entry === false){
-                                $category_id = AT__Helpers::generate_unique_string(6);
-                                $categories[] = [
-                                    'id'    => $category_id,
-                                    'name'  => $group
-                                ];
-                            } else {
-                                $category_id = $entry['id'];
-                            }
-
-                            // Variables
-                            while ( have_rows('field_63dd12891d1d9', 'bricks-advanced-themer') ) : the_row();
-    
-                                // Case: Fluid
-                                if( get_row_layout() == 'brxc_misc_fluid_variable' ):
-                                    $label = get_sub_field('brxc_misc_fluid_label', 'bricks-advanced-themer' );
-                                    $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                                    $min_value = get_sub_field('brxc_misc_fluid_min_value', 'bricks-advanced-themer' );
-                                    $max_value = get_sub_field('brxc_misc_fluid_max_value', 'bricks-advanced-themer' );
-                                    $variables[] = [
-                                        'id'        => AT__Helpers::generate_unique_string(6),
-                                        'name'      => $label_final,
-                                        'category'  => $category_id,
-                                        'type'      => 'clamp',
-                                        'min'       => $min_value,
-                                        'max'       => $max_value,
-                                        'value'     => AT__Helpers::clamp_builder((float) $min_value, (float) $max_value),
-                                    ];
-                        
-                                // Case: Static
-                                elseif( get_row_layout() == 'brxc_misc_static_variable' ): 
-                                    $label = get_sub_field('brxc_misc_static_label', 'bricks-advanced-themer' );
-                                    $label_final = $prefix !== '' ? $prefix . '-' . $label : $label;
-                                    $value = get_sub_field('brxc_misc_static_value', 'bricks-advanced-themer' );
-                                    $variables[] = [
-                                        'id'        => AT__Helpers::generate_unique_string(6),
-                                        'name'      => $label_final,
-                                        'category'  => $category_id,
-                                        'type'      => 'static',
-                                        'value'     => $value,
-                                    ];
-                        
-                                endif;
-                                
-                            // End Flexible Content
-                            endwhile;
-                        endif;
-                    // End Repeater
-                    endwhile;
-                endif;
-
-            // End Global repeater
-            endwhile;
-        endif;
-
-        // Reset database entries
-        $option_data = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE '%bricks-advanced-themer__brxc_%' AND option_name LIKE '%_variables_repeater%'");
-
-        // Delete options
-        if(is_array($option_data)){
-            foreach ($option_data as $option) {
-                delete_option($option->option_name);
-            }
-        }
-
-        // Update globalVariablesCategories
-        if(is_array($categories) && !empty($categories)){
-            update_option( 'bricks_global_variables_categories', $categories );
-        } 
-
-        // Update globalVariables Array
-        if(is_array($variables) && !empty($variables)){
-            update_option( 'bricks_global_variables', $variables );  
-        } 
-
-
-        // Update database: CONVERTED
-        self::set_option_as_converted('global_css_variables');
-    }
-
     public static function convert_settings_to_logical_properties(array $obj): array {
         $keyTransformations = [
             '_margin' => [
@@ -700,6 +309,100 @@ class AT__Conversion{
             }
         }
     
+        return $transformedObj;
+    }
+
+    public static function convert_settings_to_directional_properties(array $obj): array {
+        $reverseTransformations = [
+            '_marginLogical' => [
+                'newKey' => '_margin',
+                'map' => ['block-start' => 'top', 'block-end' => 'bottom', 'inline-start' => 'left', 'inline-end' => 'right']
+            ],
+            '_paddingLogical' => [
+                'newKey' => '_padding',
+                'map' => ['block-start' => 'top', 'block-end' => 'bottom', 'inline-start' => 'left', 'inline-end' => 'right']
+            ],
+            '_borderWidthLogical' => [
+                'newKey' => '_border',
+                'map' => ['block-start-width' => 'top', 'block-end-width' => 'bottom', 'inline-start-width' => 'left', 'inline-end-width' => 'right'],
+                'subKey' => 'width'
+            ],
+            '_borderRadiusLogical' => [
+                'newKey' => '_border',
+                'map' => ['start-start-radius' => 'top', 'end-start-radius' => 'bottom', 'end-end-radius' => 'left', 'start-end-radius' => 'right'],
+                'subKey' => 'radius'
+            ],
+            '_borderStyle' => ['newKey' => '_border', 'subKey' => 'style'],
+            '_borderColor' => ['newKey' => '_border', 'subKey' => 'color'],
+            '_insetLogical' => [
+                'newKey' => null, // handled by subKey mapping
+                'map' => ['block-start' => '_top', 'block-end' => '_bottom', 'inline-start' => '_left', 'inline-end' => '_right']
+            ],
+            '_inlineSize'    => ['newKey' => '_width'],
+            '_inlineSizeMin' => ['newKey' => '_widthMin'],
+            '_inlineSizeMax' => ['newKey' => '_widthMax'],
+            '_blockSize'     => ['newKey' => '_height'],
+            '_blockSizeMin'  => ['newKey' => '_heightMin'],
+            '_blockSizeMax'  => ['newKey' => '_heightMax']
+        ];
+
+        $transformedObj = [];
+
+        foreach ($obj as $key => $value) {
+            $parts = explode(':', $key, 2);
+            $baseKey = $parts[0];
+            $suffix = isset($parts[1]) ? ":{$parts[1]}" : '';
+
+            if (isset($reverseTransformations[$baseKey])) {
+                $transform = $reverseTransformations[$baseKey];
+
+                // margin/padding/border width/radius maps
+                if (isset($transform['map']) && is_array($value)) {
+                    if ($baseKey === '_insetLogical') {
+                        // special case: inset maps directly to top/bottom/left/right
+                        foreach ($value as $subKey => $val) {
+                            $dirKey = $transform['map'][$subKey] ?? null;
+                            if ($dirKey) {
+                                $transformedObj[$dirKey . $suffix] = $val;
+                            }
+                        }
+                    } elseif (isset($transform['subKey'])) {
+                        $newArr = [];
+                        foreach ($value as $subKey => $val) {
+                            $dirKey = $transform['map'][$subKey] ?? $subKey;
+                            $newArr[$dirKey] = $val;
+                        }
+                        $newKey = $transform['newKey'] . $suffix;
+                        if (!isset($transformedObj[$newKey])) {
+                            $transformedObj[$newKey] = [];
+                        }
+                        $transformedObj[$newKey][$transform['subKey']] = $newArr;
+                    } else {
+                        $newArr = [];
+                        foreach ($value as $subKey => $val) {
+                            $dirKey = $transform['map'][$subKey] ?? $subKey;
+                            $newArr[$dirKey] = $val;
+                        }
+                        $transformedObj[$transform['newKey'] . $suffix] = $newArr;
+                    }
+                }
+                // simple key with optional subKey (style, color, size, etc.)
+                elseif (isset($transform['subKey'])) {
+                    $newKey = $transform['newKey'] . $suffix;
+                    if (!isset($transformedObj[$newKey])) {
+                        $transformedObj[$newKey] = [];
+                    }
+                    $transformedObj[$newKey][$transform['subKey']] = $value;
+                } else {
+                    $newKey = $transform['newKey'] . $suffix;
+                    $transformedObj[$newKey] = $value;
+                }
+            } else {
+                // no transformation → keep as is
+                $transformedObj[$key] = $value;
+            }
+        }
+
         return $transformedObj;
     }
 

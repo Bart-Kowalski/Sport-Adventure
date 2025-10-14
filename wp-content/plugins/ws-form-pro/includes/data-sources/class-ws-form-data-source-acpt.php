@@ -11,15 +11,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('ACPT Field Options', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving ACPT field options...', 'ws-form');
-
-			// Register action
-			parent::register($this);
-
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 
@@ -28,6 +19,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('ACPT Field Options', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving ACPT field options...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -69,7 +75,8 @@
 			$acpt_field_id = $this->{'data_source_' . $this->id . '_field_id'};
 
 			// Get ACPT field object
-			$acpt_field_object = WS_Form_ACPT::acpt_get_field_object($acpt_field_id);
+			$acpt_field_object = WS_Form_ACPT::acpt_get_field_object($acpt_field_id, 'posts');
+			if(empty($acpt_field_object)) { return self::error(__('Field ID not found', 'ws-form'), $field_id, $this, $api_request); }
 
 			// Get ACPT field name
 			$acpt_field_name = $acpt_field_object->name;
@@ -288,7 +295,7 @@
 					'placeholder'				=>	'#post_id',
 					'help'						=>	sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Choose the post ID to filter by. This can be a number or %s variable. If blank, the ID of the post the form is shown on will be used.', 'ws-form'),
 
 						WS_FORM_NAME_GENERIC

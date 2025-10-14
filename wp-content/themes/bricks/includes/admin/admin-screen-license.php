@@ -20,7 +20,7 @@ $license_status = License::get_license_status() ?? 'no_license';
 			<p>
 				<?php
 				// translators: %s = account url
-				printf( __( 'You can manage your license, update payment method and view your invoices right from %s.', 'bricks' ), '<a href="' . BRICKS_REMOTE_ACCOUNT . '" target="_blank">' . esc_html__( 'your account', 'bricks' ) . '</a>' );
+				printf( __( 'You can manage your license, update payment method and view your invoices right from %s.', 'bricks' ), '<a href="' . BRICKS_REMOTE_URL . '" target="_blank">' . esc_html__( 'your account', 'bricks' ) . '</a>' );
 				?>
 			</p>
 
@@ -52,8 +52,8 @@ $license_status = License::get_license_status() ?? 'no_license';
 				<p><?php esc_html_e( 'Activate your license to edit with Bricks, receive one-click updates, and access to all community templates.', 'bricks' ); ?></p>
 				<p>
 					<?php
-					// translators: %s = account url
-					printf( __( 'Log in to %s to retrieve your license key or copy & paste it from your purchase confirmation email.', 'bricks' ), '<a href="' . BRICKS_REMOTE_ACCOUNT . '" target="_blank">' . esc_html__( 'your account', 'bricks' ) . '</a>' );
+					// translators: %s = Bricks account URL
+					printf( __( 'Log in to %s to retrieve your license key or copy & paste it from your purchase confirmation email.', 'bricks' ), '<a href="' . BRICKS_REMOTE_URL . '" target="_blank">' . esc_html__( 'your account', 'bricks' ) . '</a>' );
 					?>
 				</p>
 

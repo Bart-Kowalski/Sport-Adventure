@@ -53,17 +53,17 @@
 
 								'fields' => array(
 
-									'_regular_price'  => array('label' => __('Regular Price', 'woocommerce'), 'type' => 'price', 'no_map' => true),
-									'_sale_price'   => array('label' => __('Sale Price', 'woocommerce'), 'type' => 'price', 'no_map' => true),
-									'_manage_stock' => array('label' => __('Manage Stock', 'woocommerce'), 'type' => 'checkbox', 'no_map' => true),
-									'_stock' => array('label' => __('Stock', 'woocommerce'), 'type' => 'number', 'no_map' => true),
-									'_sku'  => array('label' => __('SKU', 'woocommerce'), 'type' => 'text', 'no_map' => true),
-									'_weight'  => array('label' => __('Weight', 'woocommerce'), 'type' => 'number', 'no_map' => true),
-									'_length'  => array('label' => __('Length', 'woocommerce'), 'type' => 'number', 'no_map' => true),
-									'_width'  => array('label' => __('Width', 'woocommerce'), 'type' => 'number', 'no_map' => true),
-									'_height'  => array('label' => __('Height', 'woocommerce'), 'type' => 'number', 'no_map' => true),
-									'_virtual' => array('label' => __('Virtual', 'woocommerce'), 'type' => 'checkbox', 'no_map' => true)
-//									'_downloadable' => array('label' => __('Downloadable', 'woocommerce'), 'type' => 'checkbox', 'no_map' => true),
+									'_regular_price'  => array('label' => __('Regular Price', 'ws-form'), 'type' => 'price', 'no_map' => true),
+									'_sale_price'   => array('label' => __('Sale Price', 'ws-form'), 'type' => 'price', 'no_map' => true),
+									'_manage_stock' => array('label' => __('Manage Stock', 'ws-form'), 'type' => 'checkbox', 'no_map' => true),
+									'_stock' => array('label' => __('Stock', 'ws-form'), 'type' => 'number', 'no_map' => true),
+									'_sku'  => array('label' => __('SKU', 'ws-form'), 'type' => 'text', 'no_map' => true),
+									'_weight'  => array('label' => __('Weight', 'ws-form'), 'type' => 'number', 'no_map' => true),
+									'_length'  => array('label' => __('Length', 'ws-form'), 'type' => 'number', 'no_map' => true),
+									'_width'  => array('label' => __('Width', 'ws-form'), 'type' => 'number', 'no_map' => true),
+									'_height'  => array('label' => __('Height', 'ws-form'), 'type' => 'number', 'no_map' => true),
+									'_virtual' => array('label' => __('Virtual', 'ws-form'), 'type' => 'checkbox', 'no_map' => true)
+//									'_downloadable' => array('label' => __('Downloadable', 'ws-form'), 'type' => 'checkbox', 'no_map' => true),
 								)
 							)
 						);
@@ -81,17 +81,17 @@
 
 							'fields' => array(
 
-								'billing_first_name'  => array('label' => __('Billing First Name', 'woocommerce'), 'type' => 'text'),
-								'billing_last_name'   => array('label' => __('Billing Last Name', 'woocommerce'), 'type' => 'text'),
-								'billing_company'     => array('label' => __('Billing Company', 'woocommerce'), 'type' => 'text'),
-								'billing_address_1'   => array('label' => __('Billing Address 1', 'woocommerce'), 'type' => 'text'),
-								'billing_address_2'   => array('label' => __('Billing Address 2', 'woocommerce'), 'type' => 'text'),
-								'billing_city'        => array('label' => __('Billing City', 'woocommerce'), 'type' => 'text'),
-								'billing_state'       => array('label' => __('Billing State', 'woocommerce'), 'type' => 'text'),
-								'billing_postcode'    => array('label' => __('Billing Postal/Zip Code', 'woocommerce'), 'type' => 'text'),
-								'billing_country'     => array('label' => __('Billing Country / Region', 'woocommerce'), 'type' => 'select'),
-								'billing_phone'       => array('label' => __('Billing Phone Number', 'woocommerce'), 'type' => 'text'),
-								'billing_email'       => array('label' => __('Billing Email Address', 'woocommerce'), 'type' => 'text')
+								'billing_first_name'  => array('label' => __('Billing First Name', 'ws-form'), 'type' => 'text'),
+								'billing_last_name'   => array('label' => __('Billing Last Name', 'ws-form'), 'type' => 'text'),
+								'billing_company'     => array('label' => __('Billing Company', 'ws-form'), 'type' => 'text'),
+								'billing_address_1'   => array('label' => __('Billing Address 1', 'ws-form'), 'type' => 'text'),
+								'billing_address_2'   => array('label' => __('Billing Address 2', 'ws-form'), 'type' => 'text'),
+								'billing_city'        => array('label' => __('Billing City', 'ws-form'), 'type' => 'text'),
+								'billing_state'       => array('label' => __('Billing State', 'ws-form'), 'type' => 'text'),
+								'billing_postcode'    => array('label' => __('Billing Postal/Zip Code', 'ws-form'), 'type' => 'text'),
+								'billing_country'     => array('label' => __('Billing Country / Region', 'ws-form'), 'type' => 'select'),
+								'billing_phone'       => array('label' => __('Billing Phone Number', 'ws-form'), 'type' => 'text'),
+								'billing_email'       => array('label' => __('Billing Email Address', 'ws-form'), 'type' => 'text')
 							)
 						),
 
@@ -101,15 +101,15 @@
 
 							'fields' => array(
 
-								'shipping_first_name' => array('label' => __('Shipping First Name', 'woocommerce'), 'type' => 'text'),
-								'shipping_last_name'  => array('label' => __('Shipping Last Name', 'woocommerce'), 'type' => 'text'),
-								'shipping_company'    => array('label' => __('Shipping Company', 'woocommerce'), 'type' => 'text'),
-								'shipping_address_1'  => array('label' => __('Shipping Address 1', 'woocommerce'), 'type' => 'text'),
-								'shipping_address_2'  => array('label' => __('Shipping Address 2', 'woocommerce'), 'type' => 'text'),
-								'shipping_city'       => array('label' => __('Shipping City', 'woocommerce'), 'type' => 'text'),
-								'shipping_state'      => array('label' => __('Shipping State', 'woocommerce'), 'type' => 'text'),
-								'shipping_postcode'   => array('label' => __('Shipping Postal/Zip Code', 'woocommerce'), 'type' => 'text'),
-								'shipping_country'    => array('label' => __('Shipping Country / Region', 'woocommerce'), 'type' => 'select')
+								'shipping_first_name' => array('label' => __('Shipping First Name', 'ws-form'), 'type' => 'text'),
+								'shipping_last_name'  => array('label' => __('Shipping Last Name', 'ws-form'), 'type' => 'text'),
+								'shipping_company'    => array('label' => __('Shipping Company', 'ws-form'), 'type' => 'text'),
+								'shipping_address_1'  => array('label' => __('Shipping Address 1', 'ws-form'), 'type' => 'text'),
+								'shipping_address_2'  => array('label' => __('Shipping Address 2', 'ws-form'), 'type' => 'text'),
+								'shipping_city'       => array('label' => __('Shipping City', 'ws-form'), 'type' => 'text'),
+								'shipping_state'      => array('label' => __('Shipping State', 'ws-form'), 'type' => 'text'),
+								'shipping_postcode'   => array('label' => __('Shipping Postal/Zip Code', 'ws-form'), 'type' => 'text'),
+								'shipping_country'    => array('label' => __('Shipping Country / Region', 'ws-form'), 'type' => 'select')
 							)
 						)
 					);

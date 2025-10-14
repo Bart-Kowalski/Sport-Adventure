@@ -96,6 +96,22 @@
 	},
 
 	{	
+		"id"			:	"consent",
+		"label" 		: 	"Consent",
+		"file_path"		:	"consent/",
+		"templates"		:	[
+
+			{
+				"id"					:	"trustedform",
+				"label" 				: 	"TrustedForm",
+				"file_json"				:	"wsf-section-trustedform.json",
+				"preview_url"			:	false,
+				"pro_required"			:	true
+			}
+		]
+	},
+
+	{	
 		"id"			:	"contact",
 		"label" 		: 	"Contact",
 		"file_path"		:	"contact/",
@@ -150,7 +166,8 @@
 				"id"					:	"date-from-to",
 				"label" 				: 	"Date From / To",
 				"file_json"				:	"wsf-section-date-from-to.json",
-				"preview_url"			:	false
+				"preview_url"			:	false,
+				"pro_required"			:	true
 			},
 
 			{
@@ -254,7 +271,8 @@
 				"id"					:	"question",
 				"label" 				: 	"Question",
 				"file_json"				:	"wsf-section-question.json",
-				"preview_url"			:	false
+				"preview_url"			:	false,
+				"pro_required"			:	true
 			}
 		]
 	}

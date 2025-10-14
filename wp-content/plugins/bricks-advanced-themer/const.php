@@ -14,6 +14,5 @@ function brxc_is_option_enabled($option_key, $options) {
 }
 
 define('BRICKS_ADVANCED_THEMER_CLAMP_SETTINGS_CONVERTED', brxc_is_option_enabled('clamp_settings', $brxc_options));
-define('BRICKS_ADVANCED_THEMER_CSS_VARIABLES_CONVERTED', brxc_is_option_enabled('global_css_variables', $brxc_options));
 define('BRICKS_ADVANCED_THEMER_GRID_UTILITY_CLASSES_CONVERTED', brxc_is_option_enabled('grid_utility_classes_3_2', $brxc_options));
 define('BRICKS_ADVANCED_THEMER_GLOBAL_COLORS_PREFIX_CONVERTED', brxc_is_option_enabled('global_colors_prefix', $brxc_options));

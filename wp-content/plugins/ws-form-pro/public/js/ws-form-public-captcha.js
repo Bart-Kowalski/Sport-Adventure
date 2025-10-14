@@ -45,6 +45,10 @@
 					break;
 			}
 			$('body').append(recaptcha_script_body);
+
+		} else {
+
+			window.wsf_recaptcha_loaded = true;
 		}
 
 		// Reset reCAPTCHA arrays

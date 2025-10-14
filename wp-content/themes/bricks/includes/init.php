@@ -38,6 +38,7 @@ class Theme {
 	public $instagram;
 	public $rank_math;
 	public $yoast;
+	public $block_editor;
 
 	public $builder;
 	public $frontend;
@@ -130,6 +131,7 @@ class Theme {
 		$this->instagram         = new Integrations\Instagram\Instagram();
 		$this->rank_math         = new Integrations\Rank_Math\Rank_Math();
 		$this->yoast             = new Integrations\Yoast\Yoast();
+		$this->block_editor      = new Integrations\Block_Editor();
 
 		if ( is_admin() ) {
 			$this->admin     = new Admin();
@@ -184,6 +186,9 @@ class Theme {
 				$this->query_filters_fields = Integrations\Query_Filters\Fields::get_instance(); // @since 1.11.1
 			}
 		}
+
+		// Include Query API class (@since 2.1)
+		require_once BRICKS_PATH . 'includes/integrations/query/query-api.php';
 	}
 
 	/**

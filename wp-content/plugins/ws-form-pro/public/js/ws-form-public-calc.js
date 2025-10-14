@@ -11,7 +11,7 @@
 
 			var calc = this.calc[calc_index];
 
-			var field_id = this.get_part_id(calc.field.id, calc.section_repeatable_index, 'field-wrapper');
+			var field_id = this.get_part_id(calc.field.id, calc.section_repeatable_index, ((calc.field.type == 'hidden') ? 'field' : 'field-wrapper'));
 
 			var field_obj = $('#' + field_id, this.form_canvas_obj);
 
@@ -145,12 +145,32 @@
 
 			case 'field_text_editor' :
 			case 'field_html' :
+			case 'summary' :
 
 				// Get field object
 				var field_wrapper_id = this.get_part_id(calc.field.id, calc.section_repeatable_index, 'field-wrapper');
 
+				// Determine attribute to target
+				switch(calc.field_part) {
+
+					case 'field_text_editor' :
+
+						var target_attribute = 'data-text-editor';
+						break;
+
+					case 'field_html' :
+
+						var target_attribute = 'data-html';
+						break;
+
+					case 'summary' :
+
+						var target_attribute = 'data-wsf-summary';
+						break;
+				}
+
 				// Get target object
-				var target_obj = $('[' + ((calc.field_part == 'field_text_editor') ? 'data-text-editor' : 'data-html') + ']', $('#' + field_wrapper_id, this.form_canvas_obj));
+				var target_obj = $('[' + target_attribute + ']', $('#' + field_wrapper_id, this.form_canvas_obj));
 
 				// Set HTML
 				target_obj.html(value);
@@ -320,11 +340,15 @@
 
 						target_obj.val(value);
 
-						if(field_trigger) { target_obj.trigger('change'); }
+						if(field_trigger) {
 
-						if(target_obj.hasClass('minicolors-input')) {
+							target_obj.trigger('change');
 
-							target_obj.minicolors('value', {color: value});
+							// Coloris
+							if(typeof(Coloris) !== 'undefined') {
+
+								target_obj[0].dispatchEvent(new Event('input', { bubbles: true }));
+							}
 						}
 
 						break;
@@ -355,10 +379,7 @@
 						// We can safely pass HTML entities to val() without risk of XSS
 
 						// Strip HTML
-						if(calc.field.type != 'textarea') {
-
-							value = this.html_strip(value);
-						}
+						value = this.esc_html_undo(value);
 
 						// Set value
 						target_obj.val(value);

@@ -157,8 +157,8 @@
 					// Error
 					WS_Form_Common::echo_esc_html(sprintf(
 
-						/* translators: %s = WS Form, %s = Error message */
-						__('%s Data Source CRON Error: %s', 'ws-form'),
+						/* translators: %1$s: WS Form, %2$s: Error message */
+						__('%1$s Data Source CRON Error: %2$s', 'ws-form'),
 						WS_FORM_NAME_GENERIC,
 						$error_message
 					));

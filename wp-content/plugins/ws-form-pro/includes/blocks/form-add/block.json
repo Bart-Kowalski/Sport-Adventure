@@ -1,0 +1,37 @@
+{
+  "apiVersion": 3,
+  "name": "wsf-block/form-add",
+  "title": "WS Form",
+  "example": {
+    "attributes": {
+      "form_id": "preview"
+    }
+  },
+  "supports": {
+    "html": false,
+    "customClassName": true,
+    "className": true,
+    "anchor": true,
+    "align": ["left", "center", "right", "wide", "full"],
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "dimensions": {
+      "minHeight": true
+    }
+  },
+  "attributes": {
+    "form_id": {
+      "type": "string",
+      "default": ""
+    },
+    "form_element_id": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "providesContext": {},
+  "usesContext": [],
+  "editorScript": ["ws-form-block-editor", "ws-form-block-editor-iframe"]
+}

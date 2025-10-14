@@ -2074,7 +2074,7 @@ function bricksCreateMultiselect(selectId, options = {}) {
  *
  * @since 2.0
  */
-function bricksElementManger() {
+function bricksElementManager() {
 	let elementManagerForm = document.getElementById('bricks-element-manager')
 
 	if (!elementManagerForm) {
@@ -3103,6 +3103,41 @@ function bricksAdminMaintenanceExcludedPosts() {
 }
 
 /**
+ * User activation
+ *
+ * @since 2.1
+ */
+function bricksAdminUserActivation() {
+	// STEP: Get needed elements
+	const userActivationCheckbox = document.getElementById('userActivationEnabled')
+	const activationElements = document.querySelectorAll('[data-on="userActivationEnabled"]')
+
+	// STEP: Check if all required elements exist, otherwise return
+	if (!userActivationCheckbox || !activationElements.length) {
+		return
+	}
+
+	// General function to toggle visibility of elements
+	const toggle = function (elements, toggle) {
+		elements.forEach((element) => {
+			if (toggle) {
+				element.classList.remove('hide')
+			} else {
+				element.classList.add('hide')
+			}
+		})
+	}
+
+	// STEP: Toggle visibility of activation elements
+	toggle(activationElements, userActivationCheckbox.checked)
+
+	// STEP: Add event listeners
+	userActivationCheckbox.addEventListener('change', function (e) {
+		toggle(activationElements, e.target.checked)
+	})
+}
+
+/**
  * Handle attribute & term image swatch uploads
  *
  * @since 2.0
@@ -3559,8 +3594,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
 	bricksAdminTemplateExclusion()
 	bricksAdminMaintenanceExcludedPosts()
 
-	bricksElementManger()
+	bricksAdminUserActivation()
 	bricksAdminElementManagerUsage()
+	bricksElementManager()
 
 	bricksAttributeImageSwatches()
 	bricksAttributeColorSwatches()

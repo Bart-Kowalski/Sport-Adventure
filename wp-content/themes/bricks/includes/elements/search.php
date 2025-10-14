@@ -323,6 +323,36 @@ class Element_Search extends Element {
 
 		// SEARCH OVERLAY
 
+		$this->controls['overlayFormDirection'] = [
+			'group'   => 'overlay',
+			'label'   => esc_html__( 'Direction', 'bricks' ) . ' (' . esc_html__( 'Form', 'bricks' ) . ')',
+			'inline'  => true,
+			'tooltip' => [
+				'content'  => 'flex-direction',
+				'position' => 'top-left',
+			],
+			'type'    => 'direction',
+			'css'     => [
+				[
+					'property' => 'flex-direction',
+					'selector' => '.bricks-search-overlay form',
+				],
+			],
+		];
+
+		$this->controls['overlayFormGap'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Gap', 'bricks' ),
+			'type'  => 'number',
+			'units' => true,
+			'css'   => [
+				[
+					'property' => 'gap',
+					'selector' => '.bricks-search-overlay form',
+				],
+			],
+		];
+
 		$this->controls['searchOverlayTitle'] = [
 			'group'   => 'overlay',
 			'label'   => esc_html__( 'Title', 'bricks' ),
@@ -371,6 +401,68 @@ class Element_Search extends Element {
 				[
 					'property' => 'background-color',
 					'selector' => '.bricks-search-overlay:after',
+				],
+			],
+		];
+
+		// OVERLAY BUTTON
+		$this->controls['overlayIconWidth'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Button', 'bricks' ) . ': ' . esc_html__( 'Width', 'bricks' ),
+			'type'  => 'number',
+			'units' => true,
+			'css'   => [
+				[
+					'property' => 'width',
+					'selector' => '.bricks-search-overlay button[type="submit"]',
+				],
+			],
+		];
+
+		$this->controls['overlayButtonPadding'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Button', 'bricks' ) . ': ' . esc_html__( 'Padding', 'bricks' ),
+			'type'  => 'spacing',
+			'css'   => [
+				[
+					'property' => 'padding',
+					'selector' => '.bricks-search-overlay button[type="submit"]',
+				],
+			],
+		];
+
+		$this->controls['overlayButtonBackground'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Button', 'bricks' ) . ': ' . esc_html__( 'Background color', 'bricks' ),
+			'type'  => 'color',
+			'css'   => [
+				[
+					'property' => 'background-color',
+					'selector' => '.bricks-search-overlay button[type="submit"]',
+				],
+			],
+		];
+
+		$this->controls['overlayButtonBorder'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Button', 'bricks' ) . ': ' . esc_html__( 'Border', 'bricks' ),
+			'type'  => 'border',
+			'css'   => [
+				[
+					'property' => 'border',
+					'selector' => '.bricks-search-overlay button[type="submit"]',
+				],
+			],
+		];
+
+		$this->controls['overlayButtonTypography'] = [
+			'group' => 'overlay',
+			'label' => esc_html__( 'Button', 'bricks' ) . ': ' . esc_html__( 'Typography', 'bricks' ),
+			'type'  => 'typography',
+			'css'   => [
+				[
+					'property' => 'font',
+					'selector' => '.bricks-search-overlay button[type="submit"]',
 				],
 			],
 		];

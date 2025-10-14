@@ -14,7 +14,7 @@
 		public $record_count = false;
 
 		// Construct
-	    public function __construct() {
+		public function __construct() {
 
 			parent::__construct(array(
 
@@ -27,7 +27,7 @@
 			add_filter('list_table_primary_column',[$this, 'list_table_primary_column'], 10, 2);
 
 			// Get the form ID
-			$this->form_id = absint(WS_Form_Common::get_query_var('id'));
+			self::get_form_id();
 
 			// Initialize submit fields
 			$this->submit_fields = array();
@@ -40,7 +40,7 @@
 
 				$submit_fields = $ws_form_submit->db_get_submit_fields();
 
-				$ws_form_field = New WS_Form_Field();
+				$ws_form_field = new WS_Form_Field();
 
 				if($submit_fields !== false) {
 
@@ -61,13 +61,77 @@
 					}
 				}
 			}
-	    }
+		}
 
-	    // Get columns
+		// Get form ID
+		public function get_form_id() {
+
+			// Is query var provided?
+			$id_set = (WS_Form_Common::get_query_var('id') != '');
+
+			// Get form ID by query var
+			$this->form_id = absint(WS_Form_Common::get_query_var('id'));
+
+			// If no form is selected, get last form ID used
+			if(
+				($this->form_id == 0) &&
+				!$id_set
+			) {
+				// Get form ID from option
+				$form_id_last = absint(WS_Form_Common::option_get('submit_table_form_id', 0));
+				if($form_id_last > 0) {
+
+					$this->form_id = $form_id_last;
+				}
+			}
+
+			// If no form selected, and there is only one form, select it
+			if(
+				($this->form_id == 0) &&
+				!$id_set
+			) {
+				// Get form ID from database if there is only one form
+				$ws_form_form = new WS_Form_Form();
+				$ws_form_form->db_count_update_all();
+				$forms = $ws_form_form->db_read_all(
+
+					'',
+					"NOT (status = 'trash') AND count_submit > 0",
+					'label ASC',
+					'',
+					'',
+					false,
+					false,
+					'id'
+				);
+
+				if(count($forms) == 1) {
+
+					$this->form_id = absint($forms[0]['id']);
+				}
+			}
+
+			// Check if form ID specified exists
+			if($this->form_id > 0) {
+
+				$ws_form_form = new WS_Form_Form();
+				$ws_form_form->id = $this->form_id;
+				if(!$ws_form_form->db_check_id_exists()) {
+
+					// Form ID doesn't exists, so set to 0
+					$this->form_id = 0;
+				}
+			}
+
+			// Save last used form ID
+			WS_Form_Common::option_set('submit_table_form_id', $this->form_id);
+		}
+
+		// Get columns
 		public function get_columns() {
 
 			// Initial columns
-  		  	$columns = [
+			$columns = [
 
 				'cb'			=> '<input type="checkbox" />',
 				'media'			=> '<div class="wsf-starred wsf-starred-header">' . WS_Form_Config::get_icon_16_svg('rating') . '</div>',
@@ -126,7 +190,7 @@
 			if(isset($item->viewed) && !$item->viewed) { $class_array[] = 'wsf-submit-not-viewed'; }
 			$class = implode(' ', $class_array);
 
-			echo '<tr' . (($class != '') ? ' class="' . $class . '"' : '') . '>';
+			echo '<tr' . (($class != '') ? ' class="' . esc_attr($class) . '"' : '') . '>';
 			$this->single_row_columns( $item );
 			echo '</tr>';
 		}
@@ -243,7 +307,7 @@
 							// Build lookup URL
 							$latlon_lookup_url = WS_Form_Common::mask_parse($latlon_lookup_url_mask, $latlon_lookup_url_mask_values);
 
-							$value = '<a href="' . esc_attr($latlon_lookup_url) . '" target="_blank">' . esc_html($value) . '</a>';
+							$value = sprintf('<a href="%s" target="_blank">%s</a>', esc_url($latlon_lookup_url), esc_html($value));
 
 						} else {
 
@@ -256,20 +320,58 @@
 
 					break;
 
+
+				case 'url' :
+
+					$value = implode($submit_delimiter_row, array_map(function($value) {
+
+						$value_url = WS_Form_Common::get_url($value);
+						return !empty($value_url) ? sprintf(
+
+							'<a href="%s" target="_blank">%s</a>',
+							esc_url($value),
+							esc_html($value)
+
+						) : esc_html($value);
+
+					}, $values_array));
+
+					break;
+
 				case 'tel' :
 
-					$value = implode($submit_delimiter_row, array_map(function($tel) { return sprintf('<a href="tel:%s">%s</a>', esc_attr(WS_Form_Common::get_tel($tel)), esc_html($tel)); }, $values_array));
+					$value = implode($submit_delimiter_row, array_map(function($value) {
+
+						$value_tel = WS_Form_Common::get_tel($value);
+						return !empty($value_tel) ? sprintf(
+
+							'<a href="%s">%s</a>',
+							(!empty($value_tel) ? esc_url('tel:' . $value_tel) : ''),
+							esc_html($value)
+
+						) : esc_html($value);
+
+					}, $values_array));
+
 					break;
 
 				case 'email' :
 
-					$value = implode($submit_delimiter_row, array_map(function($email) { return sprintf('<a href="mailto:%1$s">%1$s</a>', esc_attr($email)); }, $values_array));
+					$value = implode($submit_delimiter_row, array_map(function($value) {
+
+						$value_email = WS_Form_Common::get_email($value);
+						return !empty($value_email) ? sprintf(
+
+							'<a href="%s">%s</a>',
+							(!empty($value_email) ? esc_url('mailto:' . $value_email) : ''),
+							esc_html($value)
+
+						) : esc_html($value);
+
+					}, $values_array));
+
 					break;
 
-				case 'url' :
-
-					$value = implode($submit_delimiter_row, array_map(function($url) { return sprintf('<a href="%1$s" target="_blank">%1$s</a>', esc_attr($url)); }, $values_array));
-					break;
 
 				case 'rating' :
 
@@ -314,7 +416,7 @@
 
 						if($range >= 1 && (($max - $min) >= 1)) {
 
-							$value = sprintf('<progress class="wsf-progress wsf-progress-small" min="%2$s" max="%3$s" value="%1$s"></progress><div class="wsf-helper">%1$s</div>', esc_attr($range), esc_attr($min), esc_attr($max));
+							$value = sprintf('<progress class="wsf-progress wsf-progress-small" min="%d" max="%d" value="%d"></progress><div class="wsf-helper">%d</div>', esc_attr($min), esc_attr($max), esc_attr($range), esc_html($range));
 
 						} else {
 
@@ -329,7 +431,7 @@
 
 				case 'color' :
 
-					$value = implode($submit_delimiter_row, array_map(function($color) { return sprintf('<span class="wsf-submit-color-sample" style="background:%1$s"></span><span class="wsf-submit-color">%1$s</span>', $color); }, $values_array));
+					$value = implode($submit_delimiter_row, array_map(function($color) { return sprintf('<span class="wsf-submit-color-sample" style="background:%s"></span><span class="wsf-submit-color">%s</span>', esc_attr($color), esc_html($color)); }, $values_array));
 
 					break;
 
@@ -385,7 +487,7 @@
 			$icon = isset($file_types[$type]) ? $file_types[$type]['icon'] : $file_types['default']['icon'];
 
 			// Download
-			$return_html = sprintf('<a download="%1$s" href="%2$s" title="%1$s">%3$s</a>', esc_attr($name), esc_attr($url), WS_Form_Config::get_icon_16_svg($icon));
+			$return_html = sprintf('<a download="%1$s" href="%2$s" title="%1$s">%3$s</a>', esc_attr($name), esc_url($url), WS_Form_Config::get_icon_16_svg($icon));
 
 			return $return_html;
 		}
@@ -461,12 +563,13 @@
 						WS_Form_Common::can_user('edit_submission')
 					) {
 
-						$form_id = absint(WS_Form_Common::get_query_var('id'));
+						// Get form ID
+						$form_id = absint($item->form_id);
 
 						$actions['wsf-edit-preview'] = sprintf(
 
 							'<a href="%s" target="_blank">%s</a>',
-							WS_Form_Common::get_preview_url($form_id, 'ws-form', false, $item->hash),
+							esc_url(WS_Form_Common::get_preview_url($form_id, false, false, false, false, $item->hash, 'ws-form')),
 							__('Edit in Preview', 'ws-form')
 						);
 					}
@@ -503,10 +606,16 @@
 
 			// Spam level indicator
 			$spam_level = isset($item->spam_level) ? $item->spam_level : null;
-			$spam_level_indicator = is_null($spam_level) ? '' : '<span class="wsf-spam-level" style="background:' . WS_Form_Common::get_green_to_red_rgb($spam_level, 0, WS_FORM_SPAM_LEVEL_MAX) . '" title="' . sprintf(__('Spam level: %u%%', 'ws-form'), round($spam_level)) . '"></span>';
+			$spam_level_indicator = is_null($spam_level) ? '' : '<span class="wsf-spam-level" style="background:' . WS_Form_Color::get_green_to_red_rgb($spam_level, 0, WS_FORM_SPAM_LEVEL_MAX) . '" title="' . sprintf(
+
+					/* translators: %u: Spam level 0 - 100 */
+					__('Spam level: %u%%', 'ws-form'),
+					round($spam_level)
+
+				) . '"></span>';
 
 			// Build title
-			$ws_form_submit = New WS_Form_Submit();
+			$ws_form_submit = new WS_Form_Submit();
 			$title = $spam_level_indicator . $ws_form_submit->db_get_status_name($item->status) . ($preview ? ' (' . __('Preview', 'ws-form') . ')' : '');
 
 			return $title;
@@ -536,7 +645,7 @@
 		function get_views(){
 
 			// Get data from API
-			$ws_form_submit = New WS_Form_Submit();
+			$ws_form_submit = new WS_Form_Submit();
 
 			$views = array();
 			$current = WS_Form_Common::get_query_var('ws-form-status', 'all');
@@ -545,40 +654,71 @@
 			// All link
 			$count_all = $ws_form_submit->db_get_count_by_status($this->form_id);
 			if($count_all) {
-				$class = ($current === 'all' ? ' class="current"' :'');
-				$views['all'] = "<a href=\"{$all_url}\" {$class} >" . __('All', 'ws-form') . " <span class=\"count\">$count_all</span></a>";
+
+				$views['all'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'all', $all_url)),
+					($current === 'all' ? ' class="current"' :''),
+					__('All', 'ws-form'),
+					$count_all
+				);
 			}
 
 			// Draft link
 			$count_draft = $ws_form_submit->db_get_count_by_status($this->form_id, 'draft');
 			if($count_draft) {
-				$draft_url = add_query_arg('ws-form-status', 'draft', $all_url);
-				$class = ($current === 'draft' ? ' class="current"' :'');
-				$views['draft'] = "<a href=\"{$draft_url}\" {$class} >" . __('In Progress', 'ws-form') . " <span class=\"count\">$count_draft</span></a>";
+
+				$views['draft'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'draft', $all_url)),
+					($current === 'draft' ? ' class="current"' :''),
+					__('In Progress', 'ws-form'),
+					$count_draft
+				);
 			}
 
 			// Published link
 			$count_publish = $ws_form_submit->db_get_count_by_status($this->form_id, 'publish');
 			if($count_publish) {
-				$publish_url = add_query_arg('ws-form-status', 'publish', $all_url);
-				$class = ($current === 'publish' ? ' class="current"' :'');
-				$views['publish'] = "<a href=\"{$publish_url}\" {$class} >" . __('Submitted', 'ws-form') . " <span class=\"count\">$count_publish</span></a>";
+
+				$views['publish'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'publish', $all_url)),
+					($current === 'publish' ? ' class="current"' :''),
+					__('Submitted', 'ws-form'),
+					$count_publish
+				);
 			}
 
 			// Spam link
 			$count_spam = $ws_form_submit->db_get_count_by_status($this->form_id, 'spam');
 			if($count_spam) {
-				$spam_url = add_query_arg('ws-form-status', 'spam', $all_url);
-				$class = ($current === 'spam' ? ' class="current"' :'');
-				$views['spam'] = "<a href=\"{$spam_url}\" {$class} >" . __('Spam', 'ws-form') . " <span class=\"count\">$count_spam</span></a>";
+
+				$views['spam'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'spam', $all_url)),
+					($current === 'spam' ? ' class="current"' :''),
+					__('Spam', 'ws-form'),
+					$count_spam
+				);
 			}
 
-			// Trash link
+			// Trashed link
 			$count_trash = $ws_form_submit->db_get_count_by_status($this->form_id, 'trash');
 			if($count_trash) {
-				$trash_url = add_query_arg('ws-form-status', 'trash', $all_url);
-				$class = ($current === 'trash' ? ' class="current"' :'');
-				$views['trash'] = "<a href=\"{$trash_url}\" {$class} >" . __('Trash', 'ws-form') . " <span class=\"count\">$count_trash</span></a>";
+
+				$views['trash'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'trash', $all_url)),
+					($current === 'trash' ? ' class="current"' :''),
+					__('Trash', 'ws-form'),
+					$count_trash
+				);
 			}
 
 			return $views;
@@ -620,7 +760,7 @@
 			$clear_hidden_fields = (get_user_meta(get_current_user_id(), 'ws_form_submissions_clear_hidden_fields', true) === 'on');
 
 			// Get data from core
-			$ws_form_submit = New WS_Form_Submit();
+			$ws_form_submit = new WS_Form_Submit();
 			$ws_form_submit->form_id = $this->form_id;
 
 			return $ws_form_submit->db_read_all(
@@ -739,15 +879,25 @@
 			if($which != 'top') { return; }
 
 			// Select form
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->db_count_update_all();
-			$forms = $ws_form_form->db_read_all('', "NOT (status = 'trash') AND count_submit > 0", 'label ASC', '', '', false);
+			$forms = $ws_form_form->db_read_all(
+
+				'',
+				(
+					($this->form_id > 0) ? sprintf("(NOT (status = 'trash') AND count_submit > 0) OR (id = %u)", $this->form_id) : "NOT (status = 'trash') AND count_submit > 0"
+				),
+				'label ASC',
+				'',
+				'',
+				false
+			);
 
 			if($forms) {
 ?>
 <div class="alignleft actions">
 <select id="wsf_filter_id" name="id">
-<option value=""><?php esc_html_e('Select form...', 'ws-form'); ?></option>
+<option value="0"><?php esc_html_e('Select form...', 'ws-form'); ?></option>
 <?php
 				foreach($forms as $form) {
 
@@ -760,10 +910,21 @@
 					if($form['id'] == $this->form_id) { echo ' selected'; }
 ?>><?php
 					// Label
-					WS_Form_Common::echo_esc_html(sprintf(__('%s (ID: %u)', 'ws-form'), $form['label'], $form['id']));
+					WS_Form_Common::echo_esc_html(sprintf(
+
+						'%s (%s: %u)',
+						$form['label'],
+						__('ID', 'ws-form'),
+						$form['id']
+					));
 
 					// Submit count
-					WS_Form_Common::echo_esc_html(' - ' . sprintf(_n('%u record', '%u records', $count_submit, 'ws-form'), $count_submit));
+					WS_Form_Common::echo_esc_html(' - ' . sprintf(
+
+						/* translators: %u: Submission count */
+						_n('%u record', '%u records', $count_submit, 'ws-form'),
+						$count_submit
+					));
 ?></option>
 <?php
 				}
@@ -792,9 +953,9 @@
 		// Set primary column
 		public function list_table_primary_column($default, $screen) {
 
-		    if($screen === 'ws-form_page_ws-form-submit') { $default = 'id'; }
+			if($screen === 'ws-form_page_ws-form-submit') { $default = 'id'; }
 
-		    return $default;
+			return $default;
 		}
 
 		// Get record count
@@ -807,7 +968,7 @@
 			if($this->record_count !== false) { return $this->record_count; }
 
 			// Get data from API
-			$ws_form_submit = New WS_Form_Submit();
+			$ws_form_submit = new WS_Form_Submit();
 			$ws_form_submit->form_id = $this->form_id;
 
 			// Get record count

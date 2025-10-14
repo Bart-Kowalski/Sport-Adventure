@@ -69,6 +69,8 @@ window.addEventListener('load', () => {
     toggles.forEach(toggle => {
         toggle.classList.remove('no-animation');
         toggle.removeAttribute('data-no-animation');
+        const input = toggle.querySelector('input[type="checkbox"]');
+        if(input) input.style = "";
 
     })
 })

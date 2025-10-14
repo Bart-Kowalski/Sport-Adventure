@@ -55,10 +55,13 @@ final class WS_Form {
 
 		// Filter DropzoneJS files
 		add_action('pre_get_posts', 'WS_Form_File_Handler::dropzonejs_filter_attachments', 10);
+		add_action('template_redirect', 'WS_Form_File_Handler::dropzonejs_filter_attachment_posts', 10);
 	}
 
 	// Load the required dependencies for this plugin.
 	private function load_dependencies() {
+
+		$wp_version = get_bloginfo('version');
 
 		// Configuration (Options, field types, field variables)
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/class-ws-form-config.php';
@@ -69,15 +72,13 @@ final class WS_Form {
 		// The class responsible for defining internationalization functionality of the plugin
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/class-ws-form-i18n.php';
 
-		// The class responsible for customizing
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/class-ws-form-customize.php';
-
 		// The classes responsible for populating WP List Tables
 		if(is_admin()) {
 
 			require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 			require_once WS_FORM_PLUGIN_DIR_PATH . 'admin/class-ws-form-wp-list-table-form.php';
 			require_once WS_FORM_PLUGIN_DIR_PATH . 'admin/class-ws-form-wp-list-table-submit.php';
+			require_once WS_FORM_PLUGIN_DIR_PATH . 'admin/class-ws-form-wp-list-table-style.php';
 		}
 
 		// The class responsible for defining all actions that occur in the admin area
@@ -88,6 +89,7 @@ final class WS_Form {
 
 		// The class responsible for managing form previews
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'public/class-ws-form-preview.php';
+
 		// The class responsible for managing conversational forms
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'public/class-ws-form-conversational.php';
 		// The class responsible for the widget
@@ -99,11 +101,19 @@ final class WS_Form {
 		// Cron
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-cron.php';
 
+		// Color
+		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/class-ws-form-color.php';
+
 		// Reporting
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-report-cron.php';
+
 		// Object classes
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-meta.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-form.php';
+		if(WS_FORM_ABILITY_CLASS) {
+
+			require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-json.php';
+		}
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-group.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-section.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-field.php';
@@ -112,6 +122,7 @@ final class WS_Form {
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-submit-export.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-template.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-css.php';
+		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-style.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-encryption.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-form-stat.php';
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-view.php';
@@ -121,7 +132,6 @@ final class WS_Form {
 
 		// Actions - Spam protection
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/actions/class-ws-form-action-akismet.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/actions/class-ws-form-action-human-presence.php';
 
 		// Actions - GDPR
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/actions/class-ws-form-action-data-erasure-request.php';
@@ -163,29 +173,28 @@ final class WS_Form {
 		// Functions
 		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/functions.php';
 
-		// Visual builders
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/beaver-builder/fl-ws-form.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/divi/ws-form/ws-form.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/elementor/elementor.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/oxygen/oxygen.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/bricks/bricks.php';
-		require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/breakdance/breakdance.php';
+		// Blocks
+ 		if(WS_Form_Common::version_compare($wp_version, '5.9') >= 0) {
 
-		// Litespeed
-		if(class_exists('LiteSpeed\Core')) {
-
-			require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/litespeed/litespeed.php';
+ 			// API version 3
+			require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/blocks/form-add/form-add.php';
 		}
 
-		// Check for third party components when plugins loaded. Run before add-ons with priority 5.
+		// Ability class
+		if(WS_FORM_ABILITY_CLASS) {
+
+			require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/core/class-ws-form-ability.php';
+		}
+
+		// ability-api
+		if(WS_Form_Common::ability_api_enabled()) {
+
+			$ws_form_ability = new WS_Form_Ability();
+			add_action('abilities_api_init', array($ws_form_ability, 'register'));
+		}
+
+		// Third party
 		add_action('plugins_loaded', function() {
-
-			// WooCommerce
-			if(defined('WC_VERSION')) {
-
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/woocommerce/class-ws-form-woocommerce.php';
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-woocommerce.php';
-			}
 
 			// ACF
 			if(class_exists('ACF')) {
@@ -194,11 +203,87 @@ final class WS_Form {
 				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-acf.php';
 			}
 
-			// Meta Box
-			if(class_exists('RWMB_Loader')) {
+			// ACPT
+			if(
+				defined('ACPT_PLUGIN_VERSION') &&
+				(WS_Form_Common::version_compare(ACPT_PLUGIN_VERSION, '2.0.0') >= 0)
+			) {
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/acpt/class-ws-form-acpt-v2.php';
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-acpt.php';
+			}
 
+			// Angie
+			if(WS_Form_Common::angie_enabled()) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/angie/angie.php';
+			}
+
+			// Beaver Builder
+			if(class_exists('FLBuilder')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/beaver-builder/fl-ws-form.php';
+			}
+
+			// Breakdance
+			if(defined('__BREAKDANCE_VERSION')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/breakdance/breakdance.php';
+			}
+
+			// Bricks Theme (Don't remove init action)
+			add_action('init', function() {
+
+				if(class_exists('\Bricks\Elements')) {
+
+					require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/bricks/bricks.php';
+				}
+
+			}, 11);
+
+			// Divi
+			if(
+				wp_get_theme()->get('Name') === 'Divi' ||
+				wp_get_theme()->get('Template') === 'Divi' ||
+				file_exists( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' ) ||
+				defined('ET_CORE_VERSION') ||
+				class_exists('ET_Builder_Module')
+			) {
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/divi/ws-form/ws-form.php';
+			}
+
+			// Elementor
+			if(defined('ELEMENTOR_VERSION')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/elementor/elementor.php';
+			}
+
+			// JetEngine
+			if(class_exists('Jet_Engine')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/jetengine/class-ws-form-jetengine.php';
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-jetengine.php';
+			}
+
+			// Litespeed
+			if(class_exists('LiteSpeed\Core')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/litespeed/litespeed.php';
+			}
+
+			// Meta Box
+			if(
+				defined('RWMB_VER') ||
+				defined('META_BOX_LITE_DIR') ||
+				defined('META_BOX_AIO_DIR')
+			) {
 				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/meta-box/class-ws-form-meta-box.php';
 				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-meta-box.php';
+			}
+
+			// Oxygen
+			if(class_exists('OxyEl')) {
+
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/oxygen/oxygen.php';
 			}
 
 			// Pods
@@ -215,21 +300,11 @@ final class WS_Form {
 				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-toolset.php';
 			}
 
-			// JetEngine
-			if(class_exists('Jet_Engine')) {
+			// WooCommerce
+			if(defined('WC_VERSION')) {
 
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/jetengine/class-ws-form-jetengine.php';
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-jetengine.php';
-			}
-
-			// ACPT
-			if(
-				class_exists('ACPT') &&
-				defined('ACPT_PLUGIN_VERSION') &&
-				(WS_Form_Common::version_compare(ACPT_PLUGIN_VERSION, '2.0.0') >= 0)
-			) {
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/acpt/class-ws-form-acpt-v2.php';
-				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-acpt.php';
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/third-party/woocommerce/class-ws-form-woocommerce.php';
+				require_once WS_FORM_PLUGIN_DIR_PATH . 'includes/data-sources/class-ws-form-data-source-woocommerce.php';
 			}
 
 /*			// Translation
@@ -257,7 +332,119 @@ final class WS_Form {
 			do_action('wsf_loaded');
 		});
 
+		// Options and styles are initialized on init because of translated strings
+		// The activation script sets two options to initialize these because init is not called during activation
+		add_action('init', function() {
+
+			// Check if options need to be initialized
+			if(WS_Form_Common::option_get('options_init')) {
+
+				// Initialize options
+				self::options_init();
+
+				// Remove option
+				WS_Form_Common::option_remove('options_init');
+			}
+
+			// Check if styler needs to be initialized
+			if(WS_Form_Common::option_get('styler_init')) {
+
+				// Initialize styles
+				self::styler_init(WS_Form_Common::option_get('styler_init') == 'fresh_intall');
+
+				// Remove option
+				WS_Form_Common::option_remove('styler_init');
+			}
+		});
+
 		$this->loader = new WS_Form_Loader();
+	}
+
+	private function options_init() {
+
+		// Get mode
+		$mode = WS_Form_Common::option_get('mode', 'basic', true);
+
+		// Get  options
+		$options = WS_Form_Config::get_options(false);
+
+		// Set up options with default values
+		foreach($options as $tab => $attributes) {
+
+			if(isset($attributes['fields'])) {
+
+				$fields = $attributes['fields'];
+				self::options_set($mode, $fields);
+			}
+
+			if(isset($attributes['groups'])) {
+
+				$groups = $attributes['groups'];
+
+				foreach($groups as $group) {
+
+					$fields = $group['fields'];
+					self::options_set($mode, $fields);
+				}
+			}
+		}
+
+		// Set skin option defaults
+		$ws_form_css = new WS_Form_CSS();
+		$ws_form_css->option_set_defaults();
+
+		// Clear compiled CSS
+		WS_Form_Common::option_set('css_public_layout', '');
+	}
+
+	private function options_set($mode, $fields) {
+
+		// File upload checks
+		$upload_checks = WS_Form_Common::uploads_check();
+		$max_upload_size = $upload_checks['max_upload_size'];
+		$max_uploads = $upload_checks['max_uploads'];
+
+		foreach($fields as $key => $attributes) {
+
+			if(
+				isset($attributes['type']) && 
+				($attributes['type'] != 'static')
+			) { 
+
+				if(
+					isset($attributes['mode']) &&
+					isset($attributes['mode'][$mode])
+				) {
+
+					// Use mode specific values
+					$value = $attributes['mode'][$mode];
+
+					WS_Form_Common::option_set($key, $value, false);
+
+				} else if(isset($attributes['default'])) {
+
+					// Use default value
+					$value = $attributes['default'];
+
+					// Value parsing
+					if($value === '#max_upload_size') { $value = $max_upload_size; }
+					if($value === '#max_uploads') { $value = $max_uploads; }
+
+					WS_Form_Common::option_set($key, $value, false);
+				}
+			}
+		}
+	}
+
+	private function styler_init($fresh_install = false) {
+
+		// Check style system has initialized
+		$ws_form_style = new WS_Form_Style();
+		$ws_form_style->check_initialized(true, !$fresh_install);
+
+		// Ensure all forms are configured with default style ID
+		$ws_form_form = new WS_Form_Form();
+		$ws_form_form->db_style_resolve(true);
 	}
 
 	/**
@@ -270,7 +457,8 @@ final class WS_Form {
 
 		$plugin_i18n = new WS_Form_i18n();
 
-		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
+		// Set priority to 0 to ensure it runs before register_widget is called otherwise it knocks out translations
+		$this->loader->add_action('init', $plugin_i18n, 'load_plugin_textdomain', 0);
 	}
 
 	/**
@@ -279,16 +467,13 @@ final class WS_Form {
 	 */
 	private function define_admin_hooks() {
 
-		global $wp_version;
+		$wp_version = get_bloginfo('version');
 
 		$plugin_admin = new WS_Form_Admin();
 
 		// General
 		$this->loader->add_action('admin_init', $plugin_admin, 'admin_init');
 		$this->loader->add_action('admin_menu', $plugin_admin, 'admin_menu');
-
-		// Gutenberg block
-		$this->loader->add_action('init', $plugin_admin, 'register_blocks');
 
 		// Screen options
 		$this->loader->add_action('wp_ajax_ws_form_hidden_columns', $plugin_admin, 'ws_form_hidden_columns', 1);
@@ -316,7 +501,15 @@ final class WS_Form {
 		$this->loader->add_filter('plugin_action_links_' . WS_FORM_PLUGIN_BASENAME, $plugin_admin, 'plugin_action_links');
 
 		// Blocks
-		$this->loader->add_action('enqueue_block_editor_assets', $plugin_admin, 'enqueue_block_editor_assets');
+ 		$this->loader->add_action('enqueue_block_assets', $plugin_admin, 'enqueue_block_assets');
+
+ 		if(!(WS_Form_Common::version_compare($wp_version, '5.9') >= 0)) {
+
+ 			// API version 1
+			$this->loader->add_action('init', $plugin_admin, 'register_blocks');
+			$this->loader->add_action('enqueue_block_assets', $plugin_admin, 'enqueue_block_assets');
+			$this->loader->add_action('enqueue_block_editor_assets', $plugin_admin, 'enqueue_block_editor_assets_v1');
+ 		}
 
  		if(WS_Form_Common::version_compare($wp_version, '5.8') >= 0) {
 
@@ -409,6 +602,12 @@ final class WS_Form {
 
 		// Initialize API
 		$this->loader->add_action('rest_api_init', $plugin_api, 'api_rest_api_init');
+
+		// mcp-adapter
+		if(WS_Form_Common::mcp_adapter_enabled()) {
+
+			$this->loader->add_action('mcp_adapter_init', $plugin_api, 'mcp_adapter_init', 10, 1);
+		}
 	}
 
 	/**

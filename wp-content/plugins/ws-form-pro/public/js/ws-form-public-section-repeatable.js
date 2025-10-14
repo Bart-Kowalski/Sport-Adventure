@@ -226,7 +226,7 @@
 
 						) ? section_icon_sets[section_icons_style][section_icon_type] : false;
 
-						var section_icon_html = (section_icon_svg !== false) ? ('<svg class="wsf-section-icon" focusable="false" height="' + ws_this.esc_attr(section_icons_size) + '" width="' + ws_this.esc_attr(section_icons_size) + '" viewBox="0 0 16 16" style="display: block; height: auto; max-width: 100%;">' + section_icon_svg + '</svg>') : section_icon_text;
+						var section_icon_html = (section_icon_svg !== false) ? ('<svg class="wsf-section-icon" focusable="false" viewBox="0 0 16 16" style="display: block; height: auto; max-width: 100%;">' + section_icon_svg + '</svg>') : section_icon_text;
 				}
 
 				section_icons_array.push('<a href="#" data-action="wsf-section-' + ws_this.esc_attr(section_icon_type) + '-icon" class="wsf-section-' + ws_this.esc_attr(section_icon_type) + '" style="cursor: ' + ws_this.esc_attr(section_icon_cursor) + '; margin: 0; -webkit-margin-end: ' + ws_this.esc_attr(skin_spacing_small) + 'px; margin-inline-end: ' + ws_this.esc_attr(skin_spacing_small) + 'px; padding: 0;" title="' + ws_this.esc_attr(section_icon_label) + '" aria-label="' + ws_this.esc_attr(section_icon_label) + '" data-color-on="' + ws_this.esc_attr(section_icons_color_on) + '" data-color-off="' + ws_this.esc_attr(section_icons_color_off) + '" data-repeatable-section-id="' + ws_this.esc_attr(repeatable_section_id) + '">' + section_icon_html + '</a>');
@@ -352,7 +352,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-add-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-add-disabled')) { return; }
 
 			// Get section ID
 			var section_id = $(this).attr('data-repeatable-section-id');
@@ -397,7 +397,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-delete-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-delete-disabled')) { return; }
 
 			// Get section ID
 			var section_id = $(this).attr('data-repeatable-section-id');
@@ -454,7 +454,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-move-up-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-move-up-disabled')) { return; }
 
 			var section_id = $(this).attr('data-repeatable-section-id');
 			var section_obj = $(this).closest('[data-repeatable]');
@@ -485,7 +485,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-move-down-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-move-down-disabled')) { return; }
 
 			var section_id = $(this).attr('data-repeatable-section-id');
 			var section_obj = $(this).closest('[data-repeatable]');
@@ -516,7 +516,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-drag-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-drag-disabled')) { return; }
 
 			var section_obj = $(this).closest('[data-repeatable]');
 
@@ -567,7 +567,7 @@
 			e.preventDefault();
 
 			// Check if we should run this
-			if($(this).hasClass('wsf-section-drag-disabled')) { return; }
+			if($(this).hasClass('wsf-section-icon-drag-disabled')) { return; }
 
 			if(ws_this.section_repeatable_dragged === false) {
 
@@ -738,33 +738,13 @@
 	// Section button/icon off
 	$.WS_Form.prototype.section_action_off = function(obj, id) {
 
-		obj.addClass('wsf-section-' + id + '-disabled').filter(':button').prop('disabled', true).attr('aria-disabled', 'true');
-
-		// Section icon
-		if(typeof(obj.attr('data-color-off')) !== 'undefined') {
-
-			obj.css({cursor: 'not-allowed'}).attr('aria-disabled', 'true').attr('tabindex', '-1');
-			var color_off = obj.attr('data-color-off');
-			$('svg path', obj).attr({'fill': color_off});
-			$('span.wsf-section-icon-text', obj).css({color: color_off});
-		}
+		obj.addClass('wsf-section-icon-disabled').addClass('wsf-section-icon-' + id + '-disabled').filter(':button').prop('disabled', true).attr('aria-disabled', 'true').attr('tabindex', '-1');
 	}
 
 	// Section button/icon on
 	$.WS_Form.prototype.section_action_on = function(obj, id) {
 
-		obj.removeClass('wsf-section-' + id + '-disabled').filter(':button').removeAttr('disabled', false).removeAttr('aria-disabled');
-
-		// Section icon
-		if(typeof(obj.attr('data-color-on')) !== 'undefined') {
-
-			var action = obj.attr('data-action');
-			var cursor = ((action === 'wsf-section-drag-icon') ? 'move' : 'pointer');
-			obj.css({cursor: cursor}).removeAttr('aria-disabled').removeAttr('tabindex');
-			var color_on = obj.attr('data-color-on');
-			$('svg path', obj).attr({'fill': color_on});
-			$('span.wsf-section-icon-text', obj).css({color: color_on});
-		}
+		obj.removeClass('wsf-section-icon-disabled').removeClass('wsf-section-icon-' + id + '-disabled').filter(':button').removeAttr('disabled').removeAttr('aria-disabled').removeAttr('tabindex');
 	}
 
 	// Clone section
@@ -842,6 +822,9 @@
 		// Radio validation
 		if(typeof(this.form_radio_validation) === 'function') { this.form_radio_validation(); }
 
+		// Select
+		if(typeof(this.form_select) === 'function') { this.form_select(); }
+
 		// Select min max
 		if(typeof(this.form_select_min_max) === 'function') { this.form_select_min_max(); }
 
@@ -859,6 +842,9 @@
 
 		// Signature
 		if(typeof(this.form_signature) === 'function') { this.form_signature(); }
+
+		// Email
+		if(typeof(this.form_email) === 'function') { this.form_email(); }
 
 		// Label
 		this.form_label();

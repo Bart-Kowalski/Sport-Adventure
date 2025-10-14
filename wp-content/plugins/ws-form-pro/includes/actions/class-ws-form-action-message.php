@@ -29,20 +29,26 @@
 
 		public function __construct() {
 
+			// Events
+			$this->events = array('submit');
+
+			// Register config filters
+			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = __('Message', 'ws-form');
 
 			// Set label for actions pull down
 			$this->label_action = __('Show Message', 'ws-form');
 
-			// Events
-			$this->events = array('submit');
-
 			// Register action
 			parent::register($this);
-
-			// Register config filters
-			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 		}
 
 		public function post($form, &$submit, $config) {
@@ -57,7 +63,13 @@
 				$message = WS_Form_Common::do_shortcode($this->message);
 
 				// Show the message
-				parent::success(sprintf(__('Message added to queue: %s', 'ws-form'), $this->message), array(
+				parent::success(sprintf(
+
+					/* translators: %s: Message */
+					__('Message added to queue: %s', 'ws-form'),
+					$this->message
+
+				), array(
 
 					array(
 
@@ -78,7 +90,7 @@
 
 			} else {
 
-				// Invalud message
+				// Invalid message
 				parent::error(__('Invalid message', 'ws-form'));
 			}
 		}

@@ -49,6 +49,11 @@ class Frontend {
 
 		add_action( 'template_redirect', [ $this, 'template_redirect' ] );
 
+		// User activation: Update the user meta when the user is activated
+		if ( Database::get_setting( 'userActivationEnabled' ) ) {
+				add_action( 'template_redirect', [ $this, 'activate_user_account' ] );
+		}
+
 		add_action( 'bricks_body', [ $this, 'add_skip_link' ] );
 
 		add_action( 'bricks_body', [ $this, 'remove_wp_hooks' ] );
@@ -584,7 +589,7 @@ class Frontend {
 		foreach ( $component_elements as $component_element ) {
 			// Set 'parentComponent' on component child to get use .brxe-{} class name on component child
 			$component_element['parentComponent'] = $component_id;
-			$component_element['instanceId']      = $element['id'];
+			$component_element['instanceId']      = $element['instanceId'] ?? $element['id']; // Use grandparent instanceId if available (nested component) (#86c51y7xy; @since 2.1)
 
 			self::$elements[ $component_element['id'] ] = $component_element;
 
@@ -756,6 +761,7 @@ class Frontend {
 				 */
 				if (
 					Helpers::enabled_query_filters() &&
+					! empty( $element['settings']['hasLoop'] ) &&
 					! empty( $element['settings']['query']['is_live_search'] ) &&
 					! empty( $element['settings']['query']['is_live_search_wrapper_selector'] )
 				) {
@@ -960,7 +966,7 @@ class Frontend {
 
 		// Sticky header (top, not left or right)
 		if ( ! isset( $settings['headerPosition'] ) && isset( $settings['headerSticky'] ) ) {
-			$classes[] = 'sticky';
+			$classes[] = 'brx-sticky';
 
 			if ( isset( $settings['headerStickyOnScroll'] ) ) {
 				$classes[] = 'on-scroll';
@@ -1131,5 +1137,68 @@ class Frontend {
 		}
 
 		return $items;
+	}
+
+		/**
+		 * If user lands on an activation page, check if there is a valid activation key,
+		 * and if so, activate the user account.
+		 *
+		 * @since 2.1
+		 */
+
+	public function activate_user_account() {
+
+		$page_success = Database::get_setting( 'userActivationLinkSuccessPage', null );
+		$page_failure = Database::get_setting( 'userActivationLinkFailurePage', null );
+
+		// If no activation pages are set, return
+		if ( ! $page_success || ! $page_failure ) {
+			return;
+		}
+
+		// Check if it's an activation page
+		if ( ! is_page( $page_success ) ) {
+			return;
+		}
+
+		// Check for required query parameters (activation_key, user_id), otherwise redirect to failure page
+		if ( ! isset( $_GET['activation_key'] ) || ! isset( $_GET['user_id'] ) ) {
+			wp_safe_redirect( get_permalink( $page_failure ) );
+		}
+
+		// Get user ID and activation key
+		$user_id        = intval( $_GET['user_id'] );
+		$activation_key = sanitize_text_field( $_GET['activation_key'] );
+
+		// Check: If user ID or activation key is empty, redirect to failure page
+		if ( empty( $user_id ) || empty( $activation_key ) ) {
+			wp_safe_redirect( get_permalink( $page_failure ) );
+		}
+
+		// If user is already activated, skip activation
+		if ( get_user_meta( $user_id, 'bricks_user_activation_status', true ) === 'active' ) {
+			return;
+		}
+
+		// Check if the activation key is valid
+		$activation_key_valid = get_user_meta( $user_id, 'bricks_user_activation_key', true ) === $activation_key;
+
+		// Activate user account
+		if ( $activation_key_valid ) {
+			delete_user_meta( $user_id, 'bricks_user_activation_key' );
+			update_user_meta( $user_id, 'bricks_user_activation_status', 'active' );
+
+			// Auto login user, if enabled
+			if ( Database::get_setting( 'userActivationAutoLogin', false ) ) {
+				wp_set_current_user( $user_id );
+				wp_set_auth_cookie( $user_id, false, is_ssl() );
+			}
+
+		}
+
+		// Else: redirect to activation error page
+		else {
+			wp_safe_redirect( get_permalink( $page_failure ) );
+		}
 	}
 }

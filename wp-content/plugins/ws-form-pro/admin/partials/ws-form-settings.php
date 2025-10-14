@@ -57,7 +57,7 @@
 	// Render tabs
 	foreach($options as $tab => $fields) {
 ?>
-<a href="<?php WS_Form_Common::echo_esc_attr(admin_url('admin.php?page=ws-form-settings&tab=' . $tab)); ?>" class="nav-tab<?php if($tab_current == $tab) { ?> nav-tab-active<?php } ?>"><?php WS_Form_Common::echo_esc_html($fields['label']); ?></a>
+<a href="<?php WS_Form_Common::echo_esc_url(admin_url('admin.php?page=ws-form-settings&tab=' . $tab)); ?>" class="nav-tab<?php if($tab_current == $tab) { ?> nav-tab-active<?php } ?>"><?php WS_Form_Common::echo_esc_html($fields['label']); ?></a>
 <?php
 
 	}
@@ -131,14 +131,9 @@
 		// On load
 		$(function() {
 
-			// Manually inject language strings (Avoids having to call the full config)
-			$.WS_Form.settings_form = [];
-			$.WS_Form.settings_form.language = [];
-			$.WS_Form.settings_form.language['error_server'] = '<?php esc_html_e('500 Server error response from server.', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['error_bad_request_message'] = '<?php esc_html_e('400 Bad request response from server: %s', 'ws-form'); ?>';
-
 			var wsf_obj = new $.WS_Form();
 
+			// Partial initialization
 			wsf_obj.init_partial();
 
 			var file_frame;
@@ -193,7 +188,7 @@
 					// Show info message
 					wsf_obj.message('<?php WS_Form_Common::echo_esc_html(sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Your current theme does not contain a recognized framework. Using %s as the form framework.', 'ws-form'),
 						WS_FORM_NAME_GENERIC
 
@@ -429,6 +424,9 @@
 
 		global $image_preview_size;
 
+		// Groups with no fields
+		if(!is_array($fields) || (count($fields) == 0)) { return false; }
+
 		// Heading
 		if($heading !== false) {
 ?>
@@ -468,6 +466,7 @@
 			if($config['type'] == 'hidden') { continue; }
 
 			// Condition
+			$read_only = false;
 			if(isset($config['condition'])) {
 
 				$condition_result = true;
@@ -480,7 +479,7 @@
 						break;
 					}
 				}
-				if(!$condition_result) { continue; }
+				if(!$condition_result) { $read_only = true; }
 			}
 
 			// Minimum
@@ -501,8 +500,14 @@
 
 				$maximum = false;
 			}
+
+			// Classes
+			$class_row_array = array();
+			if($read_only) { $class_row_array[] = 'wsf-read-only'; }
+			if(!empty($config['class_row'])) { $class_row_array[] = $config['class_row']; }
+			$class_row = implode(' ', $class_row_array);
 ?>
-<tr>
+<tr<?php if(!empty($class_row)) { ?> class="<?php WS_Form_Common::echo_esc_attr($class_row); ?>"<?php } ?>>
 <?php
 			if($config['label'] !== false) {
 ?>
@@ -571,7 +576,6 @@
 					(strpos($field, '_client_id') !== false)
 				)
 			) {
-
 				$config['type'] = empty($value) ? 'text' : 'password';
 			}
 
@@ -610,7 +614,10 @@
 					switch($field) {
 
 						// Version
-						case 'version' : WS_Form_Common::echo_esc_html(WS_FORM_VERSION); break;
+						case 'version' :
+
+							WS_Form_Common::echo_esc_html(WS_FORM_VERSION);
+							break;
 
 						// License description
 						case 'license_status' : 
@@ -630,6 +637,15 @@
 
 							WS_Form_Common::echo_wp_kses(WS_Form_Common::get_encryption_status_html(), wp_kses_allowed_html('post'));
 							break;
+						// MCP adapter URL
+						case 'mcp_adapter_url' :
+
+							echo sprintf(
+								'<code>%s</code>',
+								esc_url(WS_Form_Common::get_api_path('mcp'))
+							);
+							break;
+
 						default :
 
 							// Other
@@ -890,7 +906,7 @@
 
 						sprintf(
 
-							/* translators: %s = License key named constant, e.g. WSF_LICENSE_KEY */
+							/* translators: %s: License key named constant, e.g. WSF_LICENSE_KEY */
 							__('The license key can also be set in <code>wp-config.php</code> using the <code>%s</code> named constant.', 'ws-form'),
 							esc_html($license_constant)
 						),

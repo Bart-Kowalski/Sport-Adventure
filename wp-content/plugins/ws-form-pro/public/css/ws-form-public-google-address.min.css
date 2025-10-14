@@ -1,0 +1,55 @@
+.wsf-form gmp-place-autocomplete {
+  -webkit-appearance: none;
+  background-color: var(--wsf-field-color-background);
+  border: var(--wsf-field-border);
+  border-radius: var(--wsf-field-border-radius);
+  display: inline-block;
+  height: auto;
+  margin: 0;
+  max-width: none;
+  min-height: auto;
+  opacity: 1;
+  padding: var(--wsf-field-padding) !important;
+  padding: 0;
+  width: 100%;
+}
+.wsf-form gmp-place-autocomplete:hover:enabled:not(:focus) {
+  background-color: var(--wsf-field-color-background-hover);
+  border: var(--wsf-field-border-width) var(--wsf-field-border-style) var(--wsf-field-border-color-hover);
+}
+.wsf-form gmp-place-autocomplete:focus {
+  background-color: var(--wsf-field-color-background-focus);
+  border: var(--wsf-field-border-width) var(--wsf-field-border-style) var(--wsf-field-border-color-focus);
+  box-shadow: var(--wsf-field-box-shadow);
+  color: var(--wsf-field-color-focus);
+  outline: 0;
+}
+.wsf-form gmp-place-autocomplete.wsf-field:disabled {
+  background-color: var(--wsf-field-color-background-disabled);
+  border: var(--wsf-field-border-width) var(--wsf-field-border-style) var(--wsf-field-border-color-disabled);
+  color: var(--wsf-field-color-disabled);
+  -webkit-text-fill-color: var(--wsf-field-color-disabled);
+  cursor: not-allowed;
+  opacity: 1;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.wsf-form gmp-place-autocomplete::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+.wsf-form.wsf-validated input.wsf-field:invalid + div > gmp-place-autocomplete,
+.wsf-form .wsf-validated input.wsf-field:invalid + div > gmp-place-autocomplete {
+  background-color: var(--wsf-field-color-background-invalid);
+  border-color: var(--wsf-field-border-color-invalid);
+}
+.wsf-form.wsf-validated input.wsf-field:invalid:focus:not(:hover) + div > gmp-place-autocomplete,
+.wsf-form .wsf-validated input.wsf-field:invalid:focus:not(:hover) + div > gmp-place-autocomplete {
+  box-shadow: var(--wsf-field-box-shadow);
+}
+.wsf-form.wsf-validated input.wsf-field:-moz-ui-invalid + div > gmp-place-autocomplete,
+.wsf-form .wsf-validated input.wsf-field:-moz-ui-invalid + div > gmp-place-autocomplete {
+  box-shadow: none;
+}

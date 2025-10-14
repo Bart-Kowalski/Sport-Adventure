@@ -11,7 +11,7 @@
 		// Litespeed control set nocache
 		do_action('litespeed_control_set_nocache', sprintf(
 
-			/* translators: %s = WS Form */
+			/* translators: %s: WS Form */
 			__('Caching disabled for %s API response', 'ws-form'),
 
 			WS_FORM_NAME_GENERIC

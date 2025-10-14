@@ -19,20 +19,26 @@
 
 		public function __construct() {
 
+			// Events
+			$this->events = array('submit');
+
+			// Register config filters
+			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = __('Run Hook', 'ws-form');
 
 			// Set label for actions pull down
 			$this->label_action = __('Run WordPress Hook', 'ws-form');
 
-			// Events
-			$this->events = array('submit');
-
 			// Register action
 			parent::register($this);
-
-			// Register config filters
-			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 		}
 
 		public function get_priority($config) {
@@ -63,7 +69,12 @@
 						if($filter_return === 'halt') { return 'halt'; }
 
 						// Success
-						parent::success(sprintf(__('Hook successfully called: %s', 'ws-form'), $this->type . "('" . $this->hook . "', \$form, \$submit)"));
+						parent::success(sprintf(
+
+							/* translators: %s: Hook details */
+							__('Hook successfully called: %s', 'ws-form'),
+							$this->type . "('" . $this->hook . "', \$form, \$submit)"
+						));
 
 						// Process return types
 
@@ -97,7 +108,12 @@
 						do_action($this->hook, $form, $submit);
 
 						// Success
-						parent::success(sprintf(__('Hook successfully called: %s', 'ws-form'), $this->type . "('" . $this->hook . "', \$form, \$submit)"));
+						parent::success(sprintf(
+
+							/* translators: %s: Hook details */
+							__('Hook successfully called: %s', 'ws-form'),
+							$this->type . "('" . $this->hook . "', \$form, \$submit)"
+						));
 
 						break;
 

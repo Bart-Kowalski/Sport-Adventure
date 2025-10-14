@@ -35,22 +35,30 @@
 		public $file_to_url;
 		public $ignore_empty;
 		public $array_to_delimited;
+		public $array_delimiter;
 		public $array_dedupe;
 		public $cookie_passthrough;
+		public $repeaters_to_arrays;
 
 		public function __construct() {
-
-			// Set label
-			$this->label = __('Webhook', 'ws-form');
-
-			// Set label for actions pull down
-			$this->label_action = __('Webhook', 'ws-form');
 
 			// Events
 			$this->events = array('submit');
 
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Webhook', 'ws-form');
+
+			// Set label for actions pull down
+			$this->label_action = __('Webhook', 'ws-form');
 
 			// Register action
 			parent::register($this);
@@ -78,7 +86,20 @@
 				// Get value
 				$field_id = $field_map['ws_form_field'];
 				if(empty($field_id)) { continue; }
-				$value = parent::get_submit_value($submit, WS_FORM_FIELD_PREFIX . $field_id, '', true);
+
+				// Get value(s)
+				if($this->repeaters_to_arrays) {
+
+					$return_array = parent::get_submit_value_repeatable($submit, WS_FORM_FIELD_PREFIX . $field_id, '', true);
+
+					$repeatable = $return_array['repeatable'];
+					$value_array = $return_array['value'];
+
+				} else {
+
+					$repeatable = false;
+					$value_array = array(parent::get_submit_value($submit, WS_FORM_FIELD_PREFIX . $field_id, '', true));
+				}
 
 				// Get type
 				$type = isset($field_map['action_' . $this->id . '_endpoint_type']) ? $field_map['action_' . $this->id . '_endpoint_type'] : '';
@@ -88,67 +109,70 @@
 				if(!isset($fields[$field_id])) { continue; }
 				$field = $fields[$field_id];
 
-				// Process by field type
-				switch($field->type) {
+				foreach($value_array as $repeatable_index => $value) {
 
-					case 'file' :
-					case 'signature' :
+					// Process by field type
+					switch($field->type) {
 
-						// Add URLs to file objects
-						if(is_array($value)) {
+						case 'file' :
+						case 'signature' :
 
-							$file_urls = array();
+							// Add URLs to file objects
+							if(is_array($value)) {
 
-							foreach($value as $file_object_index => $file_object) {
+								$file_urls = array();
 
-								if(
-									isset($file_object['url']) ||
-									!isset($file_object['name']) ||
-									!isset($file_object['size']) ||
-									!isset($file_object['type']) ||
-									!isset($file_object['path'])
+								foreach($value as $file_object_index => $file_object) {
 
-								) { continue; }
+									if(
+										isset($file_object['url']) ||
+										!isset($file_object['name']) ||
+										!isset($file_object['size']) ||
+										!isset($file_object['type']) ||
+										!isset($file_object['path'])
 
-								// Get handler
-								$handler = isset($file_object['handler']) ? $file_object['handler'] : 'wsform';
+									) { continue; }
 
-								// Get URL
-								if(isset(WS_Form_File_Handler_WS_Form::$file_handlers[$handler])) {
+									// Get handler
+									$handler = isset($file_object['handler']) ? $file_object['handler'] : 'wsform';
 
-									$file_url = WS_Form_File_Handler_WS_Form::$file_handlers[$handler]->get_url($file_object, $field_id, $file_object_index, $submit->hash);
-									$value[$file_object_index]['url'] = $file_url;
-									$file_urls[] = $file_url;
+									// Get URL
+									if(isset(WS_Form_File_Handler::$file_handlers[$handler])) {
+
+										$file_url = WS_Form_File_Handler::$file_handlers[$handler]->get_url($file_object, $field_id, $file_object_index, $submit->hash);
+										$value[$file_object_index]['url'] = $file_url;
+										$file_urls[] = $file_url;
+									}
+								}
+
+								if($this->file_to_url) {
+
+									$value = implode(',', $file_urls);
 								}
 							}
 
-							if($this->file_to_url) {
+							break;
+					}
 
-								$value = implode(',', $file_urls);
-							}
-						}
+					// Type
+					$value = self::type_process($value, $type);
 
-						break;
-				}
+					// Check empty
+					if($this->ignore_empty && is_string($value) && ($value === '')) {
 
-				// Type
-				$value = self::type_process($value, $type);
+						continue;
+					}
 
-				// Check empty
-				if($this->ignore_empty && is_string($value) && ($value === '')) {
+					// Add endpoint value to data using dot notation
+					try {
 
-					continue;
-				}
+						WS_Form_Common::set_path_value($data, $node, $value, $this->array_dedupe, $repeatable, $repeatable_index);
 
-				// Add endpoint value to data using dot notation
-				try {
+					}  catch (Exception $e) {
 
-					WS_Form_Common::set_path_value($data, $node, $value, $this->array_dedupe);
-
-				}  catch (Exception $e) {
-
-					parent::error($e->getMessage());
-					return 'halt';
+						parent::error($e->getMessage());
+						return 'halt';
+					}
 				}
 			}
 
@@ -198,11 +222,21 @@
 			) {
 
 				$data = wp_json_encode($data);
-				parent::success(sprintf(__('Request payload: <pre>%s</pre>', 'ws-form'), esc_html(print_r($data, true))));
+				parent::success(sprintf(
+
+					/* translators: %s: Payload */
+					__('Request payload: <pre>%s</pre>', 'ws-form'),
+					esc_html(print_r($data, true))
+				));
 
 			} else {
 
-				parent::success(sprintf(__('Request payload: <pre>%s</pre>', 'ws-form'), esc_html(http_build_query($data))));
+				parent::success(sprintf(
+
+					/* translators: %s: Payload */
+					__('Request payload: <pre>%s</pre>', 'ws-form'),
+					esc_html(http_build_query($data))
+				));
 			}
 
 			// Authentication
@@ -210,10 +244,15 @@
 			$password = false;
 			if($this->authentication != '') {
 
-				$username = $this->username;
-				$password = $this->password;
+				$username = WS_Form_Common::parse_variables_process($this->username, $form, $submit, 'text/plain');
+				$password = WS_Form_Common::parse_variables_process($this->password, $form, $submit, 'text/plain');
 
-				parent::success(sprintf(__('Request authentication: %s', 'ws-form'), $this->authentication));
+				parent::success(sprintf(
+
+					/* translators: %s: Authentication */
+					__('Request authentication: %s', 'ws-form'),
+					$this->authentication
+				));
 			}
 
 			// Process HTTP headers
@@ -236,7 +275,12 @@
 
 			if(count($http_headers) > 0) {
 
-				parent::success(sprintf(__('Request headers: <pre>%s</pre>', 'ws-form'), esc_html(print_r($http_headers, true))));
+				parent::success(sprintf(
+
+					/* translators: %s: HTTP headers */
+					__('Request headers: <pre>%s</pre>', 'ws-form'),
+					esc_html(print_r($http_headers, true))
+				));
 			}
 
 			// Parse endpoint
@@ -245,9 +289,24 @@
 			// Sanitize endpoint
 			$this->endpoint = sanitize_url($this->endpoint);
 
-			parent::success(sprintf(__('Request endpoint: %s', 'ws-form'), esc_html($this->endpoint)));
-			parent::success(sprintf(__('Request request method: %s', 'ws-form'), esc_html($this->request_method)));
-			parent::success(sprintf(__('Request content type: %s', 'ws-form'), esc_html($this->content_type)));
+			parent::success(sprintf(
+
+				/* translators: %s: Endpoint */
+				__('Request endpoint: %s', 'ws-form'),
+				esc_html($this->endpoint)
+			));
+			parent::success(sprintf(
+
+				/* translators: %s: Request method */
+				__('Request request method: %s', 'ws-form'),
+				esc_html($this->request_method)
+			));
+			parent::success(sprintf(
+
+				/* translators: %s: Content type */
+				__('Request content type: %s', 'ws-form'),
+				esc_html($this->content_type)
+			));
 
 			// Cookie passthrough - Only if the hostnames match for security reasons
 			$cookies = array();
@@ -270,7 +329,12 @@
 			}
 
 			// SSL Verify
-			parent::success(sprintf(__('Request SSL verify: %s', 'ws-form'), ($this->ssl_verify ? 'Enabled' : 'Disabled')));
+			parent::success(sprintf(
+
+				/* translators: %s: Enabled or Disabled */
+				__('Request SSL verify: %s', 'ws-form'),
+				($this->ssl_verify ? __('Enabled', 'ws-form') : __('Disabled', 'ws-form'))
+			));
 
 			// Check timeout
 			if($this->timeout === 0) {
@@ -280,7 +344,12 @@
 
 			if($this->response_process) {
 
-				parent::success(sprintf(__('Request timeout: %u second%s', 'ws-form'), esc_html($this->timeout), (($this->timeout === 1) ? '' : 's')));
+				parent::success(sprintf(
+
+					/* translators: %u: Request timeout */
+					_n('Request timeout: %u second', 'Request timeout: %u seconds', $this->timeout, 'ws-form'),
+					$this->timeout
+				));
 				parent::success(__('Response processing: Enabled', 'ws-form'));
 
 				// Timer
@@ -312,13 +381,28 @@
 					// Debug - Response time
 					$http_response_time = (microtime(true) - $http_response_time_start) * 1000;
 
-					parent::success(sprintf(__('Response time: %u ms', 'ws-form'), esc_html($http_response_time)));
+					parent::success(sprintf(
+
+						/* translators: %u: HTTP response time in ms */
+						__('Response time: %u ms', 'ws-form'),
+						$http_response_time
+					));
 
 					// Debug - Response code
-					parent::success(sprintf(__('Response code: %u', 'ws-form'), esc_html($http_code)));
+					parent::success(sprintf(
+
+						/* translators: %u: HTTP response code */
+						__('Response code: %u', 'ws-form'),
+						esc_html($http_code)
+					));
 
 					// Debug - Response
-					parent::success(sprintf(__('Response: <pre>%s</pre>', 'ws-form'), esc_html(print_r($http_response, true))));
+					parent::success(sprintf(
+
+						/* translators: %s: HTTP response */
+						__('Response: <pre>%s</pre>', 'ws-form'),
+						esc_html(print_r($http_response, true))
+					));
 
 					// Default response handler
 					$response_handler = '';
@@ -356,7 +440,8 @@
 
 								sprintf(
 
-									__('Webhook error - HTTP status code: %u (%s)', 'ws-form'),
+									/* translators: %1$u: HTTP response code, %2$s: HTTP response description */
+									__('Webhook error - HTTP status code: %1$u (%2$s)', 'ws-form'),
 									esc_html($http_code),
 									esc_html(self::get_http_status_code_description($http_code))
 								)
@@ -418,7 +503,13 @@
 									}
 
 									// Success
-									parent::success(sprintf(__('Response field mapping: Field ID: %u', 'ws-form'), $field_id), array(
+									parent::success(sprintf(
+
+										/* translators: %u: Field ID */
+										__('Response field mapping: Field ID: %u', 'ws-form'),
+										$field_id
+
+									), array(
 
 										array(
 
@@ -448,7 +539,7 @@
 			// Array to delimited
 			if(is_array($value) && $this->array_to_delimited) {
 
-				$value = implode(',', $value);
+				$value = implode($this->array_delimiter, $value);
 			}
 
 			if($type !== '') {
@@ -456,6 +547,7 @@
 				if(is_object($value)) { $value = (array) $value; }
 				if(is_array($value)) { $value = implode(',', $value); }
 			}
+
 			switch($type) {
 
 				case 'string' :
@@ -649,7 +741,8 @@
 							'meta_key'		=>	'action_' . $this->id . '_authentication',
 							'meta_value'	=>	''
 						)
-					)
+					),
+					'variable_helper'			=>	true
 				),
 
 				// Authentication - Password
@@ -666,7 +759,8 @@
 							'meta_key'		=>	'action_' . $this->id . '_authentication',
 							'meta_value'	=>	''
 						)
-					)
+					),
+					'variable_helper'			=>	true
 				),
 
 				// Response
@@ -804,6 +898,25 @@
 					'default'					=>	'on',
 				),
 
+				// Array delimiter
+				'action_' . $this->id . '_array_delimiter' => array(
+
+					'label'						=>	__('Array Delimiter', 'ws-form'),
+					'type'						=>	'text',
+					'help'						=>	__('Enter a delimiter to use if an array is converted to delimited text.', 'ws-form'),
+					'placeholder'				=>	',',
+					'default'					=>	',',
+					'condition'					=>	array(
+
+						array(
+
+							'logic'			=>	'==',
+							'meta_key'		=>	'action_' . $this->id . '_array_to_delimited',
+							'meta_value'	=>	'on'
+						)
+					),
+				),
+
 				// Array deduplication
 				'action_' . $this->id . '_array_dedupe' => array(
 
@@ -818,7 +931,16 @@
 
 					'label'						=>	__('Cookie Passthrough', 'ws-form'),
 					'type'						=>	'checkbox',
-					'help'						=>	__('Whether to pass cookies from the form submission through to the API request. Applies to same host requests only.', 'ws-form'),
+					'help'						=>	__('If checked, cookies will be passed from the form submission through to the API request. Applies to same host requests only.', 'ws-form'),
+					'default'					=>	'',
+				),
+
+				// Repeaters to array
+				'action_' . $this->id . '_repeaters_to_arrays' => array(
+
+					'label'						=>	__('Repeaters to Arrays', 'ws-form'),
+					'type'						=>	'checkbox',
+					'help'						=>	__('If checked, repeaters will be turned into arrays instead of being comma separated. Applies to field mappings only.', 'ws-form'),
 					'default'					=>	'',
 				),
 			);
@@ -1110,9 +1232,12 @@
 			$this->ssl_verify = (parent::get_config($config, 'action_' . $this->id . '_ssl_verify', 'on') == 'on');
 			$this->file_to_url = (parent::get_config($config, 'action_' . $this->id . '_file_to_url', 'on') == 'on');
 			$this->array_to_delimited = (parent::get_config($config, 'action_' . $this->id . '_array_to_delimited', 'on') == 'on');
+			$this->array_delimiter = parent::get_config($config, 'action_' . $this->id . '_array_delimiter', ',');
+			if($this->array_delimiter == '') { $this->array_delimiter = ','; }
 			$this->ignore_empty = (parent::get_config($config, 'action_' . $this->id . '_ignore_empty', '') == 'on');
 			$this->array_dedupe = (parent::get_config($config, 'action_' . $this->id . '_array_dedupe', '') == 'on');
 			$this->cookie_passthrough = (parent::get_config($config, 'action_' . $this->id . '_cookie_passthrough', '') == 'on');
+			$this->repeaters_to_arrays = (parent::get_config($config, 'action_' . $this->id . '_repeaters_to_arrays', '') == 'on');
 		}
 
 
@@ -1146,7 +1271,9 @@
 					'action_' . $this->id . '_ssl_verify',
 					'action_' . $this->id . '_file_to_url',
 					'action_' . $this->id . '_ignore_empty',
+					'action_' . $this->id . '_repeaters_to_arrays',
 					'action_' . $this->id . '_array_to_delimited',
+					'action_' . $this->id . '_array_delimiter',
 					'action_' . $this->id . '_array_dedupe',
 					'action_' . $this->id . '_cookie_passthrough',
 				)

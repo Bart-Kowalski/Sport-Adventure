@@ -6,6 +6,7 @@
  */
 
 use Automattic\WooCommerce\Enums\OrderStatus;
+use Automattic\WooCommerce\Internal\Admin\Settings\Utils as SettingsUtils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -22,6 +23,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     WooCommerce\Classes\Payment
  */
 class WC_Gateway_BACS extends WC_Payment_Gateway {
+
+	/**
+	 * Unique ID for this gateway.
+	 *
+	 * @var string
+	 */
+	const ID = 'bacs';
 
 	/**
 	 * Array of locales
@@ -49,7 +57,7 @@ class WC_Gateway_BACS extends WC_Payment_Gateway {
 	 */
 	public function __construct() {
 
-		$this->id                 = 'bacs';
+		$this->id                 = self::ID;
 		$this->icon               = apply_filters( 'woocommerce_bacs_icon', '' );
 		$this->has_fields         = false;
 		$this->method_title       = __( 'Direct bank transfer', 'woocommerce' );
@@ -280,7 +288,7 @@ class WC_Gateway_BACS extends WC_Payment_Gateway {
 	 * @param bool     $plain_text Email format: plain text or HTML.
 	 */
 	public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
-		if ( ! $sent_to_admin && 'bacs' === $order->get_payment_method() ) {
+		if ( ! $sent_to_admin && self::ID === $order->get_payment_method() ) {
 			/**
 			 * Filter the email instructions order status.
 			 *
@@ -477,5 +485,42 @@ class WC_Gateway_BACS extends WC_Payment_Gateway {
 
 		return $this->locale;
 
+	}
+
+	/**
+	 * Get the settings URL for the gateway.
+	 *
+	 * @return string The settings page URL for the gateway.
+	 */
+	public function get_settings_url() {
+		$should_use_react_settings_page = $this->is_reactified_settings_page();
+
+		// We must not include both the path and the section query parameter, as this can cause weird behavior.
+		return SettingsUtils::wc_payments_settings_url(
+			$should_use_react_settings_page ? '/' . WC_Settings_Payment_Gateways::OFFLINE_SECTION_NAME . '/' . $this->id : null,
+			$should_use_react_settings_page ? array() : array( 'section' => $this->id )
+		);
+	}
+
+	/**
+	 * Check if the BACS settings page is reactified.
+	 *
+	 * @return bool Whether the BACS settings page is reactified or not.
+	 */
+	private function is_reactified_settings_page(): bool {
+		// Search for a WC_Settings_Payment_Gateways instance in the settings pages.
+		$payments_settings_page = null;
+		foreach ( WC_Admin_Settings::get_settings_pages() as $settings_page ) {
+			if ( $settings_page instanceof WC_Settings_Payment_Gateways ) {
+				$payments_settings_page = $settings_page;
+				break;
+			}
+		}
+		// If no instance found, default to reactified.
+		if ( empty( $payments_settings_page ) ) {
+			return true;
+		}
+
+		return $payments_settings_page->should_render_react_section( WC_Settings_Payment_Gateways::BACS_SECTION_NAME );
 	}
 }

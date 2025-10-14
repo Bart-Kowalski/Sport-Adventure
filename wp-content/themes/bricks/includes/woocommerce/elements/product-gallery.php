@@ -522,7 +522,7 @@ class Product_Gallery extends Element {
 			'nextText'       => $next_arrow,
 			'rtl'            => is_rtl(),
 			// Target the correct main slider (@since 1.10.2)
-			'asNavFor'       => '.brxe-product-gallery[data-script-id="' . $this->id . '"] > .woocommerce-product-gallery',
+			'asNavFor'       => '.brxe-product-gallery[data-script-id="' . $this->attributes['_root']['data-script-id'] . '"] > .woocommerce-product-gallery',
 			'selector'       => '.brx-thumbnail-slider-wrapper > .woocommerce-product-gallery__image',
 		];
 

@@ -26,7 +26,7 @@
 		// Field data cache
 		this.field_data_cache = [];
 
-		// Field data cache
+		// Action data cache
 		this.action_data_cache = [];
 
 		// Validation message cache
@@ -36,15 +36,15 @@
 		this.invalid_feedback_cache = [];
 
 		// Object cache
-		this.object_cache = [];
-		this.object_cache['condition'] = [];
-		this.object_cache['then'] = [];
-		this.object_cache['else'] = [];
+		this.object_cache = {};
+		this.object_cache.condition = [];
+		this.object_cache.then = [];
+		this.object_cache.else = [];
 
 		// Actions
 		this.action = false;
 
-		// New object data (for reverting fied data back to an older state)
+		// New object data (for reverting field data back to an older state)
 		this.object_data_scratch = false;
 
 		// Form history
@@ -134,14 +134,6 @@
 		this.timeout_analytics_google = 30000;
 		this.timeout_analytics_data_layer = 30000;
 		this.analytics_function = [];
-
-		// Debug
-		this.debug_height = 0;
-		this.debug_field_id_bypass = [];
-		this.debug_timer;
-		this.debug_log_array = [];
-		this.debug_error_array = [];
-		this.debug_timeout;
 
 		// Text editor
 		this.text_editor_index = 1;
@@ -245,7 +237,6 @@
 		var test_color_input = document.createElement('input');
 		test_color_input.setAttribute('type', 'color');
 		this.native_color = (test_color_input.type == 'color');
-		this.timeout_minicolors = 5000;
 
 		// Custom action URL
 		this.form_action_custom = false;
@@ -346,11 +337,24 @@
 			this.form_obj = this.form_canvas_obj;
 		}
 
-		// Move wsf-form class to outer form tag
+		// Move attributes and classes to outer form tag
 		if(this.form_obj[0] != this.form_canvas_obj[0]) {
 
+			// Add wsf-form to form
 			if(!this.form_obj.hasClass('wsf-form')) { this.form_obj.addClass('wsf-form'); }
+
+			// Remove wsf-form from canvas
 			if(this.form_canvas_obj.hasClass('wsf-form')) { this.form_canvas_obj.removeClass('wsf-form'); }
+
+			// Move data-wsf-style-id from canvas to form
+			if(typeof(this.form_canvas_obj.attr('data-wsf-style-id')) !== 'undefined') {
+
+				// Add data-wsf-style-id to form
+				this.form_obj.attr('data-wsf-style-id', this.form_canvas_obj.attr('data-wsf-style-id'));
+
+				// Remove data-wsf-style-id from canvas
+				this.form_canvas_obj.removeAttr('data-wsf-style-id');
+			}
 		}
 
 		// Empty form canvas
@@ -389,6 +393,8 @@
 	$.WS_Form.tracking;
 	$.WS_Form.ecommerce;
 	$.WS_Form.calc;
+	$.WS_Form.styler;
+	$.WS_Form.styler_rendered = false;
 	$.WS_Form.settings_plugin;
 	$.WS_Form.settings_form = null;
 	$.WS_Form.frameworks;
@@ -473,7 +479,7 @@
 
 			// We base64 decode and then JSON parse this config to avoid any analytics scripts appearing in the config
 			$.WS_Form.analytics = JSON.parse(atob(config.analytics));
- 		}
+		}
 
 		// Sort parse_variables
 		if(typeof($.WS_Form.parse_variables) !== 'undefined') {
@@ -538,13 +544,13 @@
 		$('#' + this.form_obj_id).attr('data-id', this.form_id);
 
 		if(
-			(typeof(wsf_form_json) === 'undefined') ||
-			(typeof(wsf_form_json[this.form_id]) === 'undefined')
+			(typeof(window.wsf_form_json) === 'undefined') ||
+			(typeof(window.wsf_form_json[this.form_id]) === 'undefined')
 		) {
 
 			// Get form from API
 			var ws_this = this;
-			this.api_call('form/' + this.form_id + '/full', 'GET', false, function(response) {
+			this.api_call('form/' + this.form_id + '/full/?wsf_fp=true', 'GET', false, function(response) {
 
 				// Store form data
 				ws_this.form = response.form;
@@ -566,7 +572,7 @@
 		} else {
 
 			// Get form from dom
-			this.form = wsf_form_json[this.form_id];
+			this.form = window.wsf_form_json[this.form_id];
 
 			// Build data cache
 			this.data_cache_build();
@@ -605,7 +611,7 @@
 
 		// Render form
 		this.form_render();
-	
+
 		// Timer - Duration
 		this.timer_duration = new Date() - this.timer_start;
 
@@ -614,6 +620,13 @@
 
 			this.debug_info('debug_info_duration', this.timer_duration + 'ms');
 		}
+	}
+
+	// Get form style ID
+	$.WS_Form.prototype.get_form_style_id = function() {
+
+		var framework_id = this.is_admin ? 'ws-form' : $.WS_Form.settings_plugin.framework;
+		return $.WS_Form.frameworks.types[framework_id];
 	}
 
 	// Get current framework
@@ -632,7 +645,7 @@
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_form = framework['form'][this.is_admin ? 'admin' : 'public'];
+		var framework_form = framework.form[this.is_admin ? 'admin' : 'public'];
 
 		// Label
 		var form_label = this.esc_html(form.label);
@@ -641,7 +654,7 @@
 		if(label_render) {
 
 			var label_mask_form = !this.is_admin ? this.get_object_meta_value(this.form, 'label_mask_form', '') : '';
-			var mask = (label_mask_form != '') ? label_mask_form : (typeof framework_form['mask_label'] !== 'undefined') ? framework_form['mask_label'] : '';
+			var mask = (label_mask_form != '') ? label_mask_form : (typeof framework_form.mask_label !== 'undefined') ? framework_form.mask_label : '';
 			var mask_values = {'label': form_label};
 			var label_html_parsed = this.mask_parse(mask, mask_values);
 
@@ -657,7 +670,7 @@
 		form_html += this.get_groups_html(form.groups);
 
 		// Parse wrapper form
-		var mask = framework_form['mask_single'];
+		var mask = framework_form.mask_single;
 		var mask_values = {
 
 			'form': form_html,
@@ -686,7 +699,7 @@
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_tabs = framework['tabs'][this.is_admin ? 'admin' : 'public'];
+		var framework_tabs = framework.tabs[this.is_admin ? 'admin' : 'public'];
 
 		// Get tab index cookie if settings require it
 		var index = (this.get_object_meta_value(this.form, 'cookie_tab_index')) ? this.cookie_get('tab_index', 0) : 0;
@@ -728,7 +741,7 @@
 			}
 
 			// Parse wrapper tabs
-			var mask = framework_tabs['mask_wrapper'];
+			var mask = framework_tabs.mask_wrapper;
 			var mask_values = {
 
 				'attributes': attributes,
@@ -754,7 +767,7 @@
 
 		// Get current framework for tabs
 		var framework = this.get_framework();
-		var framework_tabs = framework['tabs'][this.is_admin ? 'admin' : 'public'];
+		var framework_tabs = framework.tabs[this.is_admin ? 'admin' : 'public'];
 
 		// Get group label
 		var group_label = this.esc_html(group.label);
@@ -770,7 +783,7 @@
 		}
 
 		// Parse and return wrapper tab
-		var mask = framework_tabs['mask_single'];
+		var mask = framework_tabs.mask_single;
 		var mask_values = {
 
 			'attributes': attributes,
@@ -780,13 +793,13 @@
 		};
 
 		// Active tab
-		if(is_active && (typeof(framework_tabs['active']) !== 'undefined')) {
+		if(is_active && (typeof(framework_tabs.active) !== 'undefined')) {
 
-			mask_values['active'] = framework_tabs['active'];
+			mask_values.active = framework_tabs.active;
 
 		} else {
 
-			mask_values['active'] = '';
+			mask_values.active = '';
 		}
 
 		return this.mask_parse(mask, mask_values);
@@ -805,7 +818,7 @@
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_groups = framework['groups'][this.is_admin ? 'admin' : 'public'];
+		var framework_groups = framework.groups[this.is_admin ? 'admin' : 'public'];
 
 		// Get tab index cookie if settings require it
 		var group_index_current = (this.get_object_meta_value(this.form, 'cookie_tab_index')) ? this.cookie_get('tab_index', 0) : 0;
@@ -829,7 +842,7 @@
 		var class_array = ['wsf-groups'];
 
 		// Parse wrapper form
-		var mask = (use_mask ? framework_groups['mask_wrapper'] : '#groups');
+		var mask = (use_mask ? framework_groups.mask_wrapper : '#groups');
 		var mask_values = {
 
 			'class': class_array.join(' '),
@@ -850,7 +863,7 @@
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_groups = framework['groups'][this.is_admin ? 'admin' : 'public'];
+		var framework_groups = framework.groups[this.is_admin ? 'admin' : 'public'];
 
 		var group_id = this.esc_html(group.id);
 
@@ -861,7 +874,7 @@
 		if(label_render) {
 
 			var label_mask_group = !this.is_admin ? this.get_object_meta_value(this.form, 'label_mask_group', '') : '';
-			var mask = (label_mask_group != '') ? label_mask_group : (typeof framework_groups['mask_label'] !== 'undefined') ? framework_groups['mask_label'] : '';
+			var mask = (label_mask_group != '') ? label_mask_group : (typeof framework_groups.mask_label !== 'undefined') ? framework_groups.mask_label : '';
 			var mask_values = {'label': group_label};
 			var label_html_parsed = this.mask_parse(mask, mask_values);
 
@@ -877,9 +890,9 @@
 		var class_array = [];
 
 		// Class - Base
-		if(typeof(framework_groups['class']) !== 'undefined') {
+		if(typeof(framework_groups.class) !== 'undefined') {
 
-			class_array.push(framework_groups['class']);
+			class_array.push(framework_groups.class);
 		}
 
 		// Class - Wrapper
@@ -895,9 +908,9 @@
 		}
 
 		// Class - Active
-		if(is_active && (typeof framework_groups['class_active'] !== 'undefined')) {
+		if(is_active && (typeof framework_groups.class_active !== 'undefined')) {
 
-			class_array.push(framework_groups['class_active']);
+			class_array.push(framework_groups.class_active);
 		}
 
 		// Attributes
@@ -911,7 +924,7 @@
 		}
 
 		// Parse wrapper tabs content
-		var mask = (use_mask ? framework_groups['mask_single'] : '#group');
+		var mask = (use_mask ? framework_groups.mask_single : '#group');
 		var mask_values = {
 
 			'attributes': ((attributes_array.length > 0) ? ' ' : '') + attributes_array.join(' '),
@@ -936,7 +949,7 @@
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_sections = framework['sections'][this.is_admin ? 'admin' : 'public'];
+		var framework_sections = framework.sections[this.is_admin ? 'admin' : 'public'];
 
 		var group_id = group.id;
 		var sections = group.sections
@@ -945,9 +958,9 @@
 		var section_repeatable = {};
 		if(typeof(this.submit) === 'object') {
 
-			if(typeof(this.submit['section_repeatable']) !== 'undefined') {
+			if(typeof(this.submit.section_repeatable) !== 'undefined') {
 
-				section_repeatable = this.submit['section_repeatable'];
+				section_repeatable = this.submit.section_repeatable;
 			}
 
 		} else {
@@ -955,9 +968,9 @@
 			// Check to see if auto populate data exists
 			if(this.submit_auto_populate !== false) {
 
-				if(typeof(this.submit_auto_populate['section_repeatable']) !== 'undefined') {
+				if(typeof(this.submit_auto_populate.section_repeatable) !== 'undefined') {
 
-					section_repeatable = this.submit_auto_populate['section_repeatable'];
+					section_repeatable = this.submit_auto_populate.section_repeatable;
 				}
 			}
 		}
@@ -977,9 +990,9 @@
 
 				(section_repeatable !== false) &&
 				(typeof(section_repeatable[section_id_string]) !== 'undefined') &&
-				(typeof(section_repeatable[section_id_string]['index']) !== 'undefined')
+				(typeof(section_repeatable[section_id_string].index) !== 'undefined')
 
-			) ? section_repeatable[section_id_string]['index'] : [false];
+			) ? section_repeatable[section_id_string].index : [false];
 
 			// Loop through section_repeatable_array
 			for(var section_repeatable_array_index in section_repeatable_array) {
@@ -995,7 +1008,7 @@
 		}
 
 		// Parse wrapper section
-		var mask = framework_sections['mask_wrapper'];
+		var mask = framework_sections.mask_wrapper;
 		var mask_values = {
 
 			'class': 'wsf-sections',
@@ -1035,11 +1048,11 @@
 		}
 
 		// Attributes
-		var attributes_array = [];
+		var attributes = '';
 
 		// Get current framework
 		var framework = this.get_framework();
-		var framework_sections = framework['sections'][this.is_admin ? 'admin' : 'public'];
+		var framework_sections = framework.sections[this.is_admin ? 'admin' : 'public'];
 
 		// Get column class array
 		var class_array = this.column_class_array(section);
@@ -1047,12 +1060,12 @@
 		// Is section repeatable?
 		if(section_repeatable && !this.is_admin) {
 
-			attributes_array.push('data-repeatable');
-			attributes_array.push('data-repeatable-index="' + this.esc_attr(section_repeatable_index) + '"');
+			attributes = this.attribute_modify(attributes, 'data-repeatable', '', true);
+			attributes = this.attribute_modify(attributes, 'data-repeatable-index', section_repeatable_index, true);
 		}
 
 		// Add any base classes
-		if(typeof(framework_sections['class_single']) !== 'undefined') { class_array = class_array.concat(framework_sections['class_single']); }
+		if(typeof(framework_sections.class_single) !== 'undefined') { class_array = class_array.concat(framework_sections.class_single); }
 
 		// Public
 		if(!this.is_admin) {
@@ -1101,7 +1114,7 @@
 
 					case 'change_blur' :
 
-						attributes_array.push('data-wsf-section-validated-class="' + class_validated_array.join(' ') + '"');
+						attributes = this.attribute_modify(attributes, 'data-wsf-section-validated-class', class_validated_array.join(' '), true);
 
 						break;
 				}
@@ -1120,7 +1133,7 @@
 		if(label_render) {
 
 			var label_mask_section = !this.is_admin ? this.get_object_meta_value(this.form, 'label_mask_section', '') : '';
-			var mask = (label_mask_section != '') ? label_mask_section : ((typeof framework_sections['mask_label'] !== 'undefined') ? framework_sections['mask_label'] : '');
+			var mask = (label_mask_section != '') ? label_mask_section : ((typeof framework_sections.mask_label !== 'undefined') ? framework_sections.mask_label : '');
 			var mask_values = {'label': section_label};
 			var label_html_parsed = this.mask_parse(mask, mask_values);
 
@@ -1133,21 +1146,38 @@
 
 			// Disabled
 			var disabled_section = this.get_object_meta_value(section, 'disabled_section', '');
-			if(disabled_section == 'on') { attributes_array.push('disabled aria-disabled="true"'); }
+			if(disabled_section == 'on') {
+
+				attributes = this.attribute_modify(attributes, 'disabled', '', true);
+				attributes = this.attribute_modify(attributes, 'aria-disabled', 'true', true);
+			}
 
 			// Hidden
 			var hidden_section = this.get_object_meta_value(section, 'hidden_section', '');
-			if(hidden_section == 'on') { attributes_array.push('style="display: none;" aria-live="polite" aria-hidden="true"'); }
+			if(hidden_section == 'on') {
+
+				attributes = this.attribute_modify(attributes, 'style', 'display: none;', true);
+				attributes = this.attribute_modify(attributes, 'aria-live', 'polite', true);
+				attributes = this.attribute_modify(attributes, 'aria-hidden', 'true', true);
+			}
+
+			// ARIA label
+			var aria_label = this.get_object_meta_value(section, 'aria_label', '');
+			if(aria_label == '') { aria_label = section.label; }
+			attributes = this.attribute_modify(attributes, 'aria-label', aria_label, true);
+
+			// Custom attributes
+			attributes = this.custom_attributes(attributes, section, 'section', section_repeatable_index);
 		}
 
 		// HTML
 		var section_single_html = this.get_fields_html(section, section_repeatable_index);
 
 		// Parse wrapper section
-		var mask = framework_sections['mask_single'];
+		var mask = framework_sections.mask_single;
 		var mask_values = {
 
-			'attributes': ((attributes_array.length > 0) ? ' ' : '') + attributes_array.join(' '),
+			'attributes': (attributes ? ' ' : '') + attributes,
 			'class': class_array.join(' '),
 			'column_count' : $.WS_Form.settings_plugin.framework_column_count,
 			'data_id': section.id,
@@ -1162,6 +1192,42 @@
 		return section_html_parsed;
 	}
 
+	// Process custom attributes
+	$.WS_Form.prototype.custom_attributes = function(attributes, object, object_type, section_repeatable_index) {
+
+		var mask_field_attributes_custom = this.get_object_meta_value(object, 'custom_attributes', false);
+
+		if(
+			(mask_field_attributes_custom !== false) &&
+			(typeof(mask_field_attributes_custom) === 'object') &&
+			(mask_field_attributes_custom.length > 0)
+		) {
+
+			// If object is not a field then set object to false ready for parse_variables_process
+			if(object_type != 'field') { object = false; }
+
+			// Run through each custom attribute
+			for(var mask_field_attributes_custom_index in mask_field_attributes_custom) {
+
+				if(!mask_field_attributes_custom.hasOwnProperty(mask_field_attributes_custom_index)) { continue; }
+
+				// Get custom attribute name/value pair
+				var mask_field_attribute_custom = mask_field_attributes_custom[mask_field_attributes_custom_index];
+
+				// Check attribute name exists
+				if(mask_field_attribute_custom.custom_attribute_name == '') { continue; }
+
+				// Parse custom attribute value
+				mask_field_attribute_custom.custom_attribute_value = this.parse_variables_process(mask_field_attribute_custom.custom_attribute_value, section_repeatable_index, false, object).output;
+
+				// Build attribute (Only add value if one is specified)
+				attributes = this.attribute_modify(attributes, mask_field_attribute_custom.custom_attribute_name, mask_field_attribute_custom.custom_attribute_value, true);
+			}
+		}
+
+		return attributes;
+	}
+
 	// Get fields html
 	$.WS_Form.prototype.get_fields_html = function(section, section_repeatable_index) {
 
@@ -1173,7 +1239,7 @@
 
 		// Get current framework for tabs
 		var framework = this.get_framework();
-		var framework_fields = framework['fields'][this.is_admin ? 'admin' : 'public'];
+		var framework_fields = framework.fields[this.is_admin ? 'admin' : 'public'];
 
 		var section_id = section.id;
 		var fields = section.fields;
@@ -1185,7 +1251,7 @@
 		if(label_render) {
 
 			var label_mask_section = !this.is_admin ? this.get_object_meta_value(this.form, 'label_mask_section', '') : '';
-			var mask = (label_mask_section != '') ? label_mask_section : ((typeof framework_fields['mask_wrapper_label'] !== 'undefined') ? framework_fields['mask_wrapper_label'] : '');
+			var mask = (label_mask_section != '') ? label_mask_section : ((typeof framework_fields.mask_wrapper_label !== 'undefined') ? framework_fields.mask_wrapper_label : '');
 			var mask_values = {'label': section_label};
 			var label_html_parsed = this.mask_parse(mask, mask_values);
 
@@ -1208,7 +1274,7 @@
 		}
 
 		// Parse wrapper section
-		var mask = framework_fields['mask_wrapper'];
+		var mask = framework_fields.mask_wrapper;
 		var mask_values = {
 
 			'column_count' : $.WS_Form.settings_plugin.framework_column_count,
@@ -1221,7 +1287,395 @@
 
 		return fields_html_parsed;
 	}
+	// Get form HTML
+	$.WS_Form.prototype.get_summary_html = function(form, field_settings, field_ids_exclude) {
 
+		// Form
+		if(typeof(form) === 'undefined') { return ''; }
+
+		// Field object
+		if(typeof(field_settings) === 'undefined') { field_settings = false; }
+
+		// Field IDs to exclude
+		if(typeof(field_ids_exclude) === 'undefined') { field_ids_exclude = []; }
+
+		// Get heading level
+		var summary_heading_level = parseInt(this.get_object_meta_value(field_settings, 'summary_heading_level', '2'), 10);
+		if(summary_heading_level < 1 || summary_heading_level > 6) { summary_heading_level = 2; }
+
+		// Render groups
+		var form_html = this.get_summary_html_groups(form.groups, field_settings, summary_heading_level);
+
+		if(form_html) {
+
+			// Label
+			form_html = this.get_summary_label(form_html, form, 'form', field_settings, summary_heading_level);
+		}
+
+		return form_html ? '<div class="wsf-summary" role="region" ' + this.get_summary_label_aria(form, 'form', field_settings) + '>\n\n' + form_html + '</div>\n' : '';
+	}
+
+	// Get groups HTML
+	$.WS_Form.prototype.get_summary_html_groups = function(groups, field_settings, summary_heading_level) {
+
+		var groups_html = '';
+
+		// Check groups
+		if(typeof(groups) === 'undefined') { return ''; }
+
+		// Get group count
+		var group_count = Object.keys(groups).length;
+		if(group_count > 1) {
+
+			summary_heading_level++;
+		}
+
+		// Render groups
+		for(var group_index in groups) {
+
+			if(!groups.hasOwnProperty(group_index)) { continue; }
+
+			var group = groups[group_index];
+
+			if(typeof(group.sections) === 'undefined') { continue; }
+
+			// Render sections
+			var sections_html = this.get_summary_html_sections(group.sections, field_settings, summary_heading_level + 1);
+
+			if(sections_html) {
+
+				if(group_count > 1) {
+
+					// Label
+					sections_html = this.get_summary_label(sections_html, group, 'group', field_settings, summary_heading_level);
+
+					groups_html += '<div class="wsf-summary-group-wrapper" role="group" ' + this.get_summary_label_aria(group, 'group', field_settings) + '>\n\n' + sections_html + '</div>\n\n';
+
+				} else {
+
+					groups_html += sections_html;
+				}
+			}
+		}
+
+		if(group_count > 1) {
+
+			return groups_html ? '<div class="wsf-summary-groups-wrapper">\n\n' + groups_html + '</div>\n\n' : '';
+
+		} else {
+
+			return groups_html;
+		}
+	}
+
+	// Get sections html
+	$.WS_Form.prototype.get_summary_html_sections = function(sections, field_settings, summary_heading_level) {
+
+		var sections_html = '';
+
+		// Check sections
+		if(typeof(sections) === 'undefined') { return ''; }
+
+		// Add classes to field_settings
+		field_settings.class_fields_wrapper = this.get_summary_fields_wrapper_class(field_settings);
+		field_settings.class_field_wrapper = this.get_summary_field_wrapper_class(field_settings);
+
+		// Render sections
+		for(var section_index in sections) {
+
+			if(!sections.hasOwnProperty(section_index)) { continue; }
+
+			var section = sections[section_index];
+
+			if(typeof(section.fields) === 'undefined') { continue; }
+
+			var fields_html = this.get_summary_html_fields(section.fields, section, field_settings);
+
+			if(fields_html) {
+
+				// Label
+				fields_html = this.get_summary_label(fields_html, section, 'section', field_settings, summary_heading_level);
+
+				var section_class_repeatable = (this.get_object_meta_value(section, 'section_repeatable', 'on') == 'on') ? ' wsf-summary-section-repeatable' : '';
+
+				sections_html += '<div class="wsf-summary-section-wrapper' + section_class_repeatable + '" role="group" ' + this.get_summary_label_aria(section, 'section', field_settings) + '>\n\n' + fields_html + '</div>\n\n';
+			}
+		}
+
+		return sections_html ? '<div class="wsf-summary-sections-wrapper">\n\n' + sections_html + '</div>\n\n' : '';
+	}
+
+	// Get fields html
+	$.WS_Form.prototype.get_summary_html_fields = function(fields, section, field_settings) {
+
+		var fields_html = '';
+
+		// Check fields
+		if(typeof(fields) === 'undefined') { return ''; }
+
+		// Section repeatable
+		var section_repeatable = (this.get_object_meta_value(section, 'section_repeatable', 'on') == 'on');
+
+		// Get settings
+		var field_ids_exclude = [];
+
+		// Get field setting field ID
+		var summary_field_id = field_settings.id;
+
+		// Hide empty fields
+		var summary_field_if = (this.get_object_meta_value(field_settings, 'summary_field_if', 'on') == 'on');
+
+		// Render repeaters as table
+		var summary_repeater_table = (this.get_object_meta_value(field_settings, 'summary_repeater_table', 'on') == 'on');
+
+		// Render row number in table
+		var summary_repeater_table_row_number = (this.get_object_meta_value(field_settings, 'summary_repeater_table_row_number', 'on') == 'on');
+
+		// Section repeatable
+		if(section_repeatable && summary_repeater_table && summary_repeater_table_row_number) {
+
+			var table_html_thead = '<th>#</th>\n';
+			var table_html_tbody = '<td>#section_row_number</td>\n';
+
+		} else {
+
+			var table_html_thead = '';
+			var table_html_tbody = '';
+		}
+
+		// Excluded field IDs
+		var summary_field_ids_exclude = this.get_object_meta_value(field_settings, 'summary_field_ids_exclude', []);
+		if(summary_field_ids_exclude) {
+
+			var field_ids_exclude = [];
+
+			for(var summary_field_ids_exclude_index in summary_field_ids_exclude) {
+
+				if(!summary_field_ids_exclude.hasOwnProperty(summary_field_ids_exclude_index)) { continue; }
+
+				var summary_field_id_exclude = summary_field_ids_exclude[summary_field_ids_exclude_index];
+
+				if(!summary_field_id_exclude.ws_form_field) { continue; }
+
+				field_ids_exclude.push(parseInt(summary_field_id_exclude.ws_form_field, 10));
+			}
+		}
+
+		// Render fields
+		var row_count = 0;
+		for(var field_index in fields) {
+
+			if(!fields.hasOwnProperty(field_index)) { continue; }
+
+			var field = fields[field_index];
+
+			// Get field ID
+			var field_id = parseInt(field.id, 10);
+
+			// Skip self
+			if(field_id == summary_field_id) { continue; }
+
+			// Get field type
+			var field_type = field.type;
+
+			// Exclude field types
+			if(['hidden', 'meter', 'progress', 'signature'].includes(field_type)) { continue; }
+
+			// Check if field ID should be excluded
+			if(field_ids_exclude.includes(field_id)) { continue; }
+
+			// Get field type config
+			var field_type_config = $.WS_Form.field_type_cache[field_type];
+
+			// Exclude fields that don't have text output
+			if(!((typeof(field_type_config.text_out) !== 'undefined') ? field_type_config.text_out : false)) { continue; }
+
+			if(section_repeatable && summary_repeater_table) {
+
+				table_html_thead += '<th scope="col">#field_label(' + this.esc_attr(field_id) + ')</th>\n';
+				table_html_tbody += '<td>#text(#field(' + this.esc_attr(field_id) + '))</td>\n';
+
+			} else {
+
+				var field_html = '<dl class="' + this.esc_attr(field_settings.class_field_wrapper) + '">';
+
+				var field_static = ((typeof(field_type_config.static) !== 'undefined') ? field_type_config.static : false);
+
+				if(field_static === false) {
+
+					field_html += '<dt class="wsf-summary-field-label">#field_label(' + this.esc_attr(field_id) + ')</dt>';
+				}
+
+				field_html += '<dd class="wsf-summary-field-value">#text(#field(' + this.esc_attr(field_id) + '))</dd>';
+				field_html += '</dl>';
+
+				if(summary_field_if) {
+
+					field_html = '#if(#field(' + this.esc_attr(field_id) + '))' + field_html + '#endif';
+				}
+
+				field_html += '\n\n';
+
+				fields_html += field_html;
+			}
+
+			row_count++;
+		}
+
+		if(row_count) {
+
+			if(section_repeatable && summary_repeater_table) {
+
+				table_html_thead = '<tr>\n' + table_html_thead + '</tr>\n\n';
+				table_html_tbody = '<tr>\n' + table_html_tbody + '</tr>';
+
+				if(section_repeatable) {
+
+					table_html_tbody = '#section_rows_start(' + section.id + ')\n' + table_html_tbody + '\n#section_rows_end';
+				}
+
+				table_html_tbody += '\n\n';
+
+				// Label
+				var summary_label_render = this.get_summary_label_render(section, 'section', field_settings);
+
+				if(summary_label_render) {
+
+					var section_id = 'wsf-summary-section-label-' + (!this.is_admin ? (this.form_instance_id + '-') : '') + section.id;
+				}
+
+				fields_html = '<table role="table" ' + (summary_label_render ? 'aria-labelledby="' + this.esc_attr(section_id) + '"' : 'aria-label="' + this.esc_attr(section.label) + '"') + '>\n\n<thead>\n\n' + table_html_thead + '</thead>\n\n<tbody>\n\n' + table_html_tbody + '</tbody>\n\n</table>\n\n';
+
+			} else {
+
+				fields_html = '<div class="' + this.esc_attr(field_settings.class_fields_wrapper) + '">\n\n' + fields_html + '</div>';
+
+				if(section_repeatable) {
+
+					fields_html = '#section_rows_start(' + section.id + ')\n' + fields_html + '\n#section_rows_end';
+				}
+
+				fields_html += '\n\n';
+			}
+		}
+
+		return fields_html;
+	}
+
+	// Get summary fields wrapper class
+	$.WS_Form.prototype.get_summary_fields_wrapper_class = function(field_settings) {
+
+		// Build classes
+		var fields_wrapper_class_array = ['wsf-summary-fields-wrapper'];
+
+		// Get orientation
+		var orientation = this.get_object_meta_value(field_settings, 'orientation', false);
+
+		switch(orientation) {
+
+			case 'grid' :
+
+				// Get wrapper class
+				var class_orientation_wrapper_array = this.get_field_value_fallback(field_settings.type, 'top', 'class_orientation_wrapper', [], false, true);
+				if(typeof(class_orientation_wrapper_array) == 'object') {
+
+					fields_wrapper_class_array = fields_wrapper_class_array.concat(class_orientation_wrapper_array);
+				}
+
+				break;
+		}
+
+		// Get field value orientation
+		var orientation = this.get_object_meta_value(field_settings, 'summary_field_orientation', '');
+
+		switch(orientation) {
+
+			case 'horizontal' :
+
+				fields_wrapper_class_array.push('wsf-summary-field-orientation-horizontal');
+
+				break;
+		}
+
+		return fields_wrapper_class_array.join(' ');
+	}
+
+	// Get summary fields wrapper class
+	$.WS_Form.prototype.get_summary_field_wrapper_class = function(field_settings) {
+
+		// Build classes
+		var field_wrapper_class_array = ['wsf-summary-field-wrapper'];
+
+		// Get orientation
+		var orientation = this.get_object_meta_value(field_settings, 'orientation', '');
+
+		switch(orientation) {
+
+			case 'horizontal' :
+
+				// Class - Horizontal
+				var class_inline_array = this.get_field_value_fallback(field_settings.type, 'top', 'class_inline', false, false, false);
+				if(typeof(class_inline_array) == 'object') {
+
+					field_wrapper_class_array = field_wrapper_class_array.concat(class_inline_array);
+				}
+
+				break;
+
+			case 'grid' :
+
+				// Get wrapper class
+				var class_orientation_row_array = this.get_field_value_fallback(field_settings.type, 'top', 'class_orientation_row', [], false, true);
+				if(typeof(class_orientation_row_array) == 'object') {
+
+					field_wrapper_class_array = field_wrapper_class_array.concat(class_orientation_row_array);
+				}
+
+				// Get class array
+				var orientation_class_array = this.column_class_array(field_settings, 'orientation_breakpoint');
+				if(typeof(orientation_class_array) == 'object') {
+
+					field_wrapper_class_array = field_wrapper_class_array.concat(orientation_class_array);
+				}
+
+				break;
+		}
+
+		return field_wrapper_class_array.join(' ');
+	}
+
+	// Get summary label render
+	$.WS_Form.prototype.get_summary_label_render = function(object, element, field_settings) {
+
+		var label_show = this.get_object_meta_value(field_settings, 'summary_label_' + element, 'on');
+
+		return (
+			(label_show == 'on') ||
+			((label_show == 'auto') && (this.get_object_meta_value(object, 'label_render', 'on') == 'on') && object.label)
+		);
+	}
+
+	// Get summary label
+	$.WS_Form.prototype.get_summary_label = function(object_html, object, element, field_settings, summary_heading_level) {
+
+		if(this.get_summary_label_render(object, element, field_settings)) {
+
+			object_html = '<h' + summary_heading_level + ' id="' + this.esc_attr(this.get_summary_label_id(object, element)) + '" class="wsf-summary-' + element + '-label">' + this.esc_html(object.label) + '</h' + summary_heading_level + '>\n\n' + object_html;
+		}
+
+		return object_html;
+	}
+
+	// Get summary label render
+	$.WS_Form.prototype.get_summary_label_aria = function(object, element, field_settings) {
+
+		return (this.get_summary_label_render(object, element, field_settings) ? 'aria-labelledby="' + this.esc_attr(this.get_summary_label_id(object, element)) + '"' : 'aria-label="' + this.esc_attr(object.label) + '"')
+	}
+
+	$.WS_Form.prototype.get_summary_label_id = function(object, element) {
+
+		return 'wsf-summary-' + element + '-label-' + (!this.is_admin ? (this.form_instance_id + '-') : '') + object.id;
+	}
 	// Process values for auto population
 	$.WS_Form.prototype.value_populate_process = function(value, field) {
 
@@ -1280,7 +1734,7 @@
 
 		// Get current framework for tabs
 		var framework = this.get_framework();
-		var framework_fields = framework['fields'][this.is_admin ? 'admin' : 'public'];
+		var framework_fields = framework.fields[this.is_admin ? 'admin' : 'public'];
 
 		// Hidden
 		if(!this.is_admin) {
@@ -1360,13 +1814,13 @@
 		if(typeof(this.submit) === 'object') {
 
 			if(
-				(typeof(this.submit['meta']) !== 'undefined') &&
-				(typeof(this.submit['meta'][submit_meta_key]) !== 'undefined') &&
-				(typeof(this.submit['meta'][submit_meta_key]['value']) !== 'undefined') &&
-				(this.submit['meta'][submit_meta_key]['value'] !== null)
+				(typeof(this.submit.meta) !== 'undefined') &&
+				(typeof(this.submit.meta[submit_meta_key]) !== 'undefined') &&
+				(typeof(this.submit.meta[submit_meta_key].value) !== 'undefined') &&
+				(this.submit.meta[submit_meta_key].value !== null)
 			) {
 
-				var value = this.submit['meta'][submit_meta_key]['value'];
+				var value = this.submit.meta[submit_meta_key].value;
 
 				value = this.value_populate_process(value, field);
 			}
@@ -1377,12 +1831,12 @@
 			if(this.submit_auto_populate !== false) {
 
 				if(
-					(typeof(this.submit_auto_populate['data']) !== 'undefined') &&
-					(typeof(this.submit_auto_populate['data'][submit_meta_key]) !== 'undefined') &&
-					(this.submit_auto_populate['data'][submit_meta_key] !== null)
+					(typeof(this.submit_auto_populate.data) !== 'undefined') &&
+					(typeof(this.submit_auto_populate.data[submit_meta_key]) !== 'undefined') &&
+					(this.submit_auto_populate.data[submit_meta_key] !== null)
 				) {
 
-					var value = this.submit_auto_populate['data'][submit_meta_key];
+					var value = this.submit_auto_populate.data[submit_meta_key];
 
 					value = this.value_populate_process(value, field);
 				}
@@ -1400,13 +1854,13 @@
 		var field_config = $.WS_Form.field_type_cache[field.type];
 
 		// Check field is licensed
-		if((typeof(field_config['pro_required']) !== 'undefined') && field_config['pro_required']) {
+		if((typeof(field_config.pro_required) !== 'undefined') && field_config.pro_required) {
 
 			return '';
 		}
 
 		// Check to see if mask_single should be ignored
-		var mask_wrappers_drop = this.is_admin ? false : ((typeof field_config['mask_wrappers_drop'] !== 'undefined') ? field_config['mask_wrappers_drop'] : false);
+		var mask_wrappers_drop = this.is_admin ? false : ((typeof field_config.mask_wrappers_drop !== 'undefined') ? field_config.mask_wrappers_drop : false);
 
 		// reCAPTCHA override
 		if((field.type == 'recaptcha') && !this.is_admin && (this.get_object_meta_value(field, 'recaptcha_recaptcha_type', 'default') == 'invisible')) { mask_wrappers_drop = true; }
@@ -1510,16 +1964,20 @@
 	// Build field type cache
 	$.WS_Form.prototype.field_type_cache_build = function() {
 
-		// If public, set field_type_cache to field_types, already in corret format
-		if(!this.is_admin) { $.WS_Form.field_type_cache = $.WS_Form.field_types; }
+		// If public, set field_type_cache to field_types, already in correct format
+		if(!this.is_admin) {
+
+			$.WS_Form.field_type_cache = $.WS_Form.field_types;
+			return true;
+		}
 
 		// If already built, do not build
-		if($.WS_Form.field_type_cache.length > 0) { return true; }
+		if(Object.keys($.WS_Form.field_type_cache.length) > 0) { return true; }
 
 		// Add field types
 		for (var group_key in $.WS_Form.field_types) {
 
-	  		var group = $.WS_Form.field_types[group_key];
+			var group = $.WS_Form.field_types[group_key];
 			var types = group.types;
 
 			// Add field types
@@ -1580,6 +2038,11 @@
 		return return_html;
 	}
 
+	$.WS_Form.prototype.esc_html_undo = function(value) {
+
+		return new DOMParser().parseFromString(value, 'text/html').documentElement.textContent;
+	}
+
 	// Escape attribute
 	$.WS_Form.prototype.esc_attr = function(value, encode_new_lines) {
 
@@ -1600,6 +2063,72 @@
 
 		return return_html;
 	}
+
+	// Escape URL with support for relative paths
+	$.WS_Form.prototype.esc_url = function (url) {
+
+		try {
+			// Decode URL to catch encoded exploits
+			url = decodeURIComponent(url);
+
+			// Allow literal hash like "#wsf-something-0"
+			if (/^#[a-zA-Z0-9\-]+$/.test(url)) {
+				return url;
+			}
+
+			// Extract the hash if present
+			var hash = '';
+			var hash_index = url.indexOf('#');
+			if (hash_index !== -1) {
+				hash = url.substring(hash_index); // Save the hash
+				url = url.substring(0, hash_index); // Remove the hash from the URL for further processing
+			}
+
+			// Add a default scheme if none is provided, but handle schemes like "tel:"
+			if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)) {
+				url = 'https://' + url;
+			}
+
+			// Parse the URL
+			var url_parsed = new URL(url);
+
+			// Allowed schemes
+			var schemes_valid = ['http', 'https', 'ftp', 'mailto', 'tel'];
+
+			// Check if the scheme is valid
+			if (!schemes_valid.includes(url_parsed.protocol.replace(':', ''))) {
+				return '';
+			}
+
+			// Disallowed patterns
+			var disallowed_patterns = [
+				/javascript:/i,   // Block "javascript:" scheme
+				/data:/i,         // Block "data:" scheme
+				/vbscript:/i,     // Block "vbscript:" scheme
+				/file:/i,         // Block "file:" scheme
+				/<.*?>/i,         // Block HTML/XSS
+				/%00/i,           // Block null bytes
+				/(\.\.\/|\.\\)/i, // Block path traversal
+				/(redirect|url|next)=http/i, // Block untrusted redirects
+				/(%25)+/i         // Block double-encoding
+			];
+
+			// Check for disallowed patterns in the URL
+			for (var pattern of disallowed_patterns) {
+				if (pattern.test(url)) {
+					return '';
+				}
+			}
+
+			// Reconstruct the URL to ensure it's properly formatted, appending the hash if present
+			return url_parsed.toString() + hash;
+
+		} catch (e) {
+
+			// If URL is invalid or cannot be parsed, return an empty string
+			return '';
+		}
+	};
 
 	// Escape selector
 	$.WS_Form.prototype.esc_selector = function(value) {
@@ -1677,17 +2206,13 @@
 
 		if(typeof(end) === 'undefined') { end = false; }
 
-		var comment_html = $.WS_Form.settings_plugin.comments_html ? ('<!-- ' + (end ? '/' : '') + string + " -->\n") + (end ? "\n" : '') : '';
-
-		return comment_html;
+		return ('<!-- ' + (end ? '/' : '') + string + " -->\n") + (end ? "\n" : '');
 	}
 
 	// HTML encode string
 	$.WS_Form.prototype.comment_css = function(string) {
 
-		var comment_css = $.WS_Form.settings_plugin.comments_css ? ("\t/* " + string + " */\n") : '';
-
-		return comment_css;
+		return ("\t/* " + string + " */\n");
 	}
 
 	// Get object value
@@ -1734,18 +2259,18 @@
 		// object[label_position] checks
 		if(label_position !== false) {
 
-			// object[label_position]['field_types'][field_type][element]
-			var object_not_found = (typeof(object) === 'undefined') || (typeof(object[label_position]) === 'undefined') || (typeof(object[label_position]['field_types']) === 'undefined') || (typeof(object[label_position]['field_types'][field_type]) === 'undefined') || (typeof(object[label_position]['field_types'][field_type][element]) === 'undefined');
-			if(!object_not_found) { return object[label_position]['field_types'][field_type][element]; }
+			// object[label_position].field_types[field_type][element]
+			var object_not_found = (typeof(object) === 'undefined') || (typeof(object[label_position]) === 'undefined') || (typeof(object[label_position].field_types) === 'undefined') || (typeof(object[label_position].field_types[field_type]) === 'undefined') || (typeof(object[label_position].field_types[field_type][element]) === 'undefined');
+			if(!object_not_found) { return object[label_position].field_types[field_type][element]; }
 
 			// object[label_position][element]
 			var object_not_found = (typeof(object) === 'undefined') || (typeof(object[label_position]) === 'undefined') || (typeof (object[label_position][element]) === 'undefined');
 			if(!object_not_found) { return object[label_position][element]; }
 		}
 
-		// object['field_types'][field_type][element]
-		var object_not_found = (typeof(object) === 'undefined') || (typeof(object['field_types']) === 'undefined') || (typeof(object['field_types'][field_type]) === 'undefined') || (typeof(object['field_types'][field_type][element]) === 'undefined');
-		if(!object_not_found) { return object['field_types'][field_type][element]; }
+		// object.field_types[field_type][element]
+		var object_not_found = (typeof(object) === 'undefined') || (typeof(object.field_types) === 'undefined') || (typeof(object.field_types[field_type]) === 'undefined') || (typeof(object.field_types[field_type][element]) === 'undefined');
+		if(!object_not_found) { return object.field_types[field_type][element]; }
 
 		// object[element]
 		var object_not_found = (typeof(object) === 'undefined') || (typeof(object[element]) === 'undefined');
@@ -1943,26 +2468,26 @@
 			// If lookup not found, skip this variable group
 			if(!var_lookup_found) { continue; }
 
-			for(var parse_variable in parse_variables['variables']) {
+			for(var parse_variable in parse_variables.variables) {
 
-				if(!parse_variables['variables'].hasOwnProperty(parse_variable)) { continue; }
+				if(!parse_variables.variables.hasOwnProperty(parse_variable)) { continue; }
 
 				if(parse_string.indexOf('#' + parse_variable) === -1) { continue; }
 
-				var parse_variable_config = parse_variables['variables'][parse_variable];
+				var parse_variable_config = parse_variables.variables[parse_variable];
 
 				// Assign value
-				var parse_variable_value = (typeof(parse_variable_config['value']) !== 'undefined') ? parse_variable_config['value'] : false;
-				var parse_variable_attributes = (typeof(parse_variable_config['attributes']) === 'object') ? parse_variable_config['attributes'] : false;
+				var parse_variable_value = (typeof(parse_variable_config.value) !== 'undefined') ? parse_variable_config.value : false;
+				var parse_variable_attributes = (typeof(parse_variable_config.attributes) === 'object') ? parse_variable_config.attributes : false;
 
 				// Single parse? (Used if different value returned each parse, e.g. random_number)
-				var parse_variable_single_parse = (typeof(parse_variable_config['single_parse']) !== 'undefined') ? parse_variable_config['single_parse'] : false;
+				var parse_variable_single_parse = (typeof(parse_variable_config.single_parse) !== 'undefined') ? parse_variable_config.single_parse : false;
 
 				// If no attributes specified, then just set the value
 				if((parse_variable_attributes === false) && (parse_variable_value !== false)) { variables[parse_variable] = parse_variable_value; continue; }
 
 				// Get number of attributes required
-				var variable_attribute_count = (typeof(parse_variable_config['attributes']) === 'object') ? parse_variable_config['attributes'].length : 0;
+				var variable_attribute_count = (typeof(parse_variable_config.attributes) === 'object') ? parse_variable_config.attributes.length : 0;
 
 				if(variable_attribute_count > 0) {
 
@@ -2018,7 +2543,7 @@
 							var parse_variable_full = parse_string.substr(variable_index_of, (variable_index_of_bracket_finish + 1) - variable_index_of);
 
 							// Get separator
-							var separator = (typeof(parse_variable_config['attribute_separator']) !== 'undefined') ? parse_variable_config['attribute_separator'] : ',';
+							var separator = (typeof(parse_variable_config.attribute_separator) !== 'undefined') ? parse_variable_config.attribute_separator : ',';
 
 							// Convert string to attributes
 							var variable_attribute_array = this.string_to_attributes(variable_attribute_string, separator);
@@ -2031,13 +2556,13 @@
 
 							var parse_variable_attribute = parse_variable_attributes[parse_variable_attributes_index];
 
-							var parse_variable_attribute_id = parse_variable_attribute['id'];
+							var parse_variable_attribute_id = parse_variable_attribute.id;
 
 							// Was attribute provided for this index?
 							var parse_variable_attribute_supplied = (typeof(variable_attribute_array[parse_variable_attributes_index]) !== 'undefined');
 
 							// Check required
-							var parse_variable_attribute_required = (typeof(parse_variable_attribute['required']) !== 'undefined') ? parse_variable_attribute['required'] : true;
+							var parse_variable_attribute_required = (typeof(parse_variable_attribute.required) !== 'undefined') ? parse_variable_attribute.required : true;
 							if(parse_variable_attribute_required && !parse_variable_attribute_supplied) {
 
 								// Syntax error - Attribute count
@@ -2046,14 +2571,14 @@
 							}
 
 							// Check default
-							var parse_variable_attribute_default = (typeof(parse_variable_attribute['default']) !== 'undefined') ? parse_variable_attribute['default'] : false;
+							var parse_variable_attribute_default = (typeof(parse_variable_attribute.default) !== 'undefined') ? parse_variable_attribute.default : false;
 							if((parse_variable_attribute_default !== false) && !parse_variable_attribute_supplied) {
 
 								variable_attribute_array[parse_variable_attributes_index] = parse_variable_attribute_default;
 							}
 
 							// Check trim
-							var parse_variable_attribute_trim = (typeof(parse_variable_attribute['trim']) !== 'undefined') ? parse_variable_attribute['trim'] : true;
+							var parse_variable_attribute_trim = (typeof(parse_variable_attribute.trim) !== 'undefined') ? parse_variable_attribute.trim : true;
 							if(parse_variable_attribute_trim) {
 
 								var parse_variable_attribute_value = variable_attribute_array[parse_variable_attributes_index];
@@ -2065,7 +2590,7 @@
 							}
 
 							// Check valid
-							var parse_variable_attribute_valid = (typeof(parse_variable_attribute['valid']) !== 'undefined') ? parse_variable_attribute['valid'] : false;
+							var parse_variable_attribute_valid = (typeof(parse_variable_attribute.valid) !== 'undefined') ? parse_variable_attribute.valid : false;
 							if(parse_variable_attribute_valid !== false) {
 
 								if(!parse_variable_attribute_valid.includes(variable_attribute_array[parse_variable_attributes_index])) {
@@ -2107,7 +2632,6 @@
 										parsed_variable = parsed_variable_raw;
 										break;
 								}
-
 
 								// Field allows in?
 								if(typeof($.WS_Form.field_type_cache[field_to.type]) === 'undefined') { break; }
@@ -2168,7 +2692,6 @@
 										var calc_single = this.calc[calc_index];
 
 										if(
-
 											(calc_single.field === field_to_original) &&
 											(calc_single.field_part === field_part) &&
 											(calc_single.value === parse_string_original) &&
@@ -2227,7 +2750,6 @@
 											this.debug_field_id_bypass.push(field_to.id);
 										}
 									}
-
 								}
 
 								break;
@@ -2370,7 +2892,7 @@
 												this.error('error_parse_variable_syntax_error_operator', variable_attribute_string, 'parse_variables');
 												return this.parse_variables_process_error(this.language('error_parse_variable_syntax_error_operator', variable_attribute_string));
 											}
-											if_boolean_array[if_boolean_array_index]['operator'] = variable_attribute;
+											if_boolean_array[if_boolean_array_index].operator = variable_attribute;
 											break;
 
 										case 3 :
@@ -2380,7 +2902,7 @@
 												this.error('error_parse_variable_syntax_error_logic', variable_attribute_string, 'parse_variables');
 												return this.parse_variables_process_error(this.language('error_parse_variable_syntax_error_logic', variable_attribute_string));
 											}
-											if_boolean_array[if_boolean_array_index]['logic_next'] = variable_attribute;
+											if_boolean_array[if_boolean_array_index].logic_next = variable_attribute;
 											break;
 									}
 
@@ -2404,84 +2926,84 @@
 									var if_boolean = if_boolean_array[if_boolean_array_index];
 									var result_single = false;
 
-									switch(if_boolean['operator']) {
+									switch(if_boolean.operator) {
 
 										// Equals
 										case '==' :
 
-											result_single = (if_boolean['value_a'] == if_boolean['value_b']);
+											result_single = (if_boolean.value_a == if_boolean.value_b);
 											break;
 
 										// Not equals
 										case '!=' :
 
-											result_single = (if_boolean['value_a'] != if_boolean['value_b']);
+											result_single = (if_boolean.value_a != if_boolean.value_b);
 											break;
 
 										// Less than
 										case '<' :
 
-											result_single = (if_boolean['value_a'] < if_boolean['value_b']);
+											result_single = (if_boolean.value_a < if_boolean.value_b);
 											break;
 
 										// Greater than
 										case '>' :
 
-											result_single = (if_boolean['value_a'] > if_boolean['value_b']);
+											result_single = (if_boolean.value_a > if_boolean.value_b);
 											break;
 
 										// Less than or equal
 										case '<=' :
 
-											result_single = (if_boolean['value_a'] <= if_boolean['value_b']);
+											result_single = (if_boolean.value_a <= if_boolean.value_b);
 											break;
 
 										// Greater than or equal
 										case '>=' :
 
-											result_single = (if_boolean['value_a'] >= if_boolean['value_b']);
+											result_single = (if_boolean.value_a >= if_boolean.value_b);
 											break;
 
 										// Contains
 										case '*=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) !== -1) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) !== -1) : false;
 											break;
 
 										// Does not contain
 										case '!*=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) === -1) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) === -1) : false;
 											break;
 
 										// Starts with
 										case '^=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) === 0) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) === 0) : false;
 											break;
 
 										// Does not start with
 										case '!^=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) > 0) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) > 0) : false;
 											break;
 
 										// Ends with
 										case '$=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) === (if_boolean['value_a_string'].length - if_boolean['value_b_string'].length)) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) === (if_boolean.value_a_string.length - if_boolean.value_b_string.length)) : false;
 											break;
 
 										// Does not end with
 										case '!$=' :
 
-											result_single = (if_boolean['value_b_string'] !== '') ? (if_boolean['value_a_string'].indexOf(if_boolean['value_b_string']) !== (if_boolean['value_a_string'].length - if_boolean['value_b_string'].length)) : false;
+											result_single = (if_boolean.value_b_string !== '') ? (if_boolean.value_a_string.indexOf(if_boolean.value_b_string) !== (if_boolean.value_a_string.length - if_boolean.value_b_string.length)) : false;
 											break;
 									}
 
 									result = (if_boolean_array_index == 0) ? result_single : ((logic_next == '&&') ? (result && result_single) : (result || result_single));
 
-									logic_next = (typeof(if_boolean['logic_next']) !== 'undefined') ? if_boolean['logic_next'] : '&&';
+									logic_next = (typeof(if_boolean.logic_next) !== 'undefined') ? if_boolean.logic_next : '&&';
 								}
 
 								parsed_variable = false;
@@ -2614,8 +3136,7 @@
 								var field_max_value = 0;
 								var field_max_label = '';
 								var variable_attribute_array_index = 0;
-
-								var section_repeatable_section_id_to = (typeof(field_to.section_repeatable_section_id) !== 'undefined') ? parseInt(field_to.section_repeatable_section_id, 10) : false;
+								var field_value_index = 0;
 
 								// Loop through provided field ID's
 								while(!isNaN(variable_attribute_array[variable_attribute_array_index])) {
@@ -2632,45 +3153,51 @@
 									var field = this.field_data_cache[field_id];
 
 									// Get field value
-									var field_value = this.get_field_value(field, section_repeatable_index_to);
+									var field_value_array = this.get_field_value(field, field.section_repeatable);
+
 									if(
-										(typeof(field_value) == 'object') &&
-										(typeof(field_value[0]) !== 'undefined')
+										(typeof(field_value_array) != 'object') ||
+										(typeof(field_value_array[0]) === 'undefined')
 									) {
-										field_value = this.get_number(field_value[0], 0, true);
-
-									} else {
-
-										field_value = 0; 
+										field_value_array = [0];
 									}
 
 									/// Get field label
 									var field_label = field.label;
 
-									// Set min and max
-									if(variable_attribute_array_index == 0) {
+									// Process each field value (Multiple for repeatable sections)
+									for(var field_value of field_value_array) {
 
-										// Initial values
-										field_max_id = field_min_id = field_id;
-										field_max_value = field_min_value = field_value;
-										field_max_label = field_min_label = field_label;
+										// Convert to number
+										field_value = this.get_number(field_value, 0, true);
 
-									} else {
+										// Set min and max
+										if(field_value_index == 0) {
 
-										// Min / max calculations
-										if(field_value < field_min_value) {
+											// Initial values
+											field_max_id = field_min_id = field_id;
+											field_max_value = field_min_value = field_value;
+											field_max_label = field_min_label = field_label;
 
-											field_min_id = field_id;
-											field_min_value = field_value;
-											field_min_label = field_label;
+										} else {
+
+											// Min / max calculations
+											if(field_value < field_min_value) {
+
+												field_min_id = field_id;
+												field_min_value = field_value;
+												field_min_label = field_label;
+											}
+
+											if(field_value > field_max_value) {
+
+												field_max_id = field_id;
+												field_max_value = field_value;
+												field_max_label = field_label;
+											}
 										}
 
-										if(field_value > field_max_value) {
-
-											field_max_id = field_id;
-											field_max_value = field_value;
-											field_max_label = field_label;
-										}
+										field_value_index++;
 									}
 
 									// Go to next variable attribute
@@ -2712,8 +3239,32 @@
 
 								break;
 
+							case 'date_format' :
+
+								// Parse date
+								var date_input = this.parse_variables_process(variable_attribute_array[0], section_repeatable_index, calc_type, field_from, field_part, calc_register, section_id, depth).output;
+
+								// Parse date format
+								var date_format = this.parse_variables_process(variable_attribute_array[1], section_repeatable_index, calc_type, field_from, field_part, calc_register, section_id, depth).output;
+
+								// Get date
+								var parsed_variable_date = new Date(date_input);
+
+								// Check date
+								if(isNaN(parsed_variable_date.getTime())) {
+
+									this.error('error_parse_variable_syntax_error_date_format', date_input, 'error-parse-variables');
+									return this.parse_variables_process_error(this.language('error_parse_variable_syntax_error_date_format', date_input));
+								}
+
+								// Process date
+								parsed_variable = this.date_format(parsed_variable_date, date_format);
+
+								break;
+
 							case 'field' :
 							case 'field_float' :
+							case 'field_date_age' :
 							case 'field_date_format' :
 							case 'field_date_offset' :
 							case 'field_count_word' :
@@ -2803,7 +3354,7 @@
 								}
 
 								// Check if submitted as array
-								var submit_array_from = (typeof(field_type_config_from['submit_array']) !== 'undefined') ? field_type_config_from['submit_array'] : false;
+								var submit_array_from = (typeof(field_type_config_from.submit_array) !== 'undefined') ? field_type_config_from.submit_array : false;
 
 								// Get criteria needed to work out how to get field value
 								var section_repeatable_section_id_from = (typeof(field_from.section_repeatable_section_id) !== 'undefined') ? parseInt(field_from.section_repeatable_section_id, 10) : false;
@@ -2852,7 +3403,6 @@
 									(parsed_variable === false) &&
 									(section_repeatable_section_id_from === false)
 								) {
-
 									// Get source repeatable index
 									var parsed_variable = this.get_field_value(field_from, false, submit_array_from, column);
 								}
@@ -2935,16 +3485,16 @@
 											case 'cart_price' :
 											case 'cart_total' :
 
-										 		var parsed_variable_total = 0;
+												var parsed_variable_total = 0;
 
-										 		// Get value, processing currency
-										 		for(var parsed_variable_index in parsed_variable) {
+												// Get value, processing currency
+												for(var parsed_variable_index in parsed_variable) {
 
 													if(!parsed_variable.hasOwnProperty(parsed_variable_index)) { continue; }
 													parsed_variable_total += this.get_number(parsed_variable[parsed_variable_index], 0, true);
-										 		}
+												}
 
-										 		// Round to e-commerce decimals setting (This removes floating point errors, e.g. 123.4500000000002)
+												// Round to e-commerce decimals setting (This removes floating point errors, e.g. 123.4500000000002)
 												var price_decimals = parseInt($.WS_Form.settings_plugin.price_decimals, 10);
 												parsed_variable = this.get_number(parsed_variable_total, 0, false, price_decimals);
 
@@ -2969,15 +3519,15 @@
 
 											default :
 
-										 		var parsed_variable_total = 0;
+												var parsed_variable_total = 0;
 
-										 		// Get value, ignoring currency
-										 		for(var parsed_variable_index in parsed_variable) {
+												// Get value, ignoring currency
+												for(var parsed_variable_index in parsed_variable) {
 
 													if(!parsed_variable.hasOwnProperty(parsed_variable_index)) { continue; }
 
 													parsed_variable_total += ws_this.get_number(parsed_variable[parsed_variable_index], 0, false);
-										 		}
+												}
 
 												parsed_variable = parsed_variable_total;
 										}
@@ -3004,6 +3554,97 @@
 									case 'ecommerce_field_price' :
 
 										var parsed_variable = this.get_price(this.get_number(parsed_variable));
+										break;
+
+									case 'field_date_age' :
+
+										var date_start = new Date((typeof(parsed_variable) == 'number') ? (parsed_variable * 1000) : parsed_variable);
+										var date_end = new Date();
+
+										// Check start date
+										if(isNaN(date_start.getTime())) {
+
+											this.error('error_parse_variable_field_date_age_invalid', parsed_variable, 'error-parse-variables');
+										}
+
+										// Check for period
+										var period = (typeof(variable_attribute_array[1]) === 'string') ? variable_attribute_array[1] : 'y';
+										period = period.toLowerCase();
+										if(![
+
+											'y','m','d','h','n','s',
+											'year', 'month', 'day', 'hour', 'minute', 'second',
+											'years', 'months', 'days', 'hours', 'minutes', 'seconds'
+
+										].includes(period)) {
+
+											this.error('error_parse_variable_syntax_error_field_date_age_period', period, 'error-parse-variables');
+										}
+
+										switch(period) {
+
+											// Seconds
+											case 's' :
+											case 'second' :
+											case 'seconds' :
+
+												parsed_variable = Math.floor((date_end - date_start) / 1000);
+												break;
+
+											// Minutes
+											case 'n' :
+											case 'minute' :
+											case 'minutes' :
+
+												parsed_variable = Math.floor((date_end - date_start) / (1000 * 60));
+												break;
+
+											// Hours
+											case 'h' :
+											case 'hour' :
+											case 'hours' :
+
+												parsed_variable = Math.floor((date_end - date_start) / (1000 * 60 * 60));
+												break;
+
+											// Days
+											case 'd' :
+											case 'day' :
+											case 'days' :
+
+												parsed_variable = Math.floor((date_end - date_start) / (1000 * 60 * 60 * 24));
+												break;
+
+											// Weeks
+											case 'w' :
+											case 'week' :
+											case 'weeks' :
+
+												parsed_variable = Math.floor((date_end - date_start) / (1000 * 60 * 60 * 24 * 7));
+												break;
+
+											// Months
+											case 'm' :
+											case 'month' :
+											case 'months' :
+
+												parsed_variable = (
+													(date_end.getFullYear() - date_start.getFullYear()) * 12 +
+													(date_end.getMonth() - date_start.getMonth()) -
+													(date_end.getDate() < date_start.getDate() ? 1 : 0)
+												);
+												break;
+
+											// Years (default)
+											default:
+
+												parsed_variable = (
+													date_end.getFullYear() - date_start.getFullYear() -
+													(date_end.getMonth() < date_start.getMonth() ||
+													(date_end.getMonth() === date_start.getMonth() && date_end.getDate() < date_start.getDate()) ? 1 : 0)
+												);
+										}
+
 										break;
 
 									case 'field_date_format' :
@@ -3204,7 +3845,7 @@
 
 							case 'query_var' :
 
-								parsed_variable = this.get_query_var(variable_attribute_array[0]);
+								parsed_variable = this.get_query_var(variable_attribute_array[0], variable_attribute_array[1]);
 								break;
 
 							case 'section_row_count' :
@@ -3280,7 +3921,9 @@
 								break;
 
 							case 'checkbox_count' :
+							case 'checkbox_count_total' :
 							case 'select_count' :
+							case 'select_count_total' :
 
 								if(isNaN(variable_attribute_array[0])) {
 
@@ -3303,17 +3946,21 @@
 								switch(parse_variable) {
 
 									case 'checkbox_count' :
+									case 'checkbox_count_total' :
 
-										// Get field checked checkboxes
-										var field_obj = $('[name="' + this.esc_selector(field_name) + '[]"]:checked', this.form_canvas_obj);
+										// Include hidden checkboxes?
+										var include_hidden = variable_attribute_array[1] && this.is_true(variable_attribute_array[1]);
+
+										// Get checked checkboxes
+										var field_obj = $('[data-type="checkbox"][data-id="' + field_id + '"] [data-row-checkbox]' + (include_hidden ? '' : ':not([style*="display: none"])') + ' input' + (include_hidden ? '' : ':not([data-hidden])') + ((parse_variable == 'checkbox_count') ? ':checked' : ''), this.form_canvas_obj);
 
 										break;
 
 									case 'select_count' :
+									case 'select_count_total' :
 
 										// Get field selected options
-										var field_obj = $('select[name="' + this.esc_selector(field_name) + '[]"] option:not([data-placeholder]):selected', this.form_canvas_obj);
-
+										var field_obj = $('select[name="' + this.esc_selector(field_name) + '[]"] option:not([data-placeholder])' + ((parse_variable == 'select_count') ? ':selected' : ''), this.form_canvas_obj);
 										break;
 								}
 
@@ -3323,6 +3970,7 @@
 								break;
 
 							case 'post_date_custom' :
+							case 'post_date_modified_custom' :
 							case 'server_date_custom' :
 							case 'blog_date_custom' :
 
@@ -3475,6 +4123,11 @@
 							case 'wpautop' :
 							case 'trim' :
 							case 'slug' :
+							case 'name_prefix' :
+							case 'name_first' :
+							case 'name_middle' :
+							case 'name_last' :
+							case 'name_suffix' :
 
 								if(typeof(variable_attribute_array[0]) === 'string') {
 
@@ -3529,6 +4182,15 @@
 										case 'slug' :
 
 											parsed_variable = this.get_slug(parsed_variable);
+											break;
+
+										case 'name_prefix' :
+										case 'name_first' :
+										case 'name_middle' :
+										case 'name_last' :
+										case 'name_suffix' :
+
+											parsed_variable = this.get_full_name_components(parsed_variable)[parse_variable];
 											break;
 									}
 								}
@@ -3647,18 +4309,18 @@
 		// Form
 		if(parse_string.indexOf('form') != -1) {
 
-			variables['form_id'] = this.form_id;
-			variables['form_instance_id'] = this.form_instance_id;
-			variables['form_obj_id'] = this.form_obj_id;
-			variables['form_label'] = this.form.label;
-			variables['form_checksum'] = this.form.published_checksum;
-			variables['form_framework'] = this.framework.name;
+			variables.form_id = this.form_id;
+			variables.form_instance_id = this.form_instance_id;
+			variables.form_obj_id = this.form_obj_id;
+			variables.form_label = this.form.label;
+			variables.form_checksum = this.form.published_checksum;
+			variables.form_framework = this.framework.name;
 		}
 
 		// Section
 		if(parse_string.indexOf('section') != -1) {
 
-			variables['section_row_index'] = section_repeatable_index;
+			variables.section_row_index = section_repeatable_index;
 
 			// Get section ID
 			var section_row_number = 1;
@@ -3680,13 +4342,13 @@
 				if(section_row_number <= 0) { section_row_number = 1; }
 			}
 
-			variables['section_row_number'] = section_row_number;
+			variables.section_row_number = section_row_number;
 		}
 
 		// Submit
 		if(parse_string.indexOf('submit') != -1) {
 
-			variables['submit_hash'] = this.hash;
+			variables.submit_hash = this.hash;
 		}
 
 		// Client
@@ -3694,8 +4356,8 @@
 
 			var client_date_time = new Date();
 
-			variables['client_time'] = ((typeof(this.date_format) === 'function') ? this.date_format(client_date_time, ws_form_settings.time_format) : '');
-			variables['client_date'] = ((typeof(this.date_format) === 'function') ? this.date_format(client_date_time, ws_form_settings.date_format) : '');
+			variables.client_time = ((typeof(this.date_format) === 'function') ? this.date_format(client_date_time, ws_form_settings.time_format) : '');
+			variables.client_date = ((typeof(this.date_format) === 'function') ? this.date_format(client_date_time, ws_form_settings.date_format) : '');
 		}
 
 		// Seconds
@@ -3704,24 +4366,22 @@
 			var now = new Date();
 			now.setHours(0,0,0,0);
 
-			variables['seconds_epoch_midnight'] = Math.round(now.getTime() / 1000);
+			variables.seconds_epoch_midnight = Math.round(now.getTime() / 1000);
 		}
 		if(parse_string.indexOf('seconds_epoch') != -1) {
 
 			var now = new Date();
 
-			variables['seconds_epoch'] = Math.round(now.getTime() / 1000);
+			variables.seconds_epoch = Math.round(now.getTime() / 1000);
 		}
 
 		// E-Commerce
 		var currency = this.get_currency();
-		if(
-			(parse_string.indexOf('ecommerce') != -1)
-		) {
+		if(parse_string.indexOf('ecommerce') != -1) {
 
-			if(typeof(this.ecommerce_cart_price_type['total']) === 'undefined') {
+			if(typeof(this.ecommerce_cart_price_type.total) === 'undefined') {
 
-				this.ecommerce_cart_price_type['total'] = {
+				this.ecommerce_cart_price_type.total = {
 
 					float: 0,
 					string: this.get_price(0, currency, false),
@@ -3729,9 +4389,9 @@
 				}
 			}
 
-			variables['ecommerce_cart_total_float'] = this.ecommerce_cart_price_type['total'].float;
-			variables['ecommerce_cart_total_currency'] = this.ecommerce_cart_price_type['total'].currency;
-			variables['ecommerce_cart_total'] = this.ecommerce_cart_price_type['total'].string;
+			variables.ecommerce_cart_total_float = this.ecommerce_cart_price_type.total.float;
+			variables.ecommerce_cart_total_currency = this.ecommerce_cart_price_type.total.currency;
+			variables.ecommerce_cart_total = this.ecommerce_cart_price_type.total.string;
 
 			for(var cart_price_type in $.WS_Form.ecommerce.cart_price_types) {
 
@@ -3750,6 +4410,23 @@
 				variables['ecommerce_cart_' + cart_price_type + '_float'] = this.ecommerce_cart_price_type[cart_price_type].float;
 				variables['ecommerce_cart_' + cart_price_type + '_currency'] = this.ecommerce_cart_price_type[cart_price_type].currency;
 				variables['ecommerce_cart_' + cart_price_type] = this.ecommerce_cart_price_type[cart_price_type].string;
+			}
+		}
+
+		// Tracking
+		if(
+			(parse_string.indexOf('tracking') != -1) &&
+			(typeof(this.form_tracking_get_values) === 'function')
+		) {
+			var tracking_values = this.form_tracking_get_values();
+
+			for(var tracking_value_index in tracking_values) {
+
+				if(!tracking_values.hasOwnProperty(tracking_value_index)) { continue; }
+
+				var tracking_value = tracking_values[tracking_value_index];	
+
+				variables[tracking_value.id] = tracking_value.value;
 			}
 		}
 
@@ -3947,7 +4624,7 @@
 					(typeof(data_cloned[label_column_index]) !== 'undefined')
 				) {
 
-					mask_values_row['data_grid_row_label'] = data_cloned[label_column_index];
+					mask_values_row.data_grid_row_label = data_cloned[label_column_index];
 				}
 
 				// Price
@@ -3956,8 +4633,8 @@
 					(typeof(data_cloned[price_column_index]) !== 'undefined')
 				) {
 
-					mask_values_row['data_grid_row_price_currency'] = this.get_price(data_cloned[price_column_index]);
-					mask_values_row['data_grid_row_price'] = this.get_number(data_cloned[price_column_index]);
+					mask_values_row.data_grid_row_price_currency = this.get_price(data_cloned[price_column_index]);
+					mask_values_row.data_grid_row_price = this.get_number(data_cloned[price_column_index]);
 				}
 				// Parse Variable
 				if(
@@ -3965,7 +4642,7 @@
 					(typeof(data_cloned[parse_variable_column_index]) !== 'undefined')
 				) {
 
-					mask_values_row['data_grid_row_action_variable'] = data_cloned[parse_variable_column_index];
+					mask_values_row.data_grid_row_action_variable = data_cloned[parse_variable_column_index];
 				}
 
 				// WooCommerce
@@ -3974,7 +4651,7 @@
 					(typeof(data_cloned[wc_column_index]) !== 'undefined')
 				) {
 
-					mask_values_row['data_grid_row_woocommerce_cart'] = data_cloned[wc_column_index];
+					mask_values_row.data_grid_row_woocommerce_cart = data_cloned[wc_column_index];
 				}
 				// Parse columns
 				for(var data_index in data_cloned) {
@@ -4013,7 +4690,7 @@
 		if(this.get_object_meta_value(field, 'wpautop_do_not_process', '') == 'on') { return false; }
 
 		// Meta wpautop
-		var wpautop_parse_variable = (typeof(field_type_config['wpautop_parse_variable']) !== 'undefined') ? field_type_config['wpautop_parse_variable'] : false;	
+		var wpautop_parse_variable = (typeof(field_type_config.wpautop_parse_variable) !== 'undefined') ? field_type_config.wpautop_parse_variable : false;	
 
 		if(typeof(wpautop_parse_variable) === 'object') {
 
@@ -4025,7 +4702,7 @@
 
 				var condition = wpautop_parse_variable[wpautop_parse_variable_index];
 
-				if(this.get_object_meta_value(field, condition['meta_key'], '') === condition['meta_value']) {
+				if(this.get_object_meta_value(field, condition.meta_key, '') === condition.meta_value) {
 
 					condition_output = true;
 				}
@@ -4039,6 +4716,7 @@
 
 	$.WS_Form.prototype.wpautop = function(i, br) {
 
+		if(typeof(i) !== 'string') { return ''; }
 		if(typeof(br) === 'undefined') { br = true; }
 
 		var pre_tags = new Map;
@@ -4422,7 +5100,7 @@
 		field_selector += '"]';
 
 		// Check field(s) exist
-		if(!$(field_selector).length) { return false; }
+		if(!$(field_selector, this.form_canvas_obj).length) { return false; }
 
 		// Return values
 		switch(field.type) {
@@ -4487,7 +5165,7 @@
 
 								var dropzone = $('.dropzone', obj_wrapper)[0].dropzone;
 
-								if(dropzone.files) {
+								if(dropzone && dropzone.files) {
 
 									var files = dropzone.files;
 								}
@@ -4654,10 +5332,12 @@
 	}
 
 	// Get query variable
-	$.WS_Form.prototype.get_query_var = function(query_var) {
+	$.WS_Form.prototype.get_query_var = function(query_var, default_value) {
+
+		if(!default_value) { default_value = ''; }
 
 		var url = window.location.href;
-		if(!url) { return ''; }
+		if(!url) { return default_value; }
 
 		try {
 
@@ -4665,8 +5345,8 @@
 			var regex = new RegExp("[?&]" + query_var + "(=([^&#]*)|&|#|$)");
 			var results = regex.exec(url);
 
-			if (!results) return '';
-			if (!results[2]) return '';
+			if (!results) return default_value;
+			if (!results[2]) return default_value;
 
 			try {
 
@@ -4674,12 +5354,12 @@
 
 			} catch(e) {
 
-				return '';
+				return default_value;
 			}
 
 		} catch(e) {
 
-			return '';
+			return default_value;
 		}
 	}
 
@@ -5523,7 +6203,7 @@
 		if(invalid_feedback_default == '') {
 
 			// Get invalid feedback mask
-			var meta_key_config = $.WS_Form.meta_keys['invalid_feedback_mask'];
+			var meta_key_config = $.WS_Form.meta_keys.invalid_feedback_mask;
 
 			// Return placeholder
 			return meta_key_config.p ? meta_key_config.p : meta_key_config.mask_placeholder;
@@ -5577,7 +6257,7 @@
 		var field_type_config = $.WS_Form.field_type_cache[field.type];
 
 		// Check to see if this field can be used in the current edition
-		var pro_required = field_type_config['pro_required'];
+		var pro_required = field_type_config.pro_required;
 		if(pro_required) { return this.language('error_pro_required'); }
 
 		// Should label be rendered?
@@ -5599,7 +6279,7 @@
 		if(label_disabled) { label_render = false; }
 
 		// Should field name be suffixed with []?
-		var submit_array = (typeof field_type_config['submit_array'] !== 'undefined') ? field_type_config['submit_array'] : false;
+		var submit_array = (typeof field_type_config.submit_array !== 'undefined') ? field_type_config.submit_array : false;
 		if(submit_array) { field_name += '[]'; }
 
 		// Determine label_position (If we are not rendering the label, then set to top so no position specific framework masks are used)
@@ -5621,7 +6301,7 @@
 		var mask_field_attributes = ($.extend(true, [], this.get_field_value_fallback(field.type, label_position, 'mask_field_attributes', [], false, sub_type)));
 
 		// Check to see if wrappers should be ignored
-		var mask_wrappers_drop = (typeof field_type_config['mask_wrappers_drop'] !== 'undefined') ? field_type_config['mask_wrappers_drop'] : false;
+		var mask_wrappers_drop = (typeof field_type_config.mask_wrappers_drop !== 'undefined') ? field_type_config.mask_wrappers_drop : false;
 
 		// reCAPTCHA override
 		if((field.type == 'recaptcha') && (this.get_object_meta_value(field, 'recaptcha_recaptcha_type', 'default') == 'invisible')) { mask_wrappers_drop = true; }
@@ -5729,24 +6409,34 @@
 			case 'password' :
 
 				var append = '';
-				var icon_separator = '';
 
-				var password_generate_toggle = this.get_object_meta_value(field, 'password_generate', '', false, true);
+				var password_generate_toggle = this.get_object_meta_value(field, 'password_generate', '');
+				var password_visibility_toggle = this.get_object_meta_value(field, 'password_visibility_toggle', '');
+				var append_value = this.get_object_meta_value(field, 'append', '');
+
 				if(password_generate_toggle) {
 
 					var password_append_title = this.get_object_meta_value(field, 'text_password_generate', '');
 					if(password_append_title == '') { password_append_title = this.language('password_generate'); }
-					append += '<div data-wsf-password-generate style="cursor: pointer; user-select: none; outline: 0;" title="' + this.esc_attr(password_append_title) + '" tabindex="0" role="button" aria-pressed="false"><svg style="display: block;" height="16" width="16" viewBox="0 0 16 16"><path d="M8 0c-3 0-5.6 1.6-6.9 4.1l-1.1-1.1v4h4l-1.5-1.5c1-2 3.1-3.5 5.5-3.5 3.3 0 6 2.7 6 6s-2.7 6-6 6c-1.8 0-3.4-0.8-4.5-2.1l-1.5 1.3c1.4 1.7 3.6 2.8 6 2.8 4.4 0 8-3.6 8-8s-3.6-8-8-8z"/></svg></div>';
-					icon_separator = 'margin-left: 8px;'
+					append += '<div data-wsf-password-generate style="cursor: pointer; user-select: none; outline: 0;' + ((password_visibility_toggle || append_value) ? ' margin-' + (ws_form_settings.rtl ? 'left' : 'right') + ': 8px;' : '') + '" title="' + this.esc_attr(password_append_title) + '" tabindex="0" role="button" aria-pressed="false"><svg style="display: block;" height="16" width="16" viewBox="0 0 16 16"><path d="M8 0c-3 0-5.6 1.6-6.9 4.1l-1.1-1.1v4h4l-1.5-1.5c1-2 3.1-3.5 5.5-3.5 3.3 0 6 2.7 6 6s-2.7 6-6 6c-1.8 0-3.4-0.8-4.5-2.1l-1.5 1.3c1.4 1.7 3.6 2.8 6 2.8 4.4 0 8-3.6 8-8s-3.6-8-8-8z"/></svg></div>';
 				}
 
-				var password_visibility_toggle = this.get_object_meta_value(field, 'password_visibility_toggle', '', false, true);
 				if(password_visibility_toggle) {
 
 					var password_append_title = this.get_object_meta_value(field, 'text_password_visibility_toggle_off', '');
 					if(password_append_title == '') { password_append_title = this.language('password_visibility_toggle_off'); }
-					append += '<div data-wsf-password-visibility-toggle style="cursor: pointer; user-select: none; outline: 0;' + icon_separator + ';" title="' + this.esc_attr(password_append_title) + '" tabindex="0" role="button" aria-pressed="false"><svg style="display: block;" height="16" width="16" viewBox="0 0 16 16"><g class="wsf-password-visibility-off"><path d="M8 3.9c-6.7 0-8 5.1-8 5.1s2.2 4.1 7.9 4.1 8.1-4 8.1-4-1.3-5.2-8-5.2zM5.3 5.4c0.5-0.3 1.3-0.3 1.3-0.3s-0.5 0.9-0.5 1.6c0 0.7 0.2 1.1 0.2 1.1l-1.1 0.2c0 0-0.3-0.5-0.3-1.2 0-0.8 0.4-1.4 0.4-1.4zM7.9 12.1c-4.1 0-6.2-2.3-6.8-3.2 0.3-0.7 1.1-2.2 3.1-3.2-0.1 0.4-0.2 0.8-0.2 1.3 0 2.2 1.8 4 4 4s4-1.8 4-4c0-0.5-0.1-0.9-0.2-1.3 2 0.9 2.8 2.5 3.1 3.2-0.7 0.9-2.8 3.2-7 3.2z"></path></g><g class="wsf-password-visibility-on" style="display: none;"><path d="M12.9 5.2l-0.8 0.8c1.7 0.9 2.5 2.3 2.8 3-0.7 0.9-2.8 3.1-7 3.1-0.7 0-1.2-0.1-1.8-0.2l-0.8 0.8c0.8 0.3 1.7 0.4 2.6 0.4 5.7 0 8.1-4 8.1-4s-0.6-2.4-3.1-3.9z"></path><path d="M12 7.1c0-0.3 0-0.6-0.1-0.8l-4.8 4.7c0.3 0 0.6 0.1 0.9 0.1 2.2 0 4-1.8 4-4z"></path><path d="M15.3 0l-4.4 4.4c-0.8-0.2-1.8-0.4-2.9-0.4-6.7 0-8 5.1-8 5.1s1 1.8 3.3 3l-3.3 3.2v0.7h0.7l15.3-15.3v-0.7h-0.7zM4 11.3c-1.6-0.7-2.5-1.8-2.9-2.3 0.3-0.7 1.1-2.2 3.1-3.2-0.1 0.4-0.2 0.8-0.2 1.3 0 1.1 0.5 2.2 1.3 2.9l-1.3 1.3zM6.2 7.9l-1 0.2c0 0-0.3-0.5-0.3-1.2 0-0.8 0.4-1.5 0.4-1.5 0.5-0.3 1.3-0.3 1.3-0.3s-0.5 0.9-0.5 1.7c-0.1 0.7 0.1 1.1 0.1 1.1z"></path></g></svg></div>';
+					append += '<div data-wsf-password-visibility-toggle style="cursor: pointer; user-select: none; outline: 0;' + (append_value ? ' margin-' + (ws_form_settings.rtl ? 'left' : 'right') + ': 8px;' : '') + ';" title="' + this.esc_attr(password_append_title) + '" tabindex="0" role="button" aria-pressed="false"><svg style="display: block;" height="16" width="16" viewBox="0 0 16 16"><g class="wsf-password-visibility-off"><path d="M8 3.9c-6.7 0-8 5.1-8 5.1s2.2 4.1 7.9 4.1 8.1-4 8.1-4-1.3-5.2-8-5.2zM5.3 5.4c0.5-0.3 1.3-0.3 1.3-0.3s-0.5 0.9-0.5 1.6c0 0.7 0.2 1.1 0.2 1.1l-1.1 0.2c0 0-0.3-0.5-0.3-1.2 0-0.8 0.4-1.4 0.4-1.4zM7.9 12.1c-4.1 0-6.2-2.3-6.8-3.2 0.3-0.7 1.1-2.2 3.1-3.2-0.1 0.4-0.2 0.8-0.2 1.3 0 2.2 1.8 4 4 4s4-1.8 4-4c0-0.5-0.1-0.9-0.2-1.3 2 0.9 2.8 2.5 3.1 3.2-0.7 0.9-2.8 3.2-7 3.2z"></path></g><g class="wsf-password-visibility-on" style="display: none;"><path d="M12.9 5.2l-0.8 0.8c1.7 0.9 2.5 2.3 2.8 3-0.7 0.9-2.8 3.1-7 3.1-0.7 0-1.2-0.1-1.8-0.2l-0.8 0.8c0.8 0.3 1.7 0.4 2.6 0.4 5.7 0 8.1-4 8.1-4s-0.6-2.4-3.1-3.9z"></path><path d="M12 7.1c0-0.3 0-0.6-0.1-0.8l-4.8 4.7c0.3 0 0.6 0.1 0.9 0.1 2.2 0 4-1.8 4-4z"></path><path d="M15.3 0l-4.4 4.4c-0.8-0.2-1.8-0.4-2.9-0.4-6.7 0-8 5.1-8 5.1s1 1.8 3.3 3l-3.3 3.2v0.7h0.7l15.3-15.3v-0.7h-0.7zM4 11.3c-1.6-0.7-2.5-1.8-2.9-2.3 0.3-0.7 1.1-2.2 3.1-3.2-0.1 0.4-0.2 0.8-0.2 1.3 0 1.1 0.5 2.2 1.3 2.9l-1.3 1.3zM6.2 7.9l-1 0.2c0 0-0.3-0.5-0.3-1.2 0-0.8 0.4-1.5 0.4-1.5 0.5-0.3 1.3-0.3 1.3-0.3s-0.5 0.9-0.5 1.7c-0.1 0.7 0.1 1.1 0.1 1.1z"></path></g></svg></div>';
 				}
+				break;
+
+			case 'summary' :
+
+				// Get summary HTML
+				var summary_html_raw = this.get_summary_html(this.form, field);
+
+				// Parse
+				var value = this.parse_variables_process(summary_html_raw, section_repeatable_index, false, field, 'summary', true).output;
+
 				break;
 		}
 
@@ -5767,8 +6457,7 @@
 			if(class_field != '') { class_field_array.push(class_field); }
 
 			// Full width class for buttons
-			var class_field_full_button_remove = this.get_object_meta_value(field, 'class_field_full_button_remove', '');
-			if(!class_field_full_button_remove) {
+			if(!this.get_object_meta_value(field, 'class_field_full_button_remove', '')) {
 
 				var class_field_full_button = this.get_field_value_fallback(field.type, label_position, 'class_field_full_button', '', false, sub_type);
 				if(typeof(class_field_full_button) === 'object') {
@@ -5789,6 +6478,29 @@
 
 					class_field_array.push(class_field_button_type_config[class_field_button_type]);
 				}
+			}
+
+			// Checkbox and radio styles
+			switch(field.type) {
+
+				case 'checkbox' :
+				case 'radio' :
+
+					switch(this.get_object_meta_value(field, field.type + '_style', '')) {
+
+						case 'button' : class_field_array.push('wsf-button'); break;
+						case 'button-full' : class_field_array.push('wsf-button wsf-button-full'); break;
+						case 'color' : class_field_array.push('wsf-color'); break;
+						case 'color-circle' : class_field_array.push('wsf-color wsf-circle'); break;
+						case 'circle' : class_field_array.push('wsf-circle'); break;
+						case 'image' : class_field_array.push('wsf-image'); break;
+						case 'image-circle' : class_field_array.push('wsf-image wsf-circle'); break;
+						case 'image-responsive' : class_field_array.push('wsf-image wsf-responsive wsf-image-full'); break;
+						case 'image-circle-responsive' : class_field_array.push('wsf-image wsf-responsive wsf-image-full wsf-circle'); break;
+						case 'switch' : class_field_array.push('wsf-switch'); break;
+					}
+
+					break;
 			}
 
 			// Type class for message
@@ -5816,7 +6528,7 @@
 			}
 
 			// Label position
-			var label_inside = (typeof(field_type_config['label_inside']) !== 'undefined') ? field_type_config['label_inside'] : false;
+			var label_inside = (typeof(field_type_config.label_inside) !== 'undefined') ? field_type_config.label_inside : false;
 			if(
 				label_inside &&
 				(label_position === 'inside')
@@ -5956,11 +6668,11 @@
 
 				) {
 
-					mask_values_field['color_type'] = 'text';
+					mask_values_field.color_type = 'text';
 
 				} else {
 
-					mask_values_field['color_type'] = 'color';
+					mask_values_field.color_type = 'color';
 				}
 			
 				break;
@@ -5974,7 +6686,7 @@
 
 						var placeholder = this.get_object_meta_value(field, 'placeholder', '', false, true);
 						if(placeholder == '') { placeholder = this.language('dropzonejs_default_message'); }
-						mask_values_field['placeholder'] = placeholder;
+						mask_values_field.placeholder = placeholder;
 
 						break;
 				}
@@ -5992,7 +6704,7 @@
 
 			// Get default value
 			var meta_key_config = (typeof($.WS_Form.meta_keys[meta_key]) === 'undefined') ? false : $.WS_Form.meta_keys[meta_key];
-			var meta_key_value_default = (meta_key_config !== false) ? ((typeof(meta_key_config['d']) === 'undefined') ? '' : meta_key_config['d']) : '';
+			var meta_key_value_default = (meta_key_config !== false) ? ((typeof(meta_key_config.d) === 'undefined') ? '' : meta_key_config.d) : '';
 
 			// Get meta value
 			var meta_value = this.get_object_meta_value(field, meta_key, meta_key_value_default);
@@ -6008,7 +6720,7 @@
 
 		// Field label - Mask values
 		var mask_values_field_label = $.extend(true, {}, mask_values_field);
-		mask_values_field_label['label_id'] = this.get_part_id(field.id, section_repeatable_index, 'label');
+		mask_values_field_label.label_id = this.get_part_id(field.id, section_repeatable_index, 'label');
 
 		// Help
 		var help_id = this.get_part_id(field.id, section_repeatable_index, 'help');
@@ -6065,12 +6777,12 @@
 		var class_help_array = this.get_field_value_fallback(field.type, label_position, 'class_help_' + ((help_position == 'bottom') ? 'post' : 'pre'), [], false, sub_type);
 
 		// Help mask values
-		mask_values_help['id'] = field_id;
-		mask_values_help['help_id'] = help_id;
-		mask_values_help['help_class'] = class_help_array.join(' ');
-		mask_values_help['help'] = help;
+		mask_values_help.id = field_id;
+		mask_values_help.help_id = help_id;
+		mask_values_help.help_class = class_help_array.join(' ');
+		mask_values_help.help = help;
 
-		mask_values_field['help_class'] = class_help_array.join(' ');
+		mask_values_field.help_class = class_help_array.join(' ');
 
 		// Get invalid_feedback parameters
 		var invalid_feedback_render = (is_submit ? false : this.get_object_meta_value(field, 'invalid_feedback_render', false, false, true));
@@ -6101,10 +6813,10 @@
 			invalid_feedback = this.get_invalid_feedback_mask_parsed(invalid_feedback, field.label);
 
 			// Invalid feedback mask values
-			mask_values_invalid_feedback['invalid_feedback_id'] = invalid_feedback_id;
-			mask_values_invalid_feedback['invalid_feedback_class'] = class_invalid_feedback_array.join(' ');
-			mask_values_invalid_feedback['invalid_feedback'] = invalid_feedback;
-			mask_values_invalid_feedback['attributes'] = '';
+			mask_values_invalid_feedback.invalid_feedback_id = invalid_feedback_id;
+			mask_values_invalid_feedback.invalid_feedback_class = class_invalid_feedback_array.join(' ');
+			mask_values_invalid_feedback.invalid_feedback = invalid_feedback;
+			mask_values_invalid_feedback.attributes = '';
 
 			var invalid_feedback_parsed = this.mask_parse(mask_invalid_feedback, mask_values_invalid_feedback);
 
@@ -6114,11 +6826,11 @@
 			var invalid_feedback_parsed = '';
 		}
 
-		mask_values_field['invalid_feedback'] = invalid_feedback_parsed;
-		mask_values_field_label['invalid_feedback'] = invalid_feedback_parsed;
+		mask_values_field.invalid_feedback = invalid_feedback_parsed;
+		mask_values_field_label.invalid_feedback = invalid_feedback_parsed;
 
 		// Field - Attributes
-		mask_values_field['attributes'] = '';
+		mask_values_field.attributes = '';
 
 		if(is_submit) {
 
@@ -6129,8 +6841,8 @@
 		}
 
 		if(mask_field_attributes.length > 0) {
- 			var get_attributes_return = this.get_attributes(field, mask_field_attributes, false, section_repeatable_index);
-			mask_values_field['attributes'] += ' '  + get_attributes_return.attributes;
+			var get_attributes_return = this.get_attributes(field, mask_field_attributes, false, section_repeatable_index);
+			mask_values_field.attributes += ' '  + get_attributes_return.attributes;
 			mask_field_attributes = get_attributes_return.mask_attributes;
 			attributes_values_field = get_attributes_return.attribute_values;
 		}
@@ -6138,7 +6850,7 @@
 		// If there is no wrapper (e.g. hidden field) then add data-repeatable-index attribute directly to field
 		if(section_repeatable_index !== false) {
 
-			mask_values_field['attributes'] += ' data-repeatable-index="' + this.esc_attr(section_repeatable_index) + '"';
+			mask_values_field.attributes += ' data-repeatable-index="' + this.esc_attr(section_repeatable_index) + '"';
 		}
 
 		// Attributes to inherit at a row level
@@ -6173,7 +6885,7 @@
 							case 'select' :
 							case 'price_select' :
 
-								mask_values_field['attributes'] += cascade_attribute;
+								mask_values_field.attributes += cascade_attribute;
 								break;
 
 							case 'checkbox' :
@@ -6195,37 +6907,13 @@
 					if(typeof(value) !== 'object') { value = [value]; }
 
 					// Add data-wsf-populate attribute
-					mask_values_field['attributes'] += ' data-wsf-populate="' + this.esc_attr(JSON.stringify(value)) + '"';
+					mask_values_field.attributes += ' data-wsf-populate="' + this.esc_attr(JSON.stringify(value)) + '"';
 				} 
 
 				break;
 		}
-		// Field - Attributes - Custom
-		var mask_field_attributes_custom = this.get_object_meta_value(field, 'custom_attributes', false);
-		if(
-			(mask_field_attributes_custom !== false) &&
-			(typeof(mask_field_attributes_custom) === 'object') &&
-			(mask_field_attributes_custom.length > 0)
-		) {
-
-			// Run through each custom attribute
-			for(var mask_field_attributes_custom_index in mask_field_attributes_custom) {
-
-				if(!mask_field_attributes_custom.hasOwnProperty(mask_field_attributes_custom_index)) { continue; }
-
-				// Get custom attribute name/value pair
-				var mask_field_attribute_custom = mask_field_attributes_custom[mask_field_attributes_custom_index];
-
-				// Check attribute name exists
-				if(mask_field_attribute_custom.custom_attribute_name == '') { continue; }
-
-				// Parse custom attribute value
-				mask_field_attribute_custom.custom_attribute_value = this.parse_variables_process(mask_field_attribute_custom.custom_attribute_value, section_repeatable_index, false, field).output;
-
-				// Build attribute (Only add value if one is specified)
-				mask_values_field['attributes'] = this.attribute_modify(mask_values_field['attributes'], mask_field_attribute_custom.custom_attribute_name, mask_field_attribute_custom.custom_attribute_value, true);
-			}
-		}
+		// Custom attributes
+		mask_values_field.attributes = this.custom_attributes(mask_values_field.attributes, field, 'field', section_repeatable_index);
 
 		// Field - Attributes - Orientation
 		var orientation = this.get_object_meta_value(field, 'orientation', false);
@@ -6244,7 +6932,7 @@
 		}
 
 		// Field label - Attributes
-		mask_values_field_label['attributes'] = '';
+		mask_values_field_label.attributes = '';
 		var mask_field_label_attributes = ($.extend(true, [], this.get_field_value_fallback(field.type, label_position, 'mask_field_label_attributes', [], false, sub_type)));
 
 		if(is_submit) {
@@ -6256,8 +6944,8 @@
 		}
 
 		if(mask_field_label_attributes.length > 0) {
- 			var get_attributes_return = this.get_attributes(field, mask_field_label_attributes, false, section_repeatable_index);
-			mask_values_field_label['attributes'] += get_attributes_return.attributes;
+			var get_attributes_return = this.get_attributes(field, mask_field_label_attributes, false, section_repeatable_index);
+			mask_values_field_label.attributes += get_attributes_return.attributes;
 			mask_field_label_attributes = get_attributes_return.mask_attributes;
 		}
 
@@ -6356,7 +7044,7 @@
 
 				// Inject placeholder row
 				var mask_values_row_placeholder = $.extend(true, {}, mask_values_field);
-				mask_values_row_placeholder['value'] = placeholder_row;
+				mask_values_row_placeholder.value = placeholder_row;
 				data += this.mask_parse(mask_row_placeholder, mask_values_row_placeholder);
 			}
 
@@ -6457,7 +7145,7 @@
 
 				// Mask values
 				var mask_values_group = $.extend(true, {}, mask_values_field);
-				mask_values_group['group_id'] = this.form_id_prefix + 'datagrid-' + field.id + '-group-' + data_group_index + repeatable_suffix;
+				mask_values_group.group_id = this.form_id_prefix + 'datagrid-' + field.id + '-group-' + data_group_index + repeatable_suffix;
 
 				var data_group = data_groups[data_group_index];
 
@@ -6488,19 +7176,19 @@
 				if(mask_values_group_label_render) {
 
 					var mask_values_group_label = $.extend(true, {}, mask_values_field);
-					mask_values_group_label['group_label'] = this.esc_html(data_group.label);
-					mask_values_group_label['label_row_id'] = this.form_id_prefix + 'label-' + field.id + '-group-' + data_group_index + repeatable_suffix;
+					mask_values_group_label.group_label = data_group.label;
+					mask_values_group_label.label_row_id = this.form_id_prefix + 'label-' + field.id + '-group-' + data_group_index + repeatable_suffix;
 
 					// Parse group label mask to build group_label value
-					mask_values_group['group_label'] = this.mask_parse(mask_group_label, mask_values_group_label);
+					mask_values_group.group_label = this.parse_variables_process(this.mask_parse(mask_group_label, mask_values_group_label), section_repeatable_index).output;
 
 				} else {
 
-					mask_values_group['group_label'] = '';
+					mask_values_group.group_label = '';
 				}
 
 				// Get group disabled (optional)
-				mask_values_group['disabled'] = (typeof(data_group.disabled) !== 'undefined') ? (data_group.disabled == 'on' ? ' disabled' : '') : '';
+				mask_values_group.disabled = (typeof(data_group.disabled) !== 'undefined') ? (data_group.disabled == 'on' ? ' disabled' : '') : '';
 
 				// Should group data mask be used?
 				var mask_group_use = ((typeof(data_group.mask_group) !== 'undefined') ? (data_group.mask_group == 'on') : false) || mask_group_always;
@@ -6567,7 +7255,7 @@
 						if(
 							(data_row === null) ||
 							(typeof(data_row) !== 'object') ||
-							(typeof(data_row['data']) !== 'object')
+							(typeof(data_row.data) !== 'object')
 						) {
 							continue;
 						}
@@ -6576,7 +7264,7 @@
 						var cascade_field_filter_value = false;
 						if(cascade_field_filter_column_index !== false) {
 
-							var cascade_field_filter_value = (typeof(data_row['data'][cascade_field_filter_column_index]) !== 'undefined') ? data_row['data'][cascade_field_filter_column_index] : false;
+							var cascade_field_filter_value = (typeof(data_row.data[cascade_field_filter_column_index]) !== 'undefined') ? data_row.data[cascade_field_filter_column_index] : false;
 						}
 						// Is this the last row?
 						var last_row = !invalid_feedback_last_row || (data_row_index == (data_rows.length - 1));
@@ -6585,12 +7273,12 @@
 						var mask_values_row = $.extend(true, {}, mask_values_field);
 
 						// Clear values
-						mask_values_row['data_grid_row_value'] = '';
-						mask_values_row['data_grid_row_action_variable'] = '';
-						mask_values_row['data_grid_row_label'] = '';
-						mask_values_row['data_grid_row_price'] = '';
-						mask_values_row['data_grid_row_price_currency'] = '';
-						mask_values_row['data_grid_row_woocommerce_cart'] = '';
+						mask_values_row.data_grid_row_value = '';
+						mask_values_row.data_grid_row_action_variable = '';
+						mask_values_row.data_grid_row_label = '';
+						mask_values_row.data_grid_row_price = '';
+						mask_values_row.data_grid_row_price_currency = '';
+						mask_values_row.data_grid_row_woocommerce_cart = '';
 
 						// Mask values - Data mask fields
 						for(var mask_row_lookup in mask_row_lookup_array) {
@@ -6603,9 +7291,9 @@
 							var data_column_index = mask_row_lookup_array[mask_row_lookup];
 
 							if(data_column_index === false) { continue; }
-							if(typeof(data_row['data'][data_column_index]) === 'undefined') { continue; }
+							if(typeof(data_row.data[data_column_index]) === 'undefined') { continue; }
 
-							var mask_row_lookup_value = data_row['data'][data_column_index];
+							var mask_row_lookup_value = data_row.data[data_column_index];
 							if(mask_row_lookup_value === null) { mask_row_lookup_value = ''; }
 
 							mask_row_lookup_value = this.parse_variables_process(mask_row_lookup_value.toString(), section_repeatable_index, false, field, 'data_grid_row', calc_register).output;
@@ -6640,7 +7328,7 @@
 									mask_values_row[mask_row_lookup_percentage] = range_percentage;
 
 									// Build datagrid row variable
-									if(mask_row_lookup.indexOf('_field_percentage') !== -1) { mask_values_row['data_grid_row_value_percentage'] = range_percentage; }
+									if(mask_row_lookup.indexOf('_field_percentage') !== -1) { mask_values_row.data_grid_row_value_percentage = range_percentage; }
 
 									break;
 							}
@@ -6656,11 +7344,11 @@
 								var mask_row_lookup_config = $.WS_Form.meta_keys[mask_row_lookup];
 
 								// Check for HTML encoding
-								var esc_html = (typeof(mask_row_lookup_config['h']) !== 'undefined') ? mask_row_lookup_config['h'] : false;
+								var esc_html = (typeof(mask_row_lookup_config.h) !== 'undefined') ? mask_row_lookup_config.h : false;
 								if(esc_html) { mask_row_lookup_value = this.esc_html(mask_row_lookup_value); }
 
 								// Check for price
-								var price = (typeof(mask_row_lookup_config['pr']) !== 'undefined') ? mask_row_lookup_config['pr'] : false;
+								var price = (typeof(mask_row_lookup_config.pr) !== 'undefined') ? mask_row_lookup_config.pr : false;
 							}
 
 							if(price) {
@@ -6672,8 +7360,8 @@
 								mask_values_row[mask_row_lookup] = mask_row_lookup_value_number;
 
 								// Build datagrid row variable
-								if(mask_row_lookup.indexOf('_price_field_price') !== -1) { mask_values_row['data_grid_row_price'] = mask_row_lookup_value_number; }
-								if(mask_row_lookup_currency.indexOf('_price_field_price_currency') !== -1) { mask_values_row['data_grid_row_price_currency'] = mask_row_lookup_value_currency; }
+								if(mask_row_lookup.indexOf('_price_field_price') !== -1) { mask_values_row.data_grid_row_price = mask_row_lookup_value_number; }
+								if(mask_row_lookup_currency.indexOf('_price_field_price_currency') !== -1) { mask_values_row.data_grid_row_price_currency = mask_row_lookup_value_currency; }
 
 							} else {
 
@@ -6681,64 +7369,64 @@
 							}
 
 							// Build datagrid row variables
-							if(mask_row_lookup.indexOf('_field_value') !== -1) { mask_values_row['data_grid_row_value'] = mask_row_lookup_value; }
-							if(mask_row_lookup.indexOf('_field_parse_variable') !== -1) { mask_values_row['data_grid_row_action_variable'] = mask_row_lookup_value; }
-							if(mask_row_lookup.indexOf('_field_label') !== -1) { mask_values_row['data_grid_row_label'] = mask_row_lookup_value; }
-							if(mask_row_lookup.indexOf('_field_wc') !== -1) { mask_values_row['data_grid_row_woocommerce_cart'] = mask_row_lookup_value; }
+							if(mask_row_lookup.indexOf('_field_value') !== -1) { mask_values_row.data_grid_row_value = mask_row_lookup_value; }
+							if(mask_row_lookup.indexOf('_field_parse_variable') !== -1) { mask_values_row.data_grid_row_action_variable = mask_row_lookup_value; }
+							if(mask_row_lookup.indexOf('_field_label') !== -1) { mask_values_row.data_grid_row_label = mask_row_lookup_value; }
+							if(mask_row_lookup.indexOf('_field_wc') !== -1) { mask_values_row.data_grid_row_woocommerce_cart = mask_row_lookup_value; }
 						}
 
 						// Check for row value mask (Used by price_select, price_radio and price_checkbox)
-						if(typeof(field_type_config['mask_row_value']) !== 'undefined') {
+						if(typeof(field_type_config.mask_row_value) !== 'undefined') {
 
-							mask_values_row['row_value'] = this.mask_parse(field_type_config['mask_row_value'], mask_values_row);
+							mask_values_row.row_value = this.mask_parse(field_type_config.mask_row_value, mask_values_row);
 
 							// Re-parse if user has variables in the row value
-							if(mask_values_row['row_value'].indexOf('#') > -1) {
+							if(mask_values_row.row_value.indexOf('#') > -1) {
 
-								mask_values_row['row_value'] = this.mask_parse(mask_values_row['row_value'], mask_values_row);
+								mask_values_row.row_value = this.mask_parse(mask_values_row.row_value, mask_values_row);
 							}
 						}
-						if(typeof(field_type_config['mask_row_price']) !== 'undefined') {
+						if(typeof(field_type_config.mask_row_price) !== 'undefined') {
 
-							mask_values_row['row_price'] = this.mask_parse(field_type_config['mask_row_price'], mask_values_row);
+							mask_values_row.row_price = this.mask_parse(field_type_config.mask_row_price, mask_values_row);
 						}
 
 						// Mask values row
 						if(data_row.select_all) {
 
-							mask_values_row['row_id'] = this.form_id_prefix + 'field-' + field.id + '-group-' + data_group_index + '-row-' + data_row['id'] + repeatable_suffix;
+							mask_values_row.row_id = this.form_id_prefix + 'field-' + field.id + '-group-' + data_group_index + '-row-' + data_row.id + repeatable_suffix;
 
 						} else {
 
-							mask_values_row['row_id'] = this.form_id_prefix + 'field-' + field.id + '-row-' + data_row['id'] + repeatable_suffix;
+							mask_values_row.row_id = this.form_id_prefix + 'field-' + field.id + '-row-' + data_row.id + repeatable_suffix;
 						}
-						mask_values_row['data_id'] = data_row['id'];
+						mask_values_row.data_id = data_row.id;
 
 						// Copy to row label and field mask values
 						var mask_values_row_field = $.extend(true, {}, mask_values_row);
 						var mask_values_row_label = $.extend(true, {}, mask_values_row);
-						mask_values_row_label['label_id'] = this.form_id_prefix + 'label-' + field.id + repeatable_suffix;
-						mask_values_row_label['label_row_id'] = this.form_id_prefix + 'label-' + field.id + '-row-' + data_row['id'] + repeatable_suffix;
+						mask_values_row_label.label_id = this.form_id_prefix + 'label-' + field.id + repeatable_suffix;
+						mask_values_row_label.label_row_id = this.form_id_prefix + 'label-' + field.id + '-row-' + data_row.id + repeatable_suffix;
 
 						// Build default extra values
 						var extra_values_default = [];
 						if(
-							(!has_value && data_row['default']) ||
+							(!has_value && data_row.default) ||
 							(has_value && (datagrid_column_value !== false) && has_value_indexof && (value.indexOf(mask_values_row[datagrid_column_value + '_compare']) > -1)) ||
-							(has_value && (typeof(mask_values_row['row_value']) !== 'undefined') && has_value_indexof && (value.indexOf(mask_values_row['row_value']) > -1))
-						) { extra_values_default['default'] = mask_row_default; }
-						if(data_row['disabled']) { extra_values_default['disabled'] = mask_row_disabled; }
-						if(data_row['required']) { extra_values_default['required'] = mask_row_required; }
+							(has_value && (typeof(mask_values_row.row_value) !== 'undefined') && has_value_indexof && (value.indexOf(mask_values_row.row_value) > -1))
+						) { extra_values_default.default = mask_row_default; }
+						if(data_row.disabled) { extra_values_default.disabled = mask_row_disabled; }
+						if(data_row.required) { extra_values_default.required = mask_row_required; }
 
 						// These attributes we manually push across to rows
-						extra_values_default['dedupe_value_scope'] = dedupe_value_scope;
-						extra_values_default['hidden_bypass'] = hidden_bypass;
-						extra_values_default['exclude_cart_total'] = exclude_cart_total;
-						extra_values_default['ecommerce_calculation_persist'] = ecommerce_calculation_persist;
+						extra_values_default.dedupe_value_scope = dedupe_value_scope;
+						extra_values_default.hidden_bypass = hidden_bypass;
+						extra_values_default.exclude_cart_total = exclude_cart_total;
+						extra_values_default.ecommerce_calculation_persist = ecommerce_calculation_persist;
 
-						mask_values_row['attributes'] = mask_values_row_attributes_source;
-						mask_values_row_label['attributes'] = '';
-						mask_values_row_field['attributes'] = '';
+						mask_values_row.attributes = mask_values_row_attributes_source;
+						mask_values_row_label.attributes = '';
+						mask_values_row_field.attributes = '';
 
 						// Row - Attributes
 						var extra_values = $.extend(true, [], extra_values_default);
@@ -6747,32 +7435,32 @@
 
 							// class (Inline)
 							var class_inline_array = (orientation == 'horizontal') ? this.get_field_value_fallback(field.type, label_position, 'class_inline', false, false, sub_type) : false;
-							if(class_inline_array !== false) { extra_values['class'] = class_inline_array.join(' '); }
+							if(class_inline_array !== false) { extra_values.class = class_inline_array.join(' '); }
 
 							// class (Row)
 							var class_row_array = this.get_field_value_fallback(field.type, label_position, 'class_row', false, false, sub_type)
-							if(class_row_array !== false) { extra_values['class'] = (class_inline_array !== false) ? (extra_values['class'] + ' ' + class_row_array.join(' ')) : class_row_array.join(' '); }
+							if(class_row_array !== false) { extra_values.class = (class_inline_array !== false) ? (extra_values.class + ' ' + class_row_array.join(' ')) : class_row_array.join(' '); }
 
 							// class if disabled
-							if(data_row['disabled']) {
+							if(data_row.disabled) {
 								var class_row_disabled_array = this.get_field_value_fallback(field.type, label_position, 'class_row_disabled', false, false, sub_type);
-								if(class_row_disabled_array !== false) { extra_values['class'] += ' ' + class_row_disabled_array.join(' '); }
+								if(class_row_disabled_array !== false) { extra_values.class += ' ' + class_row_disabled_array.join(' '); }
 							}
 						}
 
 						var mask_row_attributes = ($.extend(true, [], this.get_field_value_fallback(field.type, label_position, 'mask_row_attributes', [], false, sub_type)));
 						if(mask_row_attributes.length > 0) {
-				 			var get_attributes_return = this.get_attributes(field, mask_row_attributes, extra_values, section_repeatable_index);
-							mask_values_row['attributes'] += ' ' + get_attributes_return.attributes;
+							var get_attributes_return = this.get_attributes(field, mask_row_attributes, extra_values, section_repeatable_index);
+							mask_values_row.attributes += ' ' + get_attributes_return.attributes;
 						}
 
 						// Cascading filter value
 						if(cascade_field_filter_value !== false) {
 
-							mask_values_row['attributes'] += ' data-cascade-value="' + this.esc_attr(cascade_field_filter_value) + '"';
+							mask_values_row.attributes += ' data-cascade-value="' + this.esc_attr(cascade_field_filter_value) + '"';
 						}
 						// Skip hidden rows
-						if((typeof(data_row['hidden']) !== 'undefined') && data_row['hidden'] && !is_submit) {
+						if((typeof(data_row.hidden) !== 'undefined') && data_row.hidden && !is_submit) {
 
 							switch(field.type) {
 
@@ -6784,7 +7472,7 @@
 								// Checkboxes and radios
 								default :
 
-									mask_values_row['attributes'] += ' style="display: none;"';
+									mask_values_row.attributes += ' style="display: none;"';
 							}
 						}
 
@@ -6794,7 +7482,7 @@
 							(orientation_row_class != '') 
 						) {
 
-							mask_values_row['attributes'] = this.attribute_modify(mask_values_row['attributes'], 'class', orientation_row_class, true);
+							mask_values_row.attributes = this.attribute_modify(mask_values_row.attributes, 'class', orientation_row_class, true);
 						}
 
 						// Row - Label - Attributes
@@ -6802,7 +7490,7 @@
 
 						// Class
 						var class_row_field_label_array = this.get_field_value_fallback(field.type, label_position, 'class_row_field_label', false, false, sub_type);
-						if(class_row_field_label_array !== false) { extra_values['class'] = class_row_field_label_array.join(' '); }
+						if(class_row_field_label_array !== false) { extra_values.class = class_row_field_label_array.join(' '); }
 
 						var mask_row_label_attributes = ($.extend(true, [], this.get_field_value_fallback(field.type, label_position, 'mask_row_label_attributes', [], false, sub_type)));
 
@@ -6815,8 +7503,8 @@
 						}
 
 						if(mask_row_label_attributes.length > 0) {
-				 			var get_attributes_return = this.get_attributes(field, mask_row_label_attributes, extra_values, section_repeatable_index);
-							mask_values_row_label['attributes'] += ' ' + get_attributes_return.attributes;
+							var get_attributes_return = this.get_attributes(field, mask_row_label_attributes, extra_values, section_repeatable_index);
+							mask_values_row_label.attributes += ' ' + get_attributes_return.attributes;
 						}
 
 						// Row - Field - Attributes
@@ -6824,25 +7512,25 @@
 
 						// class
 						var class_row_field_array = this.get_field_value_fallback(field.type, label_position, 'class_row_field', false, false, sub_type);
-						if(class_row_field_array !== false) { extra_values['class'] = class_row_field_array.join(' '); }
+						if(class_row_field_array !== false) { extra_values.class = class_row_field_array.join(' '); }
 
 						// class (Field setting)
-						if(!is_submit && (class_field != '')) { extra_values['class'] += ' ' + class_field.trim(); }
+						if(!is_submit && (class_field != '')) { extra_values.class += ' ' + class_field.trim(); }
 
 						// aria-labelledby
-						extra_values['aria_labelledby'] = mask_values_row_label['label_row_id'];
+						extra_values.aria_labelledby = mask_values_row_label.label_row_id;
 
 						// Row attributes
 						if(
-							(!has_value && data_row['default']) ||
+							(!has_value && data_row.default) ||
 							(has_value && (datagrid_column_value !== false) && has_value_indexof && (value.indexOf(mask_values_row[datagrid_column_value + '_compare']) > -1))
-						) { extra_values['default'] = mask_row_default; }
+						) { extra_values.default = mask_row_default; }
 
-						if(data_row['disabled']) { extra_values['disabled'] = mask_row_disabled; }
-						if(data_row['required']) { extra_values['required'] = mask_row_required; }
+						if(data_row.disabled) { extra_values.disabled = mask_row_disabled; }
+						if(data_row.required) { extra_values.required = mask_row_required; }
 
 						// Copy field level attributes to row
-						extra_values['required_row'] = attributes_values_field['required'];
+						extra_values.required_row = attributes_values_field.required;
 
 						// Build row field attributes
 						var mask_row_field_attributes = ($.extend(true, [], this.get_field_value_fallback(field.type, label_position, 'mask_row_field_attributes', [], false, sub_type)));
@@ -6856,14 +7544,14 @@
 						}
 
 						if(mask_row_field_attributes.length > 0) {
-				 			var get_attributes_return = this.get_attributes(field, mask_row_field_attributes, extra_values, section_repeatable_index);
-							mask_values_row_field['attributes'] += ' ' + get_attributes_return.attributes;
+							var get_attributes_return = this.get_attributes(field, mask_row_field_attributes, extra_values, section_repeatable_index);
+							mask_values_row_field.attributes += ' ' + get_attributes_return.attributes;
 						}
-						if(mask_values_row_field['attributes'] != '') { mask_values_row_field['attributes'] = ' ' + mask_values_row_field['attributes']; }
+						if(mask_values_row_field.attributes != '') { mask_values_row_field.attributes = ' ' + mask_values_row_field.attributes; }
 
 						if(typeof(data_row.select_all) !== 'undefined') {
 
-							mask_values_row_field['attributes'] += ' data-wsf-select-all';
+							mask_values_row_field.attributes += ' data-wsf-select-all';
 						}
 
 						// Hierarchy (Vertical only)
@@ -6880,7 +7568,7 @@
 								case 'radio' :
 								case 'price_radio' :
 
-									mask_values_row['attributes'] += ' data-wsf-hierarchy="' + this.esc_attr(data_row.hierarchy) + '"';
+									mask_values_row.attributes += ' data-wsf-hierarchy="' + this.esc_attr(data_row.hierarchy) + '"';
 									break;
 
 								case 'select' :
@@ -6888,7 +7576,7 @@
 
 									if(data_row.hierarchy > 0) {
 
-										mask_values_row['select_field_label'] = '&nbsp;&nbsp;&nbsp;'.repeat(data_row.hierarchy) + mask_values_row['select_field_label'];
+										mask_values_row.select_field_label = '&nbsp;&nbsp;&nbsp;'.repeat(data_row.hierarchy) + mask_values_row.select_field_label;
 									}
 									break;
 							}
@@ -6897,8 +7585,8 @@
 						// Parse invalid feedback for rows
 						if(invalid_feedback_render && !invalid_feedback_last_row) {
 
-							invalid_feedback_id = this.form_id_prefix + 'invalid-feedback-' + field.id + '-row-' + data_row['id'] + repeatable_suffix;
-							mask_values_invalid_feedback['invalid_feedback_id'] = invalid_feedback_id;
+							invalid_feedback_id = this.form_id_prefix + 'invalid-feedback-' + field.id + '-row-' + data_row.id + repeatable_suffix;
+							mask_values_invalid_feedback.invalid_feedback_id = invalid_feedback_id;
 							if(invalid_feedback_render) {
 
 								var invalid_feedback_parsed = this.mask_parse(mask_invalid_feedback, mask_values_invalid_feedback);
@@ -6910,17 +7598,17 @@
 						}
 
 						// Invalid feedback
-						mask_values_row_field['invalid_feedback'] = (last_row ? invalid_feedback_parsed : '');
-						mask_values_row_label['invalid_feedback'] = (last_row ? invalid_feedback_parsed : '');
+						mask_values_row_field.invalid_feedback = (last_row ? invalid_feedback_parsed : '');
+						mask_values_row_label.invalid_feedback = (last_row ? invalid_feedback_parsed : '');
 
 						// Parse field
 						var row_field_html = this.mask_parse(mask_row_field, mask_values_row_field);
-						mask_values_row_label['row_field'] = row_field_html;
-						mask_values_row['row_field'] = row_field_html;
+						mask_values_row_label.row_field = row_field_html;
+						mask_values_row.row_field = row_field_html;
 
 						// Parse label
 						var row_field_label = this.mask_parse(mask_row_label, mask_values_row_label);
-						mask_values_row['row_label'] = row_field_label;
+						mask_values_row.row_label = row_field_label;
 
 						// Parse row
 						group += this.mask_parse(mask_row, mask_values_row);
@@ -6944,7 +7632,7 @@
 						(orientation_group_wrapper_class != '')
 					) {
 
-						mask_values_group_wrapper['attributes'] = ' class="' + this.esc_attr(orientation_group_wrapper_class) + '"';
+						mask_values_group_wrapper.attributes = ' class="' + this.esc_attr(orientation_group_wrapper_class) + '"';
 					}
 					group = this.mask_parse(mask_group_wrapper, mask_values_group_wrapper);
 				}
@@ -6952,7 +7640,7 @@
 				if((mask_group !== false) && mask_group_use) {
 
 					// Parse mask_group
-					mask_values_group['group'] = group;
+					mask_values_group.group = group;
 					data += this.mask_parse(mask_group, mask_values_group);
 
 				} else {
@@ -6966,11 +7654,11 @@
 		// Add to mask array
 		if(data_row_count > 0) {
 
-			mask_values_field['datalist'] = data;
+			mask_values_field.datalist = data;
 
 		} else {
 
-			mask_values_field['datalist'] = '';
+			mask_values_field.datalist = '';
 		}
 
 		// Field - Attributes
@@ -6981,10 +7669,10 @@
 			// list
 			if(typeof(mask_values_group) !== 'undefined') {
 				if(
-					(typeof(mask_values_group['group_id']) !== 'undefined') &&
+					(typeof(mask_values_group.group_id) !== 'undefined') &&
 					data_row_count > 0
 
-				) { extra_values['list'] = mask_values_group['group_id']; }
+				) { extra_values.list = mask_values_group.group_id; }
 			}
 
 			// aria_labelledby (Used if aria_label is blank)
@@ -6997,30 +7685,30 @@
 				) {
 
 					// Use aria_labelledby instead of aria_label
-					extra_values['aria_labelledby'] = this.form_id_prefix + 'label-' + field.id + repeatable_suffix;
+					extra_values.aria_labelledby = this.form_id_prefix + 'label-' + field.id + repeatable_suffix;
 
 				} else {
 
 					// Set to label
-					extra_values['aria_label'] = field.label;
+					extra_values.aria_label = field.label;
 				}
 			}
 
 			// aria_describedby
-			if(has_help) { extra_values['aria_describedby'] = help_id; }
+			if(has_help) { extra_values.aria_describedby = help_id; }
 
 			// class (Config)
 			var class_field_array = this.get_field_value_fallback(field.type, label_position, 'class_field', false, false, sub_type);
-			if(class_field_array !== false) { extra_values['class'] = class_field_array.join(' '); }
+			if(class_field_array !== false) { extra_values.class = class_field_array.join(' '); }
 
 			// class (Field setting)
-			if(class_field != '') { extra_values['class'] += ' '  + class_field.trim(); }
+			if(class_field != '') { extra_values.class += ' '  + class_field.trim(); }
 
 			// Process attributes
- 			var get_attributes_return = this.get_attributes(field, mask_field_attributes, extra_values, section_repeatable_index);
+			var get_attributes_return = this.get_attributes(field, mask_field_attributes, extra_values, section_repeatable_index);
 
- 			// Store as mask value
- 			if(get_attributes_return.attributes != '') { mask_values_field['attributes'] += ' ' + get_attributes_return.attributes; }
+			// Store as mask value
+			if(get_attributes_return.attributes != '') { mask_values_field.attributes += ' ' + get_attributes_return.attributes; }
 		}
 
 		// Field Label - Attributes
@@ -7030,25 +7718,24 @@
 
 			// class
 			var class_field_label_array = this.get_field_value_fallback(field.type, label_position, 'class_field_label', false, false, sub_type);
-			if(class_field_label_array !== false) { extra_values['class'] = class_field_label_array.join(' '); }
+			if(class_field_label_array !== false) { extra_values.class = class_field_label_array.join(' '); }
 
 			// Process attributes
- 			var get_attributes_return = this.get_attributes(field, mask_field_label_attributes, extra_values, section_repeatable_index);
+			var get_attributes_return = this.get_attributes(field, mask_field_label_attributes, extra_values, section_repeatable_index);
 
- 			// Store as mask value
- 			if(get_attributes_return.attributes != '') { mask_values_field_label['attributes'] += ' ' + get_attributes_return.attributes; }
-
+			// Store as mask value
+			if(get_attributes_return.attributes != '') { mask_values_field_label.attributes += ' ' + get_attributes_return.attributes; }
 		}
 
 		// Parse help mask append
-		mask_values_help['help_append_separator'] = has_help ? this.mask_parse(mask_help_append_separator, mask_values_help) : '';
+		mask_values_help.help_append_separator = has_help ? this.mask_parse(mask_help_append_separator, mask_values_help) : '';
 		if(mask_help_append != '') {
 
-			mask_values_help['text_clear'] = this.get_object_meta_value(field, 'text_clear', '');
-			if(mask_values_help['text_clear'] == '') { mask_values_help['text_clear'] = this.language('clear'); }
+			mask_values_help.text_clear = this.get_object_meta_value(field, 'text_clear', '');
+			if(mask_values_help.text_clear == '') { mask_values_help.text_clear = this.language('clear'); }
 
-			mask_values_help['text_reset'] = this.get_object_meta_value(field, 'text_reset', '');
-			if(mask_values_help['text_reset'] == '') { mask_values_help['text_reset'] = this.language('reset'); }
+			mask_values_help.text_reset = this.get_object_meta_value(field, 'text_reset', '');
+			if(mask_values_help.text_reset == '') { mask_values_help.text_reset = this.language('reset'); }
 
 			var help_append_parsed = this.mask_parse(mask_help_append, mask_values_help);
 
@@ -7056,23 +7743,23 @@
 
 			var help_append_parsed = '';
 		}
-		mask_values_help['help_append'] = help_append_parsed;
-		mask_values_help['attributes'] = '';
+		mask_values_help.help_append = help_append_parsed;
+		mask_values_help.attributes = '';
 
 		// Parse help mask
 		var help_parsed = (has_help || help_append_parsed != '') ? this.mask_parse(mask_help, mask_values_help) : '';
 
 		// Pre and post help
-		mask_values_field['pre_help'] = mask_values_field_label['pre_help'] = ((help_position == 'bottom') ? '' : help_parsed);
-		mask_values_field['post_help'] = mask_values_field_label['post_help'] = ((help_position == 'bottom') ? help_parsed : '');
+		mask_values_field.pre_help = mask_values_field_label.pre_help = ((help_position == 'bottom') ? '' : help_parsed);
+		mask_values_field.post_help = mask_values_field_label.post_help = ((help_position == 'bottom') ? help_parsed : '');
 
 		// Legacy
-		mask_values_field['help'] = help_parsed;
-		mask_values_field_label['help'] = help_parsed;
+		mask_values_field.help = help_parsed;
+		mask_values_field_label.help = help_parsed;
 
 		// Trim attributes
-		if(mask_values_field['attributes'] != '') { mask_values_field['attributes'] = ' ' + mask_values_field['attributes'].trim(); }
-		if(mask_values_field_label['attributes'] != '') { mask_values_field_label['attributes'] = ' ' + mask_values_field_label['attributes'].trim(); }
+		if(mask_values_field.attributes != '') { mask_values_field.attributes = ' ' + mask_values_field.attributes.trim(); }
+		if(mask_values_field_label.attributes != '') { mask_values_field_label.attributes = ' ' + mask_values_field_label.attributes.trim(); }
 
 		// Parse label
 		var label_parsed = this.mask_parse(mask_field_label, mask_values_field_label);
@@ -7096,23 +7783,23 @@
 			case 'inside' :
 			case 'bottom' :
 
-				mask_values_field['pre_label'] = '';
-				mask_values_field['post_label'] = field_in_label ? mask_values_field['label'] : label_parsed;
+				mask_values_field.pre_label = '';
+				mask_values_field.post_label = field_in_label ? mask_values_field.label : label_parsed;
 				break;
 
 			// Top
 			case 'top' :
 
-				mask_values_field['pre_label'] = field_in_label ? mask_values_field['label'] : label_parsed;
-				mask_values_field['post_label'] = '';
+				mask_values_field.pre_label = field_in_label ? mask_values_field.label : label_parsed;
+				mask_values_field.post_label = '';
 				break;
 
 			default :
 
-				mask_values_field['pre_label'] = '';
-				mask_values_field['post_label'] = '';
-				mask_values_field_label['pre_label'] = '';
-				mask_values_field_label['post_label'] = '';
+				mask_values_field.pre_label = '';
+				mask_values_field.post_label = '';
+				mask_values_field_label.pre_label = '';
+				mask_values_field_label.post_label = '';
 				break;
 		}
 
@@ -7123,20 +7810,20 @@
 		) {
 
 			var mask_values_input_group = $.extend(true, {}, mask_values_field);
-			mask_values_input_group['invalid_feedback'] = mask_values_field['invalid_feedback'];
-			mask_values_input_group['pre_help'] = mask_values_field['pre_help'];
-			mask_values_input_group['post_help'] = mask_values_field['post_help'];
-			mask_values_input_group['pre_label'] = mask_values_field['pre_label'];
-			mask_values_input_group['post_label'] = mask_values_field['post_label'];
-			mask_values_field['invalid_feedback'] = '';
-			mask_values_field['pre_help'] = '';
-			mask_values_field['post_help'] = '';
-			mask_values_field['pre_label'] = '';
-			mask_values_field['post_label'] = '';
+			mask_values_input_group.invalid_feedback = mask_values_field.invalid_feedback;
+			mask_values_input_group.pre_help = mask_values_field.pre_help;
+			mask_values_input_group.post_help = mask_values_field.post_help;
+			mask_values_input_group.pre_label = mask_values_field.pre_label;
+			mask_values_input_group.post_label = mask_values_field.post_label;
+			mask_values_field.invalid_feedback = '';
+			mask_values_field.pre_help = '';
+			mask_values_field.post_help = '';
+			mask_values_field.pre_label = '';
+			mask_values_field.post_label = '';
 
 			// Legacy
-			mask_values_input_group['help'] = mask_values_field['help'];
-			mask_values_field['help'] = '';
+			mask_values_input_group.help = mask_values_field.help;
+			mask_values_field.help = '';
 		}
 
 		// Parse field
@@ -7157,16 +7844,16 @@
 			) {
 
 				var col_small_prepend = (prepend !== '') ? Math.round(framework_column_count * col_small_prepend_factor, 0) : 0;
-				mask_values_input_group['col_small_prepend'] = col_small_prepend;
+				mask_values_input_group.col_small_prepend = col_small_prepend;
 
 				var col_small_append = (append !== '') ? Math.round(framework_column_count * col_small_append_factor, 0) : 0;
-				mask_values_input_group['col_small_append'] = col_small_append;
+				mask_values_input_group.col_small_append = col_small_append;
 
-				mask_values_input_group['col_small_field'] = framework_column_count - (col_small_prepend + col_small_append);
+				mask_values_input_group.col_small_field = framework_column_count - (col_small_prepend + col_small_append);
 			}
 
 			// Field
-			mask_values_input_group['field'] = field_parsed;
+			mask_values_input_group.field = field_parsed;
 
 			var mask_field_input_group_field = this.get_field_value_fallback(field.type, label_position, 'mask_field_input_group_field', '#field', false, sub_type);
 
@@ -7178,7 +7865,7 @@
 			// Prepend
 			if(prepend !== '') {
 
-				mask_values_input_group['prepend'] = prepend;
+				mask_values_input_group.prepend = prepend;
 
 				var mask_field_input_group_prepend = this.get_field_value_fallback(field.type, label_position, 'mask_field_input_group_prepend', '#prepend', false, sub_type);
 
@@ -7193,7 +7880,7 @@
 			// Append
 			if(append !== '') {
 
-				mask_values_input_group['append'] = append;
+				mask_values_input_group.append = append;
 
 				var mask_field_input_group_append = this.get_field_value_fallback(field.type, label_position, 'mask_field_input_group_append', '#append', false, sub_type);
 
@@ -7216,8 +7903,8 @@
 			if(css_input_group) { css_input_group = ' ' + css_input_group; }
 
 			// Final parse
-			mask_values_input_group['css_input_group'] = css_input_group;
-			mask_values_input_group['field'] = field_parsed;
+			mask_values_input_group.css_input_group = css_input_group;
+			mask_values_input_group.field = field_parsed;
 
 			field_parsed = this.mask_parse(mask_field_input_group, mask_values_input_group);
 		}
@@ -7226,12 +7913,12 @@
 		if(field_in_label) {
 
 			// Render field in label
-			mask_values_field_label['field'] = field_parsed;	// Make the field available in the label mask values
+			mask_values_field_label.field = field_parsed;	// Make the field available in the label mask values
 			label_parsed = this.mask_parse(mask_field_label, mask_values_field_label);
 
 			// Finished with field
 			field_parsed = '';
-			mask_values_field_label['field'] = '';
+			mask_values_field_label.field = '';
 		}
 
 		// Check to see if the #label is in the field
@@ -7239,12 +7926,12 @@
 		if(label_in_field) {
 
 			// Render label in field
-			mask_values_field['label'] = label_parsed;	// Make the label available in the field mask values
+			mask_values_field.label = label_parsed;	// Make the label available in the field mask values
 			field_parsed = this.mask_parse(mask_field, mask_values_field);
 
 			// Finished with label
 			label_parsed = '';
-			mask_values_field['label'] = '';
+			mask_values_field.label = '';
 		}
 
 		// Parse field wrapper
@@ -7281,7 +7968,7 @@
 		}
 
 		// Final parse
-		mask_values_field['field'] = field_parsed;
+		mask_values_field.field = field_parsed;
 		field_html = this.mask_parse(mask, mask_values_field);
 
 		return field_html;
@@ -7348,7 +8035,7 @@
 			// If #value is found in the help text, add an event handler
 			if(ws_this.form_help_value_render($(this))) {
 
-				$(this).on('input change', function() { ws_this.form_help_value_render($(this)); });
+				$(this).on('change input', function() { ws_this.form_help_value_render($(this)); });
 
 				$(this).attr('data-init-help-value', '');
 			}
@@ -7690,7 +8377,7 @@
 		return_obj.decimals = (price_decimals < 0) ? 0 : price_decimals;
 
 		// Separators
-		return_obj.decimal_separator = $.WS_Form.settings_plugin.price_decimal_separator;
+		return_obj.decimal_separator = $.WS_Form.settings_plugin.price_decimal_separator || '.';
 		return_obj.thousand_separator = $.WS_Form.settings_plugin.price_thousand_separator;
 
 		return return_obj;
@@ -7699,10 +8386,9 @@
 	// Get price
 	$.WS_Form.prototype.get_price = function(price_float, currency, currency_symbol_render) {
 
+		if(typeof(price_float) !== 'number') { price_float = parseFloat(price_float); }
 		if(typeof(currency) === 'undefined') { currency = this.get_currency(); }
 		if(typeof(currency_symbol_render) === 'undefined') { currency_symbol_render = true; }
-
-		if(typeof(price_float) !== 'number') { price_float = parseFloat(price_float); }
 
 		var price = (currency_symbol_render ? currency.prefix : '') + this.replace_all(this.replace_all(price_float.toFixed(currency.decimals).replace(/\B(?=(\d{3})+(?!\d))/g, '[thousand]'), '.', currency.decimal_separator), '[thousand]', currency.thousand_separator) + (currency_symbol_render ? currency.suffix : '');
 
@@ -7712,10 +8398,13 @@
 	// Get slug
 	$.WS_Form.prototype.get_slug = function(input) {
 
+		// Parse HTML entities first
+		input = this.parse_html_entities(input.toString());
+
 		return input
 			.toString()
-			.normalize( 'NFD' )
-			.replace( /[\u0300-\u036f]/g, '' )
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
 			.toLowerCase()
 			.trim()
 			.replace(/\s+/g, '-')
@@ -7723,15 +8412,38 @@
 			.replace(/\-\-+/g, '-'); 
 	}
 
-	// Parse HTML entities
+	// Parse HTML entities without use of DOM element for improved security
 	$.WS_Form.prototype.parse_html_entities = function(str) {
 
-		return str.replace(/&#([0-9]{1,3});/gi, function(match, num_str) {
+		// Basic named entity mapping
+		var named_entities = {
+			'amp': '&',
+			'lt': '<',
+			'gt': '>',
+			'quot': '"',
+			'apos': "'",
+			'nbsp': ' ',
+			'copy': '©',
+			'reg': '®',
+			'euro': '€',
+			'cent': '¢',
+			'pound': '£',
+			'yen': '¥',
+			'hellip': '…'
+		};
 
+		// Decode numeric entities (decimal)
+		str = str.replace(/&#([0-9]{1,5});/g, function(_, num_str) {
 			var num = parseInt(num_str, 10);
-
 			return String.fromCharCode(num);
 		});
+
+		// Decode named entities
+		str = str.replace(/&([a-z]+);/gi, function(_, name) {
+			return named_entities[name.toLowerCase()] || '&' + name + ';';
+		});
+
+		return str;
 	}
 
 	// Add hidden field to canvas
@@ -7811,6 +8523,54 @@
 		return obj[0].validity.valid;
 	}
 
+	// Is not a number
+	$.WS_Form.prototype.is_not_number = function(input_number) {
+
+		return (
+
+			isNaN(input_number) ||
+			(typeof(input_number) === 'boolean') ||
+			(input_number === '')
+		);
+	}
+
+	// Is true
+	$.WS_Form.prototype.is_true = function(input) {
+
+		// Check for boolean
+		if(typeof(input) === 'boolean') {
+			return input;
+		}
+
+		// Check for object (including arrays)
+		if(typeof(input) === 'object' && input !== null) {
+			// If it's an array, get the first element
+			if(Array.isArray(input)) {
+				input = input[0] !== undefined ? input[0] : '';
+			} else {
+				// Convert object to array of values and take the first one
+				input = Object.values(input)[0] || '';
+			}
+		}
+
+		// If numeric, convert to string
+		if(typeof(input) === 'number') {
+			input = String(input);
+		}
+
+		// If not a string at this point, return false
+		if(typeof(input) !== 'string') {
+			return false;
+		}
+
+		// Trim and lowercase
+		input = input.trim().toLowerCase();
+
+		// Check against true values
+		var true_array = ['1', 'on', 'yes', 'true'];
+		return true_array.includes(input);
+	}
+
 	// Replace all
 	$.WS_Form.prototype.replace_all = function(input, search, replace) {
 
@@ -7826,9 +8586,9 @@
 
 		var arr_out = [];
 
-        for(var key in arr) {
+		for(var key in arr) {
 
-        	// Check array has property key
+			// Check array has property key
 			if(!arr.hasOwnProperty(key)) { continue; }
 
 			// Strip null values
@@ -7930,6 +8690,7 @@
 				break;
 
 			case 'd.m.Y' :
+			case 'j.n.Y' :
 
 				dm_to_md_date_separator = '.';
 				break;
@@ -8025,17 +8786,6 @@
 		return input_date instanceof Date && !isNaN(input_date.valueOf())
 	}
 
-	// Is not a number
-	$.WS_Form.prototype.is_not_number = function(input_number) {
-
-		return (
-
-			isNaN(input_number) ||
-			(typeof(input_number) === 'boolean') ||
-			(input_number === '')
-		);
-	}
-
 	// Get object_row_id as an array of integers
 	$.WS_Form.prototype.get_object_row_id = function(condition) {
 
@@ -8074,11 +8824,11 @@
 			case 'datetime-local' :
 			case 'date' :
 
+				// Convert to m/d/Y format for JavaScript Date class
 				switch(format_date) {
 
 					case 'd/m/Y' :
 
-						// Convert to m/d/Y format for JavaScript Date class
 						var date_time_array = (date.indexOf(' ') !== -1) ? [date.substring(0, date.indexOf(' ')), date.substring(date.indexOf(' ') + 1)] : [date];
 						var date_array = date_time_array[0].split('/');
 						date = date_array[1] + '/' + date_array[0] + '/' + date_array[2] + ((typeof(date_time_array[1]) !== 'undefined') ? ' ' + date_time_array[1] : '');
@@ -8086,15 +8836,14 @@
 
 					case 'd-m-Y' :
 
-						// Convert to d-m-Y format for JavaScript Date class
 						var date_time_array = (date.indexOf(' ') !== -1) ? [date.substring(0, date.indexOf(' ')), date.substring(date.indexOf(' ') + 1)] : [date];
 						var date_array = date_time_array.split('-');
 						date = date_array[1] + '/' + date_array[0] + '/' + date_array[2] + ((typeof(date_time_array[1]) !== 'undefined') ? ' ' + date_time_array[1] : '');
 						break;
 
 					case 'd.m.Y' :
+					case 'j.n.Y' :
 
-						// Convert to d.m.Y format for JavaScript Date class
 						var date_time_array = (date.indexOf(' ') !== -1) ? [date.substring(0, date.indexOf(' ')), date.substring(date.indexOf(' ') + 1)] : [date];
 						var date_array = date_time_array[0].split('.');
 						date = date_array[1] + '/' + date_array[0] + '/' + date_array[2] + ((typeof(date_time_array[1]) !== 'undefined') ? ' ' + date_time_array[1] : '');
@@ -8166,7 +8915,10 @@
 			thousands_separator = ',';
 		}
 
-		// Conver num to floating point and fix it to decimal places (Returns a string)
+		// Check decimals
+		if((decimals < 0) || (decimals > 100)) { decimals = 0; }
+
+		// Convert num to floating point and fix it to decimal places (Returns a string)
 		num = parseFloat(num).toFixed(decimals);
 
 		// Replace decimal point
@@ -8185,25 +8937,89 @@
 		return num;
 	}
 
+	$.WS_Form.prototype.get_full_name_components = function(full_name) {
+
+		if(typeof(full_name) !== 'string') {
+
+			return {
+
+				name_prefix: '',
+				first_name: '',
+				name_middle: '',
+				name_last: '',
+				suffix: ''
+			};
+		}
+
+		var parts = full_name.trim().split(/\s+/);
+
+		var name_prefix = '';
+		var name_suffix = '';
+		var name_first = '';
+		var name_middle = '';
+		var name_last = '';
+
+		// Remove and save prefix
+		var prefixes = $.WS_Form.settings_form.name.prefixes;
+		if(typeof(prefixes) !== 'object') { prefixes = []; }
+		if(parts.length && prefixes.includes(parts[0].toLowerCase().replace(/\./g, ''))) {
+
+			name_prefix = parts.shift();
+		}
+
+		// Remove and save suffix
+		var suffixes = $.WS_Form.settings_form.name.suffixes;
+		if(typeof(suffixes) !== 'object') { prefixes = []; }
+		if(parts.length > 1 && suffixes.includes(parts[parts.length - 1].toLowerCase().replace(/\./g, ''))) {
+
+			name_suffix = parts.pop();
+		}
+
+		if(parts.length === 1) {
+
+			name_first = parts[0];
+
+		} else if (parts.length === 2) {
+
+			name_first = parts[0];
+			name_last = parts[1];
+
+		} else if (parts.length > 2) {
+
+			name_first = parts[0];
+			name_last = parts[parts.length - 1];
+			name_middle = parts.slice(1, -1).join(' ');
+		}
+
+		return {
+
+			name_prefix: name_prefix,
+			name_first: name_first,
+			name_middle: name_middle,
+			name_last: name_last,
+			name_suffix: name_suffix
+		};
+	}
+
 	// Equivalent to PHP's date function
 	$.WS_Form.prototype.date_format = function (date, format) {
 
 		var ws_this = this;
 
 		// Defining locale
-		var shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-		var longMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		var shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-		var longDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+		var short_months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		var long_months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+		var short_days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+		var long_days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 		// Defining patterns
-		var replaceChars = {
+		var replace_chars = {
 
 			// Day
 			d: function () { var d = this.getDate(); return (d < 10 ? '0' : '') + d },
-			D: function () { return shortDays[this.getDay()] },
+			D: function () { return short_days[this.getDay()] },
 			j: function () { return this.getDate() },
-			l: function () { return longDays[this.getDay()] },
+			l: function () { return long_days[this.getDay()] },
 			N: function () { var N = this.getDay(); return (N === 0 ? 7 : N) },
 			S: function () { var S = this.getDate(); return (S % 10 === 1 && S !== 11 ? 'st' : (S % 10 === 2 && S !== 12 ? 'nd' : (S % 10 === 3 && S !== 13 ? 'rd' : 'th'))) },
 			w: function () { return this.getDay() },
@@ -8212,31 +9028,31 @@
 			// Week
 			W: function () {
 				var target = new Date(this.valueOf())
-				var dayNr = (this.getDay() + 6) % 7
-				target.setDate(target.getDate() - dayNr + 3)
-				var firstThursday = target.valueOf()
+				var day_number = (this.getDay() + 6) % 7
+				target.setDate(target.getDate() - day_number + 3)
+				var first_thursday = target.valueOf()
 				target.setMonth(0, 1)
 				if (target.getDay() !== 4) {
 					target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7)
 				}
-				var retVal = 1 + Math.ceil((firstThursday - target) / 604800000)
+				var return_Value = 1 + Math.ceil((first_thursday - target) / 604800000)
 
-				return (retVal < 10 ? '0' + retVal : retVal)
+				return (return_Value < 10 ? '0' + return_Value : return_Value)
 			},
 
 			// Month
-			F: function () { return longMonths[this.getMonth()] },
+			F: function () { return long_months[this.getMonth()] },
 			m: function () { var m = this.getMonth(); return (m < 9 ? '0' : '') + (m + 1) },
-			M: function () { return shortMonths[this.getMonth()] },
+			M: function () { return short_months[this.getMonth()] },
 			n: function () { return this.getMonth() + 1 },
 			t: function () {
 				var year = this.getFullYear()
-				var nextMonth = this.getMonth() + 1
-				if (nextMonth === 12) {
+				var next_month = this.getMonth() + 1
+				if (next_month === 12) {
 					year = year++
-					nextMonth = 0
+					next_month = 0
 				}
-				return new Date(year, nextMonth, 0).getDate()
+				return new Date(year, next_month, 0).getDate()
 			},
 
 			// Year
@@ -8283,7 +9099,7 @@
 
 		return format.replace(/(\\?)(.)/g, function (_, esc, chr) {
 
-			return (esc === '' && replaceChars[chr]) ? replaceChars[chr].call(date) : chr;
+			return (esc === '' && replace_chars[chr]) ? replace_chars[chr].call(date) : chr;
 		});
 	}
 

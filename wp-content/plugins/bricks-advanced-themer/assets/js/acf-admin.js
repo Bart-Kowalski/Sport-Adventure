@@ -55,6 +55,54 @@ jQuery(document).ready(function($){
                 action: "convert_to_logical_properties",
                 nonce: exportOptions.nonce,
                 checked_data: checkedData,
+                logical: true,
+            },
+            success: function(response) {
+                console.log(response);
+                if (response.success) {
+                    brxcHandleResponse(response.data, {
+                        success: true,
+                        header: 'Success!',
+                        text: 'The following settings have been correctly converted:',
+                        btn: '<button class="button button-primary button-large" onclick="window.location.reload(true)">Reload Page</button>',
+                    });
+                } else {
+                    brxcHandleResponse(response.data, {
+                        success: true,
+                        header: 'Notice',
+                        text: 'No settings were converted. If you think this is an error, please contact the support.',
+                        btn: `<button class="button button-primary button-large" onclick="document.querySelector('#brxcModalResponse').remove();">Close</button>`,
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                brxcHandleResponse(null, {
+                    success: false,
+                    header: 'Error!',
+                    text: `The following error occurred: "${errorThrown}". Please contact support.`,
+                    btn: `<button class="button button-primary button-large" onclick="document.querySelector('#brxcModalResponse').remove();">Close</button>`,
+                });
+            }
+        });
+    })
+
+    $('#brxcConvertToDirectional').click(function(e) {
+        e.preventDefault();
+        const checkedData = [];
+        const options = document.querySelectorAll('[data-name="brxc_convert_to_logical_properties"] li input');
+        options.forEach(option => {
+            if(option.checked === true) checkedData.push(option.value);
+        })
+
+        $.ajax({
+            url: exportOptions.ajax_url, 
+            method: "POST",
+            dataType: "JSON",
+            data: {
+                action: "convert_to_logical_properties",
+                nonce: exportOptions.nonce,
+                checked_data: checkedData,
+                logical: false,
             },
             success: function(response) {
                 console.log(response);

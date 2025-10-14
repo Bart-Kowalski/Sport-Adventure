@@ -27,6 +27,8 @@
 
 		public $post_mode;
 
+		public $row_id_filter;
+
 		public $form_object;
 
 		public $error;
@@ -45,6 +47,8 @@
 
 		public $field_types;
 
+		public $field_object_cache = array();
+
 		public $file_objects = array();
 
 		public $submit_fields = false;
@@ -57,6 +61,9 @@
 		public $keys_fields = false;
 		public $keys_ecommerce = false;
 		public $keys_tracking = false;
+
+		public $form_count_submit_cache = false;
+		public $form_count_submit_unread_cache = false;
 
 		const DB_INSERT = 'form_id,date_added,date_updated,date_expire,user_id,hash,token,token_validated,duration,count_submit,status,actions,section_repeatable,preview,spam_level,starred,viewed,encrypted';
 		const DB_UPDATE = 'form_id,date_added,date_updated,date_expire,user_id,hash,token,token_validated,duration,count_submit,status,actions,section_repeatable,preview,spam_level,starred,viewed,encrypted';
@@ -88,6 +95,7 @@
 			$this->viewed = false;
 
 			$this->post_mode = false;
+			$this->row_id_filter = false;
 
 			$this->error = false;
 			$this->error_message = '';
@@ -234,7 +242,12 @@
 			// User capability check
 			WS_Form_Common::user_must('read_submission', $bypass_user_capability_check);
 
-			if($expand_user && isset($submit_object->user_id) && ($submit_object->user_id > 0)) {
+			if(
+				!$bypass_user_capability_check &&	// Do not expand user data if this is a public request
+				$expand_user &&
+				isset($submit_object->user_id) &&
+				($submit_object->user_id > 0)
+			) {
 
 				$user = get_user_by('ID', $submit_object->user_id);
 				if($user !== false) {
@@ -313,11 +326,11 @@
 							$handler = isset($file_object['handler']) ? $file_object['handler'] : 'wsform';
 
 							// Get URL
-							if(isset(WS_Form_File_Handler_WS_Form::$file_handlers[$handler])) {
+							if(isset(WS_Form_File_Handler::$file_handlers[$handler])) {
 
 								$section_repeatable_index = isset($meta['repeatable_index']) ? absint($meta['repeatable_index']) : 0;
 
-								$url = WS_Form_File_Handler_WS_Form::$file_handlers[$handler]->get_url($file_object, $meta['id'], $file_object_index, $submit_object->hash, $section_repeatable_index);
+								$url = WS_Form_File_Handler::$file_handlers[$handler]->get_url($file_object, $meta['id'], $file_object_index, $submit_object->hash, $section_repeatable_index);
 
 							} else {
 
@@ -600,7 +613,7 @@
 			// Update meta
 			if(isset($this->meta)) {
 
-				$ws_form_submit_meta = New WS_Form_Submit_Meta();
+				$ws_form_submit_meta = new WS_Form_Submit_Meta();
 				$ws_form_submit_meta->parent_id = $this->id;
 				$ws_form_submit_meta->db_update_from_object($this->meta, $this->encrypted);
 			}
@@ -626,7 +639,7 @@
 			// Update meta
 			if(isset($submit_object->meta)) {
 
-				$ws_form_submit_meta = New WS_Form_Submit_Meta();
+				$ws_form_submit_meta = new WS_Form_Submit_Meta();
 				$ws_form_submit_meta->parent_id = $this->id;
 				$ws_form_submit_meta->db_update_from_object($submit_object->meta, $submit_encrypted);
 			}
@@ -727,7 +740,7 @@
 				if($wpdb->query($sql) === false) { parent::db_wpdb_handle_error(__('Error deleting submit.', 'ws-form')); }
 
 				// Delete meta
-				$ws_form_meta = New WS_Form_Submit_Meta();
+				$ws_form_meta = new WS_Form_Submit_Meta();
 				$ws_form_meta->parent_id = $this->id;
 				$ws_form_meta->db_delete_by_submit($bypass_user_capability_check);
 
@@ -754,7 +767,7 @@
 			// Get all trashed forms
 			$submits = self::db_read_all('', "status='trash' AND form_id=" . $this->form_id, '', '', '', '', false, false);
 
-       		foreach($submits as $submit_object) {
+			foreach($submits as $submit_object) {
 
 				$this->id = $submit_object->id;
 				self::db_delete();
@@ -922,7 +935,7 @@
 			$done = ($items_retained_count <= 0);
 			$messages = (($items_removed_count > 0) && ($items_retained_count <= 0)) ? array(sprintf(
 
-				/* translators: %s = WS Form */
+				/* translators: %s: WS Form */
 				__('%s submissions successfully deleted.', 'ws-form'),
 
 				WS_FORM_NAME_GENERIC
@@ -1012,12 +1025,10 @@
 			// Read meta
 			if(!is_array($meta_array)) {
 
-				$ws_form_submit_meta = New WS_Form_Submit_Meta();
+				$ws_form_submit_meta = new WS_Form_Submit_Meta();
 				$ws_form_submit_meta->parent_id = $submit_id;
 				$meta_array = $ws_form_submit_meta->db_read_all($bypass_user_capability_check, $submit_encrypted);
 			}
-
-			$field_cache = array();
 
 			// Process meta data
 			foreach($meta_array as $index => $meta) {
@@ -1032,18 +1043,18 @@
 				if($field_id > 0) {
 
 					// Load field data to cache
-					if(isset($field_cache[$field_id])) {
+					if(isset($this->field_object_cache[$field_id])) {
 
 						// Use cached version
-						$field_object = $field_cache[$field_id];
+						$field_object = $this->field_object_cache[$field_id];
 
 					} else {
 
 						// Read field data and get type
-						$ws_form_field = New WS_Form_Field();
+						$ws_form_field = new WS_Form_Field();
 						$ws_form_field->id = $field_id;
 						$field_object = $ws_form_field->db_read(true, $bypass_user_capability_check);
-						$field_cache[$field_id] = $field_object;
+						$this->field_object_cache[$field_id] = $field_object;
 					}
 
 					// If field no longer exists, just return the value
@@ -1129,19 +1140,18 @@
 							case 'signature' :
 							case 'googlemap' :
 
-								if(!is_array($value)) { $value = array(); }
-
 								if($submit_meta_not_set) {
 
 									$submit_meta[$meta_key_base]['value'] = $value;
 
 								} else {
 
-									foreach($value as $file) {
+									if(is_array($value)) {
 
-										$submit_meta[$meta_key_base]['value'][] = $file;
+										$submit_meta[$meta_key_base]['value'] = is_array($submit_meta[$meta_key_base]['value']) ?  array_merge($submit_meta[$meta_key_base]['value'], $value) : $value;
 									}
 								}
+
 								break;
 
 							// Strings
@@ -1185,47 +1195,65 @@
 		}
 
 		// Get number for form submissions
-		public function db_get_count_submit($bypass_user_capability_check = false) {
+		public function db_get_count_submit_cached($bypass_user_capability_check = false) {
+
+			self::db_check_form_id();
 
 			// User capability check
 			WS_Form_Common::user_must('read_submission', $bypass_user_capability_check);
 
-			// Check form ID
-			self::db_check_form_id();
+			// Check cache
+			if($this->form_count_submit_cache === false) {
 
-			global $wpdb;
+				global $wpdb;
 
-			// Get total number for form submissions
-			$sql = $wpdb->prepare(
+				// Build cache
+				$this->form_count_submit_cache = array();
 
-				"SELECT COUNT(id) AS count_submit FROM {$this->table_name} WHERE form_id = %d AND NOT (status = 'trash');",
-				$this->form_id
-			);
+				// Get total number of form submissions
+				$sql = "SELECT form_id, COUNT(id) AS count_submit FROM {$this->table_name} WHERE NOT (status = 'trash') GROUP BY form_id;";
+				$rows = $wpdb->get_results($sql);
 
-			$count_submit = $wpdb->get_var($sql);
-			if(!is_null($count_submit)) { return absint($count_submit); } else { return 0; }
+				if(is_null($rows)) { return 0; }
+
+				foreach($rows as $row) {
+
+					$this->form_count_submit_cache[absint($row->form_id)] = absint($row->count_submit);
+				}
+			}
+
+			return isset($this->form_count_submit_cache[$this->form_id]) ? $this->form_count_submit_cache[$this->form_id] : 0;
 		}
 
 		// Get number for form submissions unread
-		public function db_get_count_submit_unread($bypass_user_capability_check = false) {
+		public function db_get_count_submit_unread_cached($bypass_user_capability_check = false) {
+
+			self::db_check_form_id();
 
 			// User capability check
 			WS_Form_Common::user_must('read_submission', $bypass_user_capability_check);
 
-			// Check form ID
-			self::db_check_form_id();
+			// Check cache
+			if($this->form_count_submit_unread_cache === false) {
 
-			global $wpdb;
+				global $wpdb;
 
-			// Get total number for form submissions that are unread
-			$sql = $wpdb->prepare(
+				// Build cache
+				$this->form_count_submit_unread_cache = array();
 
-				"SELECT COUNT(id) AS count_submit_unread FROM {$this->table_name} WHERE form_id = %d AND viewed = 0 AND status IN ('publish', 'draft');",
-				$this->form_id
-			);
+				// Get total number of form submissions that are unread
+				$sql = "SELECT form_id, COUNT(id) AS count_submit_unread FROM {$this->table_name} WHERE viewed = 0 AND status IN ('publish', 'draft') GROUP BY form_id;";
+				$rows = $wpdb->get_results($sql);
 
-			$count_submit_unread = $wpdb->get_var($sql);
-			if(!is_null($count_submit_unread)) { return absint($count_submit_unread); } else { return 0; }
+				if(is_null($rows)) { return 0; }
+
+				foreach($rows as $row) {
+
+					$this->form_count_submit_unread_cache[absint($row->form_id)] = absint($row->count_submit_unread);
+				}
+			}
+
+			return isset($this->form_count_submit_unread_cache[$this->form_id]) ? $this->form_count_submit_unread_cache[$this->form_id] : 0;
 		}
 
 		// Restore
@@ -1339,7 +1367,8 @@
 			// Ensure provided submit status is valid
 			if(WS_Form_Common::check_submit_status($status) == '') {
 
-				parent::db_throw_error(sprintf(__('Invalid submit status: %s.', 'ws-form'), $status));
+				/* translators: %s: Status */
+				parent::db_throw_error(sprintf(__('Invalid submit status: %s', 'ws-form'), $status));
 			}
 
 			// Update submit record
@@ -1646,7 +1675,7 @@
 								' AND %s %s "%s"',
 								esc_sql($field),
 								$operator,
-								esc_sql($value),
+								esc_sql($value)
 							);
 
 							break;
@@ -1942,7 +1971,7 @@
 
 						} catch (Exception $e) {
 
-    						return $order_by_return;
+							return $order_by_return;
 						}
 
 						// Process by field object type
@@ -2192,36 +2221,41 @@
 
 			// Get form ID
 			$this->form_id = absint(WS_Form_Common::get_query_var_nonce('wsf_form_id', 0));
-			self::db_check_form_id();
+
+			// If form ID is not specified then we should stop processing
+			if($this->form_id === 0) { exit; }
 
 			// Get hash
 			$this->hash = WS_Form_Common::get_query_var_nonce('wsf_hash', '');
 
 			// If hash found, look for form submission
-			if($this->hash != '') {
+			if(
+				($this->hash != '') &&
+				WS_Form_Common::check_submit_hash($this->hash)
+			) {
+				try {
 
-				// Check hash
-				if(!WS_Form_Common::check_submit_hash($this->hash)) {
+					// Read submit by hash
+					$this->db_read_by_hash(true, true, true, true);
 
-					parent::db_throw_error(__('Invalid hash ID (setup_from_post).', 'ws-form'));
-				}
+					// Reset spam level
+					$this->spam_level = null;
 
-				// Read submit by hash
-				$this->db_read_by_hash(true, true, true, true);
+					// Clear meta data
+					$submit_clear_meta_filter_keys = apply_filters('wsf_submit_clear_meta_filter_keys', array());
+					foreach($this->meta as $key => $value) {
 
-				// Reset spam level
-				$this->spam_level = null;
+						if(!in_array($key, $submit_clear_meta_filter_keys)) {
 
-				// Clear meta data
-				$submit_clear_meta_filter_keys = apply_filters('wsf_submit_clear_meta_filter_keys', array());
-				foreach($this->meta as $key => $value) {
-
-					if(!in_array($key, $submit_clear_meta_filter_keys)) {
-
-						unset($this->meta[$key]);
+							unset($this->meta[$key]);
+						}
 					}
+					$this->meta_protected = array();
+
+				} catch(Exception $e) {
+
+					$this->hash = '';
 				}
-				$this->meta_protected = array();
 			}
 
 			if($this->hash == '') {
@@ -2234,8 +2268,15 @@
 			$this->preview = (WS_Form_Common::get_query_var_nonce('wsf_preview', false) !== false);
 
 			// Read form
-			self::db_form_object_read();
+			try {
+	
+				self::db_form_object_read();
 
+			} catch(Exception $e) {
+
+				self::return_forbidden();
+			}
+	
 			// Apply restrictions (Removes any groups, sections or fields that are hidden due to restriction settings, e.g. User logged in)
 			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->apply_restrictions($this->form_object);
@@ -2243,11 +2284,41 @@
 			// Apply limits
 			if(!$this->preview) {
 
-				if($ws_form_form->apply_limits($this->form_object) !== false) {
+				$check_limit_response = $ws_form_form->apply_limits($this->form_object);
+				if($check_limit_response !== false) {
 
-					parent::db_throw_error(__('Form limit error.', 'ws-form'));
+					self::return_forbidden();
 				}
 			}
+
+			// Build keyword blocklist
+			$keyword_blocklist = array();
+
+			// Check if 
+			if(WS_Form_Common::get_object_meta_value($this->form_object, 'keyword_blocklist', '')) {
+
+				// Check limit count
+				$keyword_blocklist_keywords = WS_Form_Common::get_object_meta_value($this->form_object, 'keyword_blocklist_keywords', '');
+				if(is_array($keyword_blocklist_keywords)) {
+
+					foreach($keyword_blocklist_keywords as $row) {
+
+						if(!isset($row->keyword_blocklist_keyword)) { continue; }
+
+						$keyword_blocklist[] = $row->keyword_blocklist_keyword;
+					}
+				}
+
+				// Sanitize before filter
+				$keyword_blocklist = WS_Form_Common::sanitize_keyword_array($keyword_blocklist);
+			}
+
+			// Apply filters
+			$keyword_blocklist = apply_filters('wsf_submit_block_keywords', $keyword_blocklist, $this->form_object, $this);
+
+			// Sanitize after filter
+			$keyword_blocklist = WS_Form_Common::sanitize_keyword_array($keyword_blocklist);
+
 			// Do not validate fields that are required bypassed
 			$bypass_required = WS_Form_Common::get_query_var_nonce('wsf_bypass_required', '');
 			$this->bypass_required_array = explode(',', $bypass_required);
@@ -2263,7 +2334,10 @@
 			// Spam protection - Honeypot
 			$honeypot_hash = ($this->form_object->published_checksum != '') ? $this->form_object->published_checksum : 'honeypot_unpublished_' . $this->form_id;
 			$honeypot_value = WS_Form_Common::get_query_var_nonce("field_$honeypot_hash");
-			if($honeypot_value != '') { parent::db_throw_error(__('Spam protection error.', 'ws-form')); }
+			if($honeypot_value != '') {
+
+				self::return_forbidden();
+			}
 
 			// Get sections array
 			$sections = WS_Form_Common::get_sections_from_form($this->form_object);
@@ -2273,8 +2347,24 @@
 			$form_submit = ($this->post_mode == 'submit');
 
 			// Ensure post mode is valid
-			if(!in_array($this->post_mode, array('submit', 'save', 'action'))) { parent::db_throw_error(__('Invalid post mode.', 'ws-form')); }
+			if(!in_array($this->post_mode, array('submit', 'save', 'action'))) {
 
+				self::return_forbidden();
+			}
+			// Validate action firing
+			if($this->post_mode == 'action') {
+
+				// Get row ID filter
+				$this->row_id_filter = absint(WS_Form_Common::get_query_var_nonce('wsf_row_id_filter'));
+
+				// Check row ID is permitted
+				if(
+					empty($this->row_id_filter) ||
+					!$ws_form_form->action_row_id_permitted($this->form_object, $this->row_id_filter)
+				) {
+					self::return_forbidden();
+				}
+			}
 			// Build section_repeatable
 			$section_repeatable = array();
 			$wsf_form_section_repeatable_index_json = WS_Form_Common::get_query_var_nonce('wsf_form_section_repeatable_index', false);
@@ -2319,12 +2409,12 @@
 
 					foreach($section_repeatable_indexes as $section_repeatable_index) {
 
-						self::setup_from_post_section($section, $form_submit, $process_file_fields, $process_non_file_fields, $section_id, $section_repeatable_index, $section_repeatable);
+						self::setup_from_post_section($section, $form_submit, $process_file_fields, $process_non_file_fields, $keyword_blocklist, $section_id, $section_repeatable_index, $section_repeatable);
 					}
 
 				} else {
 
-					self::setup_from_post_section($section, $form_submit, $process_file_fields, $process_non_file_fields);
+					self::setup_from_post_section($section, $form_submit, $process_file_fields, $process_non_file_fields, $keyword_blocklist);
 				}
 			}
 
@@ -2442,7 +2532,14 @@
 			}
 		}
 
-		public function setup_from_post_section($section, $form_submit, $process_file_fields = true, $process_non_file_fields = true, $section_id = false, $section_repeatable_index = false, &$section_repeatable = array()) {
+		public function return_forbidden() {
+
+			// Exit with 403 HTTP status code
+			header('HTTP/1.0 403 Forbidden');
+			exit;
+		}
+
+		public function setup_from_post_section($section, $form_submit, $process_file_fields = true, $process_non_file_fields = true, $keyword_blocklist = array(), $section_id = false, $section_repeatable_index = false, &$section_repeatable = array()) {
 
 			// Delimiters
 			if($section_repeatable_index !== false) {
@@ -2520,33 +2617,59 @@
 				$field_bypassed = in_array($field_name_post, $this->bypass_required_array);
 
 				// Field required
-				$field_required = WS_Form_Common::get_object_meta_value($field, 'required', false) && !$field_bypassed;
+				$field_required = (
+
+					WS_Form_Common::get_object_meta_value($field, 'required', false) &&
+					!$field_bypassed &&
+					$field_type_config['has_required'] // Set in WS_Form_Config::get_field_types_flat()
+				);
 
 				// Process according to field type
 				switch($field_type) {
 
 					case 'email' :
 
-						// Sanitize email address
-						$email = sanitize_email($field_value);
+						// Build email array
+						$field_value_array = (WS_Form_Common::get_object_meta_value($field, 'multiple_email', '') == 'on') ? explode(',', $field_value) : array($field_value);
 
-						if(
-							($email !== '') &&
-							(filter_var($email, FILTER_VALIDATE_EMAIL) !== false)
-						) {
+						// Sanitized array
+						$field_value_array_sanitized = array();
 
-							$email_validate = apply_filters('wsf_action_email_email_validate', true, $email, $this->form_object->id, $field_id);
+						foreach($field_value_array as $field_value) {
+
+							// Sanitize email address
+							$field_value = sanitize_email($field_value);
+
+							// Skip empty values
+							if(empty($field_value)) { continue; }
+
+							// Double check the email address
+							if(!filter_var($field_value, FILTER_VALIDATE_EMAIL)) {
+
+								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, $email_validate);
+								continue 3;
+							}
+
+							// Run wsf_action_email_email_validate filter hook
+							$email_validate = apply_filters('wsf_action_email_email_validate', true, $field_value, $this->form_object->id, $field_id);
 
 							if(is_string($email_validate)) {
 
 								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, $email_validate);
+								continue 3;
 							}
 
 							if($email_validate === false) {
 
 								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, __('Invalid email address.', 'ws-form'));
+								continue 3;
 							}
+
+							$field_value_array_sanitized[] = $field_value;
 						}
+
+						// Rebuild field value
+						$field_value = implode(',', $field_value_array_sanitized);
 
 						break;
 
@@ -2610,7 +2733,14 @@
 							}
 
 							// Process reCAPTCHA
-							self::db_captcha_process($field_id, $section_repeatable_index, $recaptcha_secret_key, WS_FORM_RECAPTCHA_ENDPOINT, WS_FORM_RECAPTCHA_QUERY_VAR);
+							try {
+
+								self::db_captcha_process($field_id, $section_repeatable_index, $recaptcha_secret_key, WS_FORM_RECAPTCHA_ENDPOINT, WS_FORM_RECAPTCHA_QUERY_VAR);
+
+							} catch (Exception $e) {
+
+								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, $e->getMessage());
+							}
 						}
 
 						break;
@@ -2630,7 +2760,14 @@
 							}
 
 							// Process hCaptcha
-							self::db_captcha_process($field_id, $section_repeatable_index, $hcaptcha_secret_key, WS_FORM_HCAPTCHA_ENDPOINT, WS_FORM_HCAPTCHA_QUERY_VAR);
+							try {
+
+								self::db_captcha_process($field_id, $section_repeatable_index, $hcaptcha_secret_key, WS_FORM_HCAPTCHA_ENDPOINT, WS_FORM_HCAPTCHA_QUERY_VAR);
+
+							} catch (Exception $e) {
+
+								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, $e->getMessage());
+							}
 						}
 
 						break;
@@ -2650,29 +2787,26 @@
 							}
 
 							// Process Turnstile
-							self::db_captcha_process($field_id, $section_repeatable_index, $turnstile_secret_key, WS_FORM_TURNSTILE_ENDPOINT, WS_FORM_TURNSTILE_QUERY_VAR);
+							try {
+
+								self::db_captcha_process($field_id, $section_repeatable_index, $turnstile_secret_key, WS_FORM_TURNSTILE_ENDPOINT, WS_FORM_TURNSTILE_QUERY_VAR);
+
+							} catch (Exception $e) {
+
+								self::db_throw_error_field_invalid_feedback($field_id, $section_repeatable_index, $e->getMessage());
+							}
 						}
 
 						break;
 
-					case 'captchafox' :
+					case 'url' :
 
-						// Only process if form is being submitted
-						if($form_submit) {
+						$field_value = sanitize_url($field_value);
+						break;
 
-							// Get Turnstile secret
-							$captchafox_secret_key = WS_Form_Common::get_object_meta_value($field, 'captchafox_secret_key', '');
+					case 'tel' :
 
-							// If field setting is blank, check global setting
-							if(empty($captchafox_secret_key)) {
-
-								$captchafox_secret_key = WS_Form_Common::option_get('captchafox_secret_key', '');
-							}
-
-							// Process Turnstile
-							self::db_captcha_process($field_id, $section_repeatable_index, $captchafox_secret_key, WS_FORM_CAPTCHAFOX_ENDPOINT, WS_FORM_CAPTCHAFOX_QUERY_VAR);
-						}
-
+						$field_value = WS_Form_Common::sanitize_tel($field_value);
 						break;
 					case 'price' :
 					case 'price_range' :
@@ -2840,6 +2974,12 @@
 						case 'file' :
 						case 'signature' :
 						case 'googlemap' :
+						case 'select' :
+						case 'checkbox' :
+						case 'radio' :
+						case 'price_select' :
+						case 'price_checkbox' :
+						case 'price_radio' :
 
 							if($meta_not_set) {
 
@@ -2849,18 +2989,7 @@
 
 								if(is_array($field_value)) {
 
-									$meta_value = $this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value'];
-
-									if(!is_array($meta_value)) {
-
-										// Currently a blank string
-										$this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value'] = $field_value;
-
-									} else {
-
-										// Currently an array
-										$this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value'] = array_merge($field_value, $meta_value);
-									}
+									$this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value'] = is_array($this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value']) ? array_merge($this->{$meta_field}[WS_FORM_FIELD_PREFIX . $field_id]['value'], $field_value) : $field_value;
 								}
 							}
 
@@ -2913,8 +3042,119 @@
 
 						$section_repeatable_index
 					);
+
+					// Keyword blocklist
+					if(
+						is_array($keyword_blocklist) &&
+						(count($keyword_blocklist) > 0) &&
+						is_string($field_value)
+					) {
+
+						// Process keyword list
+						$keyword_match = self::keyword_blocklist_check($field_value, $keyword_blocklist);
+						if($keyword_match !== false) {
+
+							// Get message
+							$keyword_blocklist_message = apply_filters(
+
+								'wsf_submit_block_keywords_message',
+
+								(WS_Form_Common::get_object_meta_value($this->form_object, 'keyword_blocklist', '') ? WS_Form_Common::get_object_meta_value($this->form_object, 'keyword_blocklist_message', '') : ''),
+
+								$this->form_object,
+
+								$this,
+
+								$keyword_match
+							);
+
+							// If message is invalid or blank, return false to trigger default invalid feedback
+							if(
+								!is_string($keyword_blocklist_message) ||
+								($keyword_blocklist_message == '')
+							) {
+
+								$keyword_blocklist_message = false;
+
+							} else {
+
+								// Parse
+								$keyword_blocklist_message_lookups = array(
+
+									'keyword' 	=> $keyword_match
+								);
+
+								$keyword_blocklist_message = WS_Form_Common::mask_parse($keyword_blocklist_message, $keyword_blocklist_message_lookups);
+							}
+
+							// Apply wsf_submit_field_validate filter hook
+							$this->error_validation_actions = self::filter_validate(
+
+								$this->error_validation_actions,
+
+								array($keyword_blocklist_message),
+
+								$field,
+
+								$field_id,
+
+								$field_type_config,
+
+								$section_repeatable_index
+							);
+
+							break;
+						}
+					}
 				}
 			}
+		}
+
+		// Blocked keyword matching
+		public function keyword_blocklist_check($text, $keyword_blocklist) {
+
+			// Normalize text
+			$normalized = strtolower($text);
+
+			// Replace common obfuscation characters with spaces or remove them
+			$normalized = preg_replace('/[\.\,\(\)\[\]\{\}_\-]+/', ' ', $normalized);
+
+			// Collapse multiple spaces into one
+			$normalized = preg_replace('/\s+/', ' ', $normalized);
+
+			// Pad the string with spaces for whole word matching
+			$normalized = ' ' . $normalized . ' ';
+
+			// Process keyword_blocklist (Already sanitized)
+			foreach($keyword_blocklist as $keyword) {
+
+				// Skip empty keywords
+				if(empty($keyword)) { continue; }
+
+				// Search mode
+				$search_mode = substr($keyword, 0, 1);
+
+				switch($search_mode) {
+
+					// Anywhere in the text
+					case '*' :
+
+						$keyword = substr($keyword, 1);
+
+						if(stripos($text, $keyword) !== false) { return $keyword; }
+
+						break;
+
+					// Whole word match with padding and normalization
+					default :
+
+						$pattern = '/[\s\W]' . preg_quote($keyword, '/') . '[\s\W]/i';
+
+						if(preg_match($pattern, $normalized)) { return $keyword; }
+				}
+			}
+
+			return false;
 		}
 
 		// Process validation filter
@@ -2944,7 +3184,7 @@
 				// Get only newly added actions from the filter actions
 				$actions_diff = array_filter($actions_new, function ($actions_new_element) use ($actions_old) {
 
-				    return !in_array($actions_new_element, $actions_old);
+					return !in_array($actions_new_element, $actions_old);
 				});
 			}
 
@@ -3104,7 +3344,7 @@
 
 					foreach($section_repeatable_indexes as $section_repeatable_index) {
 
-						self::setup_from_post_section($section, $form_submit, true, false, $section_id, $section_repeatable_index, $section_repeatable);
+						self::setup_from_post_section($section, $form_submit, true, false, array(), $section_id, $section_repeatable_index, $section_repeatable);
 					}
 
 				} else {
@@ -3204,7 +3444,7 @@
 			self::db_check_form_id();
 
 			// Read form data
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->id = $this->form_id;
 
 			if($this->preview) {
@@ -3268,6 +3508,7 @@
 				($file_count > $max_uploads)
 			) {
 
+				/* translators: %u: Maximum files */
 				self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('Too many files were uploaded (Maximum: %u files).', 'ws-form'), $max_uploads));
 				return false;
 			}
@@ -3278,6 +3519,7 @@
 				($file_count < $file_min) 
 			) {
 
+				/* translators: %u: Minimum files */
 				self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('Too few files were uploaded (Minimum: %u files).', 'ws-form'), $file_min));
 				return false;
 			}
@@ -3286,6 +3528,7 @@
 				($file_count > $file_max) 
 			) {
 
+				/* translators: %u: Maximum files */
 				self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('Too many files were uploaded (Maximum: %u files).', 'ws-form'), $file_max));
 				return false;
 			}
@@ -3307,6 +3550,7 @@
 					case UPLOAD_ERR_INI_SIZE: 
 					case UPLOAD_ERR_FORM_SIZE: 
 
+						/* translators: %s: Maximum upload size */
 						self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('The uploaded file was too large (Maximum size: %s).', 'ws-form'), WS_Form_Common::get_file_size(wp_max_upload_size())));
 						return false;
 
@@ -3470,8 +3714,8 @@
 			}
 
 			// Field file handler type
-	 		$file_handler = WS_Form_Common::get_object_meta_value($field, 'file_handler', 'wsform');
-	 		if($file_handler == '') { $file_handler = 'wsform'; }
+			$file_handler = WS_Form_Common::get_object_meta_value($field, 'file_handler', 'wsform');
+			if($file_handler == '') { $file_handler = 'wsform'; }
 
 			// Run file handlers
 			$file_objects = apply_filters('wsf_file_handler_' . $file_handler, $file_objects, $this, $field, $section_repeatable_index);
@@ -3524,6 +3768,7 @@
 				($file_count < $file_min) 
 			) {
 
+				/* translators: %u: Minimum files */
 				self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('Too few files were uploaded (Minimum: %u files).', 'ws-form'), $file_min));
 				return false;
 			}
@@ -3532,6 +3777,7 @@
 				($file_count > $file_max) 
 			) {
 
+				/* translators: %u: Maximum files */
 				self::db_throw_error_field_invalid_feedback(absint($field->id), $section_repeatable_index, sprintf(__('Too many files were uploaded (Maximum: %u files).', 'ws-form'), $file_max));
 				return false;
 			}
@@ -3659,8 +3905,8 @@
 				}
 
 				// Field file handler type
-		 		$file_handler = WS_Form_Common::get_object_meta_value($field, 'file_handler', 'wsform');
-		 		if($file_handler == '') { $file_handler = 'wsform'; }
+				$file_handler = WS_Form_Common::get_object_meta_value($field, 'file_handler', 'wsform');
+				if($file_handler == '') { $file_handler = 'wsform'; }
 
 				// Run file handlers
 				$file_objects = apply_filters('wsf_file_handler_' . $file_handler, $file_objects, $this, $field, $section_repeatable_index);
@@ -3668,7 +3914,7 @@
 				// Delete temporary files
 				foreach($temp_files as $temp_file) {
 
-					if(file_exists($temp_file)) { unlink($temp_file); }
+					if(file_exists($temp_file)) { wp_delete_file($temp_file); }
 				}
 			}
 
@@ -3712,7 +3958,7 @@
 
 				$tracking_remote_ip = $this->meta['tracking_remote_ip'];
 
-				if(filter_var($tracking_remote_ip, FILTER_VALIDATE_IP) !== false) {
+				if(!empty(WS_Form_Common::sanitize_ip_address($tracking_remote_ip))) {
 
 					$body['remoteip'] = $tracking_remote_ip;
 				}
@@ -3739,6 +3985,8 @@
 			if(is_wp_error($response)) {
 
 				$error_message = $response->get_error_message();
+
+				/* translators: %s: Error message */
 				parent::db_throw_error(sprintf(__('Captcha verification failed (%s).', 'ws-form'), $error_message));
 
 			} else {
@@ -3812,6 +4060,7 @@
 
 								default :
 
+									/* translators: %s: Error code */
 									$error_message = sprintf(__('Captcha Error: %s.', 'ws-form'), $error_code);
 							}
 
@@ -4106,13 +4355,18 @@
 
 				if(!filter_var($email_to, FILTER_VALIDATE_EMAIL)) {
 
-					parent::db_throw_error(__('Invalid email address: %s', $email_to, 'ws-form'));
+					parent::db_throw_error(sprintf(
+
+						/* translators: %s: Email address */
+						__('Invalid email address: %s', 'ws-form'),
+						$email_to
+					));
 				}
 			}
 
 			if(empty($email_subject)) {
 
-				parent::db_throw_error(__('Invalid email subject'));
+				parent::db_throw_error(__('Invalid email subject', 'ws-form'));
 			}
 
 			// Check when error notification was last sent
@@ -4247,7 +4501,7 @@
 			// Parse email template
 			$mask_values = array(
 
-				'email_subject' => htmlentities($email_subject),
+				'email_subject' => esc_html($email_subject),
 				'email_title' => __('Form Submission Error', 'ws-form'),
 				'email_message' => $email_message
 			);
@@ -4279,7 +4533,6 @@
 				));
 			}
 		}
-
 		// Remove protected meta data
 		public function db_remove_meta_protected() {
 
@@ -4330,14 +4583,14 @@
 		// Check form id
 		public function db_check_form_id() {
 
-			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID.', 'ws-form')); }
+			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID (WS_Form_Submit | db_check_form_id)', 'ws-form')); }
 			return true;
 		}
 
 		// Check id
 		public function db_check_id() {
 
-			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid submit ID.', 'ws-form')); }
+			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid submit ID (WS_Form_Submit | db_check_id)', 'ws-form')); }
 			return true;
 		}
 	}

@@ -746,8 +746,8 @@ class Popups {
 			$all_widths = array_column( $breakpoints, 'width' );
 
 			// Determine the minimum and maximum widths from the available breakpoints
-			$min_available_width = min( $all_widths );
-			$max_available_width = max( $all_widths );
+			$min_available_width = ! empty( $all_widths ) ? min( $all_widths ) : 0; // 0 if no breakpoints exist (#86c5md8ra;)
+			$max_available_width = ! empty( $all_widths ) ? max( $all_widths ) : 9999; // Large number if no breakpoints exist (#86c5md8ra;)
 
 			// This will store the range of widths for each breakpoint
 			$width_ranges = [];

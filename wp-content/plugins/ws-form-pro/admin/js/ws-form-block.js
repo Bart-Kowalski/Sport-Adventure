@@ -64,19 +64,6 @@
 
 		edit: function (props) {
 
-			// Show preview SVG
-			var preview = props.attributes.preview;
-			if(preview) {
-
-				return(
-
-					el('div', { className: 'wsf-block-form-add-preview' }, 
-
-						el(RawHTML, null, wsf_settings_block.form_add.preview)
-					)
-				);
-			}
-
 			// Get attribute values
 			var form_id = props.attributes.form_id;
 			var form_element_id = props.attributes.form_element_id ? props.attributes.form_element_id : '';
@@ -119,7 +106,14 @@
 
 			function fragment_rendered(props) {
 
-				var block_wrapper_obj = $('#block-' + props.clientId);
+				// Check for iframe
+				var editor_canvas_iframe = $('iframe[name="editor-canvas"]');
+
+				// Determine scope
+				var block_wrapper_scope_obj = editor_canvas_iframe.length ? editor_canvas_iframe.contents() : $(document);
+
+				// Get block wrapper object
+				var block_wrapper_obj = $('#block-' + props.clientId, block_wrapper_scope_obj);
 
 				if(
 					!block_wrapper_obj.length ||
@@ -140,9 +134,6 @@
 					// Read props
 					var form_id = props.attributes.form_id;
 					var form_element_id = props.attributes.form_element_id;
-
-					// Get block wrapper
-					var block_wrapper_obj = $('#block-' + props.clientId);
 
 					// Get form object
 					var form_obj = $('form.wsf-form', block_wrapper_obj);

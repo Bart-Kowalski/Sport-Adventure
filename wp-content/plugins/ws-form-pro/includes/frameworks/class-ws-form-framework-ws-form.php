@@ -13,11 +13,6 @@
 
 				'label_positions'				=>	array('default', 'top', 'left', 'right', 'bottom', 'inside'),
 
-				'minicolors_args' 				=>	array(
-
-					'theme' 					=> 'ws-form'
-				),
-
 				'columns'					=>	array(
 
 					'column_class'				=>	'wsf-#id-#size',
@@ -93,7 +88,8 @@
 						'activate_js'		=>	"$('#form .wsf-group-tabs .wsf-group-tab:eq(#index) a').trigger('click');",
 						'event_js'			=>	'tab_show',
 						'event_type_js'		=>	'tab',
-						'class_disabled'	=>	'wsf-tab-disabled'
+						'class_disabled'	=>	'wsf-tab-disabled',
+						'class_active'		=>	'wsf-tab-active'
 					),
 				),
 
@@ -101,7 +97,7 @@
 
 					'public'	=>	array(
 
-						'mask_wrapper'		=>	'<div class="wsf-alert#mask_wrapper_class">#message</div>',
+						'mask_wrapper'		=>	'<div class="wsf-alert#mask_wrapper_class" data-wsf-style-id="#style_id">#message</div>',
 
 						'types'	=>	array(
 
@@ -183,6 +179,12 @@
 						'inside' => array(
 
 							'mask_field_wrapper'			=>	'<div class="wsf-label-position-inside">#field</div>',
+						),
+
+						// Label position - Inside Hide
+						'inside_hide' => array(
+
+							'mask_field_wrapper'			=>	'<div class="wsf-label-position-inside wsf-label-position-inside-hide">#field</div>',
 						),
 
 						// Masks - Section
@@ -279,7 +281,7 @@
 								'class_row_field'		=> array('wsf-field'),
 								'class_row_field_label'	=> array('wsf-label'),
 								'mask_group'			=> '<fieldset class="wsf-fieldset"#disabled>#group_label#group</fieldset>',
-								'mask_row_label'		=> '#row_field<label id="#label_row_id" data-label-required-id="#label_id" for="#row_id"#attributes>#radio_price_field_label</label>#invalid_feedback',
+								'mask_row_label'		=> '#row_field<label id="#label_row_id" data-label-required-id="#label_id" for="#row_id"#attributes>#radio_price_field_label</label>',
 							),
 
 							'signature' => array(

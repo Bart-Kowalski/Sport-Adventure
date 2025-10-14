@@ -226,7 +226,6 @@ class Element_Slider_Nested extends Element {
 			'fullAccess'  => true,
 		];
 
-		// @since 1.9.2
 		$this->controls['focus'] = [
 			'group'       => 'options',
 			'label'       => esc_html__( 'Focus', 'bricks' ),

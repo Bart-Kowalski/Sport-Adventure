@@ -203,7 +203,7 @@ class Filter_Select extends Filter_Element {
 		echo "<select {$this->render_attributes('_root')}>";
 
 		// Generate options HTML
-		foreach ( $this->populated_options as $option ) {
+		foreach ( $this->get_populated_options() as $option ) {
 			/**
 			 * Skip empty text options
 			 *

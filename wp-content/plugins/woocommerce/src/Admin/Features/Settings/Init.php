@@ -70,7 +70,9 @@ class Init {
 		wp_register_style(
 			$style_name,
 			WCAdminAssets::get_url( $style_path_name . '/style', 'css' ),
-			isset( $style_assets['dependencies'] ) ? $style_assets['dependencies'] : array(),
+			// Manually set dependencies for now, because the asset file is not being generated correctly.
+			// See plugins/woocommerce/assets/client/admin/settings-editor/style.asset.php. Should be: `isset( $style_assets['dependencies'] ) ? $style_assets['dependencies'] : array(),`.
+			array( 'wp-components', 'wc-components' ),
 			WCAdminAssets::get_file_version( 'css', $style_assets['version'] ),
 		);
 
@@ -80,27 +82,6 @@ class Init {
 		wp_register_style( 'wc-global-presets', false ); // phpcs:ignore
 		wp_add_inline_style( 'wc-global-presets', wp_get_global_stylesheet( array( 'presets' ) ) );
 		wp_enqueue_style( 'wc-global-presets' );
-
-		// Gutenberg posts editor styles.
-		if ( function_exists( 'gutenberg_url' ) ) {
-			// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion
-			wp_register_style(
-				'wp-gutenberg-posts-dashboard',
-				gutenberg_url( 'build/edit-site/posts.css', __FILE__ ),
-				array( 'wp-components' ),
-			);
-			// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
-			wp_enqueue_style( 'wp-gutenberg-posts-dashboard' );
-
-			// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion
-			wp_register_style(
-				'wp-gutenberg-edit-site',
-				gutenberg_url( 'build/edit-site/style.css', __FILE__ ),
-				array( 'wp-components' ),
-			);
-			// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
-			wp_enqueue_style( 'wp-gutenberg-edit-site' );
-		}
 	}
 
 	/**
@@ -123,7 +104,7 @@ class Init {
 		wp_enqueue_script(
 			$script_name,
 			WCAdminAssets::get_url( $script_path_name . '/index', 'js' ),
-			array_merge( array( 'wp-edit-site' ), $script_assets['dependencies'] ),
+			$script_assets['dependencies'],
 			WCAdminAssets::get_file_version( 'js', $script_assets['version'] ),
 			true
 		);
@@ -142,14 +123,107 @@ class Init {
 			return $settings;
 		}
 
+		global $wp_scripts;
+
+		// Set the scripts that all settings pages should have.
+		$ignored_settings_scripts                = array(
+			'wc-admin-app',
+			'woocommerce_admin',
+			'wc-settings-editor',
+			'wc-admin-edit-settings',
+			'woo-tracks',
+			'woocommerce-admin-test-helper',
+			'woocommerce-beta-tester-live-branches',
+			'WCPAY_DASH_APP',
+		);
+		$default_scripts_handles                 = array_diff(
+			$wp_scripts->queue,
+			$ignored_settings_scripts,
+		);
+		$settings['settingsScripts']['_default'] = self::get_script_urls( $default_scripts_handles );
+
+		// Add the settings data to the settings array.
 		$setting_pages = \WC_Admin_Settings::get_settings_pages();
-		$pages         = array();
-		foreach ( $setting_pages as $setting_page ) {
-			$pages = $setting_page->add_settings_page_data( $pages );
-		}
-		$transformer              = new Transformer();
-		$settings['settingsData'] = $transformer->transform( $pages );
+		$settings      = self::get_page_data( $settings, $setting_pages );
 
 		return $settings;
+	}
+
+	/**
+	 * Get the page data for the settings editor.
+	 *
+	 * @param array $settings The settings array.
+	 * @param array $setting_pages The setting pages.
+	 * @return array The settings array.
+	 */
+	public static function get_page_data( $settings, $setting_pages ) {
+		global $wp_scripts;
+		/**
+		 * Filters the settings tabs array.
+		 *
+		 * @since 2.5.0
+		 *
+		 * @param array $available_pages The available pages.
+		 */
+		$available_pages = apply_filters( 'woocommerce_settings_tabs_array', array() );
+		$pages           = array();
+
+		foreach ( $setting_pages as $setting_page ) {
+			// If any page has removed itself from the tabs array, avoid adding this page to the settings editor.
+			if ( ! in_array( $setting_page->get_id(), array_keys( $available_pages ), true ) ) {
+				continue;
+			}
+
+			$scripts_before_adding_settings = $wp_scripts->queue;
+			$pages                          = $setting_page->add_settings_page_data( $pages );
+			$settings_scripts_handles       = array_diff( $wp_scripts->queue, $scripts_before_adding_settings );
+			$settings['settingsScripts'][ $setting_page->get_id() ] = self::get_script_urls( $settings_scripts_handles );
+		}
+
+		$transformer                          = new Transformer();
+		$settings['settingsData']['pages']    = $transformer->transform( $pages );
+		$settings['settingsData']['start']    = $setting_pages[0]->get_custom_view( 'woocommerce_settings_start' );
+		$settings['settingsData']['_wpnonce'] = wp_create_nonce( 'wp_rest' );
+
+		return $settings;
+	}
+
+	/**
+	 * Retrieve the script URLs from the provided script handles.
+	 * This will also filter out scripts from WordPress core since they only need to be loaded once.
+	 *
+	 * @param array $script_handles Array of script handles.
+	 * @return array Array of script URLs.
+	 */
+	private static function get_script_urls( $script_handles ) {
+		global $wp_scripts;
+		$script_urls = array();
+		foreach ( $script_handles as $script ) {
+			$registered_script = $wp_scripts->registered[ $script ];
+			if ( ! isset( $registered_script->src ) ) {
+				continue;
+			}
+
+			// Skip scripts from WordPress core since they only need to be loaded once.
+			if ( strpos( $registered_script->src, '/' . WPINC . '/js' ) === 0 || strpos( $registered_script->src, '/wp-admin/js' ) === 0 ) {
+				continue;
+			}
+
+			$src = $registered_script->src;
+			$ver = $registered_script->ver ? $registered_script->ver : false;
+
+			// Add version query parameter.
+			if ( $ver ) {
+				$src = add_query_arg( 'ver', $ver, $src );
+			}
+
+			// Add home URL if the src is a relative path.
+			if ( strpos( $src, '/' ) === 0 ) {
+				$script_urls[] = home_url( $src );
+			} else {
+				$script_urls[] = $src;
+			}
+		}
+		return $script_urls;
 	}
 }

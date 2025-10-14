@@ -9,7 +9,7 @@
 		public function __construct($wp_customize) {
 
 			// Get skins
-			$skins = WS_Form_Config::get_skins();
+			$skins = WS_Form_Config::get_skins(WS_FORM_EDITION == 'pro');
 
 			foreach($skins as $skin_id => $skin) {
 
@@ -189,7 +189,7 @@
 			$wsf_panel_open = WS_Form_Common::get_query_var('wsf_panel_open');
 
 			// Get skins
-			$skins = WS_Form_Config::get_skins();
+			$skins = WS_Form_Config::get_skins(WS_FORM_EDITION == 'pro');
 
 			// Build form preview URL array
 			$form_preview_url_array = array();
@@ -199,7 +199,7 @@
 				$conversational = isset($skin['conversational']) ? $skin['conversational'] : false;
 
 				// Get form preview URL
-				$form_preview_url_array[$skin_id] = WS_Form_Common::get_preview_url($form_id, $skin_id, $conversational);
+				$form_preview_url_array[$skin_id] = WS_Form_Common::get_preview_url($form_id, false, false, false, $conversational, false, $skin_id);
 			}
 
 			// Start script

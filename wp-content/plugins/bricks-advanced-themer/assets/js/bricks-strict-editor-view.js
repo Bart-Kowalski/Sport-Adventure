@@ -27,40 +27,14 @@ const ADMINEDITORBRXC = {
             return true;
          },
     },
-    appendElements: function(){
-        const els = document.querySelector('#bricks-panel-inner #bricks-panel-elements');
-        const defaultPanel = document.querySelector('#bricks-panel-inner #default-panel')
+    // appendElements: function(){
+    //     const els = document.querySelector('#bricks-panel-inner #bricks-panel-elements');
+    //     const defaultPanel = document.querySelector('#bricks-panel-inner #default-panel')
 
-        if(!els || defaultPanel) return;
+    //     if(!els || defaultPanel) return;
 
-        els.innerHTML = '<div id="default-panel" class="no-results"><p>No element selected. Hover the page and click on an selectable element (with a blue outline) to modify the content.</p><a href="https://academy.bricksbuilder.io/article/builder-intro/" target="_blank" class="button">Learn more</a></div>';
-    },
-    limitPanelVisibility: function(){
-        const self = this;
-        const panel = document.querySelector('#bricks-panel');
-        const visiblePanels = ['history', 'pages', 'settings', 'revisions'];
-
-        setTimeout(() => {
-            // Visible Panels
-            if(visiblePanels.includes(self.vueState.activePanel)){
-                panel.classList.add('visible');
-                return;
-            }
-
-            if(!self.helpers.isElementActive()){
-                panel.classList.remove('visible');
-                return;
-            }
-            const activeEl = self.vueState.activeElement;
-    
-            if(self.limitPanelVisibilityArr.includes(activeEl.name)){
-                panel.classList.add('visible');
-            } else {
-                panel.classList.remove('visible');
-            }
-        }, 10)
-
-    },
+    //     els.innerHTML = '<div id="default-panel" class="no-results"><p>No element selected. Hover the page and click on an selectable element (with a blue outline) to modify the content.</p><a href="https://academy.bricksbuilder.io/article/builder-intro/" target="_blank" class="button">Learn more</a></div>';
+    // },
     controlVisibility: function(){
         const self = this;
         if(!self.helpers.isElementActive()) return;
@@ -142,8 +116,7 @@ const ADMINEDITORBRXC = {
     },
     runStateFunctions: function(){
         const self = this;
-        self.appendElements();
-        self.limitPanelVisibility();
+        //self.appendElements();
         self.controlVisibility();
     },
     runObserver: function() {
@@ -164,10 +137,17 @@ const ADMINEDITORBRXC = {
         const self = this;
         self.runObserver();
     },
+    setBodyClasses: function(){
+        const self = this;
+        brxcStrictOptions.builderTweaks.forEach(el => {
+            document.body.classList.add(`at-${el}`);
+        })
+    },
     init: function(){
         const self = this;
+        self.setBodyClasses();
         self.initObservers();
-        self.appendElements();
+        //self.appendElements();
         self.setNotes();
     }
 }
@@ -176,6 +156,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ADMINEDITORBRXC.changeIcon();
 })
 window.addEventListener('load', () => {
-    setTimeout(ADMINEDITORBRXC.init(), 300);
+    setTimeout(() => {
+        ADMINEDITORBRXC.init()
+    }, 300);
 })
 

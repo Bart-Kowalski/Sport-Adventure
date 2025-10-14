@@ -1,6 +1,14 @@
 <?php
 $controls = [];
 
+$controls['typographyFluidPopup'] = [
+	'type'      => 'popup', // NOTE: Undocumented (@since 2.1)
+	'inline'    => true,
+	'label'     => esc_html__( 'Fluid typography', 'bricks' ),
+	'popup'     => 'variables',
+	'popupView' => 'fluid-typography', // NOTE: Undocumented (@since 2.1)
+];
+
 $controls['typographyHtml'] = [
 	'type'        => 'number',
 	'units'       => true,

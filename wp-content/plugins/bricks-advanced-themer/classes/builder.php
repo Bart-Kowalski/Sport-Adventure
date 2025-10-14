@@ -246,20 +246,6 @@ class AT__Builder{
             scale: 1.1;
          }';
         }
-
-        // Hide Bricks Elements inside the builder
-        // $settings = $brxc_acf_fields['disable_bricks_elements'];
-        // $all_elements = $brxc_acf_fields['builder_elements'];
-        
-        // if(AT__Helpers::is_array($settings)){
-        //     foreach($all_elements as $key){
-        //         if(in_array($key, $settings, true)){
-        //             $css .= '#bricks-panel-elements-categories ul.sortable-wrapper li.bricks-add-element[data-element-name="' . esc_attr($key) . '"] {display:none !important;}';;
-        //         }
-        //     }
-        // }
-        
-        // Show Parent Structure Item
         
 
         wp_add_inline_style('bricks-advanced-themer-builder', $css, 'after');
@@ -336,11 +322,7 @@ class AT__Builder{
             ADMINBRXC.globalSettings.generalCats.rightShortcuts = " .$right_shortcuts_output . ";
             ADMINBRXC.globalSettings.generalCats.globalColorsPrefix = '" . $brxc_acf_fields['color_prefix'] . "';
             ADMINBRXC.globalSettings.generalCats.globalColorsDarkMode = " . json_encode((bool)$brxc_acf_fields['enable_dark_mode_on_frontend']) . ";
-            ADMINBRXC.globalSettings.generalCats.minViewportWidth = " . $brxc_acf_fields['min_vw'] . ";
-            ADMINBRXC.globalSettings.generalCats.maxViewportWidth = " . $brxc_acf_fields['max_vw'] . ";
-            ADMINBRXC.globalSettings.generalCats.clampUnit = '" . $brxc_acf_fields['clamp_unit']  . "';
             ADMINBRXC.globalSettings.generalCats.cssVariables = JSON.parse('" . json_encode($brxc_acf_fields['css_variables_general']) . "');
-            ADMINBRXC.globalSettings.generalCats.classesAndStyles = JSON.parse('" . json_encode($brxc_acf_fields['classes_and_styles_general']) . "');
             ADMINBRXC.globalSettings.shortcutsTabs = JSON.parse('" . json_encode($brxc_acf_fields['enable_tabs_icons']) . "');
             ADMINBRXC.globalSettings.shortcutsIcons = JSON.parse('" . json_encode($brxc_acf_fields['enable_shortcuts_icons']) . "');
             ADMINBRXC.globalSettings.elementShortcutIcons = JSON.parse('" . json_encode($brxc_acf_fields['elements_shortcut_icons']) . "');
@@ -392,24 +374,6 @@ class AT__Builder{
             })", 'after');
 
         require_once \BRICKS_ADVANCED_THEMER_PATH . '/inc/builder_modal.php';
-    }
-
-    public static function add_modal_after_body_wrapper_editor() {
-
-        if (!class_exists('Bricks\Capabilities')) {
-
-            return;
-        }
-
-        global $brxc_acf_fields;
-
-        if( !function_exists('bricks_is_builder') || ! bricks_is_builder() || !function_exists('bricks_is_builder_iframe') || bricks_is_builder_iframe() || !\Bricks\Capabilities::current_user_has_full_access() !== true) return;
-
-        wp_add_inline_script('bricks-strict-editor-view', preg_replace( '/\s+/', '', "window.addEventListener('DOMContentLoaded', () => {
-
-                ADMINEDITORBRXC.limitPanelVisibilityArr = JSON.parse('" . json_encode($brxc_acf_fields['enable_left_visibility_elements']) . "');
-            })"
-        ), 'after');
     }
     
     // Create the AJAX function
@@ -486,29 +450,6 @@ class AT__Builder{
         $p2 = array_splice($array, 0, $order);
         $array = array_merge($p2, $p1, $array);
     }
-    
-    // public static function disable_bricks_elements() {
-    //     global $brxc_acf_fields;
-    //     $settings = AT__Helpers::is_array($brxc_acf_fields, 'disable_bricks_elements') ? $brxc_acf_fields['disable_bricks_elements'] : [];
-        
-
-    //     add_filter('bricks/builder/elements', function ($elements) use ($settings) {
-    //         $index = 0;
-    //         $array_to_update = [];
-
-    //         foreach ($elements as $element) {
-    //             $array_to_update[] = [$element => $element];
-    //             if (in_array($element, $settings)) {
-    //                 unset($elements[$index]);
-    //             }
-    //             $index++;
-    //         }
-
-    //         update_option('bricks-advanced-themer__list_active_elements', $array_to_update);
-
-    //         return $elements;
-    //     });
-    // }
 
     public static function set_custom_default_values_in_builder(){
 
@@ -1976,71 +1917,8 @@ class AT__Builder{
                         return $controls;
                     });
                 }
-                // if(in_array("hide-remove-element",  $settings)){
-                //     add_filter('bricks/elements/' . $element . '/controls', function($controls){
-                //         $controls['hideElementSeparator'] = [
-                //             'type'  => 'separator',
-                //             'label' => esc_html__( 'Hide/Remove Element', 'bricks' ),
-                //             'fullAccess' => true,
-                //         ];
-                //         $controls['hideElement'] = [
-                //             'tab'      => 'content',
-                //             'label'    => esc_html__( 'Hide Element inside the builder' ),
-                //             'description' => esc_html__( 'Toggling this option will hide the element inside the builder, but not on the frontend', 'bricks' ),
-                //             'type'  => 'checkbox',
-                //             'fullAccess' => true,
-                //         ];
-                //         $controls['unrenderFrontend'] = [
-                //             'tab'      => 'content',
-                //             'label'    => esc_html__( 'Remove Element on the frontend' ),
-                //             'description' => esc_html__( 'Toggling this option will remove the element on the frontend, but will still be visible inside the builder', 'bricks' ),
-                //             'type'  => 'checkbox',
-                //             'fullAccess' => true,
-                //         ];
-
-                //         return $controls;
-                //     });
-                // }
             }
         }
-
-        //Scoped Variables
-        // $class_settings = $brxc_acf_fields['class_features'];
-        // if(isset($class_settings) && !empty($class_settings) && is_array($class_settings) && in_array('scoped-variables', $class_settings)){
-        //     foreach($elements as $element){
-
-        //         add_filter( 'bricks/elements/' . $element['name'] . '/controls', function( $controls ) {
-        //             $controls['_scopedVariables'] = [
-        //                 'tab'   => 'style',
-        //                 'label' => esc_html__( 'Scoped Variables', 'bricks' ),
-        //                 'group' => '_css',
-        //                 'type'  => 'repeater',
-        //                 'fields' => [
-        //                     'title' => [
-        //                         'label' => esc_html__( 'Variable', 'bricks' ),
-        //                         'type' => 'text',
-        //                         'placeholder'   => esc_html__( '--my-var', 'bricks' ),
-        //                         'hasDynamicData' => false,
-        //                     ],
-        //                     'cssVarValue' => [
-        //                         'label' => esc_html__( 'Value', 'bricks' ),
-        //                         'type' => 'text',
-        //                         'hasDynamicData' => false,
-        //                     ],
-        //                 ],
-        //                 'css' => [
-        //                     [
-        //                       'property' => 'background-color',
-        //                     ],
-        //                 ],
-        //             ];
-
-        //             self::repositionArrayElement($controls, "_scopedVariables", array_search('_cssCustom"', array_keys($controls)));
-                
-        //             return $controls;
-        //         });
-        //     }
-        // }
     }
 
     public static function disable_style_controls() {
@@ -2083,26 +1961,10 @@ class AT__Builder{
             }, 999); // High priority to ensure controls are fully registered
         }
     }
-    
-
-    // public static function remove_elements_from_frontend(){
-    //     global $brxc_acf_fields;
-    //     $settings = $brxc_acf_fields['custom_default_settings'] ?? [];
-
-    //     if(!AT__Helpers::in_array("hide-remove-element",  $settings)) return;
-
-    //     add_filter( 'bricks/element/render', function( $render, $element ) {
-    //         if ( isset( $element->settings["unrenderFrontend"] ) && $element->settings["unrenderFrontend"] == true ) {
-    //             $render = false;
-    //         }
-        
-    //         return $render;
-    //     }, 10, 2 );
-    // }
 
     public static function set_full_access_to_all_elements(){
          
-        if(!class_exists('Bricks\Elements') || !AT__Helpers::is_strict_editor_view_elements_tab_activated() || !function_exists('bricks_is_builder') || !bricks_is_builder()){
+        if(!class_exists('Bricks\Elements') || !AT__Helpers::is_strict_editor_view_category_activated() || !function_exists('bricks_is_builder') || !bricks_is_builder()){
             return;
         }
 
@@ -2191,65 +2053,4 @@ class AT__Builder{
         wp_send_json_success($query_vars);
 
     }
-
-    // public static function save_global_css_ajax_function(){
-
-    //     if (!current_user_can('manage_options')) {
-    //         wp_send_json_error('You don\'t have permission to perform this action.');
-    //     }
-
-
-    //     // Verify nonce
-    //     if ( ! wp_verify_nonce( $_POST['nonce'], 'openai_ajax_nonce' ) ) {
-    //         die( 'Invalid nonce' );
-    //     }
-    //     $option = get_option('bricks_global_settings');
-    //     $custom_css = $_POST['custom_css'];
-    //     $option['customCss'] = $custom_css;
-    //     update_option('bricks_global_settings', $option);
-
-    //     wp_send_json_success($option);
-    // }
-
-    public static function get_used_global_classes_id_on_site(){
-        global $wpdb;
-
-        $uniqueCssGlobalClasses = [];
-
-        // Define the partial meta key you want to search for.
-        $partialMetaKey = '_bricks_page_';
-
-        // Create a custom SQL query to retrieve the relevant postmeta data.
-        $sql = $wpdb->prepare(
-            "SELECT post_id, meta_value
-            FROM {$wpdb->postmeta}
-            WHERE meta_key LIKE %s",
-            '%' . $partialMetaKey . '%'
-        );
-
-        // Execute the query.
-        $results = $wpdb->get_results($sql);
-
-        // Loop through the results.
-        foreach ($results as $result) {
-            $metaValue = maybe_unserialize($result->meta_value);
-
-            if (is_array($metaValue)) {
-                foreach ($metaValue as $item) {
-                    if (AT__Helpers::is_array($item['settings'], '_cssGlobalClasses')) {
-                        $cssGlobalClasses = $item['settings']['_cssGlobalClasses'];
-
-                        // Add the unique strings to the $uniqueCssGlobalClasses array.
-                        $uniqueCssGlobalClasses = array_merge($uniqueCssGlobalClasses, $cssGlobalClasses);
-                    }
-                }
-            }
-        }
-
-        // Remove duplicate values and reindex the array.
-        $uniqueCssGlobalClasses = array_values(array_unique($uniqueCssGlobalClasses));
-        return $uniqueCssGlobalClasses;
-
-    }
-
 } 

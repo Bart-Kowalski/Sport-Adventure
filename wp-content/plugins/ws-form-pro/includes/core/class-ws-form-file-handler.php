@@ -89,12 +89,12 @@
 			$max_upload_size = absint(WS_Form_Common::option_get('max_upload_size'));
 
 			// Get min file size
-	 		$file_min_size = floatval(WS_Form_Common::get_object_meta_value($field, 'file_min_size', 'wsform'));
-	 		if($file_min_size > 0) { $file_min_size = ($file_min_size * 1048576); }
+			$file_min_size = floatval(WS_Form_Common::get_object_meta_value($field, 'file_min_size', 'wsform'));
+			if($file_min_size > 0) { $file_min_size = ($file_min_size * 1048576); }
 
-	 		// Get max file size
-	 		$file_max_size = floatval(WS_Form_Common::get_object_meta_value($field, 'file_max_size', 'wsform'));
-	 		if($file_max_size > 0) { $file_max_size = ($file_max_size * 1048576); }
+			// Get max file size
+			$file_max_size = floatval(WS_Form_Common::get_object_meta_value($field, 'file_max_size', 'wsform'));
+			if($file_max_size > 0) { $file_max_size = ($file_max_size * 1048576); }
 
 			// Get field ID
 			$field_id = absint($field->id);
@@ -107,7 +107,7 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = Maximum file size */
+						/* translators: %s: Maximum file size */
 						__('The file is too large (Maximum size: %s).', 'ws-form'),
 						WS_Form_Common::get_file_size($max_upload_size)
 					));
@@ -117,8 +117,8 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = File name, %s = Maximum file size */
-						__('The file %s is too large (Maximum size: %s).', 'ws-form'),
+						/* translators: %1$s: File name, %2$s: Maximum file size */
+						__('The file %1$s is too large (Maximum size: %2$s).', 'ws-form'),
 						esc_html($file_name),
 						WS_Form_Common::get_file_size($max_upload_size)
 					));
@@ -136,9 +136,9 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = Minimum file size */
+						/* translators: %s: Minimum file size */
 						__('The file is too small (Minimum size: %s).', 'ws-form'),
-					 	WS_Form_Common::get_file_size($file_min_size)
+						WS_Form_Common::get_file_size($file_min_size)
 					));
 
 				} else {
@@ -146,10 +146,10 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = File name, %s = Minimum file size */
-						__('The file %s is too small (Minimum size: %s).', 'ws-form'),
+						/* translators: %1$s: File name, %2$s: Minimum file size */
+						__('The file %1$s is too small (Minimum size: %2$s).', 'ws-form'),
 						esc_html($file_name),
-					 	WS_Form_Common::get_file_size($file_min_size)
+						WS_Form_Common::get_file_size($file_min_size)
 					));
 				}
 			}
@@ -165,7 +165,7 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = Minimum file size */
+						/* translators: %s: Maximum file size */
 						__('The file is too large (Maximum size: %s).', 'ws-form'),
 						WS_Form_Common::get_file_size($file_max_size)
 					));
@@ -175,8 +175,8 @@
 					// Throw error
 					throw new Exception(sprintf(
 
-						/* translators: %s = File name, %s = Minimum file size */
-						__('The file %s is too large (Maximum size: %s).', 'ws-form'),
+						/* translators: %1$s: File name, %2$s: Maximum file size */
+						__('The file %1$s is too large (Maximum size: %2$s).', 'ws-form'),
 						esc_html($file_name),
 						WS_Form_Common::get_file_size($file_max_size)
 					));
@@ -210,7 +210,7 @@
 						// Throw error
 						throw new Exception(sprintf(
 
-							/* translators: %s = Accepted file types */
+							/* translators: %s: Accepted file types */
 							__('The file is not an accepted type (%s).', 'ws-form'),
 							implode(', ', $field_accept_array)
 						));
@@ -220,8 +220,8 @@
 						// Throw error
 						throw new Exception(sprintf(
 
-							/* translators: %s = File name, %s = Accepted file types */
-							__('The file %s is not an accepted type (%s).', 'ws-form'),
+							/* translators: %1$s: File name, %2$s: Accepted file types */
+							__('The file %1$s is not an accepted type (%2$s).', 'ws-form'),
 							esc_html($file_name),
 							implode(', ', $field_accept_array)
 						));
@@ -230,21 +230,21 @@
 			}
 
 			// Get image min width
-	 		$file_image_min_width = WS_Form_Common::get_object_meta_value($field, 'file_image_min_width_restrict', '');
+			$file_image_min_width = WS_Form_Common::get_object_meta_value($field, 'file_image_min_width_restrict', '');
 
 			// Get image max width
-	 		$file_image_max_width = WS_Form_Common::get_object_meta_value($field, 'file_image_max_width_restrict', '');
+			$file_image_max_width = WS_Form_Common::get_object_meta_value($field, 'file_image_max_width_restrict', '');
 
 			// Get image min height
-	 		$file_image_min_height = WS_Form_Common::get_object_meta_value($field, 'file_image_min_height_restrict', '');
+			$file_image_min_height = WS_Form_Common::get_object_meta_value($field, 'file_image_min_height_restrict', '');
 
 			// Get image max height
-	 		$file_image_max_height = WS_Form_Common::get_object_meta_value($field, 'file_image_max_height_restrict', '');
+			$file_image_max_height = WS_Form_Common::get_object_meta_value($field, 'file_image_max_height_restrict', '');
 
 			// Get image required aspect ratio
-	 		$file_image_required_aspect_ratio = WS_Form_Common::get_object_meta_value($field, 'file_image_required_aspect_ratio', '');
+			$file_image_required_aspect_ratio = WS_Form_Common::get_object_meta_value($field, 'file_image_required_aspect_ratio', '');
 
-	 		// Image restrictions
+			// Image restrictions
 			if(
 				(
 					!empty($file_image_min_width) ||
@@ -282,7 +282,7 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %u = Minimum width in pixels */
+								/* translators: %u: Minimum width in pixels */
 								__('The width of the image is too small (Minimum: %u pixels).', 'ws-form'),
 								$file_image_min_width
 							));
@@ -292,8 +292,8 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %s = File name, %u = Minimum width in pixels */
-								__('The width of %s is too small (Minimum: %u pixels).', 'ws-form'),
+								/* translators: %1$s: File name, %2$u: Minimum width in pixels */
+								__('The width of %1$s is too small (Minimum: %2$u pixels).', 'ws-form'),
 								esc_html($file_name),
 								$file_image_min_width
 							));
@@ -311,7 +311,7 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %u = Maximum width in pixels */
+								/* translators: %u: Maximum width in pixels */
 								__('The width of the image is too large (Maximum: %u pixels).', 'ws-form'),
 								$file_image_max_width
 							));
@@ -321,8 +321,8 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %s = File name, %u = Maximum width in pixels */
-								__('The width of %s is too large (Maximum: %u pixels).', 'ws-form'),
+								/* translators: %1$s: File name, %2$u: Maximum width in pixels */
+								__('The width of %1$s is too large (Maximum: %2$u pixels).', 'ws-form'),
 								esc_html($file_name),
 								$file_image_max_width
 							));
@@ -340,7 +340,7 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %u = Minimum height in pixels */
+								/* translators: %u: Minimum height in pixels */
 								__('The height of the image is too small (Minimum: %u pixels).', 'ws-form'),
 								$file_image_min_height
 							));
@@ -350,8 +350,8 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %s = File name, %u = Minimum height in pixels */
-								__('The height of %s is too small (Minimum: %u pixels).', 'ws-form'),
+								/* translators: %1$s: File name, %2$u: Minimum height in pixels */
+								__('The height of %1$s is too small (Minimum: %2$u pixels).', 'ws-form'),
 								esc_html($file_name),
 								$file_image_min_height
 							));
@@ -369,7 +369,7 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %u = Maximum height in pixels */
+								/* translators: %u: Maximum height in pixels */
 								__('The height of the image is too large (Maximum: %u pixels).', 'ws-form'),
 								$file_image_max_height
 							));
@@ -379,8 +379,8 @@
 							// Throw error
 							throw new Exception(sprintf(
 
-								/* translators: %s = File name, %u = Maximum height in pixels */
-								__('The height of %s is too large (Maximum: %u pixels).', 'ws-form'),
+								/* translators: %1$s: File name, %2$u: Maximum height in pixels */
+								__('The height of %1$s is too large (Maximum: %2$u pixels).', 'ws-form'),
 								esc_html($file_name),
 								$file_image_max_height
 							));
@@ -388,29 +388,29 @@
 					}
 
 					// Check aspect ratio
-			 		if(!empty($file_image_required_aspect_ratio)) {
+					if(!empty($file_image_required_aspect_ratio)) {
 
-			 			// Get required aspect ratio
-			 			$aspect_ratio_required_array = explode(':', $file_image_required_aspect_ratio);
-			 			$aspect_ratio_required_x = isset($aspect_ratio_required_array[0]) ? floatval($aspect_ratio_required_array[0]) : 0;
-			 			$aspect_ratio_required_y = isset($aspect_ratio_required_array[1]) ? floatval($aspect_ratio_required_array[1]) : 0;
-			 			$aspect_ratio_required = ($aspect_ratio_required_y > 0) ? ($aspect_ratio_required_x / $aspect_ratio_required_y) : 0;
+						// Get required aspect ratio
+						$aspect_ratio_required_array = explode(':', $file_image_required_aspect_ratio);
+						$aspect_ratio_required_x = isset($aspect_ratio_required_array[0]) ? floatval($aspect_ratio_required_array[0]) : 0;
+						$aspect_ratio_required_y = isset($aspect_ratio_required_array[1]) ? floatval($aspect_ratio_required_array[1]) : 0;
+						$aspect_ratio_required = ($aspect_ratio_required_y > 0) ? ($aspect_ratio_required_x / $aspect_ratio_required_y) : 0;
 
-			 			// Get image aspect ratio
-			 			$aspect_ratio_image = ($image_height > 0) ? ($image_width / $image_height) : 0;
+						// Get image aspect ratio
+						$aspect_ratio_image = ($image_height > 0) ? ($image_width / $image_height) : 0;
 
-			 			if(
-			 				($aspect_ratio_required > 0) &&
-			 				($aspect_ratio_image > 0) &&
-			 				($aspect_ratio_required != $aspect_ratio_image)
-			 			) {
+						if(
+							($aspect_ratio_required > 0) &&
+							($aspect_ratio_image > 0) &&
+							($aspect_ratio_required != $aspect_ratio_image)
+						) {
 
 							if(empty($file_name)) {
 
 								// Throw error
 								throw new Exception(sprintf(
 
-									/* translators: %s = Aspect ratio */
+									/* translators: %s: Aspect ratio */
 									__('The aspect ratio of the image is incorrect (Must be: %s).', 'ws-form'),
 									esc_html($file_image_required_aspect_ratio)
 								));
@@ -420,14 +420,14 @@
 								// Throw error
 								throw new Exception(sprintf(
 
-									/* translators: %s = File name, %s = Aspect ratio */
-									__('The aspect ratio of %s is incorrect (Must be: %s).', 'ws-form'),
+									/* translators: %1$s: File name, %2$s: Aspect ratio */
+									__('The aspect ratio of %1$s is incorrect (Must be: %2$s).', 'ws-form'),
 									esc_html($file_name),
 									esc_html($file_image_required_aspect_ratio)
 								));
 							}
 						}
-			 		}
+					}
 				}
 			}
 		}
@@ -561,24 +561,72 @@
 		// DropzoneJS - Filter attachments
 		public static function dropzonejs_filter_attachments($query) {
 
-			if($query->get('post_type') !== 'attachment') { return; }
+			if(
+				// Bail if not querying attachments
+				($query->get('post_type') !== 'attachment') ||
 
-			$meta_query = $query->get('meta_query');
-
-			if(!is_array($meta_query)) { $meta_query = array(); }
-
-			if(isset($meta_query['relation']) && (strtolower($meta_query['relation']) === 'or')) {
-
-				$meta_query = array($meta_query);
+				// Bail if not an instance of WP_Query
+				!($query instanceof \WP_Query) ||
+				
+				// Bail if the query is coming from the block editor's Query Loop
+				!empty($query->query_vars['queryEditor'])
+			) {
+				return;
 			}
 
-			$meta_query[] = array(
+			// Get the meta query
+			$meta_query = $query->get('meta_query');
 
-				'key'     => '_wsf_attachment_scratch',
-				'compare' => 'NOT EXISTS',
-			);
+			if(!is_array($meta_query)) {
+				$meta_query = array();
+			}
+
+			// Check if original has a 'relation' key, i.e., is a proper group
+			$has_relation = isset($meta_query['relation']);
+
+			if($has_relation) {
+
+				// Wrap both the original and new condition in an outer AND group
+				$meta_query = array(
+
+					'relation' => 'AND',
+					$meta_query, // original group (could be OR)
+					array(
+						'key'     => '_wsf_attachment_scratch',
+						'compare' => 'NOT EXISTS',
+					),
+				);
+
+			} else {
+
+				// Just append the condition
+				$meta_query[] = array(
+
+					'key'     => '_wsf_attachment_scratch',
+					'compare' => 'NOT EXISTS',
+				);
+			}
 
 			$query->set('meta_query', $meta_query);
+		}
+
+		// DropzoneJS - Filter attachment posts
+		public static function dropzonejs_filter_attachment_posts() {
+
+			if(!is_attachment()) { return; }
+
+			global $post;
+
+			if(
+				!empty($post) &&
+				is_object($post) &&
+				get_post_meta($post->ID, '_wsf_attachment_scratch', true)
+			) {
+				status_header( 404 );
+				nocache_headers();
+				include( get_404_template() );
+				exit;
+			}
 		}
 		// Get file object from URL
 		public static function get_file_object_from_url($url) {

@@ -1,9 +1,13 @@
 :root {
-  --wsf-sidebar-width: 340px;
-  --wsf-sidebar-margin: calc(var(--wsf-sidebar-width) + 1px);
-  --wp-sidebar-width: 160px;
-  --wp-sidebar-width-folded: 36px;
-  --wp-sidebar-width-mobile: 190px;
+  --wsf-admin-sidebar-width: 340px;
+  --wsf-admin-sidebar-margin: calc(var(--wsf-admin-sidebar-width) + 1px);
+  --wsf-admin-sidebar-resize-height: 80px;
+  --wsf-admin-sidebar-resize-width: 8px;
+  --wsf-admin-sidebar-width-expanded: calc(var(--wsf-admin-body-width) - var(--wsf-admin-menu-width));
+  --wsf-admin-layout-editor-width: calc(var(--wsf-admin-body-width) - var(--wsf-admin-menu-width) - var(--wsf-admin-sidebar-width));
+  --wsf-admin-popup-progress-inner-width: 298px;
+  --wsf-admin-popup-progress-inner-height: 343px;
+  --wsf-admin-popup-progress-inner-left: calc(var(--wsf-admin-menu-width) + ((var(--wsf-admin-body-width) - var(--wsf-admin-menu-width)) / 2) - (var(--wsf-admin-popup-progress-inner-width) / 2));
 }
 
 .wsf-templates {
@@ -12,7 +16,6 @@
   margin-left: -6px;
   margin-right: -6px;
 }
-
 .wsf-templates > li {
   box-sizing: border-box;
   padding-left: 6px;
@@ -21,95 +24,82 @@
   width: 100%;
   margin-bottom: 12px;
 }
-
-@media (max-width: 264px) {
-  #wsf-form-add .wsf-templates > li {
+@media (max-width : 264px) {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 100%;
     max-width: 100%;
   }
 }
-
 @media (min-width: 265px) and (max-width: 516px) {
-  #wsf-form-add .wsf-templates > li {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 50%;
     max-width: 50%;
   }
 }
-
 @media (min-width: 517px) and (max-width: 768px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%;
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%;
   }
 }
-
 @media (min-width: 769px) and (max-width: 1020px) {
-  #wsf-form-add .wsf-templates > li {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 25%;
     max-width: 25%;
   }
 }
-
 @media (min-width: 1021px) and (max-width: 1272px) {
-  #wsf-form-add .wsf-templates > li {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 20%;
     max-width: 20%;
   }
 }
-
 @media (min-width: 1273px) and (max-width: 1524px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 16.66667%;
-    max-width: 16.66667%;
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 16.6666666667%;
+    max-width: 16.6666666667%;
   }
 }
-
 @media (min-width: 1525px) and (max-width: 1776px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 14.28571%;
-    max-width: 14.28571%;
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 14.2857142857%;
+    max-width: 14.2857142857%;
   }
 }
-
 @media (min-width: 1777px) and (max-width: 2028px) {
-  #wsf-form-add .wsf-templates > li {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 12.5%;
     max-width: 12.5%;
   }
 }
-
 @media (min-width: 2029px) and (max-width: 2280px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 11.11111%;
-    max-width: 11.11111%;
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 11.1111111111%;
+    max-width: 11.1111111111%;
   }
 }
-
 @media (min-width: 2281px) and (max-width: 2532px) {
-  #wsf-form-add .wsf-templates > li {
+  #wsf-template-add .wsf-templates > li {
     flex: 0 0 10%;
     max-width: 10%;
   }
 }
-
 @media (min-width: 2533px) and (max-width: 2784px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 9.09091%;
-    max-width: 9.09091%;
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 9.0909090909%;
+    max-width: 9.0909090909%;
   }
 }
-
-@media (min-width: 2785px) {
-  #wsf-form-add .wsf-templates > li {
-    flex: 0 0 8.33333%;
-    max-width: 8.33333%;
+@media (min-width : 2785px) {
+  #wsf-template-add .wsf-templates > li {
+    flex: 0 0 8.3333333333%;
+    max-width: 8.3333333333%;
   }
 }
-
-.wsf-templates > li.wsf-pro-required .wsf-template:after {
+.wsf-templates > li.wsf-pro-required .wsf-template::after {
   background-color: #002e5f;
   color: #ffffff;
-  content: 'PRO';
+  content: "PRO";
   font-size: 10px;
   line-height: 1;
   padding: 3px 0;
@@ -121,20 +111,19 @@
           transform: rotate(45deg);
   width: 49px;
 }
-
 .wsf-templates > li.wsf-pro-required .wsf-template > svg {
-  opacity: .5;
+  opacity: 0.5;
 }
-
-.wsf-templates > li.wsf-pro-required .wsf-template:hover:after {
+.wsf-templates > li.wsf-pro-required .wsf-template:hover::after {
   background-color: #ffffff;
   color: #002e5f;
 }
-
 .wsf-templates > li.wsf-pro-required .wsf-template:hover svg {
   opacity: 1;
 }
-
+.wsf-templates > li .wsf-template {
+  background: #FFF;
+}
 .wsf-templates > li .wsf-template .wsf-template-actions {
   align-items: center;
   display: none;
@@ -145,7 +134,6 @@
   top: 0;
   width: 100%;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button,
 .wsf-templates > li .wsf-template a.wsf-button {
   background-color: #ceced2;
@@ -172,49 +160,42 @@
           user-select: none;
   vertical-align: middle;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button:hover,
 .wsf-templates > li .wsf-template a.wsf-button:hover {
-  background-color: #b3b3ba;
-  border-color: #b3b3ba;
+  background-color: rgb(179.414893617, 179.414893617, 185.585106383);
+  border-color: rgb(179.414893617, 179.414893617, 185.585106383);
   color: #000000;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button:hover:disabled,
 .wsf-templates > li .wsf-template a.wsf-button:hover:disabled {
   background-color: #ceced2;
   border-color: #ceced2;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button:focus, .wsf-templates > li .wsf-template button.wsf-button:active,
 .wsf-templates > li .wsf-template a.wsf-button:focus,
 .wsf-templates > li .wsf-template a.wsf-button:active {
-  background-color: #9999a1;
-  border-color: #9999a1;
+  background-color: rgb(152.829787234, 152.829787234, 161.170212766);
+  border-color: rgb(152.829787234, 152.829787234, 161.170212766);
   color: #000000;
   -webkit-transform: none;
           transform: none;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button:focus:disabled, .wsf-templates > li .wsf-template button.wsf-button:active:disabled,
 .wsf-templates > li .wsf-template a.wsf-button:focus:disabled,
 .wsf-templates > li .wsf-template a.wsf-button:active:disabled {
   background-color: #ceced2;
   border-color: #ceced2;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button.wsf-button-full,
 .wsf-templates > li .wsf-template a.wsf-button.wsf-button-full {
   width: calc(100% - 18px);
 }
-
 .wsf-templates > li .wsf-template button.wsf-button.wsf-button-primary,
 .wsf-templates > li .wsf-template a.wsf-button.wsf-button-primary {
   background-color: transparent;
   border-color: #ffffff;
   color: #ffffff;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button.wsf-button-primary:hover, .wsf-templates > li .wsf-template button.wsf-button.wsf-button-primary:focus,
 .wsf-templates > li .wsf-template a.wsf-button.wsf-button-primary:hover,
 .wsf-templates > li .wsf-template a.wsf-button.wsf-button-primary:focus {
@@ -222,64 +203,51 @@
   border-color: #ffffff;
   color: #002e5f;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
   overflow: visible;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button:focus {
   outline: 0;
 }
-
 .wsf-templates > li .wsf-template button.wsf-button::-moz-focus-inner {
   border: 0;
   margin: 0;
   padding: 0;
 }
-
 .wsf-templates > li .wsf-template .wsf-preview {
   color: #ffffff;
   text-decoration: none;
 }
-
 .wsf-templates > li .wsf-template .wsf-preview svg {
   display: inline-block;
   vertical-align: text-bottom;
 }
-
 .wsf-templates > li .wsf-template .wsf-preview svg path {
   fill: #ffffff;
 }
-
 .wsf-templates > li .wsf-template .wsf-preview:hover {
   text-decoration: underline;
 }
-
 .wsf-templates > li .wsf-template:hover {
   background-color: #002e5f;
   border-color: #002e5f;
 }
-
-.wsf-templates > li .wsf-template:hover:after {
+.wsf-templates > li .wsf-template:hover::after {
   background-color: #ffffff;
   color: #002e5f;
 }
-
 .wsf-templates > li .wsf-template:hover > svg rect {
   fill: #002e5f;
 }
-
 .wsf-templates > li .wsf-template:hover > svg .wsf-template-title {
   fill: #ffffff;
 }
-
 .wsf-templates > li .wsf-template:hover > svg .wsf-template-title ~ * {
   display: none;
 }
-
 .wsf-templates > li .wsf-template:hover .wsf-template-actions {
   display: flex;
 }
@@ -289,7 +257,6 @@
   overflow: hidden;
   position: relative;
 }
-
 .wsf-template > svg {
   -webkit-user-select: none;
      -moz-user-select: none;

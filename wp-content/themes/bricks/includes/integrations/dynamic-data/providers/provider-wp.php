@@ -257,6 +257,11 @@ class Provider_Wp extends Base {
 			],
 
 			// Query
+			'query_loop_index'           => [
+				'label' => esc_html__( 'Query loop index', 'bricks' ),
+				'group' => 'query',
+			],
+
 			'query_results_count'        => [
 				'label' => esc_html__( 'Query results count', 'bricks' ),
 				'group' => 'query',
@@ -288,6 +293,12 @@ class Provider_Wp extends Base {
 			'search_term_filter'         => [
 				'label' => esc_html__( 'Search term', 'bricks' ) . ' (' . esc_html__( 'Filter', 'bricks' ) . ')',
 				'group' => 'queryFilters',
+			],
+
+			// Query API - Retrieve external API response data (@since 2.1)
+			'query_api'                  => [
+				'label' => esc_html__( 'Query API', 'bricks' ),
+				'group' => 'query',
 			],
 		];
 
@@ -962,6 +973,22 @@ class Provider_Wp extends Base {
 				}
 				break;
 
+			// Query loop index (@since 2.1)
+			case 'query_loop_index':
+				// Get the current index inside a query loop
+				$query_id         = Query::is_any_looping();
+				$query_loop_index = Query::get_loop_index( $query_id );
+				$start_at         = isset( $filters['start-at'] ) && is_numeric( $filters['start-at'] ) ? intval( $filters['start-at'] ) : 0;
+				$pad              = isset( $filters['pad'] ) && is_numeric( $filters['pad'] ) ? intval( $filters['pad'] ) : 0;
+
+				$value = intval( $query_loop_index ) + $start_at;
+
+				// Add leading 0's padding
+				if ( $pad !== 0 ) {
+					$value = str_pad( $value, $pad, '0', STR_PAD_LEFT );
+				}
+				break;
+
 			case 'query_results_count':
 			case 'query_results_count_filter':
 				// Get the results count from query_history, not supporting nested queries (@since 1.9.1)
@@ -1046,6 +1073,55 @@ class Provider_Wp extends Base {
 						$value = $count;
 					}
 				}
+				break;
+
+			// @since 2.1
+			case 'query_api':
+				// Get the loop object from Query
+				$is_any_looping = Query::is_any_looping();
+				$loop_object    = Query::get_loop_object( $is_any_looping );
+
+				// If the loop object is not set, return empty string
+				if ( ! $loop_object ) {
+					return '';
+				}
+
+				// Check the "key" filter, maybe it is zero '0'
+				$data_key = $filters['key'] ?? '';
+
+				if ( $data_key !== '' ) {
+					// data_key might have pipe sign = get data from nested object
+					// e.g. {query_api @key:'title|rendered'}
+					if ( strpos( $data_key, '|' ) !== false ) {
+						// Split the data_key by pipe sign
+						$data_keys = explode( '|', $data_key );
+						$value     = $loop_object;
+
+						foreach ( $data_keys as $key ) {
+							if ( is_array( $value ) && isset( $value[ $key ] ) ) {
+								$value = $value[ $key ];
+							} elseif ( is_object( $value ) && isset( $value->$key ) ) {
+								$value = $value->$key;
+							} else {
+								$value = '';
+								break;
+							}
+						}
+					} elseif ( is_array( $loop_object ) && isset( $loop_object[ $data_key ] ) ) {
+						// Get the value from the loop object array
+						$value = $loop_object[ $data_key ];
+					} elseif ( is_object( $loop_object ) && isset( $loop_object->$data_key ) ) {
+						// Get the value from the loop object object
+						$value = $loop_object->$data_key;
+					} else {
+						// Return error if data_key not found
+						$value = '';
+					}
+				} else {
+					// Return the whole loop object as JSON
+					$value = '';
+				}
+
 				break;
 		}
 
@@ -1559,17 +1635,18 @@ class Provider_Wp extends Base {
 		$object           = null;
 
 		if ( ! empty( $looping_query_id ) ) {
-			$object           = $looping_object = Query::get_loop_object( $looping_query_id );
+			$looping_object   = Query::get_loop_object( $looping_query_id );
+			$object           = ! empty( $looping_object ) ? $looping_object : null;
 			$loop_object_type = Query::get_loop_object_type( $looping_query_id );
 		}
 
-		// Is taxonomy archive (check again is_tax() not working inside Posts element in archive template @since 1.7.2)
+		// Is taxonomy archive (check again is_tax() not working inside Posts element in archive template)
 		if ( ! $object ) {
 			$object = get_queried_object();
 		}
 
 		/**
-		 * term_xx DD unable to parse correctly based on populate content (@since 1.9.5)
+		 * DD term_xx is unable to parse correctly based on populate content
 		 * History tasks: (#86bw6re4w, #86bx6wxxm)
 		 */
 		if ( Helpers::is_bricks_preview() && ! Query::is_looping() ) {

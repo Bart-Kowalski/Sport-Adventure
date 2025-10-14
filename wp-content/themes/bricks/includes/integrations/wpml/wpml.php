@@ -87,6 +87,17 @@ class Wpml {
 		add_action( 'bricks/render_query_result/start', [ $this, 'wpml_get_term_adjust_id' ] );
 		add_action( 'bricks/render_query_page/start', [ $this, 'wpml_get_term_adjust_id' ] );
 		add_action( 'bricks/render_popup_content/start', [ $this, 'wpml_get_term_adjust_id' ] );
+
+		/**
+		 * Component translation support using WPML String Packages
+		 *
+		 * @since 2.1
+		 */
+		// Declare string package kind for components
+		add_filter( 'wpml_active_string_package_kinds', [ $this, 'declare_component_string_package_kind' ] );
+
+		// Register component strings when components are saved
+		add_action( 'update_option_' . BRICKS_DB_COMPONENTS, [ $this, 'register_components_string_packages' ], 10, 2 );
 	}
 
 	/**
@@ -327,12 +338,12 @@ class Wpml {
 	/**
 	 * Traverse the tree and process each element in a depth-first manner.
 	 *
-	 * @param array             $elements
-	 * @param \WP_Post|stdClass $post
+	 * @param array                   $elements
+	 * @param \WP_Post|stdClass|array $post_or_package Post object for regular elements, package array for components.
 	 *
 	 * @since 1.10.2
 	 */
-	private function traverse_elements_tree( $elements, $post ) {
+	private function traverse_elements_tree( $elements, $post_or_package ) {
 		if ( ! is_array( $elements ) ) {
 			\Bricks\Helpers::maybe_log( 'Bricks: Invalid elements provided to traverse_elements_tree' );
 			return;
@@ -345,21 +356,26 @@ class Wpml {
 			}
 
 			// Process the current element
-			$this->process_element( $element, $post );
+			$this->process_element( $element, $post_or_package );
 
 			// Recursively process children
 			if ( ! empty( $element['children'] ) && is_array( $element['children'] ) ) {
-				$this->traverse_elements_tree( $element['children'], $post );
+				$this->traverse_elements_tree( $element['children'], $post_or_package );
 			}
 		}
 	}
 
-	private function process_element( $element, $post ) {
+	private function process_element( $element, $post_or_package ) {
 		$element_name     = ! empty( $element['name'] ) ? $element['name'] : false;
 		$element_settings = ! empty( $element['settings'] ) ? $element['settings'] : false;
 		$element_config   = Elements::get_element( [ 'name' => $element_name ] );
 		$element_controls = ! empty( $element_config['controls'] ) ? $element_config['controls'] : false;
 		$element_label    = ! empty( $element_config['label'] ) ? $element_config['label'] : $element_name;
+
+		// Handle component properties (@since 2.1)
+		if ( isset( $element['cid'] ) && isset( $element['properties'] ) && is_array( $element['properties'] ) ) {
+			$this->process_component_properties( $element, $post_or_package );
+		}
 
 		if ( ! $element_settings || ! $element_name || ! is_array( $element_controls ) ) {
 			return;
@@ -369,11 +385,57 @@ class Wpml {
 
 		// Loop over element controls to get translatable settings
 		foreach ( $element_controls as $key => $control ) {
-			$this->process_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post );
+			$this->process_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post_or_package );
 		}
 	}
 
-	private function process_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post ) {
+	/**
+	 * Process component properties for translation
+	 *
+	 * @param array                   $element The element containing component properties.
+	 * @param \WP_Post|stdClass|array $post_or_package The post object or package data.
+	 *
+	 * @since 2.1
+	 */
+	private function process_component_properties( $element, $post_or_package ) {
+		if ( ! isset( $element['id'] ) || ! isset( $element['cid'] ) || ! isset( $element['properties'] ) ) {
+			return;
+		}
+
+		$element_id    = $element['id'];
+		$component_id  = $element['cid'];
+		$properties    = $element['properties'];
+		$element_label = "Component Instance (CID: $component_id)";
+
+		foreach ( $properties as $property_key => $property_value ) {
+			// Handle direct text/HTML strings (text & textarea properties)
+			if ( is_string( $property_value ) && ! empty( $property_value ) ) {
+				$string_id = "{$element_id}_prop_{$property_key}";
+				$this->register_wpml_string( $property_value, $string_id, $element_label, $post_or_package );
+			}
+
+			// Handle objects with URLs (link property)
+			elseif ( is_array( $property_value ) ) {
+				// Handle link-type properties
+				if ( isset( $property_value['url'] ) && is_string( $property_value['url'] ) && ! empty( $property_value['url'] ) ) {
+					$string_id = "{$element_id}_prop_{$property_key}_url";
+					$this->register_wpml_string( $property_value['url'], $string_id, $element_label, $post_or_package );
+				}
+
+				// Handle image galleries or image properties
+				if ( isset( $property_value['images'] ) && is_array( $property_value['images'] ) ) {
+					foreach ( $property_value['images'] as $index => $image ) {
+						if ( isset( $image['url'] ) && is_string( $image['url'] ) && ! empty( $image['url'] ) ) {
+							$string_id = "{$element_id}_prop_{$property_key}_image_{$index}_url";
+							$this->register_wpml_string( $image['url'], $string_id, $element_label, $post_or_package );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private function process_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post_or_package ) {
 		$control_type = ! empty( $control['type'] ) ? $control['type'] : false;
 
 		if ( ! in_array( $control_type, $translatable_control_types ) ) {
@@ -390,7 +452,7 @@ class Wpml {
 		$string_value = ! empty( $element_settings[ $key ] ) ? $element_settings[ $key ] : '';
 
 		if ( $control_type == 'repeater' && isset( $control['fields'] ) ) {
-			$this->process_repeater_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post );
+			$this->process_repeater_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post_or_package );
 			return;
 		}
 
@@ -404,10 +466,10 @@ class Wpml {
 		}
 
 		$string_id = "{$element['id']}_$key"; // Set WPML string ID to "$element_id-$setting_key"
-		$this->register_wpml_string( $string_value, $string_id, $element_label, $post, $control_type );
+		$this->register_wpml_string( $string_value, $string_id, $element_label, $post_or_package, $control_type );
 	}
 
-	private function process_repeater_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post ) {
+	private function process_repeater_control( $key, $control, $element_settings, $element, $element_label, $translatable_control_types, $post_or_package ) {
 		$repeater_items = ! empty( $element_settings[ $key ] ) ? $element_settings[ $key ] : [];
 
 		if ( is_array( $repeater_items ) ) {
@@ -433,7 +495,7 @@ class Wpml {
 
 						$string_id = "{$element['id']}_{$key}_{$repeater_index}_{$repeater_key}";
 
-						$this->register_wpml_string( $string_value, $string_id, $element_label, $post );
+						$this->register_wpml_string( $string_value, $string_id, $element_label, $post_or_package );
 					}
 				}
 			}
@@ -443,7 +505,7 @@ class Wpml {
 	/**
 	 * Helper function to register a string for translation in WPML
 	 */
-	private function register_wpml_string( $string_value, $string_id, $element_label, $post, $control_type = null ) {
+	private function register_wpml_string( $string_value, $string_id, $element_label, $post_or_package, $control_type = null ) {
 		if ( ! $string_value ) {
 			return;
 		}
@@ -457,19 +519,20 @@ class Wpml {
 			$string_type = 'LINE'; // 'LINE', 'TEXTAREA', 'VISUAL'
 		}
 
-		$package_data = [
-			'kind'    => $this->wpml_identifier,
-			'name'    => $post->ID,
-			'post_id' => $post->ID,
-			'title'   => "Bricks (ID {$post->ID})",
-		];
+		// Handle both post objects and package arrays
+		if ( is_array( $post_or_package ) ) {
+			// This is a component package
+			$package_data = $post_or_package;
+		} else {
+			// This is a regular post object
+			$package_data = [
+				'kind'    => $this->wpml_identifier,
+				'name'    => $post_or_package->ID,
+				'post_id' => $post_or_package->ID,
+				'title'   => "Bricks (ID {$post_or_package->ID})",
+			];
+		}
 
-		/**
-		 * First, we need to extract the text content and register it as package strings.
-		 * We use the term "package" because these strings belong to the post and the package is the entity that groups these strings.
-		 *
-		 * https://wpml.org/wpml-hook/wpml_register_string/
-		 */
 		do_action( 'wpml_register_string', $string_value, $string_id, $package_data, $string_title, $string_type );
 	}
 
@@ -580,6 +643,31 @@ class Wpml {
 			}
 
 			if ( ! $element_id || ! $setting_key ) {
+				continue;
+			}
+
+			// Check if this is a component property translation
+			if ( $setting_key === 'prop' && count( $string_parts ) >= 3 ) {
+				$property_key = $string_parts[2];
+
+				// Handle property URL
+				if ( count( $string_parts ) >= 4 && $string_parts[3] === 'url' ) {
+					foreach ( $bricks_elements as $index => $element ) {
+						if ( $element['id'] === $element_id && isset( $element['properties'][ $property_key ] ) && isset( $translation[ $lang ]['value'] ) ) {
+							$bricks_elements[ $index ]['properties'][ $property_key ]['url'] = $translation[ $lang ]['value'];
+						}
+					}
+				}
+
+				// Handle simple property value (text & textarea properties)
+				else {
+					foreach ( $bricks_elements as $index => $element ) {
+						if ( $element['id'] === $element_id && isset( $element['properties'] ) && isset( $translation[ $lang ]['value'] ) ) {
+							$bricks_elements[ $index ]['properties'][ $property_key ] = $translation[ $lang ]['value'];
+						}
+					}
+				}
+
 				continue;
 			}
 
@@ -995,5 +1083,383 @@ class Wpml {
 		if ( $sitepress->get_setting( 'auto_adjust_ids' ) ) {
 			add_filter( 'get_term', [ $sitepress, 'get_term_adjust_id' ], 1, 1 );
 		}
+	}
+
+	/**
+	 * Register component strings for translation when components are saved
+	 *
+	 * @param mixed $old_value The old option value.
+	 * @param mixed $value     The new option value.
+	 *
+	 * @since 2.1
+	 */
+	public function register_components_string_packages( $old_value, $value ) {
+		if ( ! is_array( $value ) || empty( $value ) ) {
+			return;
+		}
+
+		// Register each component as its own package with unique name
+		foreach ( $value as $component ) {
+			if ( ! isset( $component['id'] ) ) {
+				continue;
+			}
+
+			$component_id   = $component['id'];
+			$component_name = $component['name'] ?? "Component $component_id";
+
+			// Create unique package for this component
+			$package = [
+				'kind'      => 'Bricks components',
+				'kind_slug' => 'bricks-components',
+				'name'      => $component_id,
+				'title'     => $component_name,
+			];
+
+			// Start string package registration for this component
+			do_action( 'wpml_start_string_package_registration', $package );
+
+			// Process component elements if they exist
+			if ( isset( $component['elements'] ) && is_array( $component['elements'] ) ) {
+				// Build the elements tree and traverse it
+				$elements_tree = \Bricks\Helpers::build_elements_tree( $component['elements'] );
+				$this->traverse_elements_tree( $elements_tree, $package );
+			}
+
+			// Process component properties defaults if they exist
+			if ( isset( $component['properties'] ) && is_array( $component['properties'] ) ) {
+				$this->process_component_properties_defaults( $component['properties'], $package );
+			}
+
+			// End string package registration and cleanup unused strings
+			do_action( 'wpml_delete_unused_package_strings', $package );
+		}
+	}
+
+	/**
+	 * Process component properties default values for translation
+	 *
+	 * @param array $properties The component properties array.
+	 * @param array $package    The string package data.
+	 *
+	 * @since 2.1
+	 */
+	private function process_component_properties_defaults( $properties, $package ) {
+		foreach ( $properties as $property ) {
+			if ( ! isset( $property['id'] ) || ! isset( $property['type'] ) ) {
+				continue;
+			}
+
+			$property_id    = $property['id'];
+			$property_type  = $property['type'];
+			$property_label = $property['label'] ?? "Property $property_id";
+			$default_value  = $property['default'] ?? null;
+
+			if ( ! $default_value ) {
+				continue;
+			}
+
+			switch ( $property_type ) {
+				case 'text':
+					if ( is_string( $default_value ) && ! empty( $default_value ) ) {
+						$string_name = "property_{$property_id}_default";
+						do_action( 'wpml_register_string', $default_value, $string_name, $package, $property_label, 'LINE' );
+					}
+					break;
+
+				case 'editor':
+					if ( is_string( $default_value ) && ! empty( $default_value ) ) {
+						$string_name = "property_{$property_id}_default";
+						do_action( 'wpml_register_string', $default_value, $string_name, $package, $property_label, 'TEXTAREA' );
+					}
+					break;
+
+				case 'image':
+					if ( is_array( $default_value ) && isset( $default_value['url'] ) && ! empty( $default_value['url'] ) ) {
+						$string_name = "property_{$property_id}_default_url";
+						do_action( 'wpml_register_string', $default_value['url'], $string_name, $package, $property_label, 'LINE' );
+					}
+					break;
+
+				case 'image-gallery':
+					if ( is_array( $default_value ) && isset( $default_value['images'] ) && is_array( $default_value['images'] ) ) {
+						foreach ( $default_value['images'] as $index => $image ) {
+							if ( isset( $image['url'] ) && ! empty( $image['url'] ) ) {
+								$string_name = "property_{$property_id}_default_image_{$index}_url";
+								do_action( 'wpml_register_string', $image['url'], $string_name, $package, $property_label, 'LINE' );
+							}
+						}
+					}
+					break;
+
+				case 'link':
+					if ( is_array( $default_value ) && isset( $default_value['type'] ) && $default_value['type'] === 'external' && isset( $default_value['url'] ) && ! empty( $default_value['url'] ) ) {
+						$string_name = "property_{$property_id}_default_url";
+						do_action( 'wpml_register_string', $default_value['url'], $string_name, $package, $property_label, 'LINE' );
+					}
+					break;
+
+				case 'select':
+					if ( isset( $property['options'] ) && is_array( $property['options'] ) ) {
+						foreach ( $property['options'] as $option_index => $option ) {
+							if ( isset( $option['label'] ) && ! empty( $option['label'] ) ) {
+								$string_name = "property_{$property_id}_option_{$option_index}_label";
+								do_action( 'wpml_register_string', $option['label'], $string_name, $package, $property_label, 'LINE' );
+							}
+							if ( isset( $option['value'] ) && ! empty( $option['value'] ) ) {
+								$string_name = "property_{$property_id}_option_{$option_index}_value";
+								do_action( 'wpml_register_string', $option['value'], $string_name, $package, $property_label, 'LINE' );
+							}
+						}
+					}
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Declare string package kind for components
+	 *
+	 * @param array $active_string_package_kinds
+	 * @return array
+	 *
+	 * @since 2.1
+	 */
+	public function declare_component_string_package_kind( $active_string_package_kinds ) {
+		$active_string_package_kinds['bricks-components'] = [
+			'title'  => 'Bricks Components',
+			'slug'   => 'bricks-components',
+			'plural' => 'Bricks Components',
+		];
+
+		return $active_string_package_kinds;
+	}
+
+	/**
+	 * Translate a component on-the-fly using WPML string translations
+	 *
+	 * @param array $component The component to translate.
+	 * @return array The component with translated strings.
+	 *
+	 * @since 2.1
+	 */
+	public static function get_translated_component( $component ) {
+		$current_language = self::get_current_language();
+		$default_language = apply_filters( 'wpml_default_language', null );
+
+		// Return original if current language is default or not set
+		if ( ! $current_language || $current_language === $default_language ) {
+			return $component;
+		}
+
+		// Each component has its own package with unique name
+		if ( ! isset( $component['id'] ) ) {
+			return $component;
+		}
+
+		$component_id   = $component['id'];
+		$component_name = $component['name'] ?? "Component $component_id";
+
+		// Create the package data for translation lookups
+		$package = [
+			'kind'      => 'Bricks components',
+			'kind_slug' => 'bricks-components',
+			'name'      => $component_id,
+			'title'     => $component_name,
+		];
+
+		$translated_component = $component;
+
+		// Translate component elements if they exist
+		if ( isset( $component['elements'] ) && is_array( $component['elements'] ) ) {
+			$translated_component['elements'] = self::get_translated_elements( $component['elements'], $package );
+		}
+
+		// Translate component properties defaults if they exist
+		if ( isset( $component['properties'] ) && is_array( $component['properties'] ) ) {
+			$translated_component['properties'] = self::get_translated_component_properties( $component['properties'], $package );
+		}
+
+		return $translated_component;
+	}
+
+	/**
+	 * Translate component elements on-the-fly
+	 *
+	 * @param array $elements The elements to translate.
+	 * @param array $package  The WPML package data.
+	 * @return array The translated elements.
+	 *
+	 * @since 2.1
+	 */
+	private static function get_translated_elements( $elements, $package ) {
+		if ( ! is_array( $elements ) ) {
+			return $elements;
+		}
+
+		foreach ( $elements as &$element ) {
+			if ( ! isset( $element['id'] ) ) {
+				continue;
+			}
+
+			// Translate element settings
+			if ( isset( $element['settings'] ) && is_array( $element['settings'] ) ) {
+				foreach ( $element['settings'] as $setting_key => $setting_value ) {
+					if ( is_string( $setting_value ) && ! empty( $setting_value ) ) {
+						$string_id        = "{$element['id']}_{$setting_key}";
+						$translated_value = apply_filters( 'wpml_translate_string', $setting_value, $string_id, $package );
+
+						if ( $translated_value !== $setting_value ) {
+							$element['settings'][ $setting_key ] = $translated_value;
+						}
+					}
+					// Handle link settings (URL translation)
+					elseif ( is_array( $setting_value ) && isset( $setting_value['url'] ) && ! empty( $setting_value['url'] ) ) {
+						$string_id      = "{$element['id']}_{$setting_key}_url";
+						$translated_url = apply_filters( 'wpml_translate_string', $setting_value['url'], $string_id, $package );
+
+						if ( $translated_url !== $setting_value['url'] ) {
+							$element['settings'][ $setting_key ]['url'] = $translated_url;
+						}
+					}
+					// Handle repeater settings
+					elseif ( is_array( $setting_value ) ) {
+						foreach ( $setting_value as $repeater_index => $repeater_item ) {
+							if ( is_array( $repeater_item ) ) {
+								foreach ( $repeater_item as $repeater_key => $repeater_value ) {
+									if ( is_string( $repeater_value ) && ! empty( $repeater_value ) ) {
+										$string_id        = "{$element['id']}_{$setting_key}_{$repeater_index}_{$repeater_key}";
+										$translated_value = apply_filters( 'wpml_translate_string', $repeater_value, $string_id, $package );
+										if ( $translated_value !== $repeater_value ) {
+											$element['settings'][ $setting_key ][ $repeater_index ][ $repeater_key ] = $translated_value;
+										}
+									}
+									// Handle link in repeater
+									elseif ( is_array( $repeater_value ) && isset( $repeater_value['url'] ) && ! empty( $repeater_value['url'] ) ) {
+										$string_id      = "{$element['id']}_{$setting_key}_{$repeater_index}_{$repeater_key}_url";
+										$translated_url = apply_filters( 'wpml_translate_string', $repeater_value['url'], $string_id, $package );
+										if ( $translated_url !== $repeater_value['url'] ) {
+											$element['settings'][ $setting_key ][ $repeater_index ][ $repeater_key ]['url'] = $translated_url;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Handle component properties (for component instances)
+			if ( isset( $element['properties'] ) && is_array( $element['properties'] ) ) {
+				foreach ( $element['properties'] as $property_key => $property_value ) {
+					if ( is_string( $property_value ) && ! empty( $property_value ) ) {
+						$string_id        = "{$element['id']}_prop_{$property_key}";
+						$translated_value = apply_filters( 'wpml_translate_string', $property_value, $string_id, $package );
+						if ( $translated_value !== $property_value ) {
+							$element['properties'][ $property_key ] = $translated_value;
+						}
+					}
+					// Handle link-type properties
+					elseif ( is_array( $property_value ) && isset( $property_value['url'] ) && ! empty( $property_value['url'] ) ) {
+						$string_id      = "{$element['id']}_prop_{$property_key}_url";
+						$translated_url = apply_filters( 'wpml_translate_string', $property_value['url'], $string_id, $package );
+						if ( $translated_url !== $property_value['url'] ) {
+							$element['properties'][ $property_key ]['url'] = $translated_url;
+						}
+					}
+				}
+			}
+
+			// Recursively translate children
+			if ( isset( $element['children'] ) && is_array( $element['children'] ) ) {
+				$element['children'] = self::get_translated_elements( $element['children'], $package );
+			}
+		}
+
+		return $elements;
+	}
+
+	/**
+	 * Translate component properties defaults on-the-fly
+	 *
+	 * @param array $properties The properties to translate.
+	 * @param array $package    The WPML package data.
+	 * @return array The translated properties.
+	 *
+	 * @since 2.1
+	 */
+	private static function get_translated_component_properties( $properties, $package ) {
+		if ( ! is_array( $properties ) ) {
+			return $properties;
+		}
+
+		foreach ( $properties as &$property ) {
+			if ( ! isset( $property['id'] ) || ! isset( $property['type'] ) ) {
+				continue;
+			}
+
+			$property_id   = $property['id'];
+			$property_type = $property['type'];
+			$default_value = $property['default'] ?? null;
+
+			if ( ! $default_value ) {
+				continue;
+			}
+
+			switch ( $property_type ) {
+				case 'text':
+				case 'editor':
+					if ( is_string( $default_value ) && ! empty( $default_value ) ) {
+						$string_id        = "property_{$property_id}_default";
+						$translated_value = apply_filters( 'wpml_translate_string', $default_value, $string_id, $package );
+						if ( $translated_value !== $default_value ) {
+							$property['default'] = $translated_value;
+						}
+					}
+					break;
+
+				case 'image':
+					if ( is_array( $default_value ) && isset( $default_value['url'] ) && ! empty( $default_value['url'] ) ) {
+						$string_id      = "property_{$property_id}_default_url";
+						$translated_url = apply_filters( 'wpml_translate_string', $default_value['url'], $string_id, $package );
+						if ( $translated_url !== $default_value['url'] ) {
+							$property['default']['url'] = $translated_url;
+						}
+					}
+					break;
+
+				case 'link':
+					if ( is_array( $default_value ) && isset( $default_value['url'] ) && ! empty( $default_value['url'] ) ) {
+						$string_id      = "property_{$property_id}_default_url";
+						$translated_url = apply_filters( 'wpml_translate_string', $default_value['url'], $string_id, $package );
+						if ( $translated_url !== $default_value['url'] ) {
+							$property['default']['url'] = $translated_url;
+						}
+					}
+					break;
+
+				case 'select':
+					if ( isset( $property['options'] ) && is_array( $property['options'] ) ) {
+						foreach ( $property['options'] as $option_index => $option ) {
+							if ( isset( $option['label'] ) && ! empty( $option['label'] ) ) {
+								$string_id        = "property_{$property_id}_option_{$option_index}_label";
+								$translated_label = apply_filters( 'wpml_translate_string', $option['label'], $string_id, $package );
+								if ( $translated_label !== $option['label'] ) {
+									$property['options'][ $option_index ]['label'] = $translated_label;
+								}
+							}
+							if ( isset( $option['value'] ) && ! empty( $option['value'] ) ) {
+								$string_id        = "property_{$property_id}_option_{$option_index}_value";
+								$translated_value = apply_filters( 'wpml_translate_string', $option['value'], $string_id, $package );
+								if ( $translated_value !== $option['value'] ) {
+									$property['options'][ $option_index ]['value'] = $translated_value;
+								}
+							}
+						}
+					}
+					break;
+			}
+		}
+
+		return $properties;
 	}
 }

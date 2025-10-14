@@ -3,17 +3,20 @@
 	'use strict';
 
 	// Google Routing
-	$.WS_Form.prototype.form_google_route = function() {
+	$.WS_Form.prototype.form_google_route = async function() {
 
 		var ws_this = this;
+
+		// Wait for Google Maps JS API to load
+		if(await this.form_google_maps_js_api_await('googleroute') === false) { return false; }
+
+		// Import libraries
+		await this.form_google_maps_js_api_import_libraries('googleroute');
 
 		// Get Google Address field objects
 		var google_route_objects = $('[data-google-distance]:not([data-init-google-route])', this.form_canvas_obj);
 		var google_route_objects_count = google_route_objects.length;
 		if(!google_route_objects_count) { return false;}
-
-		// Google API Init
-		if(!this.form_google_maps_api_init()) { return false; };
 
 		// Run through each autocomplete object
 		google_route_objects.each(function() {
@@ -74,31 +77,6 @@
 
 		// Reposition flag
 		google_route.reposition = true;
-
-		// Timeout check
-		if(typeof(total_ms_start) === 'undefined') { total_ms_start = new Date().getTime(); }
-		if((new Date().getTime() - total_ms_start) > this.timeout_google_maps) {
-
-			this.error('error_timeout_google_maps');
-			return false;
-		}
-
-		// Check Google Maps elements have loaded (These checks exist in case Google Maps is loaded by a third party component)
-		if(
-			window.google &&
-			window.google.map &&
-			window.google.maps.DirectionsService
-		) {
-			wsf_google_maps_loaded = true;
-		}
-
-		// Check to see if Google Maps loaded
-		if(!wsf_google_maps_loaded) {
-
-			setTimeout(function() { ws_this.google_route_process(google_route, total_ms_start); }, this.timeout_interval);
-
-			return false;
-		}
 
 		if(
 			// Check original and destination
@@ -454,14 +432,17 @@
 								}
 							}
 
+							// Get section repeatable index
+							var section_repeatable_suffix = ws_this.get_section_repeatable_suffix($(obj));
+
 							// Set Google Map
 							if(
 								(google_route.map_field_id != '') &&
-								(typeof(ws_this.google_maps[google_route.map_field_id]) !== 'undefined')
+								(typeof(ws_this.google_maps[google_route.map_field_id + section_repeatable_suffix]) !== 'undefined')
 							) {
 
 								// Get Google Map
-								var google_map = ws_this.google_maps[google_route.map_field_id];
+								var google_map = ws_this.google_maps[google_route.map_field_id + section_repeatable_suffix];
 
 								// Init directions renderer
 								ws_this.google_map_directions_renderer_init(google_map);

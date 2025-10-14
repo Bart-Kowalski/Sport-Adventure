@@ -14,17 +14,8 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Terms', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving Terms...', 'ws-form');
-
 			// ACF
 			$this->acf_activated = class_exists('ACF');
-
-			// Register action
-			parent::register($this);
 
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
@@ -34,6 +25,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Terms', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving Terms...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -118,9 +124,9 @@
 				'term_id',
 				'name',
 				'slug',
-				'menu_order',
+				'term_order',
 
-			))) { return self::error(__('Invalid order by method'), $field_id, $this, $api_request); }
+			))) { return self::error(__('Invalid order by method', 'ws-form'), $field_id, $this, $api_request); }
 
 			// Columns
 			$columns = array();
@@ -634,7 +640,7 @@
 					'placeholder'				=>	'#post_id',
 					'help'						=>	sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Choose the post ID to filter by. This can be a number or %s variable. If blank, the ID of the post the form is shown on will be used.', 'ws-form'),
 
 						WS_FORM_NAME_GENERIC
@@ -674,7 +680,7 @@
 						array('value' => 'term_id', 'text' => 'ID'),
 						array('value' => 'name', 'text' => 'Name'),
 						array('value' => 'slug', 'text' => 'Slug'),
-						array('value' => 'menu_order', 'text' => 'Menu Order')
+						array('value' => 'term_order', 'text' => 'Term Order')
 					)
 				),
 
@@ -861,7 +867,7 @@
 					'label'						=>	__('ACF Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	$options_acf,
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 

@@ -61,7 +61,11 @@ class Webhook extends Base {
 			// Add custom headers if provided
 			if ( ! empty( $webhook['headers'] ) ) {
 				try {
-					$custom_headers = json_decode( $webhook['headers'], true );
+					$custom_headers = $webhook['headers'];
+					$custom_headers = $form->render_data( $custom_headers ); // Render dynamic data (@since 2.1)
+
+					$custom_headers = json_decode( $custom_headers, true );
+
 					if ( is_array( $custom_headers ) ) {
 						foreach ( $custom_headers as $header => $value ) {
 							$header = sanitize_key( $header );

@@ -248,24 +248,35 @@
 	}
 
 	// Form Progress - Tabs
-	$.WS_Form.prototype.form_progress_tabs = function(group_index) {
+	$.WS_Form.prototype.form_progress_tabs = function() {
 
 		var ws_this = this;
 
-		var progress_objs = $('[data-source="tab_progress"]', this.form_canvas_obj);
-		if(progress_objs.length) {
+		var tabs = $('.wsf-group-tabs', this.form_canvas_obj).children(':not([data-wsf-group-hidden])');
 
-			var group_count = $('.wsf-group-tabs', this.form_canvas_obj).children(':not([data-wsf-group-hidden])').length;
+		var group_count = tabs.length;
 
-			progress_objs.each(function() {
+		// Get selector href
+		var class_active = (typeof(this.framework.tabs.public.class_active) !== 'undefined') ? this.framework.tabs.public.class_active : 'active';
 
-				// Get progress value
-				var progress_value = (parseInt(group_index) + 1) / group_count;
+		// Work out which tab number we are on
+		var group_number = 1;
+		tabs.each(function() {
 
-				// Set progress fields
-				ws_this.form_progress_set_value($(this), progress_value);
-			});
-		}
+			if($(this).hasClass(class_active)) { return false; }
+
+			group_number++;
+		});
+
+		// Get progress value
+		var progress_value = (group_number / group_count);
+
+		// Update progress fields
+		$('[data-source="tab_progress"]', this.form_canvas_obj).each(function() {
+
+			// Set progress fields
+			ws_this.form_progress_set_value($(this), progress_value);
+		});
 	}
 
 	// Form Progress - Reset progress fields configure to use post progress

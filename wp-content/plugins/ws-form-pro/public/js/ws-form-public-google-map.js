@@ -2,18 +2,21 @@
 
 	'use strict';
 
-	// Google Map
-	$.WS_Form.prototype.form_google_map = function() {
+	// Google map
+	$.WS_Form.prototype.form_google_map = async function() {
 
 		var ws_this = this;
+
+		// Wait for Google Maps JS API to load
+		if(await this.form_google_maps_js_api_await('googlemap') === false) { return false; }
+
+		// Import libraries
+		await this.form_google_maps_js_api_import_libraries('googlemap');
 
 		// Get Google Map objects
 		var google_map_objects = $('[data-google-map]:not([data-init-google-map])', this.form_canvas_obj);
 		var google_map_objects_count = google_map_objects.length;
 		if(!google_map_objects_count) { return false;}
-
-		// Google API Init
-		if(!this.form_google_maps_api_init()) { return false; };
 
 		// Reset Google Maps arrays
 		this.google_maps = [];
@@ -115,47 +118,23 @@
 			google_map.control_street_view = (ws_this.get_object_meta_value(field, 'google_map_control_street_view', 'on') !== '');
 			google_map.control_zoom = (ws_this.get_object_meta_value(field, 'google_map_control_zoom', 'on') !== '');
 
+			// Get section repeatable index
+			var section_repeatable_suffix = ws_this.get_section_repeatable_suffix($(google_map.obj));
+
 			// Add to google_map array
-			ws_this.google_maps[field_id] = google_map;
+			ws_this.google_maps[field_id + section_repeatable_suffix] = google_map;
 
 			ws_this.google_map_process(google_map);
 		});
 	}
 
-	// Wait until Google Maps loaded, then process
+	// Google map - Process
 	$.WS_Form.prototype.google_map_process = function(google_map, total_ms_start) {
 
 		var ws_this = this;
 
 		// Reposition flag
 		google_map.reposition = true;
-
-		// Timeout check
-		if(typeof(total_ms_start) === 'undefined') { total_ms_start = new Date().getTime(); }
-		if((new Date().getTime() - total_ms_start) > this.timeout_google_maps) {
-
-			this.error('error_timeout_google_maps');
-			return false;
-		}
-
-		// Check Google Maps elements have loaded (These checks exist in case Google Maps is loaded by a third party component)
-		if(
-			window.google &&
-			window.google.maps &&
-			window.google.maps.Map &&
-			window.google.maps.marker &&
-			window.google.maps.marker.AdvancedMarkerElement
-		) {
-			wsf_google_maps_loaded = true;
-		}
-
-		// Check to see if Google Maps loaded
-		if(!wsf_google_maps_loaded) {
-
-			setTimeout(function() { ws_this.google_map_process(google_map, total_ms_start); }, this.timeout_interval);
-
-			return false;
-		}
 
 		// Save default value
 		google_map.obj.attr('data-default-value', google_map.obj.val());
@@ -232,30 +211,58 @@
 				'map_type_id' : google_map.map.getMapTypeId(),
 			}
 
-			if(typeof(place) !== 'undefined') {
+			if(place) {
 
 				// Place ID
-				field_value_obj.place_id = (typeof(place.place_id) ? place.place_id : '');
+				field_value_obj.place_id = (place.place_id ? place.place_id : '');
+
+				// Plus codes
+				if(place.plus_code) {
+
+					field_value_obj.plus_code_compound_code = (place.plus_code.compound_code ? place.plus_code.compound_code : '');
+					field_value_obj.plus_code_global_code = (place.plus_code.global_code ? place.plus_code.global_code : '');
+				}
 
 				// Address
-				field_value_obj.address = (typeof(place.formatted_address) ? place.formatted_address : '');
+				field_value_obj.address = (place.formatted_address ? place.formatted_address : '');
 
 				// Name
-				field_value_obj.name = (typeof(place.name) ? place.name : '');
+				field_value_obj.name = (place.name ? place.name : '');
 
-				if(typeof(place.address_components) !== 'undefined') {
+				if(place.address_components) {
 
 					place.address_components.forEach(function(address_component) {
 
 						var types = address_component.types;
 
+						// Street number
+						if(types.indexOf('street_number') !== -1) { field_value_obj.street_number = address_component.long_name; }
+
+						// Street name - Long / short
+						if(types.indexOf('route') !== -1) {
+
+							field_value_obj.street_name = address_component.long_name;
+							field_value_obj.street_name_short = address_component.short_name;
+						}
+
 						// City
 						if(types.indexOf('locality') !== -1) { field_value_obj.city = address_component.long_name; }
 
-						// State
-						if(types.indexOf('administrative_area_level_1') !== -1) { field_value_obj.state = address_component.long_name; }
+						// State - Long / short
+						if(types.indexOf('administrative_area_level_1') !== -1) {
 
-						// Country Short / Long
+							field_value_obj.state = address_component.long_name;
+							field_value_obj.state_short = address_component.short_name;
+						}
+
+						// Postal code - Long / short
+						if(types.indexOf('postal_code') !== -1) {
+
+							field_value_obj.post_code = address_component.long_name;
+							field_value_obj.post_code_short = address_component.short_name;
+						}
+
+						// Country - Long / short
 						if(types.indexOf('country') !== -1) {
 
 							field_value_obj.country = address_component.long_name;
@@ -440,6 +447,8 @@
 				field_value_obj.zoom = google_map.map.getZoom();
 				google_map.set_field_value(field_value_obj);
 			}
+
+			$(document).trigger('wsf-google-map-zoom-changed', [ google_map, google_map.map.getZoom() ]);
 		});
 
 		// On map type change
@@ -467,9 +476,13 @@
 
 			google_map.reposition = false;
 
-			google_map.marker_set_position(e.latLng);
+			var position = e.latLng;
 
-			google_map.geolocate_process(e.latLng);
+			google_map.marker_set_position(position);
+
+			google_map.geolocate_process(position);
+
+			$(document).trigger('wsf-google-map-click', [ google_map, position ]);
 		});
 
 		// Build map marker options
@@ -501,7 +514,11 @@
 
 			google_map.reposition = false;
 
-			google_map.geolocate_process(e.latLng);
+			var position = e.latLng;
+
+			google_map.geolocate_process(position);
+
+			$(document).trigger('wsf-google-map-dragend', [ google_map, position ]);
 		})
 
 		// Clear event
@@ -559,6 +576,46 @@
 
 		// Initial change
 		google_map.obj.trigger('change');
+	}
+
+	// Normalize new API → legacy shape
+	$.WS_Form.prototype.place_legacy = function(place) {
+		var legacy = {};
+
+		if(place.addressComponents) {
+			legacy.address_components = place.addressComponents.map(function(c) {
+				return {
+					long_name: c.longText || '',
+					short_name: c.shortText || '',
+					types: c.types || []
+				};
+			});
+		}
+
+		if(place.location) {
+			legacy.geometry = {
+				location: {
+					lat: function(){ return place.location.lat(); },
+					lng: function(){ return place.location.lng(); }
+				},
+				viewport: place.viewport || null
+			};
+		}
+
+		legacy.place_id = place.id || place.placeId || '';
+		legacy.formatted_address = place.formattedAddress || '';
+		legacy.formatted_phone_number = place.formattedPhoneNumber || '';
+		legacy.international_phone_number = place.internationalPhoneNumber || '';
+		legacy.name = (place.displayName && place.displayName.text) ? place.displayName.text : (place.displayName || '');
+		legacy.plus_code = place.plusCode || null;
+		legacy.rating = place.rating || '';
+		legacy.url = place.googleMapsUri || '';
+		legacy.user_ratings_total = place.userRatingCount || '';
+		legacy.vicinity = place.vicinity || '';
+		legacy.website = place.websiteUri || '';
+		legacy.business_status = place.businessStatus || '';
+
+		return legacy;
 	}
 
 })(jQuery);

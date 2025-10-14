@@ -1148,6 +1148,25 @@ $controls['sizeXlTypography'] = [
 	],
 ];
 
+/**
+ * STEP: Wrap every 'selector' rules in a ":where()" to lower specificity
+ *
+ * Example: Button background-color set on class should precede background-color set in the theme styles.
+ *
+ * @see #86c4q0j31
+ * @since 2.1
+ * @since 2.1.2 No longer in use as the "Colors" theme styles now precede the "Button" theme styles.
+ */
+// foreach ( $controls as $key => $control ) {
+// if ( ! empty( $control['css'] ) && is_array( $control['css'] ) ) {
+// foreach ( $control['css'] as $index => $css ) {
+// if ( isset( $css['selector'] ) ) {
+// $controls[ $key ]['css'][ $index ]['selector'] = ':where(' . $css['selector'] . ')';
+// }
+// }
+// }
+// }
+
 return [
 	'name'     => 'button',
 	'controls' => $controls,

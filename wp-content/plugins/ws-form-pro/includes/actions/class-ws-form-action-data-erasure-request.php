@@ -24,18 +24,24 @@
 			// Determine if we can register this action
 			if(!self::wordpress_validate()) { return false; }
 
-			// Set label
-			$this->label = __('Data Erasure Request', 'ws-form');
-
-			// Set label for actions pull down
-			$this->label_action = __('Data Erasure Request', 'ws-form');
-
 			// Events
 			$this->events = array('submit');
 
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 			add_filter('wp_privacy_personal_data_erasers', array($this, 'eraser_register'), 10);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Data Erasure Request', 'ws-form');
+
+			// Set label for actions pull down
+			$this->label_action = __('Data Erasure Request', 'ws-form');
 
 			// Register action
 			parent::register($this);

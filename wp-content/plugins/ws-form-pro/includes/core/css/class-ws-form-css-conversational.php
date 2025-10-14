@@ -33,7 +33,7 @@ html {
 	text-size-adjust: 100%;
 }
 
-*, *:before, *:after {
+*, *::before, *::after {
 	-webkit-box-sizing: inherit;
 	box-sizing: inherit;
 }

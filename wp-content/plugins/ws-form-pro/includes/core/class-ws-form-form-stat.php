@@ -8,6 +8,8 @@
 		public $table_name;
 		public $date_ranges;
 
+		public $counts_cache = false;
+
 		public function __construct() {
 
 			global $wpdb;
@@ -200,6 +202,51 @@
 			);
 		}
 
+		// Get counts cached
+		public function db_get_counts_cached() {
+
+			self::db_check_form_id();
+
+			if($this->counts_cache === false) {
+
+				global $wpdb;
+
+				// Build count cache
+				$this->counts_cache = array();
+
+				// Get counts for each form
+				$sql = "SELECT form_id, SUM(count_view) AS count_view_total, SUM(count_save) AS count_save_total, SUM(count_submit) AS count_submit_total FROM {$this->table_name} GROUP BY form_id;";
+				$rows = $wpdb->get_results($sql);
+
+				if(is_null($rows)) {
+
+					return array(
+
+						'count_view' => 0,
+						'count_save' => 0,
+						'count_submit' => 0
+					);
+				}
+
+				foreach($rows as $row) {
+
+					$this->counts_cache[absint($row->form_id)] = array(
+
+						'count_view' => absint($row->count_view_total),
+						'count_save' => absint($row->count_save_total),
+						'count_submit' => absint($row->count_submit_total)
+					);
+				}
+			}
+
+			return isset($this->counts_cache[$this->form_id]) ? $this->counts_cache[$this->form_id] : array(
+
+				'count_view' => 0,
+				'count_save' => 0,
+				'count_submit' => 0
+			);
+		}
+
 		// Get date data started collecting
 		public function db_get_date_since() {
 
@@ -242,7 +289,7 @@
 		// Check form_id
 		public function db_check_form_id() {
 
-			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID', 'ws-form')); }
+			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID (WS_Form_Form_Stat | db_check_form_id)', 'ws-form')); }
 
 			return true;
 		}
@@ -568,13 +615,13 @@
 
 				if(!filter_var($email_to, FILTER_VALIDATE_EMAIL)) {
 
-					parent::db_throw_error(__('Invalid email address: %s', $email_to, 'ws-form'));
+					parent::db_throw_error(sprintf(__('Invalid email address: %s', 'ws-form'), $email_to));
 				}
 			}
 
 			if(empty($email_subject)) {
 
-				parent::db_throw_error(__('Invalid email subject'));
+				parent::db_throw_error(__('Invalid email subject', 'ws-form'));
 			}
 
 			// Set frequency specific variables
@@ -590,14 +637,14 @@
 				case 'weekly' :
 
 					$email_title = __('Weekly Form Statistics Report', 'ws-form');
-					$offset_from = '-8 days';
+					$offset_from = '-7 days';
 					$offset_to = '-1 day';
 					break;
 
 				case 'monthly' :
 
 					$email_title = __('Monthly Form Statistics Report', 'ws-form');
-					$offset_from = '-1 month -1 day';
+					$offset_from = '-1 month';
 					$offset_to = '-1 day';
 					break;
 			}
@@ -607,7 +654,7 @@
 
 				'<p><strong>%s:</strong> <a href="%s" target="_blank">%s</a></p>',
 				__('Website', 'ws-form'),
-				get_site_url(),
+				get_home_url(null, '/'),
 				esc_html(get_bloginfo('name'))
 			);
 
@@ -714,9 +761,9 @@
 
 				'%s <a href="https://wsform.com/knowledgebase/report-form-statistics/">%s</a>',
 
-				/* translators: %1$s = WS Form */
 				sprintf(
 
+					/* translators: %s: WS Form */
 					__('This email was sent from %s.', 'ws-form'),
 					WS_FORM_NAME_PRESENTABLE
 				),
@@ -730,7 +777,7 @@
 			// Parse email template
 			$mask_values = array(
 
-				'email_subject' => htmlentities($email_subject),
+				'email_subject' => esc_html($email_subject),
 				'email_title' => $email_title,
 				'email_message' => $email_message,
 				'email_footer' => $email_footer
@@ -994,6 +1041,8 @@
 					if($http_code !== 200) {
 
 						$add_view_php_error = true;
+
+						/* translators: %u: HTTP code **/
 						$add_view_php_error_message = sprintf(__('HTTP Code %u', 'ws-form'), $http_code);
 					}
 

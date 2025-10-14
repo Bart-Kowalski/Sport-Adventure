@@ -70,13 +70,13 @@
 			try {
 
 				// Load template form data
-				$ws_form_template = New WS_Form_Template();
+				$ws_form_template = new WS_Form_Template();
 				$ws_form_template->type = 'section';
 				$ws_form_template->id = $template_id;
 				$ws_form_template->read();
 
 				// Create sections from template
-				$label = $ws_form_section->db_create_from_form_object($ws_form_template->form_object, $next_sibling_id);
+				$label = $ws_form_section->db_create_from_form_object($ws_form_template->object, $next_sibling_id);
 
 				// Describe transaction for history
 				$history = array(
@@ -171,7 +171,7 @@
 			try {
 
 				// Get form object from file
-				$form_object = WS_Form_Common::get_form_object_from_post_file();
+				$form_object = WS_Form_Common::get_object_from_post_file();
 
 				// Create sections from template
 				$label = $ws_form_section->db_create_from_form_object($form_object, $next_sibling_id);
@@ -293,7 +293,12 @@
 				$ws_form_section->sort_index = $ws_form_section->db_object_sort_index_get($ws_form_section->table_name, 'group_id', $ws_form_section->group_id, $next_sibling_id);
 
 				// Rename
-				$ws_form_section->label = sprintf(__('%s (Copy)', 'ws-form'), $ws_form_section->label);
+				$ws_form_section->label = sprintf(
+
+					'%s (%s)',
+					$ws_form_section->label,
+					__('Copy', 'ws-form')
+				);
 
 				// Clone
 				$ws_form_section->id = $ws_form_section->db_clone();

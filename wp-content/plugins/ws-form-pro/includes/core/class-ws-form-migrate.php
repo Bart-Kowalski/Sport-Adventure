@@ -71,7 +71,7 @@
 
 			foreach($config['detect'] as $plugin) {
 
-				if(is_plugin_active($plugin)) { return true; break; }
+				if(is_plugin_active($plugin)) { return true; }
 			}
 
 			return false;
@@ -906,24 +906,33 @@
 			// Value
 			if(isset($map['value'])) {
 
-				$meta_value = WS_Form_Common::mask_parse($map['value'], $return_lookups);
-				$meta_value = WS_Form_Common::mask_parse($meta_value, $this->return_scratch_global);
+				$meta_value = $map['value'];
+
+				// String parsing
+				if(is_string($meta_value)) {
+
+					$meta_value = WS_Form_Common::mask_parse($map['value'], $return_lookups);
+					$meta_value = WS_Form_Common::mask_parse($meta_value, $this->return_scratch_global);
+				}
 
 				// Data grid parsing
-				if(is_array($meta_value)) {
+				if(
+					is_array($meta_value) &&
+					isset($meta_value['groups'])
+				) {
 
-					if(
-						isset($meta_value['groups'])
-					) {
+					foreach($meta_value['groups'] as $datagrid_group_index => $datagrid_group) {
 
-						foreach($meta_value['groups'] as $datagrid_group_index => $datagrid_group) {
+						foreach($datagrid_group['rows'] as $datagrid_row_index => $datagrid_row) {
 
-							foreach($datagrid_group['rows'] as $datagrid_row_index => $datagrid_row) {
+							foreach($datagrid_row['data'] as $datagrid_data_index => $datagrid_data) {
 
-								foreach($datagrid_row['data'] as $datagrid_data_index => $datagrid_data) {
+								$column_value = $meta_value['groups'][$datagrid_group_index]['rows'][$datagrid_row_index]['data'][$datagrid_data_index];
 
-									$meta_value['groups'][$datagrid_group_index]['rows'][$datagrid_row_index]['data'][$datagrid_data_index] = WS_Form_Common::mask_parse($datagrid_data, $return_lookups);
-								}
+								$column_value = WS_Form_Common::mask_parse($column_value, $return_lookups);
+								$column_value = WS_Form_Common::mask_parse($column_value, $this->return_scratch_global);
+
+								$meta_value['groups'][$datagrid_group_index]['rows'][$datagrid_row_index]['data'][$datagrid_data_index] = $column_value;
 							}
 						}
 					}
@@ -1610,6 +1619,7 @@
 						$return_lookups[$map['destination']] = $meta_value;
 						$this->debug('Set meta value: ' . $meta_value);
 					}
+
 					$return_single['meta'][$map['destination']] = $meta_value;
 					break;
 
@@ -1795,9 +1805,7 @@
 
 			if($this->debug) {
 
-				echo '- ';	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-				WS_Form_Common::echo_esc_html($message);
-				echo "\n";	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				WS_Form_Common::echo_esc_html('- ' . $message . "\n");
 			}
 		}
 

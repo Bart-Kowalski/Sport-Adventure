@@ -11,15 +11,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('ACF Field Options', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving ACF field options...', 'ws-form');
-
-			// Register action
-			parent::register($this);
-
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 
@@ -28,6 +19,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('ACF Field Options', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving ACF field options...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -158,6 +164,9 @@
 			// Get ACF default value
 			$default_value = isset($acf_field_object['default_value']) ? $acf_field_object['default_value'] : '';
 
+			// Check if required
+			$required = (count($choices) == 1) ? (isset($acf_field_object['required']) ? ($acf_field_object['required'] == 1) : false) : false;
+
 			// Run through choices
 			$rows = array();
 			$row_index = 1;
@@ -177,7 +186,8 @@
 						$value,
 						$text
 					),
-					'default'	=> (!empty($default_value) && ($default_value === $value)) ? 'on' : ''
+					'default'	=> (!empty($default_value) && ($default_value === $value)) ? 'on' : '',
+					'required'	=> $required ? 'on' : ''
 				);
 			}
 
@@ -289,7 +299,7 @@
 					'placeholder'				=>	'#post_id',
 					'help'						=>	sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Choose the post ID to filter by. This can be a number or %s variable. If blank, the ID of the post the form is shown on will be used.', 'ws-form'),
 
 						WS_FORM_NAME_GENERIC

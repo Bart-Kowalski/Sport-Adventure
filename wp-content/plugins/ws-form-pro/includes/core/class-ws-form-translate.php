@@ -6,20 +6,21 @@
 
 		public function __construct() {
 
-			// Actions the run when a form is updated
-//			add_action('wsf_form_updated', 'form_updated', 10, 1);
+			// Form actions
+			add_action('wsf_form_create', 'form_create', 10, 1);
+			add_action('wsf_form_delete', 'form_delete', 10, 1);
 
 			// Translate form when form parsed
 			add_filter('wsf_form_translate', array($this, 'form_translate'), 10, 1);
-
-			// Test
-			self::form_deleted(7189);
-			self::form_updated(7189);
 		}
 
-		public function forms_init() {
+		public function form_create($form_obj) {
 
-			// Initializes all forms
+			// Load form
+			self::form_load($form_obj->id);
+
+			// Register form
+			self::form_register($this->form_object);
 		}
 
 		public function form_load($form_id) {
@@ -32,16 +33,7 @@
 			$this->form_object = $ws_form_form->db_read(true, true);
 		}
 
-		public function form_updated($form_id) {
-
-			// Load form
-			self::form_load($form_id);
-
-			// Register form
-			self::form_register($this->form_object);
-		}
-
-		public function form_deleted($form_id) {
+		public function form_delete($form_id) {
 
 			// Unregister all translations
 			self::unregister_all($form_id);
@@ -144,6 +136,9 @@
 
 		public function form_register($form_object) {
 
+			// Start
+			do_action('wsf_translate_start', $form_object->id, $form_object->label);
+
 			// Get translatable meta keys
 			$meta_keys = self::get_meta_keys_translatable();
 
@@ -155,6 +150,9 @@
 
 				self::form_register_groups($form_object->groups, $meta_keys);
 			}
+
+			// Finish
+			do_action('wsf_translate_finish', $form_object->id, $form_object->label);
 		}
 
 		public function form_register_groups($groups, $meta_keys) {
@@ -296,19 +294,23 @@
 
 				case 'form' :
 
-					return sprintf(__('Form (%u) - %s', 'ws-form'), $object_id, $meta_label);
+					/* translators: %1$u: Object ID, %2$s: Meta label */
+					return sprintf(__('Form (%1$u) - %2$s', 'ws-form'), $object_id, $meta_label);
 
 				case 'group' :
 
-					return sprintf(__('Tab: %s (%u) - %s', 'ws-form'), $object_label, $object_id, $meta_label);
+					/* translators: %1$s: Object label, %2$u: Object ID, %3$s: Meta label */
+					return sprintf(__('Tab: %1$s (%2$u) - %3$s', 'ws-form'), $object_label, $object_id, $meta_label);
 
 				case 'section' :
 
-					return sprintf(__('Section: %s (%u) - %s', 'ws-form'), $object_label, $object_id, $meta_label);
+					/* translators: %1$s: Object label, %2$u: Object ID, %3$s: Meta label */
+					return sprintf(__('Section: %1$s (%2$u) - %3$s', 'ws-form'), $object_label, $object_id, $meta_label);
 
 				case 'field' :
 
-					return sprintf(__('Field: %s (%u) - %s', 'ws-form'), $object_label, $object_id, $meta_label);
+					/* translators: %1$s: Object label, %2$u: Object ID, %3$s: Meta label */
+					return sprintf(__('Field: %1$s (%2$u) - %3$s', 'ws-form'), $object_label, $object_id, $meta_label);
 			}
 		}
 

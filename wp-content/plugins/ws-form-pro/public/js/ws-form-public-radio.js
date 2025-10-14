@@ -7,7 +7,7 @@
 
 		var ws_this = this;
 
-		$('[data-type="radio"]:not([data-radio-validation-init])', this.form_canvas_obj).each(function() {
+		$('[data-type="radio"]:not([data-radio-validation-init]),[data-type="price_radio"]:not([data-radio-validation-init])', this.form_canvas_obj).each(function() {
 
 			// Get radios
 			var radios = $('input[type="radio"]', $(this));
@@ -32,16 +32,29 @@
 		// Get radio group
 		var radio_group = obj.closest('[role="radiogroup"]');
 
+		// Get radio fieldset (if set)
+		var radio_fieldset = radio_group.parent('fieldset');
+
 		// Check if it valid
 		if(this.is_valid(obj)) {
 
 			// Remove attribute
 			radio_group.removeAttr('data-wsf-invalid');
 
+			if(radio_fieldset.length) {
+
+				radio_fieldset.removeAttr('data-wsf-invalid');
+			}
+
 		} else {
 
 			// Add attribute
 			radio_group.attr('data-wsf-invalid', '');
+
+			if(radio_fieldset.length) {
+
+				radio_fieldset.attr('data-wsf-invalid', '');
+			}
 		}
 	}
 

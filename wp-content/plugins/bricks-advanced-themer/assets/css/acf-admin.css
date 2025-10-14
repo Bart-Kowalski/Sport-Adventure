@@ -906,6 +906,11 @@ body.bricks_page_bricks-advanced-themer .no-border-top {
     padding-top: 10px !important;
 }
 
+body.bricks_page_bricks-advanced-themer .btn-container .acf-input{
+    display: flex;
+    gap: 8px;
+}
+
 /****************/
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=Poppins:wght@500;600;700&display=swap');
@@ -914,7 +919,7 @@ body.bricks_page_bricks-advanced-themer .no-border-top {
 
 .wp-admin.bricks_page_bricks-advanced-themer{
 
-    --ats-version: 'V3.3.5';
+    --ats-version: 'V3.3.7';
     --ats-logo-position: 90px;
     --ats-version-position: 25px;
     

@@ -70,6 +70,9 @@ class Query_Filters {
 			add_action( 'delete_post', [ $this, 'delete_post' ] );
 			add_filter( 'wp_insert_post_parent', [ $this, 'wp_insert_post_parent' ], 10, 4 );
 			add_action( 'set_object_terms', [ $this, 'set_object_terms' ], PHP_INT_MAX - 10, 6 );
+			add_action( 'updated_post_meta', [ $this, 'handle_post_meta_update' ], PHP_INT_MAX - 10, 4 ); // (#86c4uh71y @since 2.0.2)
+			add_action( 'deleted_post_meta', [ $this, 'handle_post_meta_update' ], PHP_INT_MAX - 10, 4 ); // (#86c4uh71y @since 2.0.2)
+			add_action( 'edit_attachment', [ $this, 'edit_attachment' ] ); // (#86c4uh71y @since 2.0.2)
 
 			// Term
 			add_action( 'edited_term', [ $this, 'edited_term' ], PHP_INT_MAX - 10, 3 );
@@ -1110,6 +1113,48 @@ class Query_Filters {
 		$this->maybe_update_element( $object_id, $meta_value );
 
 		return $check;
+	}
+
+	/**
+	 * If post meta updated (Not via save_post), update the index table
+	 *
+	 * @since 2.0.2
+	 */
+	public function handle_post_meta_update( $meta_id, $object_id, $meta_key, $meta_value ) {
+		// Exclude revisions and save_post action
+		if ( wp_is_post_revision( $object_id ) || self::$is_saving_post ) {
+			return;
+		}
+
+		$exclude_keys = [
+			'_encloseme',
+			'_edit_lock',
+			'_edit_last',
+			'_wp_page_template',
+			'_wp_trash_meta_status',
+			'_wp_trash_meta_time',
+			'_wp_desired_post_slug',
+			BRICKS_DB_PAGE_HEADER, // Handled in qf_update_post_metadata
+			BRICKS_DB_PAGE_CONTENT, // Handled in qf_update_post_metadata
+			BRICKS_DB_PAGE_FOOTER, // Handled in qf_update_post_metadata
+		];
+
+		if ( ! in_array( $meta_key, $exclude_keys, true ) ) {
+			$this->index_post( $object_id );
+			return;
+		}
+	}
+
+	/**
+	 * ACF update attachment via AJAX action acf/fields/gallery/update_attachment
+	 * It will trigger wp_insert_post but not save_post, so we need to handle it separately
+	 * Need to set is_saving_post to false otherwise updated_post_meta will not be triggered
+	 * Note: is_saving_post is used to prevent duplicate index job when saving post
+	 *
+	 * @since 2.0.2
+	 */
+	public function edit_attachment( $post_id ) {
+		self::$is_saving_post = false;
 	}
 
 	/**
@@ -2204,6 +2249,11 @@ class Query_Filters {
 		$tax_found = false;
 
 		foreach ( $tax_query as $tax ) {
+			// Skip non-array items or arrays without 'taxonomy' key (@since 2.1)
+			if ( ! is_array( $tax ) || ! isset( $tax['taxonomy'] ) ) {
+				continue;
+			}
+
 			if ( $tax['taxonomy'] == $page_filters_tax ) {
 				$tax_found = true;
 				break;

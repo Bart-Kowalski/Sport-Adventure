@@ -81,6 +81,9 @@ class Ajax {
 
 		// Scan for orphaned elements across site (@since 2.0)
 		add_action( 'wp_ajax_bricks_scan_orphaned_elements', [ $this, 'scan_orphaned_elements' ] );
+
+		// Query API (@since 2.1)
+		add_action( 'wp_ajax_bricks_query_api', [ $this, 'query_api' ] );
 	}
 
 	/**
@@ -516,6 +519,7 @@ class Ajax {
 
 			$element = stripslashes_deep( $element );
 		}
+
 		// No additional processing needed for REST API calls or builder.php
 		// REST API permissions are already checked in API->render_element_permissions_check()
 
@@ -770,7 +774,11 @@ class Ajax {
 	 * @since 1.0
 	 */
 	public function get_terms_options() {
-		self::verify_request( 'bricks-nonce-builder' );
+		if ( ! check_ajax_referer( 'bricks-nonce-builder', 'nonce', false ) ) {
+			if ( ! check_ajax_referer( 'bricks-nonce-admin', 'nonce', false ) ) {
+				wp_send_json_error( 'Invalid nonce' );
+			}
+		}
 
 		$post_types  = ! empty( $_GET['postTypes'] ) ? array_map( 'sanitize_text_field', $_GET['postTypes'] ) : null;
 		$taxonomy    = ! empty( $_GET['taxonomy'] ) ? array_map( 'sanitize_text_field', $_GET['taxonomy'] ) : null;
@@ -858,6 +866,11 @@ class Ajax {
 		// Use global classes data from builder not from database
 		if ( ! empty( $_POST['globalClasses'] ) ) {
 			Database::$global_data['globalClasses'] = self::decode( $_POST['globalClasses'], false );
+		}
+
+		// Use global queries data from builder not from database (@since 2.1)
+		if ( ! empty( $_POST['globalQueries'] ) ) {
+			Database::$global_data['globalQueries'] = self::decode( $_POST['globalQueries'], false );
 		}
 
 		/**
@@ -1026,6 +1039,8 @@ class Ajax {
 		 * Save components in database
 		 *
 		 * @since 1.12
+		 * @since 2.1: decode param 2 true to add back backslashes via wp_slash
+		 * @since 2.1: decode param 2 false as wp_slash not needed for options
 		 */
 		$components = isset( $_POST['components'] ) ? self::decode( $_POST['components'], false ) : false;
 
@@ -1082,6 +1097,38 @@ class Ajax {
 				update_option( BRICKS_DB_COLOR_PALETTE, $color_palette );
 			} else {
 				delete_option( BRICKS_DB_COLOR_PALETTE );
+			}
+		}
+
+		/**
+		 * Save global query loops
+		 *
+		 * Required capability: access_query_manager
+		 *
+		 * @since 2.1
+		 */
+		if ( isset( $_POST['globalQueries'] ) && Builder_Permissions::user_has_permission( 'access_query_manager' ) ) {
+			$global_queries = self::decode( $_POST['globalQueries'], false );
+
+			if ( is_array( $global_queries ) && count( $global_queries ) ) {
+				update_option( BRICKS_DB_GLOBAL_QUERIES, $global_queries );
+			} else {
+				delete_option( BRICKS_DB_GLOBAL_QUERIES );
+			}
+		}
+
+		/**
+		 * Save globalQueriesCategories
+		 *
+		 * @since 2.1
+		 */
+		if ( isset( $_POST['globalQueriesCategories'] ) && Builder_Permissions::user_has_permission( 'access_query_manager' ) ) {
+			$global_queries_categories = self::decode( $_POST['globalQueriesCategories'], false );
+
+			if ( is_array( $global_queries_categories ) && count( $global_queries_categories ) ) {
+				update_option( BRICKS_DB_GLOBAL_QUERIES_CATEGORIES, $global_queries_categories );
+			} else {
+				delete_option( BRICKS_DB_GLOBAL_QUERIES_CATEGORIES );
 			}
 		}
 
@@ -3212,5 +3259,43 @@ class Ajax {
 				'total_posts'         => $scan_result['total_posts'],
 			]
 		);
+	}
+
+	/**
+	 * Query API
+	 *
+	 * @since 2.1
+	 */
+	public function query_api() {
+		self::verify_request( 'bricks-nonce-builder' );
+
+		$settings   = $_POST['settings'] ?? [];
+		$element_id = ! empty( $_POST['elementId'] ) ? sanitize_text_field( $_POST['elementId'] ) : false;
+		$post_id    = ! empty( $_POST['postId'] ) ? intval( $_POST['postId'] ) : get_the_ID();
+		$response   = Query_API::make_request( $settings, $element_id, $post_id, true ); // Always clear cache
+
+		if ( isset( $response['error'] ) ) {
+			wp_send_json_error(
+				[
+					'message'    => $response['error'],
+					'status'     => $response['status'] ?? 500,
+					'headers'    => $response['headers'] ?? null,
+					'last_fetch' => $response['last_fetch'] ?? time(),
+				]
+			);
+		}
+
+		// Return both full response and extracted data
+		wp_send_json_success(
+			[
+				'full_response'  => $response['full_response'] ?? null,   // Full API response
+				'extracted_data' => $response['extracted_data'] ?? null, // Extracted data
+				'response_path'  => $response['response_path'] ?? null,   // Path used
+				'status'         => $response['status'] ?? 200,
+				'headers'        => $response['headers'] ?? null,
+				'last_fetch'     => $response['last_fetch'] ?? time(),
+			]
+		);
+
 	}
 }

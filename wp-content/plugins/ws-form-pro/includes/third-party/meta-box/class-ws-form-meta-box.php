@@ -5,7 +5,7 @@
 		public static $meta_box_fields = false;
 
 		// Get fields all
-		public static function meta_box_get_fields_all($object_type = false, $post_types = false, $choices_filter = false, $raw = false, $traverse = false, $has_fields = false) {
+		public static function meta_box_get_fields_all($object_type = false, $object_filter = false, $choices_filter = false, $raw = false, $traverse = false, $has_fields = false) {
 
 			// Meta Box fields
 			$fields = array();
@@ -37,12 +37,27 @@
 				// Get meta_box from object
 				$meta_box = $meta_box->meta_box;
 
-				// Filter by post type if specified
-				if(
-					($post_types !== false) &&
-					!in_array($post_types[0], $meta_box['post_types'])
-				) {
-					continue;
+				if($object_type == 'setting') {
+
+					// Filter by setting ID if specified
+					if(
+						($object_filter !== false) &&
+						isset($meta_box['settings_pages']) &&
+						!in_array($object_filter[0], $meta_box['settings_pages'])
+					) {
+						continue;
+					}
+
+				} else {
+
+					// Filter by post type if specified
+					if(
+						($object_filter !== false) &&
+						isset($meta_box['post_types']) &&
+						!in_array($object_filter[0], $meta_box['post_types'])
+					) {
+						continue;
+					}
 				}
 
 				// Get meta box title
@@ -254,9 +269,9 @@
 		}
 
 		// Get field data
-		public static function meta_box_get_field_data($object_type, $post_types, $object_id) {
+		public static function meta_box_get_field_data($object_type, $object_filter, $object_id) {
 
-			$field_objects = self::meta_box_get_fields_all($object_type, $post_types, false, true, false);
+			$field_objects = self::meta_box_get_fields_all($object_type, $object_filter, false, true, false);
 			if($field_objects === false) { return array(); }
 
 			$custom_table_data = array();
@@ -417,7 +432,7 @@
 				// Adjust name if blank
 				if($field['name'] == '') {
 
-					$field['name'] = __('(No label)', 'meta-box-builder');
+					$field['name'] = __('(No label)', 'ws-form');
 					$meta['label_render'] = '';
 				}
 
@@ -1576,7 +1591,17 @@
 
 			} else {
 
-				$time = strtotime(WS_Form_Common::get_date_by_type($meta_box_field_values, $field_object, 'Y-m-d'));
+				switch($meta_box_field_type) {
+
+					case 'time' :
+
+						$time = strtotime(WS_Form_Common::get_date_by_type($meta_box_field_values, $field_object, 'H:i:s'));
+						break;
+
+					default :
+
+						$time = strtotime(WS_Form_Common::get_date_by_type($meta_box_field_values, $field_object, 'Y-m-d'));
+				}
 			}
 
 			// Get formats

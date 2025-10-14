@@ -50,11 +50,11 @@
 				// Attempt to JSON decode it
 				try {
 
-					var conditional = JSON.parse(conditional);
+					conditional = JSON.parse(conditional);
 
 				} catch(e) {
 
-					var conditional = false;
+					conditional = false;
 				}
 
 				// If conditional found, set up events for it
@@ -238,8 +238,8 @@
 			if(!this.conditional_action_check(action_single)) { continue; }
 
 			// Read action data
-			var destination_object = action_single['object'];
-			var destination_object_id = action_single['object_id'];
+			var destination_object = action_single.object;
+			var destination_object_id = action_single.object_id;
 
 			// Process by object type
 			switch(destination_object) {
@@ -292,14 +292,14 @@
 			var group = conditional.if[group_index];
 
 			// Error check group
-			if(typeof(group['conditions']) === 'undefined') { continue; }
+			if(typeof(group.conditions) === 'undefined') { continue; }
 
 			// Process conditions
-			for(var condition_index in group['conditions']) {
+			for(var condition_index in group.conditions) {
 
-				if(!group['conditions'].hasOwnProperty(condition_index)) { continue; }
+				if(!group.conditions.hasOwnProperty(condition_index)) { continue; }
 
-				var condition = group['conditions'][condition_index];
+				var condition = group.conditions[condition_index];
 
 				// Check integrity of condition
 				if(!this.conditional_condition_check(condition)) { continue; }
@@ -379,7 +379,7 @@
 								// Create event for matching field
 								object_events.push(this.conditional_event_get('field', field_match_id, false, field_match, logic, field_repeatable));
 
-								field_attribute_values['field_match_id'] = this.form_id_prefix + 'field-' + field_match_id;
+								field_attribute_values.field_match_id = this.form_id_prefix + 'field-' + field_match_id;
 
 								break;
 						}
@@ -686,24 +686,24 @@
 				var field_type = $.WS_Form.field_type_cache[field.type];
 
 				// Are there conditional settings?
-				if(typeof(field_type['conditional']) !== 'undefined') {
+				if(typeof(field_type.conditional) !== 'undefined') {
 
 					// Should this field type be excluded?
-					if(typeof(field_type['conditional']['exclude_condition']) !== 'undefined') {
+					if(typeof(field_type.conditional.exclude_condition) !== 'undefined') {
 
-						object_event.create = !field_type['conditional']['exclude_condition'];
+						object_event.create = !field_type.conditional.exclude_condition;
 					}
 
 					// Which event type should be created?
-					if(typeof(field_type['conditional']['condition_event']) !== 'undefined') {
+					if(typeof(field_type.conditional.condition_event) !== 'undefined') {
 
-						object_event.event = field_type['conditional']['condition_event'];
+						object_event.event = field_type.conditional.condition_event;
 					}
 
 					// Should event occur on row?
-					if(typeof(field_type['conditional']['object_event.row']) !== 'undefined') {
+					if(typeof(field_type.conditional.condition_event_row) !== 'undefined') {
 
-						if(field_type['conditional']['object_event.row'] && (object_row_id !== false)) {
+						if(field_type.conditional.condition_event_row && (object_row_id !== false)) {
 
 							object_event.row = true;
 						};
@@ -716,13 +716,13 @@
 		// Check for logic event
 		var conditional_settings = $.WS_Form.settings_form.conditional;
 		var conditional_settings_objects = conditional_settings.objects;
-		var conditional_settings_logics = conditional_settings_objects[object]['logic'];
+		var conditional_settings_logics = conditional_settings_objects[object].logic;
 
 		if(typeof(conditional_settings_logics[logic]) !== 'undefined') {
 
-			if(typeof(conditional_settings_logics[logic]['event']) !== 'undefined') {
+			if(typeof(conditional_settings_logics[logic].event) !== 'undefined') {
 
-				object_event.event = conditional_settings_logics[logic]['event'];
+				object_event.event = conditional_settings_logics[logic].event;
 			}
 		}
 
@@ -746,16 +746,16 @@
 			var group = conditional.if[group_index];
 
 			// Error check group
-			if(typeof(group['conditions']) === 'undefined') { continue; }
+			if(typeof(group.conditions) === 'undefined') { continue; }
 
 			// Process conditions
 			var result_group = false;
 			var conditional_description_array = [];
-			for(var condition_index in group['conditions']) {
+			for(var condition_index in group.conditions) {
 
-				if(!group['conditions'].hasOwnProperty(condition_index)) { continue; }
+				if(!group.conditions.hasOwnProperty(condition_index)) { continue; }
 
-				var condition = group['conditions'][condition_index];
+				var condition = group.conditions[condition_index];
 
 				// Check integrity of condition
 				if(!this.conditional_condition_check(condition)) { continue; }
@@ -861,7 +861,7 @@
 						var conditional_settings_logic_previous = conditional_settings.logic_previous;
 
 						var conditional_settings_objects = conditional_settings.objects;
-						var conditional_settings_logics = conditional_settings_objects[object]['logic'];
+						var conditional_settings_logics = conditional_settings_objects[object].logic;
 
 						// Get logic description
 						if(typeof(conditional_settings_logics[logic]) !== 'undefined') {
@@ -1101,7 +1101,7 @@
 
 						var object_value = $('option:not([data-placeholder]):selected', object_wrapper).length;
 						result_condition = (object_value == this.get_number(value));
-						if(logic == 'rc!=') { result_condition = !result_condition; }
+						if(logic == 'rs!=') { result_condition = !result_condition; }
 						break;
 
 					// Selected count greater than
@@ -1473,7 +1473,8 @@
 							) ||
 
 							// Multi-event triggers
-							((logic == 'change_input') && (['change', 'input'].indexOf(event.type) != -1))
+							((logic == 'change_input') && (['change', 'input'].indexOf(event.type) != -1)) ||
+							((logic == 'click') && (['click', 'wsf-click'].indexOf(event.type) != -1))
 						);
 
 						if(result_condition) {
@@ -1504,51 +1505,81 @@
 
 					// Color - Hue greater than
 					case 'ch>' :
-
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.h * 360) > value);
-						break;
-
-					// Color - Hue less than
 					case 'ch<' :
-
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.h * 360) < value);
-						break;
-
-					// Color - Saturation greater than
 					case 'cs>' :
-
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.s * 100) > value);
-						break;
-
-					// Color - Saturation less than
 					case 'cs<' :
-
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.s * 100) < value);
-						break;
-
-					// Color - Lightness greater than
 					case 'cl>' :
-
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.l * 100) > value);
-						break;
-
-					// Color - Lightness less than
 					case 'cl<' :
+					case 'ca>' :
+					case 'ca<' :
 
-						var hsl = this.hex_to_hsl(object_value);
-						result_condition = ((hsl.l * 100) < value);
+						if(typeof(this.color_to_hsla_array) !== 'function') {
+
+							result_condition = false;
+							break;
+						}
+
+						// Convert color to HSLA array
+						var hsla_array = this.color_to_hsla_array(object_value);
+
+						switch(logic) {
+
+							// Color - Hue greater than
+							case 'ch>' :
+
+								result_condition = (hsla_array.h > value);
+								break;
+
+							// Color - Hue less than
+							case 'ch<' :
+
+								result_condition = (hsla_array.h < value);
+								break;
+
+							// Color - Saturation greater than
+							case 'cs>' :
+
+								result_condition = (hsla_array.s > value);
+								break;
+
+							// Color - Saturation less than
+							case 'cs<' :
+
+								result_condition = (hsla_array.s < value);
+								break;
+
+							// Color - Lightness greater than
+							case 'cl>' :
+
+								result_condition = (hsla_array.l > value);
+								break;
+
+							// Color - Lightness less than
+							case 'cl<' :
+
+								result_condition = (hsla_array.l < value);
+								break;
+
+							// Color - Alpha greater than
+							case 'ca>' :
+
+								result_condition = (hsla_array.a > value);
+								break;
+
+							// Color - Alpha less than
+							case 'ca<' :
+
+								result_condition = (hsla_array.a < value);
+								break;
+						}
+					
 						break;
 
 					// Check reCAPTCHA is valid
 					case 'recaptcha' :
 					case 'recaptcha_not' :
 
-						if(typeof(this.recaptcha_get_response_by_name)) {
+						if(typeof(this.recaptcha_get_response_by_name) === 'function') {
 
 							var captcha_get_response = this.recaptcha_get_response_by_name(field_name);
 							result_condition = (typeof(captcha_get_response) === 'string') && (captcha_get_response.length > 0);
@@ -1560,7 +1591,7 @@
 					case 'hcaptcha' :
 					case 'hcaptcha_not' :
 
-						if(typeof(this.hcaptcha_get_response_by_name)) {
+						if(typeof(this.hcaptcha_get_response_by_name) === 'function') {
 
 							var captcha_get_response = this.hcaptcha_get_response_by_name(field_name);
 							result_condition = (typeof(captcha_get_response) === 'string') && (captcha_get_response.length > 0);
@@ -1572,7 +1603,7 @@
 					case 'turnstile' :
 					case 'turnstile_not' :
 
-						if(typeof(this.turnstile_get_response_by_name)) {
+						if(typeof(this.turnstile_get_response_by_name) === 'function') {
 
 							var captcha_get_response = this.turnstile_get_response_by_name(field_name);
 							result_condition = (typeof(captcha_get_response) === 'string') && (captcha_get_response.length > 0);
@@ -1584,7 +1615,7 @@
 					case 'signature' :
 					case 'signature_not' :
 
-						if(typeof(this.signature_get_response_by_name)) {
+						if(typeof(this.signature_get_response_by_name) === 'function') {
 
 							result_condition = this.signature_get_response_by_name(field_name);
 							if(logic == 'signature_not') { result_condition = !result_condition; }
@@ -1595,7 +1626,7 @@
 					case 'file' :
 					case 'file_not' :
 
-						if(typeof(this.file_get_count_by_field_id)) {
+						if(typeof(this.file_get_count_by_field_id) === 'function') {
 
 							result_condition = (this.file_get_count_by_field_id(object_id) > 0);
 							if(logic == 'file_not') { result_condition = !result_condition; }
@@ -1605,7 +1636,7 @@
 					// File count greater than
 					case 'f>' :
 
-						if(typeof(this.file_get_count_by_field_id)) {
+						if(typeof(this.file_get_count_by_field_id) === 'function') {
 
 							result_condition = (this.file_get_count_by_field_id(object_id) > value);
 						}
@@ -1614,7 +1645,7 @@
 					// Files count less than
 					case 'f<' :
 
-						if(typeof(this.file_get_count_by_field_id)) {
+						if(typeof(this.file_get_count_by_field_id) === 'function') {
 
 							result_condition = (this.file_get_count_by_field_id(object_id) < value);
 						}
@@ -1624,7 +1655,7 @@
 					case 'f==' :
 					case 'f!=' :
 
-						if(typeof(this.file_get_count_by_field_id)) {
+						if(typeof(this.file_get_count_by_field_id) === 'function') {
 
 							result_condition = (this.file_get_count_by_field_id(object_id) == value);
 							if(logic == 'f!=') { result_condition = !result_condition; }
@@ -1640,6 +1671,15 @@
 
 							var field_selector = '#' + this.form_id_prefix + 'field-' + field_id + ((source_repeatable_index > 0) ? '-repeat-' + source_repeatable_index : '');
 							var field_value = $(field_selector, this.form_canvas_obj).val();
+
+							// Case sensitive
+							if(!case_sensitive) {
+
+								if(field_value && (typeof(field_value) === 'string')) {
+
+									field_value = field_value.toLowerCase();
+								}
+							}
 
 							result_condition = (field_value == object_value);
 							if(logic == 'field_match_not') { result_condition = !result_condition; }
@@ -1727,8 +1767,7 @@
 					case 'active' :
 					case 'active_not' :
 
-						var group_index = $(object_event_selector, this.form_canvas_obj).attr('data-group-index');
-						result_condition = (group_index == this.group_index);
+						result_condition = ($(object_event_selector, this.form_canvas_obj).attr('data-group-index') == this.group_index);
 						if(logic == 'active_not') { result_condition = !result_condition; }
 
 						break;
@@ -1843,10 +1882,10 @@
 			if(!this.conditional_action_check(action_single)) { continue; }
 
 			// Read action data
-			var destination_object = action_single['object'];
-			var destination_object_id = action_single['object_id'];
+			var destination_object = action_single.object;
+			var destination_object_id = action_single.object_id;
 			var destination_object_row_id = this.get_object_row_id(action_single);	// Array of integers
-			var destination_action = action_single['action'];
+			var destination_action = action_single.action;
 
 			// Process by object type
 			switch(destination_object) {
@@ -1860,7 +1899,7 @@
 					var destination_obj = ws_this.form_obj;
 
 					// Get value parsed
-					var destination_value = (typeof(action_single['value']) === 'undefined') ? false : this.parse_variables_process(action_single['value'], false, false, false, false, false).output;
+					var destination_value = (typeof(action_single.value) === 'undefined') ? false : this.parse_variables_process(action_single.value, false, false, false, false, false).output;
 
 					// Process action
 					var conditional_process_action_return = this.conditional_process_action(action_then_else, destination_action, destination_obj_wrapper, destination_obj, destination_object, destination_object_id, false, destination_value, false);
@@ -1879,7 +1918,7 @@
 					var destination_obj_wrapper = destination_obj = $(destination_selector, this.form_canvas_obj);
 
 					// Get value parsed
-					var destination_value = (typeof(action_single['value']) === 'undefined') ? false : this.parse_variables_process(action_single['value'], false, false, false, false, false).output;
+					var destination_value = (typeof(action_single.value) === 'undefined') ? false : this.parse_variables_process(action_single.value, false, false, false, false, false).output;
 
 					// Process action
 					var conditional_process_action_return =  this.conditional_process_action(action_then_else, destination_action, destination_obj_wrapper, destination_obj, destination_object, destination_object_id, false, destination_value, false);
@@ -1916,7 +1955,7 @@
 						var destination_repeatable_index = ((typeof($(this).attr('data-repeatable-index')) !== 'undefined') ? $(this).attr('data-repeatable-index') : false);
 
 						// Get value parsed
-						var destination_value = (typeof(action_single['value']) === 'undefined') ? false : ws_this.parse_variables_process(action_single['value'], destination_repeatable_index, false, false, false, false, false).output;
+						var destination_value = (typeof(action_single.value) === 'undefined') ? false : ws_this.parse_variables_process(action_single.value, destination_repeatable_index, false, false, false, false, false).output;
 
 						// Process action
 						var conditional_process_action_return = ws_this.conditional_process_action(action_then_else, destination_action, $(this), $(this), destination_object, destination_object_id, false, destination_value, destination_repeatable_index);
@@ -1988,7 +2027,7 @@
 						var field_to = (typeof(ws_this.field_data_cache[destination_object_id]) !== 'undefined') ? ws_this.field_data_cache[destination_object_id] : false;
 
 						// Get value parsed
-						var destination_value = (typeof(action_single['value']) === 'undefined') ? false : ws_this.parse_variables_process(action_single['value'], destination_repeatable_index, false, field_to, false, false, false).output;
+						var destination_value = (typeof(action_single.value) === 'undefined') ? false : ws_this.parse_variables_process(action_single.value, destination_repeatable_index, false, field_to, false, false, false).output;
 
 						// Process action
 						var conditional_process_action_return = ws_this.conditional_process_action(action_then_else, destination_action, $(this), destination_obj, destination_object, destination_object_id, destination_object_row_id, destination_value, destination_repeatable_index);
@@ -2002,7 +2041,7 @@
 				case 'action' :
 
 					// Get value parsed
-					var destination_value = (typeof(action_single['value']) === 'undefined') ? false : ws_this.parse_variables_process(action_single['value'], false, false, false, false, false).output;
+					var destination_value = (typeof(action_single.value) === 'undefined') ? false : ws_this.parse_variables_process(action_single.value, false, false, false, false, false).output;
 
 					// Process action
 					var conditional_process_action_return = ws_this.conditional_process_action(action_then_else, destination_action, $(this), false, destination_object, destination_object_id, false, destination_value, false);
@@ -2258,6 +2297,9 @@
 
 				debug_action_language_id = 'debug_action_' + ((action == 'value_row_required') ? 'required' : 'not_required');
 
+				// Reset bypass attributes on object so that form_bypass processes correctly
+				this.form_bypass_obj_reset(obj);
+
 				process_required = true;
 				process_bypass = true;
 
@@ -2283,6 +2325,7 @@
 			case 'value_row_not_visible' :
 
 				if(action === 'value_row_not_visible') { obj.parent().hide(); } else { obj.parent().show(); }
+				obj.trigger('change');
 				debug_action_language_id = 'debug_action_' + ((action == 'value_row_not_visible') ? 'hide' : 'show');
 				process_bypass = true;
 				break;
@@ -2331,6 +2374,12 @@
 
 				this.obj_set_attribute(obj, action, value);
 
+				// Reset bypass attributes on object so that form_bypass processes correctly
+				this.form_bypass_obj_reset(obj);
+
+				// Process bypass
+				process_bypass = true;
+
 				break;
 
 			// Set min / max / step (Integer)
@@ -2343,6 +2392,12 @@
 				value = (value != '') ? this.get_number(value, 0, false) : false;
 
 				this.obj_set_attribute(obj, action_int, value);
+
+				// Reset bypass attributes on object so that form_bypass processes correctly
+				this.form_bypass_obj_reset(obj);
+
+				// Process bypass
+				process_bypass = true;
 
 				break;
 
@@ -2741,6 +2796,7 @@
 
 			// Required
 			case 'required' :
+			case 'required_signature' :
 
 				// Get field data
 				var field = this.field_data_cache[object_id];
@@ -2758,41 +2814,15 @@
 
 				if(value == 'on') {
 
-					// Set ARIA required
 					obj.attr('data-required', '').attr('aria-required', 'true').removeAttr('data-conditional-logic-bypass');
 
 				} else {
 
-					// Set ARIA not required
-					obj.removeAttr('data-required').removeAttr('aria-required').removeAttr('data-required-bypass').removeAttr('data-aria-required-bypass').attr('data-conditional-logic-bypass', '');
+					obj.removeAttr('data-required').removeAttr('aria-required').attr('data-conditional-logic-bypass', '');
 				}
 
-				// Re-process form validation
-				this.form_validate_real_time();
-
-				debug_action_language_id = 'debug_action_' + ((value == 'on') ? 'required' : 'not_required');
-
-				process_required = true;
-				process_bypass = true;
-
-				break;
-
-			// Required - Signature
-			case 'required_signature' :
-
-				// Set required attribute
-				obj.prop('required', (value == 'on')).removeAttr('data-init-required');
-
-				if(value == 'on') {
-
-					// Set ARIA required
-					obj.attr('data-required', '').attr('aria-required', 'true').removeAttr('data-conditional-logic-bypass');
-
-				} else {
-
-					// Set ARIA not required
-					obj.removeAttr('data-required').removeAttr('aria-required').removeAttr('data-required-bypass').removeAttr('data-aria-required-bypass').attr('data-conditional-logic-bypass', '');
-				}
+				// Reset bypass attributes on object so that form_bypass processes correctly
+				this.form_bypass_obj_reset(obj);
 
 				// Re-process form validation
 				this.form_validate_real_time();
@@ -2833,7 +2863,7 @@
 
 				if(typeof(this.generate_password) === 'function') {
 
-					obj.val(this.generate_password(16)).trigger('change');
+					obj.val(this.generate_password(24)).trigger('change');
 				}
 
 				break;
@@ -2876,6 +2906,9 @@
 
 				// Set invalid feedback
 				this.set_invalid_feedback(obj, value, object_row_id);
+
+				// Reset bypass attributes on object so that form_bypass processes correctly
+				this.form_bypass_obj_reset(obj);
 
 				// Process bypass
 				process_bypass = true;
@@ -2996,6 +3029,12 @@
 
 					this.error('error_js', value);
 				}
+				break;
+
+			// Copy to clipboard
+			case 'copy_to_clipboard' :
+
+				navigator.clipboard.writeText(obj.val());
 				break;
 
 			// Form - Show validation
@@ -3150,7 +3189,7 @@
 
 				var conditional_settings = $.WS_Form.settings_form.conditional;
 				var conditional_settings_objects = conditional_settings.objects;
-				var conditional_settings_actions = conditional_settings_objects[object]['action'];
+				var conditional_settings_actions = conditional_settings_objects[object].action;
 				var conditional_settings_action = conditional_settings_actions[action];
 
 				if(!conditional_settings_action) {

@@ -27,7 +27,7 @@
 		$form_id = absint($form_id);
 
 		// Check form ID
-		if($form_id === 0) { throw new Exception('Invalid form ID'); }
+		if($form_id === 0) { throw new Exception('Invalid form ID (wsf_form_get_object)'); }
 
 		// Create new form instance
 		$ws_form_form = new WS_Form_Form();
@@ -52,7 +52,7 @@
 		$form_id = absint($form_id);
 
 		// Check form ID
-		if($form_id === 0) { throw new Exception('Invalid form ID'); }
+		if($form_id === 0) { throw new Exception('Invalid form ID (wsf_form_get_label_by_id)'); }
 
 		// Create new form instance
 		$ws_form_form = new WS_Form_Form();
@@ -84,7 +84,7 @@
 		$form_id = absint($form_id);
 
 		// Check form ID
-		if($form_id === 0) { throw new Exception('Invalid form ID'); }
+		if($form_id === 0) { throw new Exception('Invalid form ID (wsf_form_get_count_submit_by_id)'); }
 
 		// Create new form stat instance
 		$ws_form_form_stat = new WS_Form_Form_Stat();
@@ -109,17 +109,11 @@
 	 */
 	function wsf_form_get_all($published = false, $order_by = 'label') {
 
-		// Build WHERE SQL
-		$where_sql = $published ? 'status="publish"' : 'NOT status="trash"';
-
-		// Build order_by_sql
-		$order_by_sql = in_array($order_by, array('id', 'label', 'date_added', 'date_updated'), true) ? $order_by : 'label';
-
 		// Initiate instance of Form class
 		$ws_form_form = new WS_Form_Form();
 
 		// Read all forms
-		return $ws_form_form->db_read_all('', $where_sql, $order_by_sql, '', '', false, true);
+		return $ws_form_form->get_all($published, $order_by);
 	}
 
 	/**
@@ -130,20 +124,13 @@
 	 *
 	 * @return Array WS_Form_Form  id => label
 	 */
-	function wsf_form_get_all_key_value($published = false, $order_by = 'label') {
+	function wsf_form_get_all_key_value($published = false, $order_by = 'label', $include_ids = true) {
 
-		// Get all forms
-		$forms = wsf_form_get_all($published = false, $order_by = 'label');
+		// Initiate instance of Form class
+		$ws_form_form = new WS_Form_Form();
 
-		// Build return array
-		$return_array = array();
-
-		foreach($forms as $form) {
-
-			$return_array[$form['id']] = sprintf(__('%s (ID: %u)', 'ws-form'), esc_html($form['label']), $form['id']);
-		}
-
-		return $return_array;
+		// Read all forms
+		return $ws_form_form->get_all_key_value($published, $order_by);
 	}
 
 	/**
@@ -462,8 +449,13 @@
 
 		if(count($return_fields) === 0) {
 
-			throw new Exception('Field not found');
-		}
+			throw new Exception(
+
+				empty($field_id) ?
+				'Field not found' :
+				sprintf('Field ID %u not found', absint($field_id))
+			);
+ 		}
 
 		return $return_fields;
 	}
@@ -562,7 +554,7 @@
 			default : $meta_key = 'data_grid';
 		}
 
-		if(!isset($field_object->meta->{$meta_key})) { throw new Exception('Field meta key ' . $meta_key . ' not found'); }
+		if(!isset($field_object->meta->{$meta_key})) { throw new Exception('Field meta key ' . esc_html($meta_key) . ' not found'); }
 
 		return $field_object->meta->{$meta_key};
 	}
@@ -775,7 +767,7 @@
 	 */
 	function wsf_submit_get_object($submit_id) {
 
-		$ws_form_submit = New WS_Form_Submit();
+		$ws_form_submit = new WS_Form_Submit();
 		$ws_form_submit->id = $submit_id;
 		$ws_form_submit->db_read(true, true, true);
 
@@ -791,7 +783,7 @@
 	 */
 	function wsf_submit_get_by_hash($submit_hash) {
 
-		$ws_form_submit = New WS_Form_Submit();
+		$ws_form_submit = new WS_Form_Submit();
 		$ws_form_submit->hash = $submit_hash;
 		$ws_form_submit->db_read_by_hash(true, true, false, true);
 
@@ -986,7 +978,7 @@
 		));
 
 		// Update submit meta data
-		$ws_form_submit_meta = New WS_Form_Submit_Meta();
+		$ws_form_submit_meta = new WS_Form_Submit_Meta();
 		$ws_form_submit_meta->parent_id = $submit_id;
 		return $ws_form_submit_meta->db_update_from_array($meta);
 	}
@@ -1023,7 +1015,7 @@
 		));
 
 		// Update submit meta data
-		$ws_form_submit_meta = New WS_Form_Submit_Meta();
+		$ws_form_submit_meta = new WS_Form_Submit_Meta();
 		$ws_form_submit_meta->parent_id = $submit_id;
 		return $ws_form_submit_meta->db_update_from_array($meta);
 	}

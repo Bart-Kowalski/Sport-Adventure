@@ -21,6 +21,9 @@ class Polylang {
 			add_filter( 'pll_the_languages_args', [ $this, 'modify_language_switcher_post_id' ] );
 		}
 
+		// Change the register hook to rest_pre_dispatch for Polylang in REST API requests (#86c3htjt0 @since 2.0)
+		add_filter( 'bricks/dynamic_data/register_hook', [ $this, 'register_hook' ] );
+
 		add_action( 'init', [ $this, 'init_elements' ] );
 
 		add_filter( 'bricks/helpers/get_posts_args', [ $this, 'polylang_get_posts_args' ] );
@@ -62,6 +65,17 @@ class Polylang {
 		add_action( 'bricks/render_query_result/start', [ $this, 'switch_locale' ] );
 		add_action( 'bricks/render_query_page/start', [ $this, 'switch_locale' ] );
 		add_action( 'bricks/render_popup_content/start', [ $this, 'switch_locale' ] );
+	}
+
+	/**
+	 * init or rest_api_init is too early and causing Poylang no language set, use rest_pre_dispatch which will run after rest_api_init and before callback.
+	 *
+	 * #86c3htjt0
+	 *
+	 * @since 2.0.2
+	 */
+	public function register_hook( $hook ) {
+		return \Bricks\Api::is_bricks_rest_request() ? 'rest_pre_dispatch' : $hook;
 	}
 
 	/**

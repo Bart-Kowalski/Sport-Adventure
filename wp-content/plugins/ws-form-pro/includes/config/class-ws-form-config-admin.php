@@ -238,11 +238,21 @@
 
 									'fieldsets'	=>	array(
 
-/*										array(
-											'label'			=>	__('WS Form Anti-Spam', 'ws-form'),
-											'meta_keys'	=> array('antispam')
+										array(
+											'label'			=>	__('IP Throttling', 'ws-form'),
+											'meta_keys'	=> array('ip_limit', 'ip_limit_intro', 'ip_limit_count', 'ip_limit_period', 'ip_limit_message', 'ip_limit_message_type')
 										),
-*/
+
+										array(
+											'label'			=>	__('IP Blocklist', 'ws-form'),
+											'meta_keys'	=> array('ip_blocklist', 'ip_blocklist_ips', 'ip_blocklist_message', 'ip_blocklist_message_type', 'ip_blocklist_note')
+										),
+
+										array(
+											'label'			=>	__('Keyword Blocklist', 'ws-form'),
+											'meta_keys'	=> array('keyword_blocklist', 'keyword_blocklist_keywords', 'keyword_blocklist_message', 'keyword_blocklist_note')
+										),
+
 										array(
 											'label'			=>	__('Honeypot', 'ws-form'),
 											'meta_keys'	=> array('honeypot')
@@ -263,7 +273,7 @@
 
 										array(
 											'label'			=>	__('By Submission Count', 'ws-form'),
-											'meta_keys'	=> array('submit_limit', 'submit_limit_count', 'submit_limit_period', 'submit_limit_message', 'submit_limit_message_type')
+											'meta_keys'	=> array('submit_limit', 'submit_limit_count', 'submit_limit_logged_in', 'submit_limit_period', 'submit_limit_message', 'submit_limit_message_type')
 										),
 
 										array(
@@ -278,11 +288,6 @@
 										array(
 											'label'			=>	__('By User', 'ws-form'),
 											'meta_keys'	=> array('user_limit_logged_in', 'form_user_roles', 'form_user_capabilities', 'user_limit_logged_in_message_type', 'user_limit_logged_in_message')
-										),
-
-										array(
-											'label'			=>	__('By IP', 'ws-form'),
-											'meta_keys'	=> array('ip_limit', 'ip_limit_count', 'ip_limit_period', 'ip_limit_message', 'ip_limit_message_type')
 										)
 									)
 								),
@@ -317,7 +322,7 @@
 
 										array(
 											'label'		=>	__('Styling', 'ws-form'),
-											'meta_keys'	=> array('conversational_customize')
+											'meta_keys'	=> WS_Form_Common::styler_enabled() ? array('style_id_conv', 'conversational_style') : array('conversational_customize')
 										),
 
 										array(
@@ -447,8 +452,8 @@
 
 									'label'			=>	__('Basic', 'ws-form'),
 									'meta_keys'	=>	array('label_render_off', 'hidden_section'),
-									'fieldsets'	=>	array(
 
+									'fieldsets'	=>	array(
 										array(
 											'label'			=>	__('Repeatable', 'ws-form'),
 											'meta_keys'	=> array('section_repeatable', 'section_repeat_label', 'section_repeat_default')
@@ -457,7 +462,11 @@
 										array(
 											'label'		=>	__('Remove Row Behavior', 'ws-form'),
 											'meta_keys'	=>	array('section_repeatable_remove_row_confirm', 'section_repeatable_remove_row_confirm_message')
-										)
+										),
+										array(
+											'label'		=>	__('Accessibility', 'ws-form'),
+											'meta_keys'	=>	array('aria_label')
+										),
 									)
 								),
 
@@ -490,6 +499,11 @@
 											'meta_keys'	=> array('section_repeat_min',
 												'section_repeat_max', 'section_repeatable_delimiter_section', 'section_repeatable_delimiter_row')
 										),
+										array(
+											'label'		=>	__('Custom Attributes', 'ws-form'),
+											'meta_keys'	=>	array('custom_attributes')
+										),
+
 										array(
 											'label'		=>	__('Breakpoints', 'ws-form'),
 											'meta_keys'	=> array('breakpoint_sizes'),
@@ -673,6 +687,7 @@
 					'field'				=>	__('Field', 'ws-form'),
 					'fields'			=>	__('Fields', 'ws-form'),
 					'field_label'		=>	__('Field Label', 'ws-form'),
+					/* translators: %s: Field type label, e.g. Text */
 					'field_label_aria'	=>	__('%s field label', 'ws-form'),
 					'action'			=>	__('Action', 'ws-form'),
 					'actions'			=>	__('Actions', 'ws-form'),
@@ -712,7 +727,7 @@
 					'disabled'			=>	__('Disabled', 'ws-form'),
 					'readonly'			=>	__('Read Only', 'ws-form'),
 					'saving'			=>	__('Saving', 'ws-form'),
-					'clipboard'			=>	__('Click to Copy', 'ws-form'),
+					'clipboard'			=>	__('Click to copy', 'ws-form'),
 
 					// Tutorial
 					'intro_learn_more'	=>	__('Learn More', 'ws-form'),
@@ -730,11 +745,13 @@
 
 					// Error messages
 					'error_field_type_unknown'			=>	__('Unknown field type', 'ws-form'),
+					/* translators: %s: Breakpoint name */
 					'error_admin_max_width'				=>	__('admin_max_width not defined for breakpoint: %s.', 'ws-form'),
 					'error_object'						=>	__('Unable to find object', 'ws-form'),
 					'error_object_data'					=>	__('Unable to retrieve object data', 'ws-form'),
 					'error_object_meta_value'			=>	__('Unable to retrieve object meta', 'ws-form'),
 					'error_object_type'					=>	__('Unable to determine object type', 'ws-form'),
+					/* translators: %s: Meta key */
 					'error_meta_key'					=>	__('Unknown meta_key: %s', 'ws-form'),
 					'error_data_grid'					=>	__('Data grid not specified', 'ws-form'),
 					'error_data_grid_groups'			=>	__('Data grid has no groups', 'ws-form'),
@@ -744,9 +761,12 @@
 					'error_data_grid_csv_no_data'		=>	__('No data to export', 'ws-form'),
 					'error_data_grid_row_id'			=>	__('Data grid row has no ID', 'ws-form'),
 					'error_timeout_codemirror'			=>	__('Timeout waiting for CodeMirror to load', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_submit_export'				=>	__('Export error: %s', 'ws-form'),
 					'error_auto_map_api_fields'			=>	__('No API fields to map'),
 					'error_action_list_sub_get'			=>	__('Unable to retrieve list subs'),
+					/* translators: %s: Error message */
+					'error_api_reload'        			=> 	__('API reload error: %s', 'ws-form'),
 
 					// Popover
 					'confirm_group_delete'				=>	__('Are you sure you want to delete this tab?', 'ws-form'),
@@ -778,18 +798,25 @@
 
 					// Section templates
 					'section_selector_import'			=>	__('Import Section', 'ws-form'),
-					'section_selector_drop_zone'		=>	sprintf('%s<br /><a href="%s" target="_blank">%s</a>', __('Drag a form JSON file here', 'ws-form'), WS_Form_Common::get_plugin_website_url('/knowledgebase/section-library/', 'siderbar_toolbox'), __('Learn more', 'ws-form')),
+					'section_selector_drop_zone'		=>	sprintf('%s<br /><a href="%s" target="_blank">%s</a>', __('Drag a form JSON file here', 'ws-form'), WS_Form_Common::get_plugin_website_url('/knowledgebase/section-library/', 'sidebar_toolbox'), __('Learn more', 'ws-form')),
 					'section_download'					=>	__('Export Section', 'ws-form'),
 					'section_delete'					=>	__('Delete Section', 'ws-form'),
 
 					// Data grids - Data sources
 					'data_grid_data_source_error'			=>	__('Error retrieving data source', 'ws-form'),
+					/* translators: %s: Error message */
 					'data_grid_data_source_error_s'			=>	__('Error retrieving data source: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'data_grid_data_source_error_last'			=>	__('Error retrieving data source<br />%s', 'ws-form'),
+					/* translators: %s: Field label */
 					'data_grid_data_source_error_last_field'	=>	__('Field: %s', 'ws-form'),
+					/* translators: %s: Field ID */
 					'data_grid_data_source_error_last_field_id'	=>	__('ID: %s', 'ws-form'),
+					/* translators: %s: Data source */
 					'data_grid_data_source_error_last_source'	=>	__('Data source: %s', 'ws-form'),
+					/* translators: %s: Date */
 					'data_grid_data_source_error_last_date'		=>	__('Last attempt: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'data_grid_data_source_error_last_error'	=>	__('Error: %s', 'ws-form'),
 
 					// Data grids - Groups
@@ -846,6 +873,7 @@
 
 					// Data grids - Actions
 					'data_grid_action_edit'					=>	__('Edit', 'ws-form'),
+					'data_grid_action_clone'				=>	__('Clone', 'ws-form'),
 					'data_grid_action_action'				=>	__('Action', 'ws-form'),
 					'data_grid_action_event'				=>	__('When Should This Action Run?', 'ws-form'),
 					'data_grid_action_event_conditional'	=>	__('Actions can also be run by using conditional logic.', 'ws-form'),
@@ -853,10 +881,6 @@
 					// Data grids - Conditional
 					'data_grid_conditional_edit'			=>	__('Edit', 'ws-form'),
 					'data_grid_conditional_clone'			=>	__('Clone', 'ws-form'),
-
-					// Data grids - Actions
-					'data_grid_action_edit'					=>	__('Edit', 'ws-form'),
-					'data_grid_action_clone'				=>	__('Clone', 'ws-form'),
 
 					// Data grids - Insert image
 					'data_grid_insert_image'				=>	__('Insert Image', 'ws-form'),
@@ -944,14 +968,20 @@
 					'breakpoint_option_offset_plural'			=>	'%s',
 
 					// Orientation Breakpoint options
+					/* translators: %s: Breakpoint name */
 					'orientation_breakpoint_label_width'					=>	__('%s Width', 'ws-form'),
+					/* translators: %s: Fraction */
 					'orientation_breakpoint_width'							=>	__(' = %s width', 'ws-form'),
 					'orientation_breakpoint_width_full'						=>	__(' = Full width', 'ws-form'),
 					'orientation_breakpoint_option_default'					=>	__('Default', 'ws-form'),
 					'orientation_breakpoint_option_inherit'					=>	__('Inherit', 'ws-form'),
+					/* translators: %s: Column count */
 					'orientation_breakpoint_option_column_default_singular'	=>	'%s column',
+					/* translators: %s: Column count */
 					'orientation_breakpoint_option_column_default_plural'	=>	'%s columns',
+					/* translators: %s: Column count */
 					'orientation_breakpoint_option_column_singular'			=>	'%s column',
+					/* translators: %s: Column count */
 					'orientation_breakpoint_option_column_plural'			=>	'%s columns',
 
 					'column_size_change'						=>	__('Change column size', 'ws-form'),
@@ -963,7 +993,6 @@
 					'submit_date_added'							=>	__('Added', 'ws-form'),
 					'submit_date_updated'						=>	__('Updated', 'ws-form'),
 					'submit_user'								=>	__('User', 'ws-form'),
-					'submit_status'								=>	__('Status', 'ws-form'),
 					'submit_duration'							=>	__('Duration', 'ws-form'),
 					'submit_tracking'							=>	__('Tracking', 'ws-form'),
 					'submit_tracking_geo_location_permission_denied'	=>	__('User denied the request for geo location.', 'ws-form'),
@@ -1003,7 +1032,11 @@
 
 					// Contact
 					'support_contact_thank_you'			=>	__('Thank you for your support request.', 'ws-form'),
-					'support_contact_error'				=>	__('An error occurred when submitting your support request. Please email support@wsform.com (%s)', 'ws-form'),
+					'support_contact_error' => sprintf(
+						/* translators: %s: Support email address. */
+						__('An error occurred when submitting your support request. Please email %s', 'ws-form'),
+						'support@wsform.com'
+					) ,
 
 					// Starred
 					'starred_on'						=>	__('Starred', 'ws-form'),
@@ -1014,6 +1047,8 @@
 					'viewed_off'						=>	__('Mark as Read', 'ws-form'),
 
 					// Form location
+					/* translators: %s: Form location(s) */
+					'form_location_found'				=>	__('Form found in %s', 'ws-form'),
 					'form_location_not_found'			=>	__('Form not found in content', 'ws-form'),
 
 					// Clipboard
@@ -1040,7 +1075,12 @@
 					'usage_action'			=>	__('Actions', 'ws-form'),
 					'usage_datagrid'		=>	__('Data Grid', 'ws-form'),
 					'usage_texthelp'		=>	__('Text Help', 'ws-form'),
-					'usage_progresshelp'	=>	__('Progress Help', 'ws-form')
+					'usage_progresshelp'	=>	__('Progress Help', 'ws-form'),
+
+					 // Styler
+					'styler_default_confirm' => __('Are you sure you want to set this style as the default for standard forms?', 'ws-form'),
+					'styler_default_conv_confirm' => __('Are you sure you want to set this style as the default for conversational forms?', 'ws-form'),
+					'styler_reset_confirm' => __('Are you sure you want to reset this to the default WS Form styling?', 'ws-form'),
 				)
 			);
 
@@ -1059,6 +1099,16 @@
 
 				$method = $buttons['method'];
 				$settings_form_admin['field']['buttons'][$key]['icon'] = self::get_icon_16_svg($method);
+			}
+
+			// Styler
+			if(WS_Form_Common::styler_enabled()) {
+
+				array_unshift($settings_form_admin['sidebars']['form']['meta']['fieldsets']['styling']['fieldsets'], array(
+
+					'label'		=>	__('Style', 'ws-form'),
+					'meta_keys'	=> array('style_id')
+				));
 			}
 
 			// Apply filter
@@ -1083,8 +1133,14 @@
 
 					array('type' => 'select', 'source' => 'field', 'colspan' => 2, 'label' => __('Insert Field', 'ws-form'), 'action' => 'insert-select'),
 					array('type' => 'button', 'label' => __('del', 'ws-form'), 'class' => 'wsf-button-danger', 'title' => __('Delete', 'ws-form'), 'action' => 'delete'),
-					/* translators: AC = All Clear button on calculator */
-					array('type' => 'button', 'label' => __('AC', 'ws-form'), 'class' => 'wsf-button-danger', 'title' => __('All Clear', 'ws-form'), 'action' => 'clear'),
+					array(
+						'type' => 'button',
+						/* translators: AC = All Clear button on calculator */
+						'label' => __('AC', 'ws-form'),
+						'class' => 'wsf-button-danger',
+						'title' => __('All Clear', 'ws-form'),
+						'action' => 'clear'
+					),
 				),
 
 				// Row 2
@@ -1092,7 +1148,7 @@
 
 					array('type' => 'button', 'label' => '(', 'title' => __('Opening Parentheses', 'ws-form'), 'action' => 'insert', 'insert' => '('),
 					array('type' => 'button', 'label' => ')', 'title' => __('Closing Parentheses', 'ws-form'), 'action' => 'insert', 'insert' => ')'),
-					array('type' => 'button', 'label' => ',', 'title' => __('Percentage', 'ws-form'), 'action' => 'insert', 'insert' => ','),
+					array('type' => 'button', 'label' => ',', 'title' => __('Comma', 'ws-form'), 'action' => 'insert', 'insert' => ','),
 					array('type' => 'select', 'source' => 'variables', 'label' => 'f', 'class' => 'wsf-button-primary', 'title' => __('Variables', 'ws-form'), 'action' => 'insert-select-highlight-parameters', 'variables_group_id' => 'math'),
 				),
 
@@ -1229,7 +1285,7 @@
 					);
 				}
 
-				self::parse_variable_help_add($parse_variable_help, $parse_variable_help_single);
+				$parse_variable_help[] = $parse_variable_help_single;
 			}
 
 			// Apply filter
@@ -1251,21 +1307,6 @@
 			self::$parse_variable_help[$public] = $parse_variable_help;
 
 			return $parse_variable_help;
-		}
-
-		// Parse variables help add
-		public static function parse_variable_help_add(&$parse_variable_help, $parse_variable_help_single) {
-
-			$passthrough_attributes = array('description', 'limit', 'kb_slug');
-
-			// Passthrough attributes
-			foreach($passthrough_attributes as $passthrough_attribute) {
-
-				if(isset($parse_variable[$passthrough_attribute])) { $parse_variable_help_single[$passthrough_attribute] = $parse_variable[$passthrough_attribute]; }
-
-			}
-
-			$parse_variable_help[] = $parse_variable_help_single;
 		}
 
 		// System report
@@ -1351,7 +1392,7 @@
 					'variables'	=> array(
 
 						'version'	=> array('label' => __('Version', 'ws-form'), 'value' => $wpdb->db_version(), 'valid' => version_compare($wpdb->db_version(), $required_mysql_version, '>='), 'min' => $required_mysql_version),
-						'max_allowed_packet' => array('label' => __('Max Allowed Packet', 'ws-form'), 'value' => $mysql_max_allowed_packet, 'type' => 'size', 'valid' => ($mysql_max_allowed_packet >= WS_FORM_MIN_MYSQL_MAX_ALLOWED_PACKET), 'min' => '4 MB')
+						'max_allowed_packet' => array('label' => __('Max Allowed Packet', 'ws-form'), 'value' => $mysql_max_allowed_packet, 'type' => 'size', 'valid' => ($mysql_max_allowed_packet >= WS_FORM_MAX_MYSQL_ALLOWED_PACKET), 'min' => '4 MB')
 					)
 				)
 			);

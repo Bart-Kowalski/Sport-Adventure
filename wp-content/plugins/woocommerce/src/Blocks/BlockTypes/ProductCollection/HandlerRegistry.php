@@ -62,6 +62,30 @@ class HandlerRegistry {
 		);
 
 		$this->register_collection_handlers(
+			'woocommerce/product-collection/by-category',
+			function ( $collection_args, $common_query_values, $query ) {
+				// For Products by Category collection, if no category is selected, we should return an empty result set.
+				if ( empty( $query['taxonomies_query'] ) ) {
+					return array(
+						'post__in' => array( -1 ),
+					);
+				}
+			}
+		);
+
+		$this->register_collection_handlers(
+			'woocommerce/product-collection/by-tag',
+			function ( $collection_args, $common_query_values, $query ) {
+				// For Products by Tag collection, if no tag is selected, we should return an empty result set.
+				if ( empty( $query['taxonomies_query'] ) ) {
+					return array(
+						'post__in' => array( -1 ),
+					);
+				}
+			}
+		);
+
+		$this->register_collection_handlers(
 			'woocommerce/product-collection/related',
 			function ( $collection_args ) {
 				// No products should be shown if no related product reference is set.
@@ -85,7 +109,9 @@ class HandlerRegistry {
 				$related_products = wc_get_related_products(
 					$collection_args['relatedProductReference'],
 					// Use a higher limit so that the result set contains enough products for the collection to subsequently filter.
-					100
+					100,
+					array(),
+					$collection_args['relatedBy']
 				);
 
 				remove_filter( 'woocommerce_product_related_posts_relate_by_category', $category_callback, PHP_INT_MAX );
@@ -113,7 +139,10 @@ class HandlerRegistry {
 				}
 
 				$collection_args['relatedProductReference'] = $product_reference;
-				$collection_args['relatedBy']               = array(
+				$collection_args['relatedBy']               = ! isset( $query['relatedBy'] ) ? array(
+					'categories' => true,
+					'tags'       => true,
+				) : array(
 					'categories' => isset( $query['relatedBy']['categories'] ) && true === $query['relatedBy']['categories'],
 					'tags'       => isset( $query['relatedBy']['tags'] ) && true === $query['relatedBy']['tags'],
 				);
@@ -132,9 +161,13 @@ class HandlerRegistry {
 
 				$collection_args['relatedProductReference'] = $product_reference;
 
-				$collection_args['relatedBy'] = array(
-					'categories' => rest_sanitize_boolean( $request->get_param( 'relatedBy' )['categories'] ?? false ),
-					'tags'       => rest_sanitize_boolean( $request->get_param( 'relatedBy' )['tags'] ?? false ),
+				$related_by                   = $request->get_param( 'relatedBy' );
+				$collection_args['relatedBy'] = ! isset( $related_by ) ? array(
+					'categories' => true,
+					'tags'       => true,
+				) : array(
+					'categories' => rest_sanitize_boolean( $related_by['categories'] ?? false ),
+					'tags'       => rest_sanitize_boolean( $related_by['tags'] ?? false ),
 				);
 
 				return $collection_args;

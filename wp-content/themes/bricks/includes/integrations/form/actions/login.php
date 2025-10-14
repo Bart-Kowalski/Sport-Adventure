@@ -39,6 +39,10 @@ class Login extends Base {
 			return;
 		}
 
+		// Fix wp_get_current_user failed (#86c4dvxc0)
+		wp_set_current_user( $login_response->ID );
+		wp_set_auth_cookie( $login_response->ID, $remember );
+
 		$redirect_to = '';
 
 		// Check for the 'redirect_to' URL parameter if 'redirect' action is not set (@since 1.11)

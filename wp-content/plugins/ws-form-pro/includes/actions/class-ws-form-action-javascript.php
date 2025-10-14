@@ -19,20 +19,26 @@
 
 		public function __construct() {
 
+			// Events
+			$this->events = array('submit');
+
+			// Register config filters
+			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = __('Run JavaScript', 'ws-form');
 
 			// Set label for actions pull down
 			$this->label_action = __('Run JavaScript', 'ws-form');
 
-			// Events
-			$this->events = array('submit');
-
 			// Register action
 			parent::register($this);
-
-			// Register config filters
-			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 		}
 
 		public function post($form, &$submit, $config) {

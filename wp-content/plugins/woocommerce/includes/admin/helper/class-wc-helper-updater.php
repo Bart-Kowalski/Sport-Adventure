@@ -409,7 +409,9 @@ class WC_Helper_Updater {
 		$payload = array();
 
 		// Scan subscriptions.
-		foreach ( WC_Helper::get_subscriptions() as $subscription ) {
+		$subscriptions = WC_Helper::get_subscriptions();
+
+		foreach ( $subscriptions as $subscription ) {
 			$payload[ $subscription['product_id'] ] = array(
 				'product_id' => $subscription['product_id'],
 				'file_id'    => '',
@@ -443,7 +445,9 @@ class WC_Helper_Updater {
 		$payload = array();
 
 		// Scan subscriptions.
-		foreach ( WC_Helper::get_subscriptions() as $subscription ) {
+		$subscriptions = WC_Helper::get_subscriptions();
+
+		foreach ( $subscriptions as $subscription ) {
 			$payload[ $subscription['product_id'] ] = array(
 				'product_id' => $subscription['product_id'],
 				'file_id'    => '',
@@ -690,6 +694,10 @@ class WC_Helper_Updater {
 				continue;
 			}
 
+			if ( ! is_plugin_active( $plugin['_filename'] ) ) {
+				continue;
+			}
+
 			if ( version_compare( $plugin['Version'], $update_data[ $plugin['_product_id'] ]['version'], '<' ) ) {
 				++$count;
 			}
@@ -698,6 +706,10 @@ class WC_Helper_Updater {
 		// Scan local themes.
 		foreach ( WC_Helper::get_local_woo_themes() as $theme ) {
 			if ( empty( $update_data[ $theme['_product_id'] ] ) ) {
+				continue;
+			}
+
+			if ( get_stylesheet() !== $theme['_stylesheet'] ) {
 				continue;
 			}
 
@@ -775,7 +787,7 @@ class WC_Helper_Updater {
 	 */
 	public static function get_updates_count_html() {
 		$count      = self::get_updates_count_based_on_site_status();
-		$count_html = sprintf( '<span class="update-plugins count-%d"><span class="update-count">%d</span></span>', $count, number_format_i18n( $count ) );
+		$count_html = sprintf( ' <span class="update-plugins count-%d"><span class="update-count">%d</span></span>', $count, number_format_i18n( $count ) );
 
 		return $count_html;
 	}
@@ -823,7 +835,7 @@ class WC_Helper_Updater {
 			sprintf(
 				// translators: %s: URL of WooCommerce.com subscriptions tab.
 				__( 'Please visit the <a href="%s" target="_blank">subscriptions page</a> and renew to continue receiving updates.', 'woocommerce' ),
-				esc_url( admin_url( 'admin.php?page=wc-addons&section=helper' ) )
+				esc_url( admin_url( 'admin.php?page=wc-admin&tab=my-subscriptions&path=%2Fextensions' ) )
 			)
 		);
 	}

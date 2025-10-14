@@ -2313,8 +2313,6 @@ window.ADMINBRXC = {
     ],
     handleGlobalClassesOnLoad: function(){
         const self = this;
-        const isClassAndStyleActive = self.helpers.isClassesAndStylesTabActive();
-        const classAndStylesAtt = self.globalSettings.generalCats.classesAndStyles || [];
         let globalClasses = self.vueState.globalClasses || [];
         let globalClassesLocked = self.vueState.globalClassesLocked || [];
         let globalClassesCategories = self.vueState.globalClassesCategories || [];
@@ -2335,11 +2333,9 @@ window.ADMINBRXC = {
         globalClasses = globalClasses.reduce((accumulatedClasses, item) => {
             if (!item || !item.id) return accumulatedClasses;
     
-            let modified = false;
-    
             // Remove imported classes if options turned off
             const isImportedClass = item.id.startsWith("brxc_imported");
-            if ((!isClassAndStyleActive || !classAndStylesAtt.includes('class-importer')) && isImportedClass) {
+            if (isImportedClass) {
                 hasChangesGlobalClasses = true;
                 return accumulatedClasses;
             }
@@ -4458,7 +4454,6 @@ window.ADMINBRXC = {
         let finalClasses = []
         let newClasses = [];
         const globalClasses = self.vueState.globalClasses;
-        const elementObj = self.builderStates.activeElement;
         if (classes) {
            newClasses = classes.split(/\s+/).filter(word => word.trim() !== '').filter((value, index, array) => array.indexOf(value) === index);
         }
@@ -4476,7 +4471,15 @@ window.ADMINBRXC = {
                 finalClasses.push(id)
             })
         }
-        elementObj.settings._cssGlobalClasses = [...new Set(finalClasses)];
+
+        if(self.helpers.areElementsSelected()){
+            self.vueState.selectedElements.forEach(el => {
+                el.settings._cssGlobalClasses = [...new Set(finalClasses)];        
+            })
+        } else {
+            self.builderStates.activeElement.settings._cssGlobalClasses = [...new Set(finalClasses)]; 
+        }
+
         self.closeModal(target, target.target, '#brxcPlainClassesOverlay');
 
         self.stickyCssStates.forceMount = true;
@@ -5106,18 +5109,6 @@ window.ADMINBRXC = {
         }
 
     },
-    // toggleRadioVisibility: function(){
-    //     const radios = document.querySelectorAll('[name="brxc-extend-styles"]');
-    //     const target = document.querySelector('#brxc-extend-css-property');
-    //     const eraseClass = document.querySelector('#brxc-extend-erase-classes');
-    //     radios.forEach(radio => {
-    //         radio.addEventListener('change', () =>{
-    //             const radio = document.querySelector('#brxc-extend-style');
-    //             (radio.checked == true) ? target.style.display = 'block' : target.style.display = 'none';
-    //             (radio.checked == true) ? eraseClass.style.display = 'none' : eraseClass.style.display = 'block';
-    //         })
-    //     })
-    // },
     mounAIHistory: function(prefix, overlay){
         const self = this;
 
@@ -5795,7 +5786,8 @@ window.ADMINBRXC = {
     },
     autoformat: function(input, control){
         const self = this;
-        
+        if(typeof input === "undefined" || typeof input.value === "undefined") return;
+
         let values, operators;
         const rootFontSize = self.helpers.getRootFontSize();
 
@@ -7588,7 +7580,6 @@ window.ADMINBRXC = {
     },
     setSuperPowerCSSObject: function(){
         const self = this;
-        
         if (!self.builderStates.isClassActive) {
             self.superPowerStates.obj = self.builderStates.activeElement;
             self.superPowerStates.isActiveClass = false;
@@ -8368,27 +8359,27 @@ window.ADMINBRXC = {
         }
         
         // Tag Label
-        let tagLabel = "Tag Manager (mode: none)";
-        if (self.elementsTagStates.mode !== '') tagLabel = `Tag Manager (mode: ${self.elementsTagStates.mode})`
+        let tagLabel = "Tag Manager <span class='error'>(disabled)</span>";
+        if (self.elementsTagStates.mode !== '') tagLabel = `Tag Manager <span class='success'>(mode: ${self.elementsTagStates.mode})</span>`
 
         // Note Label
-        let notesLabel = 'Notes (none)'
-        if(self.noteStates.active === 'adminNotes') notesLabel = 'Notes (for admins)';
-        if(self.noteStates.active === 'editorNotes') notesLabel = 'Notes (for editors)'
+        let notesLabel = "Notes <span class='error'>(disabled)</span>"
+        if(self.noteStates.active === 'adminNotes') notesLabel = "Notes <span class='success'>(for admins)</span>";
+        if(self.noteStates.active === 'editorNotes') notesLabel = "Notes <span class='success'>(for editors)</span>";
         
         // Elements Order Label
-        let elementsOrderLabel = "Elements Order (unlocked)"
-        if(self.lockDraggableElementsStates.active) elementsOrderLabel = "Elements Order (locked)"
+        let elementsOrderLabel = "Elements Order <span class='error'>(unlocked)</span>"
+        if(self.lockDraggableElementsStates.active) elementsOrderLabel = "Elements Order <span class='success'>(locked)</span>"
 
         // StickyCSS Label
-        let stickyCSSLabel = "Sticky CSS (disabled)"
-        if(self.stickyCssStates.active) stickyCSSLabel = "Sticky CSS (enabled)"
+        let stickyCSSLabel = "Sticky CSS <span class='error'>(disabled)</span>"
+        if(self.stickyCssStates.active) stickyCSSLabel = "Sticky CSS <span class='success'>(enabled)</span>"
 
         // Visibility Floating Bar Label
-        let visibilityLabel = "Visibility Floating Bar (disabled)"
-        if( self.hideElementStates.active) visibilityLabel = "Visibility Floating Bar (enabled)"
+        let visibilityLabel = "Visibility Floating Bar <span class='error'>(disabled)</span>"
+        if( self.hideElementStates.active) visibilityLabel = "Visibility Floating Bar <span class='success'>(enabled)</span>"
 
-        const shortcutItems = [
+        const modals = [
             {
                 label: "Structure Generator",
                 url: 'https://advancedthemer.com/features/structure-generator/',
@@ -8439,10 +8430,10 @@ window.ADMINBRXC = {
                         isActive: checkShortcutState('nested-elements-library')
                     }
                 ]
-            },
-            {
-                label: "sep"
-            },
+            }
+        ];
+
+        const states = [
             {
                 label: tagLabel,
                 url: 'https://advancedthemer.com/features/tag-manager-inside-the-structure-panel/',
@@ -8601,26 +8592,29 @@ window.ADMINBRXC = {
 
         ]
 
+        function printGroup(arr, title, print){
+            const callback = print === "tweak" ? arr.map(item => printTweak(item)).join('') : arr.map(item => printItem(item)).join('')
+            return `<div class="brxc-context-menu__block">
+                            <div class="title">${title}</div>
+                            ${callback}
+                        </div>`
+        }
+
+         
         content += `<ul>`;
+        content += printGroup(tweaks, 'Tweaks', "tweak")
+        content += `</ul>`
 
-        shortcutItems.forEach(item => {
-            content += printItem(item);
-        })
-
-        content += `<li class="sep"></<li>`
-
-        tweaks.forEach(item => {
-            content += printTweak(item);
-        })
-
-
+        content += `<ul>`;
+        content += printGroup(modals, 'Modals', "item")
+        content += printGroup(states, 'States', "item")
         content += `</ul>`
 
         return content;
     },
     toggleStructureMode: function (){
         const self = this;
-        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure")
+        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure", "2")
     },
     toggleStructureHeaderIcon: function(key) {
         const self = this;
@@ -8633,7 +8627,7 @@ window.ADMINBRXC = {
         }
 
         self.helpers.setLocalStorage('structureIcons', self.structurePanelStates.icons);
-        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure")
+        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure", "2")
         self.setHeaderStructurePanel();
     },
     toggleStructureTweak: function(key){
@@ -8676,7 +8670,7 @@ window.ADMINBRXC = {
                 break;
         }
 
-        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure")
+        self.openContextualMenu(false, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure", "2")
         setTimeout(() => {
             self.runStructureHighlights();
         })
@@ -8686,7 +8680,7 @@ window.ADMINBRXC = {
         left: false,
         width: false,
     },
-    openContextualMenu: function(event, callback, position = "right", dataType = "class"){
+    openContextualMenu: function(event, callback, position = "right", dataType = "class", cols = "1"){
         const self = this;
         const existingMenu = document.querySelector('#brxc-class-context-menu');
 
@@ -8695,7 +8689,7 @@ window.ADMINBRXC = {
         menu.id = "brxc-class-context-menu";
         menu.setAttribute('class', 'brxc-context-menu');
         menu.setAttribute('data-type', dataType);
-        menu.innerHTML = `<div id="brxc-class-context-menu-canvas"></div>`;
+        menu.innerHTML = `<div id="brxc-class-context-menu-canvas" class="col-${cols}"></div>`;
         document.body.appendChild(menu);
         const menuCanvas = document.querySelector('#brxc-class-context-menu-canvas');
     
@@ -9391,8 +9385,8 @@ window.ADMINBRXC = {
         activeEl.classList.add('has-border-settings');
     },
     topbarStates: {
-        icons: ['main-menu', 'quick-remote-template', 'class-manager', 'color-manager', 'variable-manager', 'advanced-css', 'responsive-slider', 'zoom-out'],
-        tweaks: ['responsive-slider', 'responsive-helper'],
+        icons: ['main-menu', 'quick-remote-template', 'class-manager', 'color-manager', 'variable-manager', 'advanced-css', 'zoom-out'],
+        tweaks: [],
     },
     initToolbar: function(){
         const self = this;
@@ -16583,7 +16577,7 @@ window.ADMINBRXC = {
                 }
     
                 MyCM.on("keyup", function (cm) {
-                    const obj = self.vueGlobalProp.$_getGlobalClass(classId);
+                    const obj = self.vueState.globalClasses.find(e => e.id === classId)
                     if (!obj) return;
     
                     const selector = `.${obj.name}`;
@@ -16620,11 +16614,17 @@ window.ADMINBRXC = {
                     
                     const generatedCSS = contenttWrapper.querySelector('[data-type="generated-css"]');
                     const dataOptions = { indent_size: 2 }
-                    setTimeout(() => {generatedCSS.CodeMirror.setValue(css_beautify(self.vueGlobalProp.$_generateCss('globalClass', classId, ['block']).replaceAll('.brxe-block', ''), dataOptions))}, 1);
+                    setTimeout(() => {
+                        generatedCSS.CodeMirror.setValue(css_beautify(self.vueGlobalProp.$_generateCss('globalClass', classId, ['block']).replaceAll('.brxe-block', ''), dataOptions))
+                    }, 1);
                     
                     // Save Global Classes
                     self.helpers.saveChanges('globalClasses');
                 });
+
+                setTimeout(() => {
+                    MyCM.refresh();
+                }, 0)
             }
         }
 
@@ -16875,7 +16875,7 @@ window.ADMINBRXC = {
             id: newId,
             name: newName,
             new: true,
-            settings: JSON.parse(JSON.stringify(obj.settings).replaceAll(obj.name, newName)),
+            settings: JSON.parse(JSON.stringify(obj.settings).replaceAll(`.${obj.name}`, `.${newName}`)),
         };
         delete newClass.at_framework;
         delete newClass.at_version;
@@ -17160,6 +17160,8 @@ window.ADMINBRXC = {
         if (self.vueState.activePanel !== 'elements') return;
 
         const header = document.querySelector('#bricks-panel-inner #bricks-panel-elements #bricks-panel-header')
+        if(!header) return;
+
         const oldMenu = document.querySelector('#bricks-panel-view');
         if(oldMenu) oldMenu.remove();
     
@@ -17543,8 +17545,9 @@ window.ADMINBRXC = {
         const self = this;
         if(!self.builderStates.isElementActive) return;
 
-        const classes = document.querySelectorAll('#bricks-panel-element #bricks-panel-element-classes .element-classes li');
+        const classes = document.querySelectorAll('#bricks-panel-element #bricks-panel-element-classes .active-classes li');
         if (classes.length < 1) return;
+
         classes.forEach(el => {
             el.removeAttribute("data-locked");
             const name = el.querySelector('.name')
@@ -17553,16 +17556,25 @@ window.ADMINBRXC = {
         })
     },
     focusOnFirstClassStates: {
-        lastElementFocus: '',
+        lastElementFocus: false,
         isComponentActive: false, 
     },
     focusOnFirstClass: function(){
         const self = this;
-        if(!self.helpers.isElementActive()) return;
+        if(!self.helpers.isElementActive()) {
+            self.focusOnFirstClassStates.lastElementFocus = false;
+            return;
+        }
 
         const elementObj = self.vueState.activeElement;
-
-        if(!elementObj || !elementObj.hasOwnProperty('id') || !elementObj.hasOwnProperty('settings') || self.focusOnFirstClassStates.lastElementFocus === elementObj.id && self.focusOnFirstClassStates.isComponentActive === self.helpers.isComponentActive()) {
+        const hasClass = elementObj && elementObj.hasOwnProperty('id') && elementObj.hasOwnProperty('settings') && elementObj.settings.hasOwnProperty('_cssGlobalClasses');
+        if(!hasClass){
+            self.focusOnFirstClassStates.lastElementFocus = false;
+            return;
+        }
+        
+        const isSameElement = self.focusOnFirstClassStates.lastElementFocus === elementObj.id && self.focusOnFirstClassStates.isComponentActive === self.helpers.isComponentActive();
+        if(isSameElement) {
             return;
         } 
 
@@ -17570,22 +17582,16 @@ window.ADMINBRXC = {
         self.focusOnFirstClassStates.lastElementFocus = elementObj.id;
 
         if (elementObj.settings.hasOwnProperty('_cssGlobalClasses') && elementObj.settings._cssGlobalClasses.length > 0) {
-            const unlockedClass = elementObj.settings._cssGlobalClasses.find(className => {
-                const globalClass = self.vueGlobalProp.$_getGlobalClass(className);
-                return className && globalClass && !self.vueGlobalProp.$_isLocked(className);
+            const unlockedClass = elementObj.settings._cssGlobalClasses.find(classId => {
+                const globalClass = self.vueGlobalProp.$_getGlobalClass(classId);
+                return classId && globalClass && !self.vueGlobalProp.$_isLocked(classId);
             });
-        
             if (unlockedClass) {
-                const classObj = self.vueGlobalProp.$_getGlobalClass(unlockedClass);
-        
-                if (self.vueState.messageOrigin === "iframe") {
-                    FRAMEBRXC.vueState.activeClass = classObj;
-                }
-        
+                self.vueState.messageOrigin = "main";
+                const classObj = self.vueState.globalClasses.find(el => el.id === unlockedClass);
                 self.vueState.activeClass = classObj;
+
                 self.forceClassStlyesStates.showLock = false;
-                self.vueState.rerenderControls = Date.now();
-                self.runStates();
             }
         }
         
@@ -20774,7 +20780,7 @@ window.ADMINBRXC = {
         }
 
         setTimeout(()=> {
-            const control = document.querySelector('[data-controlkey="query"] [controlkey="query"]');
+            const control = document.querySelector('[data-controlkey="query"] [data-control="query"]');
             if(!control) return;
 
             const icon = control.querySelector('.brxc-global-query-loops');
@@ -20860,7 +20866,7 @@ window.ADMINBRXC = {
     },
     setGenerateGlobalQuery: function(){
         const self = this;
-        const popup = document.querySelector('[data-controlkey="query"] [controlkey="query"] .bricks-control-popup');
+        const popup = document.querySelector('[data-controlkey="query"] [data-control="query"] .bricks-control-popup');
         if(!popup || !self.builderStates.isElementActive) return;
 
         const elementObj = self.builderStates.activeElement
@@ -22450,7 +22456,9 @@ window.ADMINBRXC = {
     advancedCSSRenderPageCSS: function(activeObj, value){
         const self = this;
         const pageSettings = self.vueState.pageSettings;
-        const targetCss = self.vueState.breakpointActive === "desktop" ? "customCss" : `customCss:${self.vueState.breakpointActive}`;
+        const baseKey = self.vueGlobalProp.$_getBaseBreakpointKey();
+
+        const targetCss = baseKey === "desktop" ? "customCss" : `customCss:${baseKey}`;
         if (value === "") {
             self.advancedCSSRemoveError(document.querySelector('#advancedCSSUI__panel'));
             setTimeout(() => {
@@ -24968,7 +24976,7 @@ window.ADMINBRXC = {
         self.closeModal({target: true}, true, '#brxcClassConverterOverlay');
     },
     hideElementStates: {
-        active: true,
+        active: false,
     },
     toggleHideFloatingBar: function(){
         const self = this;
@@ -26491,8 +26499,8 @@ window.ADMINBRXC = {
         self.structureHelperStates.activeFilter = event.target.dataset.id;
     },
     structurePanelStates: {
-        icons: ['structure-generator', 'structure-helper'],
-        tweaks: ['right-elements-shortcuts','styles-and-classes-indicators','highlight-classes','highlight-nestable-elements','highlight-parent-elements','expand-all-children','draggable-structure-panel','link','focus-mode','filterable-structure', 'hide-remove-highlights']
+        icons: ['structure-generator'],
+        tweaks: ['right-elements-shortcuts','styles-and-classes-indicators','highlight-classes','highlight-nestable-elements','highlight-parent-elements','expand-all-children','draggable-structure-panel','link','focus-mode','filterable-structure', 'hide-remove-highlights', 'db-click-edit-component']
     },
     setHeaderStructurePanel: function(){
         const self = this;
@@ -26562,7 +26570,7 @@ window.ADMINBRXC = {
         contextualIcon.setAttribute('class', 'brxc-item')
         contextualIcon.setAttribute('data-balloon', 'Structure Menu')
         contextualIcon.setAttribute('data-balloon-pos', 'bottom-right');
-        contextualIcon.setAttribute('onClick', `ADMINBRXC.openContextualMenu(event, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure")`,);
+        contextualIcon.setAttribute('onClick', `ADMINBRXC.openContextualMenu(event, () => {return ADMINBRXC.structureContextualMenu()}, "left", "structure", "2")`,);
         contextualIcon.innerHTML = `<svg version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="bricks-svg" style="rotate: 90deg;"><path d="M3,9.5l-6.55671e-08,-1.77636e-15c-0.828427,-3.62117e-08 -1.5,-0.671573 -1.5,-1.5c3.62117e-08,-0.828427 0.671573,-1.5 1.5,-1.5l-6.55671e-08,1.77636e-15c0.828427,-3.62117e-08 1.5,0.671573 1.5,1.5c3.62117e-08,0.828427 -0.671573,1.5 -1.5,1.5Zm5,0l-6.55671e-08,-1.77636e-15c-0.828427,-3.62117e-08 -1.5,-0.671573 -1.5,-1.5c3.62117e-08,-0.828427 0.671573,-1.5 1.5,-1.5l-6.55671e-08,1.77636e-15c0.828427,-3.62117e-08 1.5,0.671573 1.5,1.5c3.62117e-08,0.828427 -0.671573,1.5 -1.5,1.5Zm5,0l-6.55671e-08,-1.77636e-15c-0.828427,-3.62117e-08 -1.5,-0.671573 -1.5,-1.5c3.62117e-08,-0.828427 0.671573,-1.5 1.5,-1.5l-6.55671e-08,1.77636e-15c0.828427,-3.62117e-08 1.5,0.671573 1.5,1.5c3.62117e-08,0.828427 -0.671573,1.5 -1.5,1.5Z" fill="currentColor" fill-rule="evenodd"></path></svg>`
         header.appendChild(contextualIcon);
     },
@@ -28333,7 +28341,7 @@ window.ADMINBRXC = {
         self.refreshColorPrefix();
     },
     responsiveSliderStates: {
-        active: true,
+        active: false,
     },
     toggleResponsiveSlider: function(){
         const self = this;
@@ -28825,7 +28833,10 @@ window.ADMINBRXC = {
                 e.preventDefault();
                 dropzone.classList.remove('dragover');
                 const file = e.dataTransfer.files[0];
-                handleFile(file);
+                if (file) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFile(file);
+                }
             });
 
             fileInput.addEventListener('change', e => {
@@ -30539,7 +30550,6 @@ window.ADMINBRXC = {
             } else if ("linkOpposites" in this.control && !this.control.linkOpposites) {
                 state = value === "opposites" ? "unlinked" : "all";
             }
-
             return {
                 directionLastChanged: "",
                 variablesEnabled: !this.bricks.disableVariablesManager,
@@ -30708,19 +30718,21 @@ window.ADMINBRXC = {
             }
         })
     },
-    delaySaveBtn: function(){
-        const self = this;
-        const btn = document.querySelector('#bricks-toolbar li.save');
-        if(!btn) return;
+    // delaySaveBtn: function(){
+    //     const self = this;
+    //     const btn = document.querySelector('#bricks-toolbar li.save');
+    //     if(!btn) return;
 
-        btn.addEventListener('click', (e) => {
-            setTimeout(() => {
-                self.vueGlobalProp.$_savePost({
-                    skipNotifications: !0
-                })
-            },350)
-        })
-    },
+    //     btn.addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         e.stopPropagation();
+    //         setTimeout(() => {
+    //             self.vueGlobalProp.$_savePost({
+    //                 skipNotifications: !0
+    //             })
+    //         },350)
+    //     }, true)
+    // },
 
     removeControlGroups: function() {
         for (const [key, element] of Object.entries(bricksData.elements)) {
@@ -31501,7 +31513,7 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         self.setCSSVariableManager();
     },
     stickyCssStates: {
-        active: true,
+        active: false,
         activeId: false,
         activeBreakpoint: false,
         activePseudo: false,
@@ -32108,7 +32120,10 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         }, true)
     },
     controlGroupCopyPasteStates: {
-        obj: {},
+        obj: {
+            css: {},
+            element: {}
+        },
     },
     controlGroupContextualMenu: function(event, tab, group = false){
         const self = this;
@@ -32116,16 +32131,16 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         const elementConfig = self.vueGlobalProp.$_getElementConfig(elName)
         const label = self.helpers.capitalizeStrings(elementConfig.controlGroups[group]?.title || tab);
         tab = tab.toLowerCase();
-        const hasPasteValue = group ? Object.keys(self.controlGroupCopyPasteStates.obj).some(el => {
+        const hasPasteValue = group ? Object.keys(self.controlGroupCopyPasteStates.obj.css).concat(Object.keys(self.controlGroupCopyPasteStates.obj.element)).some(el => {
             return elementConfig.controls[el]?.group === group
         }) : true;
-        const isClassActive = !!self.builderStates.isClassActive;
+        const isBulkActive = !!self.helpers.isBulkEdit()
 
         return `
             <ul>
                 <li onclick="ADMINBRXC.copyElementSettings('${tab}','${group}')">Copy ${label} Settings</li>
                 <li class="${!hasPasteValue ? 'disabled' : ''}" onclick="ADMINBRXC.pasteElementSettings('${tab}','${group}')">Paste ${label} Settings</li>
-                <li class="${isClassActive ? 'disabled' : ''}" onclick="ADMINBRXC.extendElementSettings('${tab}','${group}')">Extend ${label} Settings to same DOM-level Elements</li>
+                <li class="${isBulkActive ? 'disabled' : ''}" onclick="ADMINBRXC.extendElementSettings('${tab}','${group}')">Extend ${label} Settings to same DOM-level Elements</li>
                 <li class="delete" onclick="ADMINBRXC.resetElementSettings('${tab}','${group}')">Reset ${label} Settings</li>
             </ul>`;
     },
@@ -32136,17 +32151,32 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         if(!settings || !elName) return;
 
         const elControls = self.vueGlobalProp.$_getElementConfig(elName)?.controls;
-        const finalObj = {};
+        const cssObj = {};
+        const elementObj = {};
+
+        // css
         Object.entries(settings).forEach(entry => {
             const entryKey = entry[0].split(':')[0];
-            const target = elControls[entryKey].hasOwnProperty('css') ? self.helpers.createTargetWithPseudo(entryKey) : entry[0];
+            if(typeof elControls[entryKey] === "undefined" || !elControls[entryKey].hasOwnProperty('css')) return;
+
+            const target = self.helpers.createTargetWithPseudo(entryKey);
 
             if(entry[0] !== target || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
             
-            finalObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+            cssObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+        })
+        // element
+        Object.entries(self.builderStates.activeElement.settings).forEach(entry => {
+            const entryKey = entry[0].split(':')[0];
+            if(typeof elControls[entryKey] === "undefined" || elControls[entryKey].hasOwnProperty('css')) return;
+
+            if(tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+            
+            elementObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
         })
 
-        self.controlGroupCopyPasteStates.obj = finalObj;
+        self.controlGroupCopyPasteStates.obj.css = cssObj;
+        self.controlGroupCopyPasteStates.obj.element = elementObj;
     },
     pasteElementSettings: function(tab = "style", group = false){
         const self = this;
@@ -32159,15 +32189,29 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
             if (self.helpers.isClassActive()) obj = self.builderStates.activeObject
             if(Object.getPrototypeOf(obj.settings).length === 0) obj.settings = {};
 
-            Object.entries(self.controlGroupCopyPasteStates.obj).forEach(entry => {
+            // css
+            Object.entries(self.controlGroupCopyPasteStates.obj.css).forEach(entry => {
                 const entryKey = entry[0]
 
                 if(!elControls.hasOwnProperty(entryKey) || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
                 
-                const target = elControls[entryKey].hasOwnProperty('css') ? self.helpers.createTargetWithPseudo(entryKey) : entry[0];
+                const target = self.helpers.createTargetWithPseudo(entryKey);
+                const targetObject = !self.helpers.isBulkEdit() && obj.id === self.vueState.activeElement.id && self.helpers.isClassActive() ? self.builderStates.activeObject : obj; 
+                targetObject.settings[target] = entry[1];
+                
+            })
+
+            // element
+            Object.entries(self.controlGroupCopyPasteStates.obj.element).forEach(entry => {
+                const entryKey = entry[0]
+
+                if(!elControls.hasOwnProperty(entryKey) || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+                
+                const target = entry[0];
                 obj.settings[target] = entry[1];
                 
             })
+                
         })
         
         self.vueState.rerenderControls = Date.now();
@@ -32176,31 +32220,72 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         const self = this;
         const el = self.builderStates.activeElement;
         const settings = self.builderStates.activeObject?.settings;
-        if(!el || el.parent === 0) return;
+        if(!el || !settings) return;
 
-        const elParentObject = self.helpers.getElementObject(el.parent);
-        const elChildren = elParentObject.children;
+        const contentType = self.helpers.getTemplateType();
+        const elParentObject = el.parent === 0 ? false : self.helpers.getElementObject(el.parent);
+        const elChildren = elParentObject ? elParentObject.children : self.vueState[contentType].filter(el => el.parent === 0).map(el => el.id)
+
+        const elControls = self.vueGlobalProp.$_getElementConfig(el.name)?.controls;
+        const cssObj = {};
+        const elementObj = {};
+
+        // css
+        Object.entries(settings).forEach(entry => {
+            const entryKey = entry[0].split(':')[0];
+            if(typeof elControls[entryKey] === "undefined" || !elControls[entryKey].hasOwnProperty('css')) return;
+
+            const target = self.helpers.createTargetWithPseudo(entryKey);
+
+            if(entry[0] !== target || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+            
+            cssObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+        })
+        // element
+        Object.entries(self.builderStates.activeElement.settings).forEach(entry => {
+            const entryKey = entry[0].split(':')[0];
+            if(typeof elControls[entryKey] === "undefined" || elControls[entryKey].hasOwnProperty('css')) return;
+
+            if(tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+            
+            elementObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+        })
+
+        const originalSettings = {
+            css: cssObj,
+            element: elementObj
+        }
+        originalSettings.css = cssObj;
+        originalSettings.element = elementObj;
+;
 
         // Loop through each child
         elChildren.forEach(child => {
             if(child === el.id) return;
 
             const childObject = self.helpers.getElementObject(child);
-            const childName = childObject?.name;
+            const childControls = self.vueGlobalProp.$_getElementConfig(childObject.name)?.controls;
             if(Object.getPrototypeOf(childObject.settings).length === 0) childObject.settings = {};
 
-            const childControls = self.vueGlobalProp.$_getElementConfig(childName)?.controls;
+            // css
+            Object.entries(originalSettings.css).forEach(entry => {
+                const entryKey = entry[0]
 
-            Object.entries(settings).forEach(entry => {
-                const entryKey = entry[0].split(":")[0];
-                if(!childControls.hasOwnProperty(entryKey)) return;
+                if(!childControls.hasOwnProperty(entryKey) || tab !== childControls[entryKey].tab || (group && group !== "false" && childControls[entryKey].group !== group)) return;
+                
+                const target = self.helpers.createTargetWithPseudo(entryKey);
+                childObject.settings[target] = entry[1];
+                
+            })
 
-                const target = childControls[entryKey].hasOwnProperty('css') ? self.helpers.createTargetWithPseudo(entryKey) : entry[0];
+            // element
+            Object.entries(originalSettings.element).forEach(entry => {
+                const entryKey = entry[0]
+
+                if(!childControls.hasOwnProperty(entryKey) || tab !== childControls[entryKey].tab || (group && group !== "false" && childControls[entryKey].group !== group)) return;
                 
-                if(entry[0] !== target || tab !== childControls[entryKey].tab || (group && group !== "false" && childControls[entryKey].group !== group)) return;
-                
-                childObject.settings[target] = JSON.parse(JSON.stringify(entry[1]));
-                
+                const target = entry[0];
+                childObject.settings[target] = entry[1];
             })
         })
 
@@ -32208,23 +32293,68 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
     },
     resetElementSettings: function(tab = "style", group = false){
         const self = this;
+        const el = self.builderStates.activeElement;
+        const settings = self.builderStates.activeObject?.settings;
+        if(!el || !settings) return;
+
+        const elControls = self.vueGlobalProp.$_getElementConfig(el.name)?.controls;
         const elementObjs = self.helpers.isBulkEdit() ? self.vueState.selectedElements : [self.builderStates.activeElement];
-        
-        elementObjs.forEach(obj => {
-            const elControls = self.vueGlobalProp.$_getElementConfig(obj.name)?.controls;
-            if(!elControls) return;
+        const cssObj = {};
+        const elementObj = {};
 
-            if (self.helpers.isClassActive()) obj = self.builderStates.activeObject
-            if(Object.getPrototypeOf(obj.settings).length === 0) return;
+        // css
+        Object.entries(settings).forEach(entry => {
+            const entryKey = entry[0].split(':')[0];
+            if(typeof elControls[entryKey] === "undefined" || !elControls[entryKey].hasOwnProperty('css')) return;
 
-            Object.entries(self.controlGroupCopyPasteStates.obj).forEach(entry => {
+            const target = self.helpers.createTargetWithPseudo(entryKey);
+
+            if(entry[0] !== target || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+            
+            cssObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+        })
+        // element
+        Object.entries(self.builderStates.activeElement.settings).forEach(entry => {
+            const entryKey = entry[0].split(':')[0];
+            if(typeof elControls[entryKey] === "undefined" || elControls[entryKey].hasOwnProperty('css')) return;
+
+            if(tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+            
+            elementObj[entryKey] = JSON.parse(JSON.stringify(entry[1]));
+        })
+
+        const originalSettings = {
+            css: cssObj,
+            element: elementObj
+        }
+        originalSettings.css = cssObj;
+        originalSettings.element = elementObj;
+;
+
+        // Loop through each child
+        elementObjs.forEach(child => {
+            const childControls = self.vueGlobalProp.$_getElementConfig(child.name)?.controls;
+
+            // css
+            Object.entries(originalSettings.css).forEach(entry => {
                 const entryKey = entry[0]
 
-                if(!elControls.hasOwnProperty(entryKey) || tab !== elControls[entryKey].tab || (group && group !== "false" && elControls[entryKey].group !== group)) return;
+                if(!childControls.hasOwnProperty(entryKey) || tab !== childControls[entryKey].tab || (group && group !== "false" && childControls[entryKey].group !== group)) return;
                 
-                const target = elControls[entryKey].hasOwnProperty('css') ? self.helpers.createTargetWithPseudo(entryKey) : entry[0];
-                delete obj.settings[target];
+                const target = self.helpers.createTargetWithPseudo(entryKey);
+                const targetObject = child.id === self.vueState.activeElement.id && self.helpers.isClassActive() ? self.builderStates.activeObject : child; 
+                delete targetObject.settings[target];
                 
+            })
+
+            // element
+            Object.entries(originalSettings.element).forEach(entry => {
+                const entryKey = entry[0]
+
+                if(!childControls.hasOwnProperty(entryKey) || tab !== childControls[entryKey].tab || (group && group !== "false" && childControls[entryKey].group !== group)) return;
+                
+                const target = entry[0];
+                delete child.settings[target];
             })
         })
 
@@ -32264,8 +32394,8 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         }
 
         //Sticky CSS
-        if(ls.stickyCss === false){
-            self.stickyCssStates.active = false;
+        if(ls.stickyCss === true){
+            self.stickyCssStates.active = true;
         } 
 
         if(ls.stickyCssComputed){
@@ -32273,13 +32403,13 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         }
 
         // Visitibility Floating Bar
-        if(ls.visibilityFloatingBar === false){
-            self.hideElementStates.active = false;
+        if(ls.visibilityFloatingBar === true){
+            self.hideElementStates.active = true;
         }
         
         //Responsive Slider
-        if(ls.responsiveSlider === false){
-            self.responsiveSliderStates.active = false;
+        if(ls.responsiveSlider === true){
+            self.responsiveSliderStates.active = true;
         }
 
         // Elements Tag
@@ -32379,8 +32509,8 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
         self.initToolbar();
         self.topbarStates.tweaks.forEach(tweak => self.runTopbarTweaks(tweak))
 
-        // Classes & Styles
-        self.helpers.isClassesAndStylesTabActive() && self.globalSettings.generalCats.classesAndStyles.includes('class-importer') ? self.importedClasses() : '';
+        // Classes Importer
+        self.importedClasses();
 
 
         // Builder Tweaks
@@ -32419,7 +32549,6 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
             arr.includes("locked-class-indicator") ? document.body.classList.add('at-locked-classes', "true") : '';
             if (arr.includes("autocomplete-variable") ){
                 self.populateCSSVariables();
-                document.body.classList.add('at-variable-autocomplete');
             }
             arr.includes("variable-picker") ? document.body.classList.add('at-variable-picker') : '';
             
@@ -32436,6 +32565,7 @@ We strongly recommend keeping the default "at-" prefix unless you're sure about 
             }
             if(arr.includes("superpower-custom-css")) {
                 document.body.classList.add('at-superpower-css');
+                //self.delaySaveBtn()
             }
             if(arr.includes("expand-spacing")) {
                 document.body.classList.add('at-expand-spacing');

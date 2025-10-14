@@ -124,7 +124,7 @@
 			}
 
 			// Show loader
-		 	if(typeof(this.form_loader_show) === 'function') { this.form_loader_show('geolocate'); }
+			if(typeof(this.form_loader_show) === 'function') { this.form_loader_show('geolocate'); }
 
 			// Make GET request
 			$.get(url, function(resp) {
@@ -197,7 +197,7 @@
 				ws_this.log('log_geo_success', ip_lookup_method);
 
 				// Hide loader
-			 	if(typeof(this.form_loader_hide) === 'function') { ws_this.form_loader_hide('geolocate'); }
+				if(typeof(this.form_loader_hide) === 'function') { ws_this.form_loader_hide(); }
 
 				// Empty callback stack
 				ws_this.form_geo_stack_empty();
@@ -227,13 +227,17 @@
 	// Geo - Empty stack
 	$.WS_Form.prototype.form_geo_stack_empty = function() {
 
-		for(var form_geo_stack_index in this.form_geo_stack) {
+		while(this.form_geo_stack.length) {
 
-			if(!this.form_geo_stack.hasOwnProperty(form_geo_stack_index)) { continue; }
+			var form_geo_stack = this.form_geo_stack.shift();
 
-			var form_geo_stack = this.form_geo_stack[form_geo_stack_index];
+			this.form_geo_callback(
 
-			this.form_geo_callback(form_geo_stack.element, form_geo_stack.default_value, form_geo_stack.callback, form_geo_stack.callback_data);
+				form_geo_stack.element,
+				form_geo_stack.default_value,
+				form_geo_stack.callback,
+				form_geo_stack.callback_data
+			);
 		}
 	}
 
@@ -258,6 +262,6 @@
 
 			this[callback](callback_value, callback_data);
 		}
- 	}
+	}
 
 })(jQuery);

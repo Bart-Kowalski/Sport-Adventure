@@ -11,15 +11,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Preset', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving Preset...', 'ws-form');
-
-			// Register action
-			parent::register($this);
-
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 
@@ -28,6 +19,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Preset', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving Preset...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -107,6 +113,7 @@
 
 				if(is_wp_error($wp_remote_get_response)) {
 
+					/* translators: %s: Data source URL */
 					return self::error(sprintf(__('Error retrieving CSV file: %s', 'ws-form'), $url), $field_id, $this, $api_request);
 				}
 

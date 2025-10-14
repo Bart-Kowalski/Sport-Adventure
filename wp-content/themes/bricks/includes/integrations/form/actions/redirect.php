@@ -20,17 +20,17 @@ class Redirect extends Base {
 
 		// Redirect to admin area
 		if ( isset( $form_settings['redirectAdminUrl'] ) ) {
+			// Single site
 			$redirect_to = isset( $form_settings['redirect'] ) ? admin_url( $form_settings['redirect'] ) : admin_url();
 
-			if ( is_multisite() ) {
-				$user_sites = get_blogs_of_user( $login_response->ID );
+			// Multisite
+			if ( is_multisite() && is_user_logged_in() ) {
+				// Use get_current_user_id() instead of $login_response (#86c5v5qjg)
+				$user_id       = get_current_user_id();
+				$redirect_path = isset( $form_settings['redirect'] ) ? $form_settings['redirect'] : '';
 
-				foreach ( $user_sites as $site_id => $site ) {
-					// Skip main site
-					if ( $site_id !== 1 ) {
-						$redirect_to = isset( $form_settings['redirect'] ) ? get_admin_url( $site_id, $form_settings['redirect'] ) : get_admin_url( $site_id );
-					}
-				}
+				// @see https://developer.wordpress.org/reference/functions/get_dashboard_url/
+				$redirect_to = get_dashboard_url( $user_id, $redirect_path );
 			}
 		}
 

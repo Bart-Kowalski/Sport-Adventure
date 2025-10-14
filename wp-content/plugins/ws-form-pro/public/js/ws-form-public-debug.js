@@ -2,59 +2,23 @@
 
 	'use strict';
 
-	// Debug size
-	$.WS_Form.prototype.debug_size = function(difference_y, resize_on_complete, debug_height_force) {
-
-		// Change height
-		if(debug_height_force > 0) {
-
-			this.debug_height = debug_height_force;
-
-		} else {
-
-			this.debug_height = this.debug_height_start + difference_y;
-		}
-
-		// If height < allowed minimum
-		this.debug_height_min = $('#wsf-debug-nav-wrapper').outerHeight();
-		if(this.debug_height < this.debug_height_min) { this.debug_height = this.debug_height_min; }
-
-		// If height > allowed maximum
-		var debug_height_max = ($(window).height() - 150);
-		if(this.debug_height > debug_height_max) { this.debug_height = debug_height_max; }
-
-		// Set height
-		$('#wsf-debug').css({ height: this.debug_height });
-
-		// Scroll
-		this.debug_scroll_y = this.debug_scroll_y_start - (this.debug_height_start - this.debug_height);
-
-		// If scroll < 0
-		if(this.debug_scroll_y < 0) { this.debug_scroll_y = 0; }
-
-		// Set scroll
-		$(window).scrollTop(this.debug_scroll_y);
-
-		if(resize_on_complete) {
-
-			// Change body margin
-			this.debug_margin_bottom = this.debug_margin_bottom_start + this.debug_height;
-
-			// If margin < allowed minimum (i.e. minimum originally set on body)
-			if(this.debug_margin_bottom < this.debug_margin_bottom_start) { this.debug_margin_bottom = this.debug_margin_bottom_start; }
-
-			// Set margin
-			$('body').css({ marginBottom: this.debug_margin_bottom + 'px' });
-
-			// Set panel heights
-			this.debug_panel_heights();
-		}
-	}
-
 	// Debug
 	$.WS_Form.prototype.debug = function() {
 
 		var ws_this = this;
+
+		this.debug_audit_count = [];
+		this.debug_drag = false;
+		this.debug_height = 0;
+		this.debug_field_id_bypass = [];
+		this.debug_timer;
+		this.debug_log_array = [];
+		this.debug_error_array = [];
+		this.debug_timeout;
+		this.debug_height_default = 200;
+		this.debug_margin_bottom_start;
+		this.debug_scroll_y_start;
+		this.debug_height_start;
 
 		// forEach support on NodeList
 		if(window.NodeList && !NodeList.prototype.forEach) {
@@ -94,12 +58,10 @@
 		observer.observe(document.body, { subtree: true, childList: true });
 
 		// Debug counters
-		this.audit_count = [];
-		this.audit_count['log'] = 0;
-		this.audit_count['error'] = 0;
+		this.debug_audit_count.log = 0;
+		this.debug_audit_count.error = 0;
 
 		// Debug variables
-		var debug_height_default = 200;
 		this.debug_margin_bottom_start = parseInt($('body').css('marginBottom'), 10);
 		this.debug_scroll_y_start = $(window).scrollTop();
 		this.debug_height_start = $('#wsf-debug').height();
@@ -111,10 +73,13 @@
 		if(!$.WS_Form.debug_rendered) {
 
 			// Debug height start (Read from cookie, or use default)
-			this.debug_height_start = parseInt(this.cookie_get('debug_height', debug_height_default, false), 10);
+			this.debug_height_start = parseInt(this.cookie_get('debug_height', this.debug_height_default, false), 10);
+
+			// Set height
+			document.querySelector(':root').style.setProperty('--wsf-debug-height', this.debug_height_default + 'px');
 
 			// Build debug HTML
-			var debug_core_html = '<div id="wsf-debug" style="height:' + this.debug_height_start + 'px">';
+			var debug_core_html = '<div id="wsf-debug"' + (ws_form_settings.rtl ? ' class="wsf-debug-rtl"' : '') + '>';
 
 			// Primary nav wrapper
 			debug_core_html += '<div id="wsf-debug-nav-wrapper">';
@@ -123,7 +88,7 @@
 			debug_core_html += '<ul id="wsf-debug-nav"></ul>';
 
 			// Logo
-			debug_core_html += '<a href="https://wsform.com?utm_source=ws_form_pro&utm_medium=debug" target="_blank" class="wsf-debug-logo" title="' + this.language('debug_logo') + '"><svg version="1.1" id="WS_Form_Logo" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 1500 428" xml:space="preserve"><path fill="#002D5D" d="m215.2 422.9-44.3-198.4c-.4-1.4-.7-3-1-4.6-.3-1.6-3.4-18.9-9.3-51.8h-.6l-4.1 22.9-6.8 33.5-45.8 198.4H69.7L0 130.1h28.1L68 300.7l18.6 89.1h1.8c3.5-25.7 9.3-55.6 17.1-89.6l39.9-170H175l40.2 170.6c3.1 12.8 8.8 42.5 16.8 89.1h1.8c.6-5.9 3.5-20.9 8.7-44.8 5.2-23.9 21.9-95.5 50.1-214.8h27.8l-72.1 292.8h-33.1zM495 349.5c0 24.7-7.1 44-21.3 57.9-14.2 13.9-34.7 20.9-61.5 20.9-14.6 0-27.4-1.7-38.4-5.1-11-3.4-19.6-7.2-25.7-11.3l12.3-21.3c8.3 5.1 5.9 3.6 16.6 7.4 12 4.2 24.3 6.1 36.9 6.1 16.5 0 29.6-4.9 39-14.8 9.5-9.9 14.2-23.1 14.2-39.7 0-13-3.4-23.9-10.2-32.8-6.8-8.9-19.8-19-38.9-30.4-21.9-12.6-36.8-22.7-44.8-30.2-8-7.6-14.2-16-18.6-25.4-4.4-9.4-6.6-20.5-6.6-33.5 0-21.1 7.8-38.5 23.3-52.2 15.6-13.8 35.4-20.6 59.4-20.6 25.8 0 45.2 6.7 62.6 17.8L481 163.6c-16.2-9.9-33.3-14.8-51.4-14.8-16.6 0-29.8 4.5-39.6 13.4-9.9 8.9-14.8 20.6-14.8 35.2 0 13 3.3 23.8 10 32.5s20.9 19.3 42.6 31.7c21.3 12.8 35.9 23 43.7 30.6 7.9 7.6 13.7 16.1 17.6 25.4 4 9.2 5.9 19.9 5.9 31.9z"/><path fill="#ACA199" d="M643.8 152.8h-50.2V423h-27.8V152.8H525l.2-22.3h40.3l.3-25.5c0-37.2 3.6-60.9 13.4-77.2C589.5 10.7 606.6 0 630.5 0h28.9v23.6c-6.4 0-18.9.2-27.3.4-13.9.2-20.1 4.5-25.1 9.7-4.9 5.2-7.5 11.5-9.9 23.2-2.4 11.7-3.5 27.9-3.5 48.6v24.6h50.2v22.7zM857.1 275.8c0 49.3-8.5 87-25.6 113.2-17 26.2-41.4 39.3-73.1 39.3-31.3 0-55.3-13.1-72-39.3-16.7-26.2-25-63.9-25-113.2 0-100.9 32.7-151.4 98.1-151.4 30.7 0 54.7 13.2 71.8 39.7 17.2 26.4 25.8 63.7 25.8 111.7zm-166.4 0c0 42.3 5.5 74.2 16.6 95.8 11 21.6 28.3 32.4 51.7 32.4 45.9 0 68.9-42.7 68.9-128.2 0-84.7-23-127.1-68.9-127.1-24 0-41.4 10.6-52.2 31.8-10.7 21.3-16.1 53.1-16.1 95.3zM901.8 196.5c0-35.5 42.9-71.7 88.5-72 30.9-.3 42 8.6 53.2 13.7l-13.9 21.6c-9.7-5.1-18.8-9.2-39.9-9.9-13.3-.4-24.1 1.4-35.9 9.3-9.7 6.4-20.4 12.9-23.6 40.8-2.2 19-.8 45.9-.8 67.8V423h-28.1M1047.6 191.4c5.6-48.2 49.8-67.2 80.6-67.2 17.7 0 39.6 6.4 50.2 14.5 9.5 7.2 14.7 13.4 20.3 32.2 7.7-18 13.9-23.4 25.1-31.3 11.2-7.9 25.8-14.9 43.7-14.9 24.2 0 48.4 7.5 62.9 28.5 11.6 16.7 16.8 41 16.8 78.4V423h-27.8V223.5c.7-56.9-14.3-75.2-52-75.2-18.7 0-32.2 4.7-42.2 21.9-9.8 17-14.3 47.9-14.3 81.3v171.4h-27.8V223.5c0-24.8-3.8-43.3-11.5-55.5s-26.7-18.6-42.8-18.6c-21.3 0-35.6 10.4-45.3 28-9.7 17.6-8.6 45.1-8.6 84.6v160.9h-28.1"/><circle fill="#ACA199" cx="1412.6" cy="149.4" r="25.3"/><circle fill="#ACA199" cx="1412.6" cy="273" r="25.3"/><circle fill="#ACA199" cx="1412.6" cy="395" r="25.3"/><path fill="#ACA199" d="M1449.5 85.4c0-2.2.3-4.3.9-6.4.6-2 1.4-3.9 2.4-5.7 1-1.8 2.3-3.4 3.7-4.8 1.5-1.4 3.1-2.7 4.8-3.7 1.8-1 3.7-1.9 5.7-2.4 2-.6 4.1-.9 6.3-.9s4.3.3 6.4.9c2 .6 3.9 1.4 5.7 2.4 1.8 1 3.4 2.3 4.8 3.7 1.5 1.5 2.7 3.1 3.7 4.8 1 1.8 1.8 3.7 2.4 5.7.6 2 .8 4.2.8 6.4s-.3 4.3-.8 6.3c-.6 2-1.4 3.9-2.4 5.7-1 1.8-2.3 3.4-3.7 4.8-1.5 1.5-3.1 2.7-4.8 3.7-1.8 1-3.7 1.9-5.7 2.4-2 .6-4.2.9-6.4.9s-4.3-.3-6.3-.9c-2-.6-3.9-1.4-5.7-2.4-1.8-1-3.4-2.3-4.8-3.7-1.5-1.4-2.7-3.1-3.7-4.8-1-1.8-1.8-3.7-2.4-5.7s-.9-4.1-.9-6.3zm3.2 0c0 1.9.2 3.8.7 5.6.5 1.8 1.2 3.5 2.1 5 .9 1.6 2 3 3.2 4.2 1.2 1.3 2.6 2.3 4.2 3.3 1.5.9 3.2 1.6 4.9 2.1 1.8.5 3.6.7 5.5.7 2.9 0 5.6-.5 8.1-1.6s4.7-2.6 6.6-4.5c1.9-1.9 3.3-4.1 4.4-6.6 1.1-2.5 1.6-5.3 1.6-8.2 0-1.9-.2-3.8-.7-5.6-.5-1.8-1.2-3.5-2.1-5.1-.9-1.6-2-3-3.2-4.3-1.3-1.3-2.6-2.4-4.2-3.3-1.5-.9-3.2-1.6-5-2.1-1.8-.5-3.6-.8-5.5-.8-2.9 0-5.6.6-8.1 1.7s-4.7 2.6-6.5 4.5c-1.9 1.9-3.3 4.1-4.4 6.7-1 2.6-1.6 5.3-1.6 8.3zm17.3 2.5v7.9h-3.5V75.9h6.4c2.6 0 4.4.5 5.7 1.4 1.2.9 1.8 2.3 1.8 4.1 0 1.4-.4 2.6-1.2 3.6-.8 1-2 1.7-3.6 2 .3.1.5.3.7.6.2.2.4.5.5.8l5.1 7.4h-3.3c-.5 0-.9-.2-1.1-.6l-4.5-6.7c-.1-.2-.3-.3-.5-.4-.2-.1-.5-.2-.9-.2h-1.6zm0-2.6h2.6c.8 0 1.5-.1 2.1-.2.6-.2 1-.4 1.4-.7.3-.3.6-.7.8-1.1.2-.4.2-.9.2-1.5 0-.5-.1-1-.2-1.4-.1-.4-.4-.8-.7-1-.3-.3-.7-.5-1.3-.6-.5-.1-1.2-.2-1.9-.2h-2.9v6.7z"/></svg></a>';
+			debug_core_html += '<a href="https://wsform.com/knowledgebase/debug-console/?utm_source=ws_form_pro&utm_medium=debug" target="_blank" class="wsf-debug-logo" title="' + this.language('debug_logo') + '"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 1500 428" xml:space="preserve"><path fill="#002D5D" d="m215.2 422.9-44.3-198.4c-.4-1.4-.7-3-1-4.6-.3-1.6-3.4-18.9-9.3-51.8h-.6l-4.1 22.9-6.8 33.5-45.8 198.4H69.7L0 130.1h28.1L68 300.7l18.6 89.1h1.8c3.5-25.7 9.3-55.6 17.1-89.6l39.9-170H175l40.2 170.6c3.1 12.8 8.8 42.5 16.8 89.1h1.8c.6-5.9 3.5-20.9 8.7-44.8 5.2-23.9 21.9-95.5 50.1-214.8h27.8l-72.1 292.8h-33.1zM495 349.5c0 24.7-7.1 44-21.3 57.9-14.2 13.9-34.7 20.9-61.5 20.9-14.6 0-27.4-1.7-38.4-5.1-11-3.4-19.6-7.2-25.7-11.3l12.3-21.3c8.3 5.1 5.9 3.6 16.6 7.4 12 4.2 24.3 6.1 36.9 6.1 16.5 0 29.6-4.9 39-14.8 9.5-9.9 14.2-23.1 14.2-39.7 0-13-3.4-23.9-10.2-32.8-6.8-8.9-19.8-19-38.9-30.4-21.9-12.6-36.8-22.7-44.8-30.2-8-7.6-14.2-16-18.6-25.4-4.4-9.4-6.6-20.5-6.6-33.5 0-21.1 7.8-38.5 23.3-52.2 15.6-13.8 35.4-20.6 59.4-20.6 25.8 0 45.2 6.7 62.6 17.8L481 163.6c-16.2-9.9-33.3-14.8-51.4-14.8-16.6 0-29.8 4.5-39.6 13.4-9.9 8.9-14.8 20.6-14.8 35.2 0 13 3.3 23.8 10 32.5s20.9 19.3 42.6 31.7c21.3 12.8 35.9 23 43.7 30.6 7.9 7.6 13.7 16.1 17.6 25.4 4 9.2 5.9 19.9 5.9 31.9z"/><path fill="#ACA199" d="M643.8 152.8h-50.2V423h-27.8V152.8H525l.2-22.3h40.3l.3-25.5c0-37.2 3.6-60.9 13.4-77.2C589.5 10.7 606.6 0 630.5 0h28.9v23.6c-6.4 0-18.9.2-27.3.4-13.9.2-20.1 4.5-25.1 9.7-4.9 5.2-7.5 11.5-9.9 23.2-2.4 11.7-3.5 27.9-3.5 48.6v24.6h50.2v22.7zM857.1 275.8c0 49.3-8.5 87-25.6 113.2-17 26.2-41.4 39.3-73.1 39.3-31.3 0-55.3-13.1-72-39.3-16.7-26.2-25-63.9-25-113.2 0-100.9 32.7-151.4 98.1-151.4 30.7 0 54.7 13.2 71.8 39.7 17.2 26.4 25.8 63.7 25.8 111.7zm-166.4 0c0 42.3 5.5 74.2 16.6 95.8 11 21.6 28.3 32.4 51.7 32.4 45.9 0 68.9-42.7 68.9-128.2 0-84.7-23-127.1-68.9-127.1-24 0-41.4 10.6-52.2 31.8-10.7 21.3-16.1 53.1-16.1 95.3zM901.8 196.5c0-35.5 42.9-71.7 88.5-72 30.9-.3 42 8.6 53.2 13.7l-13.9 21.6c-9.7-5.1-18.8-9.2-39.9-9.9-13.3-.4-24.1 1.4-35.9 9.3-9.7 6.4-20.4 12.9-23.6 40.8-2.2 19-.8 45.9-.8 67.8V423h-28.1M1047.6 191.4c5.6-48.2 49.8-67.2 80.6-67.2 17.7 0 39.6 6.4 50.2 14.5 9.5 7.2 14.7 13.4 20.3 32.2 7.7-18 13.9-23.4 25.1-31.3 11.2-7.9 25.8-14.9 43.7-14.9 24.2 0 48.4 7.5 62.9 28.5 11.6 16.7 16.8 41 16.8 78.4V423h-27.8V223.5c.7-56.9-14.3-75.2-52-75.2-18.7 0-32.2 4.7-42.2 21.9-9.8 17-14.3 47.9-14.3 81.3v171.4h-27.8V223.5c0-24.8-3.8-43.3-11.5-55.5s-26.7-18.6-42.8-18.6c-21.3 0-35.6 10.4-45.3 28-9.7 17.6-8.6 45.1-8.6 84.6v160.9h-28.1"/><circle fill="#ACA199" cx="1412.6" cy="149.4" r="25.3"/><circle fill="#ACA199" cx="1412.6" cy="273" r="25.3"/><circle fill="#ACA199" cx="1412.6" cy="395" r="25.3"/><path fill="#ACA199" d="M1449.5 85.4c0-2.2.3-4.3.9-6.4.6-2 1.4-3.9 2.4-5.7 1-1.8 2.3-3.4 3.7-4.8 1.5-1.4 3.1-2.7 4.8-3.7 1.8-1 3.7-1.9 5.7-2.4 2-.6 4.1-.9 6.3-.9s4.3.3 6.4.9c2 .6 3.9 1.4 5.7 2.4 1.8 1 3.4 2.3 4.8 3.7 1.5 1.5 2.7 3.1 3.7 4.8 1 1.8 1.8 3.7 2.4 5.7.6 2 .8 4.2.8 6.4s-.3 4.3-.8 6.3c-.6 2-1.4 3.9-2.4 5.7-1 1.8-2.3 3.4-3.7 4.8-1.5 1.5-3.1 2.7-4.8 3.7-1.8 1-3.7 1.9-5.7 2.4-2 .6-4.2.9-6.4.9s-4.3-.3-6.3-.9c-2-.6-3.9-1.4-5.7-2.4-1.8-1-3.4-2.3-4.8-3.7-1.5-1.4-2.7-3.1-3.7-4.8-1-1.8-1.8-3.7-2.4-5.7s-.9-4.1-.9-6.3zm3.2 0c0 1.9.2 3.8.7 5.6.5 1.8 1.2 3.5 2.1 5 .9 1.6 2 3 3.2 4.2 1.2 1.3 2.6 2.3 4.2 3.3 1.5.9 3.2 1.6 4.9 2.1 1.8.5 3.6.7 5.5.7 2.9 0 5.6-.5 8.1-1.6s4.7-2.6 6.6-4.5c1.9-1.9 3.3-4.1 4.4-6.6 1.1-2.5 1.6-5.3 1.6-8.2 0-1.9-.2-3.8-.7-5.6-.5-1.8-1.2-3.5-2.1-5.1-.9-1.6-2-3-3.2-4.3-1.3-1.3-2.6-2.4-4.2-3.3-1.5-.9-3.2-1.6-5-2.1-1.8-.5-3.6-.8-5.5-.8-2.9 0-5.6.6-8.1 1.7s-4.7 2.6-6.5 4.5c-1.9 1.9-3.3 4.1-4.4 6.7-1 2.6-1.6 5.3-1.6 8.3zm17.3 2.5v7.9h-3.5V75.9h6.4c2.6 0 4.4.5 5.7 1.4 1.2.9 1.8 2.3 1.8 4.1 0 1.4-.4 2.6-1.2 3.6-.8 1-2 1.7-3.6 2 .3.1.5.3.7.6.2.2.4.5.5.8l5.1 7.4h-3.3c-.5 0-.9-.2-1.1-.6l-4.5-6.7c-.1-.2-.3-.3-.5-.4-.2-.1-.5-.2-.9-.2h-1.6zm0-2.6h2.6c.8 0 1.5-.1 2.1-.2.6-.2 1-.4 1.4-.7.3-.3.6-.7.8-1.1.2-.4.2-.9.2-1.5 0-.5-.1-1-.2-1.4-.1-.4-.4-.8-.7-1-.3-.3-.7-.5-1.3-.6-.5-.1-1.2-.2-1.9-.2h-2.9v6.7z"/></svg></a>';
 
 			// Close
 			debug_core_html += '<div class="wsf-debug-close" data-action="wsf-debug-close" title="' + this.language('debug_close') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path d="M11.5 10.1 9.4 8l2.1-2.1-1.4-1.4L8 6.6 5.9 4.5 4.5 5.9 6.6 8l-2.1 2.1 1.4 1.4L8 9.4l2.1 2.1 1.4-1.4z"/><path d="M15 1H1v14h14V1zm-1 13H2V2h12v12z"/></svg></div>';
@@ -146,25 +111,30 @@
 			$('#wsf-debug-nav-wrapper').on('selectstart dragstart', function(evt){ evt.preventDefault(); return false; });
 
 			// Debug resize event - Mouse
-			$('#wsf-debug-nav-wrapper').on('mousedown', function(e){
+			$('#wsf-debug-nav-wrapper').on('mousedown', function(e) {
 	
 				// Initialize start points
-				var debug_screen_y_start = e.screenY;
+				ws_this.debug_screen_y_start = e.screenY;
 				ws_this.debug_height_start = $('#wsf-debug').height();
 				ws_this.debug_scroll_y_start = $(window).scrollTop();
 
-				$(document).on('mouseup', function(e) {
+				ws_this.debug_drag = true;
+			});
 
-					ws_this.cookie_set('debug_height', $('#wsf-debug').height(), false, false);
+			$(document).on('mousemove', function(e) {
 
-					$(document).off('mouseup').off('mousemove');
-				});
+				if(!ws_this.debug_drag) { return; }
 
-				$(document).on('mousemove', function(e) {
+				ws_this.debug_size((ws_this.debug_screen_y_start - e.screenY), true);
+			});
 
-					var mouse_y_difference = (debug_screen_y_start - e.screenY);
-					ws_this.debug_size(mouse_y_difference, true);
-				});
+			$(document).on('mouseup', function(e) {
+
+				if(!ws_this.debug_drag) { return; }
+
+				ws_this.cookie_set('debug_height', $('#wsf-debug').height(), false, false);
+
+				ws_this.debug_drag = false;
 			});
 
 			// Mark debug as rendered
@@ -212,8 +182,8 @@
 		debug_instance += '<li><div data-action="wsf-identify" title="' + this.language('debug_tools_identify') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path fill="#444" d="M15.7 14.3l-4.2-4.2c-0.2-0.2-0.5-0.3-0.8-0.3 0.8-1 1.3-2.4 1.3-3.8 0-3.3-2.7-6-6-6s-6 2.7-6 6 2.7 6 6 6c1.4 0 2.8-0.5 3.8-1.4 0 0.3 0 0.6 0.3 0.8l4.2 4.2c0.2 0.2 0.5 0.3 0.7 0.3s0.5-0.1 0.7-0.3c0.4-0.3 0.4-0.9 0-1.3zM6 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path></svg> ' + this.language('debug_tools_identify') + '</div></li>';
 
 		// *** TO DO: Capability check ***
-		debug_instance += '<li><a href="' + this.esc_attr(ws_form_settings.admin_url + 'admin.php?page=ws-form-edit&id=' + ws_this.form_id) + '" target="_blank" title="' + this.language('debug_tools_edit') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path d="M16 9v-2l-1.7-0.6c-0.2-0.6-0.4-1.2-0.7-1.8l0.8-1.6-1.4-1.4-1.6 0.8c-0.5-0.3-1.1-0.6-1.8-0.7l-0.6-1.7h-2l-0.6 1.7c-0.6 0.2-1.2 0.4-1.7 0.7l-1.6-0.8-1.5 1.5 0.8 1.6c-0.3 0.5-0.5 1.1-0.7 1.7l-1.7 0.6v2l1.7 0.6c0.2 0.6 0.4 1.2 0.7 1.8l-0.8 1.6 1.4 1.4 1.6-0.8c0.5 0.3 1.1 0.6 1.8 0.7l0.6 1.7h2l0.6-1.7c0.6-0.2 1.2-0.4 1.8-0.7l1.6 0.8 1.4-1.4-0.8-1.6c0.3-0.5 0.6-1.1 0.7-1.8l1.7-0.6zM8 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="#444"></path><path d="M10.6 7.9c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5c0-1.381 1.119-2.5 2.5-2.5s2.5 1.119 2.5 2.5z" fill="#444"></path></svg> ' + this.language('debug_tools_edit') + '</a></li>';
-		debug_instance += '<li><a href="' + this.esc_attr(ws_form_settings.admin_url + 'admin.php?page=ws-form-submit&id=' + ws_this.form_id) + '" target="_blank" title="' + this.language('debug_tools_submissions') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path fill="#444" d="M0 1v15h16v-15h-16zM5 15h-4v-2h4v2zM5 12h-4v-2h4v2zM5 9h-4v-2h4v2zM5 6h-4v-2h4v2zM10 15h-4v-2h4v2zM10 12h-4v-2h4v2zM10 9h-4v-2h4v2zM10 6h-4v-2h4v2zM15 15h-4v-2h4v2zM15 12h-4v-2h4v2zM15 9h-4v-2h4v2zM15 6h-4v-2h4v2z"></path></svg> ' + this.language('debug_tools_submissions') + '</a></li>';
+		debug_instance += '<li><a href="' + this.esc_url(ws_form_settings.admin_url + 'admin.php?page=ws-form-edit&id=' + ws_this.form_id) + '" target="_blank" title="' + this.language('debug_tools_edit') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path d="M16 9v-2l-1.7-0.6c-0.2-0.6-0.4-1.2-0.7-1.8l0.8-1.6-1.4-1.4-1.6 0.8c-0.5-0.3-1.1-0.6-1.8-0.7l-0.6-1.7h-2l-0.6 1.7c-0.6 0.2-1.2 0.4-1.7 0.7l-1.6-0.8-1.5 1.5 0.8 1.6c-0.3 0.5-0.5 1.1-0.7 1.7l-1.7 0.6v2l1.7 0.6c0.2 0.6 0.4 1.2 0.7 1.8l-0.8 1.6 1.4 1.4 1.6-0.8c0.5 0.3 1.1 0.6 1.8 0.7l0.6 1.7h2l0.6-1.7c0.6-0.2 1.2-0.4 1.8-0.7l1.6 0.8 1.4-1.4-0.8-1.6c0.3-0.5 0.6-1.1 0.7-1.8l1.7-0.6zM8 12c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="#444"></path><path d="M10.6 7.9c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5c0-1.381 1.119-2.5 2.5-2.5s2.5 1.119 2.5 2.5z" fill="#444"></path></svg> ' + this.language('debug_tools_edit') + '</a></li>';
+		debug_instance += '<li><a href="' + this.esc_url(ws_form_settings.admin_url + 'admin.php?page=ws-form-submit&id=' + ws_this.form_id) + '" target="_blank" title="' + this.language('debug_tools_submissions') + '"><svg height="16" width="16" viewBox="0 0 16 16"><path fill="#444" d="M0 1v15h16v-15h-16zM5 15h-4v-2h4v2zM5 12h-4v-2h4v2zM5 9h-4v-2h4v2zM5 6h-4v-2h4v2zM10 15h-4v-2h4v2zM10 12h-4v-2h4v2zM10 9h-4v-2h4v2zM10 6h-4v-2h4v2zM15 15h-4v-2h4v2zM15 12h-4v-2h4v2zM15 9h-4v-2h4v2zM15 6h-4v-2h4v2z"></path></svg> ' + this.language('debug_tools_submissions') + '</a></li>';
 
 		debug_instance += '</ul>';
 
@@ -245,6 +215,7 @@
 		// Tools - Info
 		this.debug_info('debug_info_label', this.form.label);
 		this.debug_info('debug_info_id', this.form_id);
+		this.debug_info('debug_info_style_id', this.form.meta.style_id);
 		this.debug_info('debug_info_instance', this.form_instance_id);
 		this.debug_info('debug_info_hash', (this.hash == '' ? this.language('debug_hash_empty') : this.hash), ((this.hash == '') ? '' : 'clear_hash'));
 		this.debug_info('debug_info_checksum', this.form.published_checksum, ((this.form.published_checksum != this.form.checksum) ? 'publish' : ''));
@@ -589,7 +560,7 @@
 		}
 
 		// Increment audit counter
-		this.audit_count[audit_type]++;
+		this.debug_audit_count[audit_type]++;
 	}
 
 	// Debug - Audit clear
@@ -599,7 +570,7 @@
 		$('#wsf-debug-instance-' + this.form_instance_id + '-' + audit_type + ' tbody tr').remove();
 
 		// Reset audit counter
-		this.audit_count[audit_type] = 0;
+		this.debug_audit_count[audit_type] = 0;
 
 		// Update audit tab
 		this.debug_audit_tab(audit_type);
@@ -609,9 +580,9 @@
 	$.WS_Form.prototype.debug_audit_tab = function(audit_type) {
 
 		var audit_tab_obj = $('a[href="#wsf-debug-instance-' + this.esc_selector(this.form_instance_id + '-' + audit_type) + '"]');
-		if(this.audit_count[audit_type] == 0) { audit_tab_obj.removeClass('wsf-has-' + audit_type); }
-		if(this.audit_count[audit_type] == 1) { audit_tab_obj.addClass('wsf-has-' + audit_type); }
-		$('a[href="#wsf-debug-instance-' + this.form_instance_id + '-' + audit_type + '"] span').html(this.audit_count[audit_type]);
+		if(this.debug_audit_count[audit_type] == 0) { audit_tab_obj.removeClass('wsf-has-' + audit_type); }
+		if(this.debug_audit_count[audit_type] == 1) { audit_tab_obj.addClass('wsf-has-' + audit_type); }
+		$('a[href="#wsf-debug-instance-' + this.form_instance_id + '-' + audit_type + '"] span').html(this.debug_audit_count[audit_type]);
 	}
 
 	// Get date / time string
@@ -710,6 +681,10 @@
 				var populate_obj_required = $('[name="' + ws_this.esc_selector(field_name) + '"]:required', form_obj);
 				var populate_array_obj_required = $('[name="' + ws_this.esc_selector(field_name) + '[]"]:required', form_obj);
 				var populate_ecommerce_price = $('[name="' + ws_this.esc_selector(field_name) + '"][data-ecommerce-price]', form_obj).length;
+
+				// Do not populate data-debug-populate-bypass fields
+				var populate_obj_data_debug_populate_bypass = $('[name="' + ws_this.esc_selector(field_name) + '"][data-debug-populate-bypass]', form_obj);
+				if(populate_obj_data_debug_populate_bypass.length) { return; }
 
 				// Do not populate data-required-bypass fields
 				var populate_obj_data_required_bypass = $('[name="' + ws_this.esc_selector(field_name) + '"][data-required-bypass],[name="' + ws_this.esc_selector(field_name) + '"][data-required-bypass-section],[name="' + ws_this.esc_selector(field_name) + '"][data-required-bypass-group]', form_obj);
@@ -901,7 +876,7 @@
 
 					case 'url' :
 
-						populate = 'http://www.' + ws_this.debug_get_word() + '.com';
+						populate = 'https://www.wsf' + ws_this.debug_get_word() + ws_this.debug_random_number(1000, 9999, 1) + '.com';
 						break;
 
 					case 'tel' :
@@ -1048,10 +1023,11 @@
 
 						populate = '#' + r + g + b;
 
-						// Minicolors
-						if(typeof(populate_obj.minicolors) === 'function') {
+						// Coloris
+						if(typeof(Coloris) !== 'undefined') {
 
-							populate_obj.minicolors('value', populate);
+							populate_obj.val(populate);
+							populate_obj[0].dispatchEvent(new Event('input', { bubbles: true }));
 						}
 
 						break;
@@ -1549,40 +1525,53 @@
 		this.form_hash_clear();
 	}
 
+	// Debug size
+	$.WS_Form.prototype.debug_size = function(difference_y, resize_on_complete, debug_height_force) {
+
+		// Change height
+		if(debug_height_force > 0) {
+
+			this.debug_height = debug_height_force;
+
+		} else {
+
+			this.debug_height = this.debug_height_start + difference_y;
+		}
+
+		// If height < allowed minimum
+		this.debug_height_min = $('#wsf-debug-nav-wrapper').outerHeight();
+		if(this.debug_height < this.debug_height_min) { this.debug_height = this.debug_height_min; }
+
+		// If height > allowed maximum
+		var debug_height_max = ($(window).height() - 150);
+		if(this.debug_height > debug_height_max) { this.debug_height = debug_height_max; }
+
+		// Set height
+		document.querySelector(':root').style.setProperty('--wsf-debug-height', this.debug_height + 'px');
+
+		// Scroll
+		this.debug_scroll_y = this.debug_scroll_y_start - (this.debug_height_start - this.debug_height);
+
+		// If scroll < 0
+		if(this.debug_scroll_y < 0) { this.debug_scroll_y = 0; }
+
+		// Set scroll
+		$(window).scrollTop(this.debug_scroll_y);
+
+		if(resize_on_complete) {
+
+			// Change body margin
+			this.debug_margin_bottom = this.debug_margin_bottom_start + this.debug_height;
+
+			// If margin < allowed minimum (i.e. minimum originally set on body)
+			if(this.debug_margin_bottom < this.debug_margin_bottom_start) { this.debug_margin_bottom = this.debug_margin_bottom_start; }
+
+			// Set margin
+			$('body').css({ marginBottom: this.debug_margin_bottom + 'px' });
+
+			// Set panel heights
+			this.debug_panel_heights();
+		}
+	}
+
 })(jQuery);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -17,13 +17,6 @@
 
 				'label_positions'			=>	array('default', 'top', 'left', 'right', 'bottom'),
 
-				'minicolors_args'			=>	array(
-
-					'changeDelay' 	=> 200,
-					'letterCase' 	=> 'uppercase',
-					'theme' 		=> 'bootstrap'
-				),
-
 				'columns'					=>	array(
 
 					'column_class'			=>	'col-#id-#size',

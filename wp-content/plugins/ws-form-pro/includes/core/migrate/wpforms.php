@@ -823,7 +823,6 @@
 							))
 						),
 
-
 						'name'	=>	array(
 
 							array('source' => 'format', 'type' => 'scratch', 'destination' => 'format'),

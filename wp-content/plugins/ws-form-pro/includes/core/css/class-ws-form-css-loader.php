@@ -19,10 +19,10 @@
 	--wsf-loader-sprite-color: 0, 0, 0;
 	--wsf-loader-sprite-color-accent: 255, 61, 0;
 	--wsf-loader-sprite-offset-top: -10px;
-	--wsf-loader-sprite-offset-top-align: 0px;
-	--wsf-loader-sprite-offset-top-always-visible: 0px;
-	--wsf-loader-sprite-offset-left: 0px;
-	--wsf-loader-sprite-offset-left-align: 0px;
+	--wsf-loader-sprite-offset-top-align: 0;
+	--wsf-loader-sprite-offset-top-always-visible: 0;
+	--wsf-loader-sprite-offset-left: 0;
+	--wsf-loader-sprite-offset-left-align: 0;
 	--wsf-loader-sprite-opacity: 1;
 	--wsf-loader-sprite-opacity-accent: 1;
 	--wsf-loader-sprite-size: 48px;
@@ -105,7 +105,7 @@
 	border-radius: 50%;
 	border: var(--wsf-loader-sprite-border) solid rgba(var(--wsf-loader-sprite-color), var(--wsf-loader-sprite-opacity));
 	content: "";
-	inset: 0px;
+	inset: 0;
 	position: absolute;
 }
 

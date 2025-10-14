@@ -65,7 +65,12 @@
 			if(!(defined('DISABLE_NAG_NOTICES') && DISABLE_NAG_NOTICES && $nag_notice)) {
 
 				// $message may contain HTML
-				echo sprintf('<div class="notice %s"><p>%s</p></div>', esc_attr($type . ($dismissible ? ' is-dismissible' : '') . ($class ? ' '  . $class : '')), str_replace("\n", "<br />\n", $message));	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+				echo sprintf(		// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
+					'<div class="notice %s"><p>%s</p></div>',
+					esc_attr($type . ($dismissible ? ' is-dismissible' : '') . ($class ? ' '  . $class : '')),
+					str_replace("\n", "<br />\n", $message)
+				);
 			}
 		}
 
@@ -84,9 +89,8 @@
 			if(
 				isset($_SERVER) && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				isset($_SERVER['HTTP_X_PRESSABLE_PROXY']) && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				(isset($_SERVER['HTTP_X_PRESSABLE_PROXY']) == 'wordpress')// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitiz	ed
+				($_SERVER['HTTP_X_PRESSABLE_PROXY'] == 'wordpress') // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			) {
-
 				$wrapper_classes_array[] = 'wsf-wpcom';
 			}
 
@@ -142,12 +146,20 @@
 			if($options === false) {
 
 				// Check cache
-				if($enable_cache && isset(self::$options[$option_name])) {
+				if(
+					$enable_cache &&
+					isset(self::$options[$option_name]) &&
+					is_array(self::$options[$option_name])
+				) {
 
 					$options = self::$options[$option_name];
 
 				} else {
 
+					// Clear cache
+					wp_cache_delete($option_name, 'options');
+
+					// Get fresh copy of options
 					$options = get_option($option_name, false);
 
 					// Check options
@@ -166,11 +178,18 @@
 		public static function get_options_by_option_name($option_name, $key_prefix, $enable_cache) {
 
 			// Check cache
-			if($enable_cache && isset(self::$options[$option_name])) {
+			if(
+				$enable_cache &&
+				isset(self::$options[$option_name]) &&
+				is_array(self::$options[$option_name])
+			) {
 
 				return self::$options[$option_name];
 
 			} else {
+
+				// Clear cache
+				wp_cache_delete($option_name, 'options');
 
 				// Check if options have already been migrated
 				$options = get_option($option_name, false);
@@ -183,6 +202,9 @@
 
 				// Check options
 				if(!is_array($options)) { $options = array(); }
+
+				// Cache options
+				self::$options[$option_name] = $options;
 
 				return $options;
 			}
@@ -231,7 +253,7 @@
 		}
 
 		// Get plugin option key value
-		public static function option_get($key, $default = false, $default_set = false, $enable_cache = true, $use_default_if_blank = false) {
+		public static function option_get($key, $default = false, $default_set = false, $enable_cache = true, $use_default_if_blank = false, $bypass_filter = false) {
 
 			// Get option name
 			$option_name_return = self::get_options($key, $enable_cache);
@@ -258,7 +280,7 @@
 				$value = $default;
 			}
 
-			return apply_filters('wsf_option_get', $value, $key);
+			return $bypass_filter ? $value : apply_filters('wsf_option_get', $value, $key);
 		}
 
 		// Set plugin option key value
@@ -274,13 +296,19 @@
 
 				// Set key to value in options array
 				$options[$key] = apply_filters('wsf_option_set', $value, $key);
+
+				// Cache options
+				if(
+					isset(self::$options[$option_name]) &&
+					is_array(self::$options[$option_name]) &&
+					is_array($options)
+				) {
+					self::$options[$option_name] = $options;
+				}
+
+				// Update WordPress option
+				update_option($option_name, $options, 'no');
 			}
-
-			// Cache options
-			self::$options[$option_name] = $options;
-
-			// Update WordPress option
-			update_option($option_name, $options, 'no');
 		}
 
 		// Remove plugin option key value
@@ -344,7 +372,24 @@
 		// Get customize URL
 		public static function get_customize_url($panel = 'ws_form', $preview_form_id = 0) {
 
-			return sprintf('customize.php?return=%s&wsf_panel_open=%s%s', urlencode(remove_query_arg(wp_removable_query_args(), wp_unslash($_SERVER['REQUEST_URI']))), $panel, (($preview_form_id > 0) ? sprintf('&wsf_preview_form_id=%u', $preview_form_id) : ''));
+			return sprintf(
+
+				'customize.php?return=%s&wsf_panel_open=%s%s',
+				urlencode(
+
+					remove_query_arg(
+
+						wp_removable_query_args(),
+						wp_unslash(
+							isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''
+						)
+					)
+				),
+				$panel,
+				(
+					($preview_form_id > 0) ? sprintf('&wsf_preview_form_id=%u', $preview_form_id) : ''
+				)
+			);
 		}
 
 		// Get tooltip attributes
@@ -362,11 +407,11 @@
 			}
 		}
 
-		// Echo tooltip attribut
+		// Echo tooltip attribute
 		public static function tooltip_e($title, $position = 'bottom-center') {
 
 			// Output is escaped in tooltip method
-			echo self::tooltip($title, $position = 'bottom-center');	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo self::tooltip($title, $position);	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 		}
 
 		// Output settings attributes
@@ -382,27 +427,6 @@
 				self::echo_esc_attr($value);
 				echo '"';	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			}
-		}
-
-		// Sanitize IP addresses
-		public static function sanitize_ip_address($ip) {
-
-			return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '';
-		}
-
-		// Escape CSS output
-		public static function esc_css($css_value) {
-
-			// Clean output
-			$css_value = str_replace(';', '', $css_value);
-
-			// Escape
-			$css_value = esc_html($css_value);
-
-			// We allow double quotes (e.g. for delimiting font names)
-			$css_value = str_replace('&quot;', '"', $css_value);
-
-			return $css_value;
 		}
 
 		// Get query var (NONCE is not available)
@@ -972,11 +996,14 @@
 			// Check for valid request methods
 			if(!$valid_request_methods) { $valid_request_methods = ['GET', 'POST', 'PUT', 'DELETE']; }
 
-			// Check to ensure we can determine request method
-			if(!isset($_SERVER) || !isset($_SERVER["REQUEST_METHOD"])) { return false; }	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
 			// Read request method
-			$request_method = strtoupper(wp_unslash($_SERVER["REQUEST_METHOD"]));
+			$request_method = strtoupper(
+
+				wp_unslash(
+
+					isset($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : ''
+				)
+			);
 
 			// Ensure it is valid
 			if(!in_array($request_method, $valid_request_methods)) { return false; }
@@ -1119,8 +1146,42 @@
 			), true) ? $order_by : '';
 		}
 
-		// Check order
+		// Check form order
 		public static function check_form_order($order) {
+
+			return in_array($order, array(
+
+				'asc',
+				'desc'
+
+			), true) ? $order : '';
+		}
+
+		// Check style status
+		public static function check_style_status($status) {
+
+			return in_array($status, array(
+
+				'draft',
+				'publish',
+				'trash'
+
+			), true) ? $status : '';
+		}
+
+		// Check style order by
+		public static function check_style_order_by($order_by) {
+
+			return in_array($order_by, array(
+
+				'label',
+				'id'
+
+			), true) ? $order_by : '';
+		}
+
+		// Check style order
+		public static function check_style_order($order) {
 
 			return in_array($order, array(
 
@@ -1148,18 +1209,27 @@
 		public static function get_api_path($path = '', $query_string = false) {
 
 			// Check permalinks
-			$permalink_custom = (get_option('permalink_structure') != '');
-
-			if($permalink_custom) {
+			if(get_option('permalink_structure') != '') {
 
 				$api_path = rest_url() . WS_FORM_RESTFUL_NAMESPACE . '/' . $path;
 				if($query_string !== false) { $api_path .= '?' . $query_string; }
 
 			} else {
 
-				$path = '/' . WS_FORM_RESTFUL_NAMESPACE . '/' . $path;
-				$api_path = get_site_url() . '/?rest_route=' . rawurlencode($path);
-				if($query_string !== false) { $api_path .= '&' . $query_string; }
+				// Split path and inline query
+				$path_parts = explode('?', $path, 2);
+				$path_encoded = rawurlencode('/' . WS_FORM_RESTFUL_NAMESPACE . '/' . $path_parts[0]);
+				$api_path = get_site_url(null, '/') . '?rest_route=' . $path_encoded;
+
+				// Inline query (from path itself)
+				if(!empty($path_parts[1])) {
+					$api_path .= '&' . $path_parts[1];
+				}
+
+				// Additional query string parameter (passed via $query_string)
+				if($query_string !== false) {
+					$api_path .= '&' . $query_string;
+				}
 			}
 
 			return $api_path;
@@ -1184,10 +1254,6 @@
 
 						// Works better for multisite than checking roles. Roles are not available in WP_User on multisite
 						$debug_enabled = current_user_can('activate_plugins');
-
-					} else {
-
-						$debug_enabled = false;
 					}
 
 					break;
@@ -1199,9 +1265,146 @@
 					break;
 			}
 
-			$debug_enabled = apply_filters('wsf_debug_enabled', $debug_enabled);
+			return apply_filters('wsf_debug_enabled', $debug_enabled);
+		}
 
-			return $debug_enabled;
+		// Is ability API enabled?
+		public static function ability_api_enabled() {
+
+			return (
+
+				WS_FORM_ABILITY_CLASS &&
+				apply_filters('wsf_ability_api_enabled', WS_FORM_ABILITY_API) &&
+				class_exists('WP_Ability')
+			);
+		}
+
+		// Is MCP adapter enabled?
+		public static function mcp_adapter_enabled($include_setting = true) {
+
+			return (
+
+				apply_filters('wsf_mcp_adapter_enabled', WS_FORM_MCP_ADAPTER) &&
+				self::ability_api_enabled() &&
+				class_exists('WP\MCP\Plugin') &&
+				($include_setting ? WS_Form_Common::option_get('mcp_adapter') : true)
+			);
+		}
+
+		// Is Angie enabled?
+		public static function angie_enabled() {
+
+			return (
+
+				WS_FORM_ABILITY_CLASS &&
+				apply_filters('wsf_angie_enabled', WS_FORM_ANGIE) &&
+				defined('ANGIE_VERSION')
+			);
+		}
+
+		// Is styler enabled?
+		public static function styler_enabled() {
+
+			return (
+
+				apply_filters('wsf_styler_enabled', WS_FORM_STYLER) &&
+				(self::option_get('framework', 'ws-form', false, true, false, true) === 'ws-form')
+			);
+		}
+
+		// Is styler visible in admin?
+		public static function styler_visible_admin() {
+
+			return (
+				self::styler_enabled() &&
+				self::can_user('read_form_style')
+			);
+		}
+
+		// Should styler be visible on site?
+		public static function styler_visible_public() {
+
+			return (
+
+				self::styler_visible_admin() &&
+				(
+					!empty(self::get_query_var('wsf_preview_style_id')) ||
+					!empty(self::get_query_var('wsf_preview_styler'))
+				)
+			);
+		}
+
+		// Is styler preview template being shown?
+		public static function styler_preview_template_shown() {
+
+			return (
+
+				self::styler_visible_public() &&
+				!empty(self::get_query_var('wsf_preview_template_id'))
+			);
+		}
+
+
+
+		// Is customizer enabled?
+		public static function customizer_enabled() {
+
+			return !self::styler_enabled();
+		}
+
+		// Is customizer visible?
+		public static function customizer_visible() {
+
+			return (
+
+				self::customizer_enabled() &&
+				(self::option_get('framework', 'ws-form') === 'ws-form') &&
+				self::can_user('customize') &&
+				self::can_user('read_form')
+			);
+		}
+
+		// Legacy color functions for add-ons
+		public static function hex_lighten_percentage($hex, $percentage) {
+
+			return WS_Form_Color::hex_color_lighten_percentage($hex, $percentage);
+		}
+
+		public static function hex_darken_percentage($hex, $percentage) {
+
+			return WS_Form_Color::hex_color_darken_percentage($hex, $percentage);
+		}
+
+		// Clean wp_remote_post
+		public static function wp_remote_post_clean( $url, $args = array() ) {
+
+			// Backup existing filters
+			global $wp_filter;
+
+			$saved_filters = array();
+
+			$filter_keys = array('http_request_args', 'http_api_curl', 'pre_http_request', 'http_response');
+
+			foreach($filter_keys as $key) {
+
+				if(isset($wp_filter[$key])) {
+
+					$saved_filters[$key] = $wp_filter[$key];
+
+					remove_all_filters($key);
+				}
+			}
+
+			// Make the request
+			$response = wp_remote_post($url, $args);
+
+			// Restore filters
+			foreach($saved_filters as $key => $filters) {
+
+				$wp_filter[$key] = $filters;
+			}
+
+			return $response;
 		}
 
 		// Check to see if object should show
@@ -1482,6 +1685,42 @@
 			return $groups;
 		}
 
+		// Get field type config meta keys
+		public static function get_field_type_config_meta_keys($field_type_config, $meta_keys, $meta_keys_return = array()) {
+
+			if(!isset($field_type_config['fieldsets'])) { return $meta_keys_return; }
+
+			foreach($field_type_config['fieldsets'] as $id => $fieldset) {
+
+				// Process meta_keys
+				if(isset($fieldset['meta_keys'])) {
+
+					foreach($fieldset['meta_keys'] as $meta_key) {
+
+						// Check for key
+						if(!isset($meta_keys[$meta_key])) { continue; }
+
+						$meta_key_config = $meta_keys[$meta_key];
+
+						if(isset($meta_key_config['key'])) {
+
+							$meta_key = $meta_key_config['key'];
+						}
+
+						$meta_keys_return[$meta_key] = true;
+					}
+				}
+
+				// Process fieldsets
+				if(isset($fieldset['fieldsets'])) {
+
+					$meta_keys_return = self::get_field_type_config_meta_keys($fieldset, $meta_keys, $meta_keys_return);
+				}
+			}
+
+			return $meta_keys_return;
+		}
+
 		// Mask parse
 		public static function mask_parse($mask, $values, $prefix = '#', $single_parse = false) {
 
@@ -1574,7 +1813,13 @@
 			// Check to see if WS Forms upload folder exists
 			if(!file_exists($upload_dir_ws_form)) {
 
-				if(!wp_mkdir_p($upload_dir_ws_form)) { return ['error' => true, 'message' => sprintf(__('Unable to create upload folder for uploaded files (wp-content/uploads/%s).', 'ws-form'), $upload_dir_path)]; }
+				if(!wp_mkdir_p($upload_dir_ws_form)) { return ['error' => true, 'message' => sprintf(
+
+					/* translators: %s: Upload path */
+					__('Unable to create upload folder for uploaded files (wp-content/uploads/%s).', 'ws-form'),
+					$upload_dir_path
+
+				)]; }
 			}
 
 			return ['error' => false, 'dir' => $upload_dir_ws_form, 'path' => $upload_dir_path];
@@ -1608,16 +1853,15 @@
 			// Run through each variable
 			foreach($variable_array as $variable_array_index => $variable) {
 
-				if(isset($_SERVER[$variable])) {	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$server_variable = isset($_SERVER[$variable]) ? $_SERVER[$variable] : '';
 
-					if($variable_array_index == $variable_array_index_last) {
+				if($variable_array_index == $variable_array_index_last) {
 
-						return wp_unslash($_SERVER[$variable]);
+					return wp_unslash($server_variable);
 
-					} else {
+				} else {
 
-						if(!empty($_SERVER[$variable])) return wp_unslash($_SERVER[$variable]);
-					}
+					if(!empty($server_variable)) return wp_unslash($server_variable);
 				}
 			}
 
@@ -1627,13 +1871,19 @@
 		// Get IP
 		public static function get_ip() {
 
-			return self::sanitize_ip_address(self::get_http_env_raw(array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR')));
+			return self::sanitize_ip_address(self::get_http_env_raw(array(
+
+				'HTTP_CF_CONNECTING_IP', // Cloudflare passthrough IP address
+				'HTTP_CLIENT_IP',        // Client IP
+				'HTTP_X_FORWARDED_FOR',  // Forwarded IP
+				'REMOTE_ADDR'            // Remote address
+			)));
 		}
 
 		// Ger user agent
 		public static function get_user_agent() {
 
-			return sanitize_text_field(WS_Form_Common::get_http_env_raw(array('HTTP_USER_AGENT')));
+			return sanitize_text_field(self::get_http_env_raw(array('HTTP_USER_AGENT')));
 		}
 
 		// Get referrer
@@ -1707,10 +1957,22 @@
 			return $array['meta']->{$meta_key};
 		}
 
-		// Get numbers from string
-		public static function get_tel($phone) {
+		// Get URL from string
+		public static function get_url($url_input) {
 
-			return preg_replace('/[^+\d]+/', '', $phone);
+			return (filter_var($url_input, FILTER_VALIDATE_URL) ? $url_input : '');
+		}
+
+		// Get tel from string
+		public static function get_tel($tel_input) {
+
+			return preg_replace('/[^+\d]+/', '', $tel_input);
+		}
+
+		// Get email address from string
+		public static function get_email($email_input) {
+
+			return (filter_var($email_input, FILTER_VALIDATE_EMAIL) ? $email_input : '');
 		}
 
 		// Get string from any type of input
@@ -1888,338 +2150,6 @@
 			header('Content-Type: ' . $mime_type);
 			header('Content-Disposition: attachment; filename=' . $filename);
 			header('Content-Transfer-Encoding: ' . $encoding);
-		}
-
-		public static function hex_to_hsl($hex) {
-
-			$hex = array($hex[0].$hex[1], $hex[2].$hex[3], $hex[4].$hex[5]);
-			$rgb = array_map(function($part) {
-
-				return hexdec($part) / 255;
-
-			}, $hex);
-
-			$max = max($rgb);
-			$min = min($rgb);
-
-			$l = ($max + $min) / 2;
-
-			if ($max == $min) {
-
-				$h = $s = 0;
-
-			} else {
-
-				$diff = $max - $min;
-				$s = $l > 0.5 ? $diff / (2 - $max - $min) : $diff / ($max + $min);
-
-				switch($max) {
-
-					case $rgb[0]:
-						$h = ($rgb[1] - $rgb[2]) / $diff + ($rgb[1] < $rgb[2] ? 6 : 0);
-						break;
-
-					case $rgb[1]:
-						$h = ($rgb[2] - $rgb[0]) / $diff + 2;
-						break;
-
-					case $rgb[2]:
-						$h = ($rgb[0] - $rgb[1]) / $diff + 4;
-						break;
-				}
-
-				$h /= 6;
-			}
-
-			return array($h, $s, $l);
-		}
-
-		public static function hex_to_rgba($color, $opacity = false) {
-		 
-			$default = 'rgb(0,0,0)';
-		 
-			if(empty($color))
-		  	return $default; 
-
-			if ($color[0] == '#' ) {
-				$color = substr( $color, 1 );
-			}
-	 
-			if (strlen($color) == 6) {
-				$hex = array( $color[0] . $color[1], $color[2] . $color[3], $color[4] . $color[5] );
-			} elseif ( strlen( $color ) == 3 ) {
-				$hex = array( $color[0] . $color[0], $color[1] . $color[1], $color[2] . $color[2] );
-			} else {
-				return $default;
-			}
-	 
-			$rgb =  array_map('hexdec', $hex);
-	 
-			if ($opacity) {
-				if (abs($opacity) > 1)
-					$opacity = 1.0;
-				$output = 'rgba('.implode(",",$rgb).','.$opacity.')';
-			} else {
-				$output = 'rgb('.implode(",",$rgb).')';
-			}
-	 
-			return $output;
-		}
-
-		public static function hsl_to_rgb($hsl) {
-
-			list($h, $s, $l) = $hsl;
-
-			$r; 
-			$g; 
-			$b;
-
-			$c = ( 1 - abs( 2 * $l - 1 ) ) * $s;
-			$x = $c * ( 1 - abs( fmod( ( $h / 60 ), 2 ) - 1 ) );
-			$m = $l - ( $c / 2 );
-			if ( $h < 60 ) {
-				$r = $c;
-				$g = $x;
-				$b = 0;
-			} else if ( $h < 120 ) {
-				$r = $x;
-				$g = $c;
-				$b = 0;			
-			} else if ( $h < 180 ) {
-				$r = 0;
-				$g = $c;
-				$b = $x;					
-			} else if ( $h < 240 ) {
-				$r = 0;
-				$g = $x;
-				$b = $c;
-			} else if ( $h < 300 ) {
-				$r = $x;
-				$g = 0;
-				$b = $c;
-			} else {
-				$r = $c;
-				$g = 0;
-				$b = $x;
-			}
-			$r = ( $r + $m ) * 255;
-			$g = ( $g + $m ) * 255;
-			$b = ( $b + $m  ) * 255;
-
-			return array( floor( $r ), floor( $g ), floor( $b ) );
-		}
-
-		public static function hsl_to_hex($hsl) {
-
-			list($h, $s, $l) = $hsl;
-
-			if ($s == 0) {
-
-				$r = $g = $b = 1;
-
-			} else {
-
-				$q = $l < 0.5 ? $l * (1 + $s) : $l + $s - $l * $s;
-				$p = 2 * $l - $q;
-
-				$r = self::hue_to_rgb($p, $q, $h + 1/3);
-				$g = self::hue_to_rgb($p, $q, $h);
-				$b = self::hue_to_rgb($p, $q, $h - 1/3);
-			}
-
-			return self::rgb_to_hex($r) . self::rgb_to_hex($g) . self::rgb_to_hex($b);
-		}
-
-		public static function hue_to_rgb($p, $q, $t) {
-
-			if ($t < 0) $t += 1;
-			if ($t > 1) $t -= 1;
-			if ($t < 1/6) return $p + ($q - $p) * 6 * $t;
-			if ($t < 1/2) return $q;
-			if ($t < 2/3) return $p + ($q - $p) * (2/3 - $t) * 6;
-
-			return $p;
-		}
-
-		public static function rgb_to_hex($rgb) {
-
-			return str_pad(dechex($rgb * 255), 2, '0', STR_PAD_LEFT);
-		}
-
-		public static function hex_hsl_adjust($hex, $hPercent, $sPercent, $lPercent) {
-
-			if($hex == '') { return ''; }
-
-			// Check for hash
-			$has_hash = (substr($hex, 0, 1) == '#');
-			if($has_hash) { $hex = substr($hex, 1); }
-
-			// Convert to HSL
-			$hsl = self::hex_to_hsl($hex);
-
-			$h = $hsl[0];
-			$s = $hsl[1];
-			$l = $hsl[2];
-
-			// Adjust
-			$h = $h + (($hPercent / 100) * $h);
-			$s = $s + (($sPercent / 100) * $s);
-			$l = $l + (($lPercent / 100) * $l);
-
-			// Convert back to hex
-			return ($has_hash ? '#' : '') . self::hsl_to_hex(array($h, $s, $l));
-		}
-
-		// Green (0) --> Lime Green (25) --> Yellow (50) --> Orange (75) --> Red (100)
-		public static function get_green_to_red_rgb($value, $min = 0, $max = 100) {
-
-			// Calculate ratio
-			$ratio = $value / $max;
-			if($ratio < 0) { $ratio = 0; }
-			if($ratio > 1) { $ratio = 1; }
-
-			// Red
-			$r = ($ratio * 2) * 255;
-			$r = ($r > 255) ? 255 : $r;
-
-			// Green
-			$g = (2 - ($ratio * 2)) * 255;
-			$g = ($g > 255) ? 255 : $g;
-
-			// Blue
-			$b = 0;
-
-			return "rgb($r,$g,$b)";
-		}
-
-		public static function hex_lighten_percentage($hex, $percentage) {
-
-			$rgbhex = str_split(trim($hex, '# '), 2);
-			$rgbdec = array_map('hexdec', $rgbhex);
-
-			if(count($rgbdec) !== 3) { return $hex; }
-
-			$hsv = self::rgb_to_hsv($rgbdec[0], $rgbdec[1], $rgbdec[2]);
-
-			$hsv_s = $hsv['S'];
-			$hsv['S'] = $hsv_s - ($hsv_s * ($percentage / 100));
-
-			$hsv_v = $hsv['V'];
-			$hsv_diff = (1 - $hsv_v);
-			$hsv['V'] = $hsv_v + ($hsv_diff * ($percentage / 100));
-
-			$rgblight = self::hsv_to_rgb($hsv['H'], $hsv['S'], $hsv['V']);
-			$output = array_map('dechex', $rgblight);
-			$output = self::zero_pad($output);
-
-			return '#' . implode($output);
-		}
-
-		public static function hex_darken_percentage($hex, $percentage) {
-
-			$rgbhex = str_split(trim($hex, '# '), 2);
-			$rgbdec = array_map('hexdec', $rgbhex);
-
-			if(count($rgbdec) !== 3) { return $hex; }
-
-			$hsv = self::rgb_to_hsv($rgbdec[0], $rgbdec[1], $rgbdec[2]);
-
-			$hsv_v = $hsv['V'];
-			$hsv['V'] = ($hsv_v * ((100 - $percentage) / 100));
-
-			$rgblight = self::hsv_to_rgb($hsv['H'], $hsv['S'], $hsv['V']);
-			$output = array_map('dechex', $rgblight);
-			$output = self::zero_pad($output);
-
-			return '#' . implode($output);
-		}
-
-		public static function zero_pad($hex_array) {
-
-			foreach($hex_array as $key => $value) {
-
-				if (strlen($value) == 0) { $hex_array[$key] = '00'; }
-				if (strlen($value) == 1) { $hex_array[$key] = '0' . $hex_array[$key]; }
-			}
-
-			return $hex_array;
-		}
-
-		public static function rgb_to_hsv($R, $G, $B) {  // RGB Values:Number 0-255 
-
-			$HSL = array(); 
-
-			$var_R = ($R / 255); 
-			$var_G = ($G / 255); 
-			$var_B = ($B / 255); 
-
-			$var_Min = min($var_R, $var_G, $var_B); 
-			$var_Max = max($var_R, $var_G, $var_B); 
-			$del_Max = $var_Max - $var_Min; 
-
-			$V = $var_Max; 
-
-			if ($del_Max == 0) { 
-
-				$H = 0; 
-				$S = 0; 
-
-			} else { 
-
-				$S = $del_Max / $var_Max; 
-
-				$del_R = ( ( ( $var_Max - $var_R ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max; 
-				$del_G = ( ( ( $var_Max - $var_G ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max; 
-				$del_B = ( ( ( $var_Max - $var_B ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max; 
-
-				if	  ($var_R == $var_Max) $H = $del_B - $del_G; 
-				else if ($var_G == $var_Max) $H = ( 1 / 3 ) + $del_R - $del_B; 
-				else if ($var_B == $var_Max) $H = ( 2 / 3 ) + $del_G - $del_R; 
-
-				if ($H<0) $H++; 
-				if ($H>1) $H--; 
-			}
-
-			$HSL['H'] = $H;
-			$HSL['S'] = $S;
-			$HSL['V'] = $V;
-
-			return $HSL; 
-		} 
-
-		public static function hsv_to_rgb($H, $S, $V) {  // HSV Values:Number 0-1 
-
-			$RGB = array(); 
-
-			if($S == 0) 
-			{ 
-				$R = $G = $B = $V * 255; 
-			} 
-			else 
-			{ 
-				$var_H = $H * 6; 
-				$var_i = floor( $var_H ); 
-				$var_1 = $V * ( 1 - $S ); 
-				$var_2 = $V * ( 1 - $S * ( $var_H - $var_i ) ); 
-				$var_3 = $V * ( 1 - $S * (1 - ( $var_H - $var_i ) ) ); 
-
-				if	   ($var_i == 0) { $var_R = $V	 ; $var_G = $var_3  ; $var_B = $var_1 ; } 
-				else if  ($var_i == 1) { $var_R = $var_2 ; $var_G = $V	  ; $var_B = $var_1 ; } 
-				else if  ($var_i == 2) { $var_R = $var_1 ; $var_G = $V	  ; $var_B = $var_3 ; } 
-				else if  ($var_i == 3) { $var_R = $var_1 ; $var_G = $var_2  ; $var_B = $V	 ; } 
-				else if  ($var_i == 4) { $var_R = $var_3 ; $var_G = $var_1  ; $var_B = $V	 ; } 
-				else				   { $var_R = $V	 ; $var_G = $var_1  ; $var_B = $var_2 ; } 
-
-				$R = $var_R * 255; 
-				$G = $var_G * 255; 
-				$B = $var_B * 255; 
-			} 
-
-			$RGB['R'] = round($R);
-			$RGB['G'] = round($G);
-			$RGB['B'] = round($B);
-
-			return $RGB; 
 		}
 
 		// Get tracking data
@@ -2501,7 +2431,14 @@
 										if($parse_variable_attribute_required && !$parse_variable_attribute_supplied) {
 
 											// Syntax error - Attribute count
-											self::throw_error(sprintf(__('Syntax error, missing attribute: %s (Expected: %s)', 'ws-form'), '#' . $parse_variable, $parse_variable_attribute_id));
+											self::throw_error(sprintf(
+
+												/* translators: %1$s: Parse variable, %2$s: Attribute ID */
+												__('Syntax error, missing attribute: %1$s (Expected: %2$s)', 'ws-form'),
+												'#' . $parse_variable,
+												$parse_variable_attribute_id
+											));
+
 											continue;
 										}
 
@@ -2534,7 +2471,13 @@
 											) {
 
 												// Syntax error - Attribute count
-												self::throw_error(sprintf(__('Syntax error, invalid attribute: %s (Expected: %s)', 'ws-form'), '#' . $parse_variable, implode(', ', $parse_variable_attribute_valid)));
+												self::throw_error(sprintf(
+
+													/* translators: %1$s: Parse variable, %2$s: Valid attributes */
+													__('Syntax error, invalid attribute: %1$s (Expected: %2$s)', 'ws-form'),
+													'#' . $parse_variable,
+													implode(', ', $parse_variable_attribute_valid)
+												));
 											}
 										}
 									}
@@ -2545,8 +2488,8 @@
 										case 'query_var' :
 										case 'post_var' :
 
-											$parsed_variable = self::get_query_var($variable_attribute_array[0]);
-											if($content_type == 'text/html') { $parsed_variable = htmlentities($parsed_variable); }
+											$parsed_variable = self::get_query_var($variable_attribute_array[0], $variable_attribute_array[1]);
+											if($content_type == 'text/html') { $parsed_variable = esc_html($parsed_variable); }
 											break;
 
 										case 'email_submission' :
@@ -2580,7 +2523,12 @@
 
 											if($endif_position === false) {
 
-												self::throw_error(sprintf(__('Syntax error, missing #endif for #if(%s)', 'ws-form'), $variable_attribute_string));
+												self::throw_error(sprintf(
+
+													/* translators: %s: IF condition */
+													__('Syntax error, missing #endif for #if(%s)', 'ws-form'),
+													$variable_attribute_string
+												));
 											}
 
 											// Valid operators
@@ -2645,7 +2593,13 @@
 
 														if(!in_array($variable_attribute, $operators_valid)) {
 
-															self::throw_error(sprintf(__('Syntax error, invalid operator %s in #if(%s).', 'ws-form'), $variable_attribute, $variable_attribute_string));
+															self::throw_error(sprintf(
+
+																/* translators: %1$s: Operator, %2$s: IF condition */
+																__('Syntax error, invalid operator %1$s in #if(%2$s)', 'ws-form'),
+																$variable_attribute,
+																$variable_attribute_string
+															));
 														}
 														$if_boolean_array[$if_boolean_array_index]['operator'] = $variable_attribute;
 														break;
@@ -2654,7 +2608,13 @@
 
 														if(!in_array($variable_attribute, $logic_previous_valid)) {
 
-															self::throw_error(sprintf(__('Syntax error, invalid logic %s in #if(%s).', 'ws-form'), $variable_attribute, $variable_attribute_string));
+															self::throw_error(sprintf(
+
+																/* translators: %1$s: Logic, %2$s: IF condition */
+																__('Syntax error, invalid logic %1$s in #if(%2$s)', 'ws-form'),
+																$variable_attribute,
+																$variable_attribute_string
+															));
 														}
 														$if_boolean_array[$if_boolean_array_index]['logic_next'] = $variable_attribute;
 														break;
@@ -2785,7 +2745,12 @@
 
 											if($section_rows_end_position === false) {
 
-												self::throw_error(sprintf(__('Syntax error, missing #section_rows_end for #section_rows_start(%s)', 'ws-form'), $variable_attribute_string));
+												self::throw_error(sprintf(
+
+													/* translators: %s: Variable attribute string */
+													__('Syntax error, missing #section_rows_end for #section_rows_start(%s)', 'ws-form'),
+													$variable_attribute_string
+												));
 											}
 
 											// Get section_id
@@ -2814,7 +2779,7 @@
 											foreach($section_repeatable_array as $section_repeatable_array_index => $section_repeatable_index_row) {
 
 												// Parse at same depth
-												$parsed_string .= self::parse_variables_process($parse_string_loop, $form, $submit, $content_type, $scope, $section_repeatable_index_row, $section_row_number++, $exclude_secure_nested_parse, $action_config, $depth);
+												$parsed_string .= self::parse_variables_process($parse_string_loop, $form, $submit, $content_type, $scope, $section_repeatable_index_row, $section_row_number++, false, $action_config, $depth);
 											}
 
 											// Remove from section_rows_start to section_rows_end
@@ -2871,7 +2836,12 @@
 
 											} else {
 
-												self::throw_error(sprintf(__('Syntax error, invalid group ID in #group_label(%u)', 'ws-form'), $group_id));
+												self::throw_error(sprintf(
+
+													/* translators: %u: Tab ID */
+													__('Syntax error, invalid group ID in #group_label(%u)', 'ws-form'),
+													$group_id
+												));
 											}
 
 											break;
@@ -2896,7 +2866,12 @@
 
 											} else {
 
-												self::throw_error(sprintf(__('Syntax error, invalid section ID in #section_label(%u)', 'ws-form'), $section_id));
+												self::throw_error(sprintf(
+
+													/* translators: %u: Section ID */
+													__('Syntax error, invalid section ID in #section_label(%u)', 'ws-form'),
+													$section_id
+												));
 											}
 
 											break;
@@ -2904,7 +2879,7 @@
 										case 'cookie_get' :
 
 											// Get cookie value
-											$parsed_variable = htmlentities(self::cookie_get_raw($variable_attribute_array[0]));
+											$parsed_variable = esc_html(self::cookie_get_raw($variable_attribute_array[0]));
 
 											break;
 
@@ -2928,7 +2903,12 @@
 
 											} else {
 
-												self::throw_error(sprintf(__('Syntax error, invalid field ID in #field_label(%u)', 'ws-form'), $field_id));
+												self::throw_error(sprintf(
+
+													/* translators: %u: Field ID */
+													__('Syntax error, invalid field ID in #field_label(%u)', 'ws-form'),
+													$field_id
+												));
 											}
 
 											break;
@@ -3070,6 +3050,33 @@
 
 											break;
 
+										case 'date_format' :
+
+											// Parse date
+											$date_input = self::parse_variables_process($variable_attribute_array[0], $form, $submit, $content_type, $scope, $section_repeatable_index, $section_row_number, $exclude_secure_nested_parse, $action_config, $depth + 1);
+
+											// Parse date format
+											$date_format = self::parse_variables_process($variable_attribute_array[1], $form, $submit, $content_type, $scope, $section_repeatable_index, $section_row_number, $exclude_secure_nested_parse, $action_config, $depth + 1);
+
+											// Get time
+											$time_input = strtotime($date_input);
+
+											// Check time
+											if($time_input === false) {
+
+												self::throw_error(sprintf(
+
+													/* translators: %s: Date input */
+													__('Syntax error, invalid input date: %s', 'ws-form'),
+													$date_input
+												));
+											}
+
+											// Process date
+											$parsed_variable = gmdate($date_format, $time_input);
+
+											break;
+
 										case 'field' :
 										case 'field_float' :
 										case 'field_date_format' :
@@ -3167,7 +3174,7 @@
 													$input_type_datetime = self::get_object_meta_value($field, 'input_type_datetime', 'date');
 
 													// Get input date
-													$parsed_variable_date = self::get_date_by_type($parsed_variable, (object) $field);
+													$parsed_variable_date = self::get_date_by_type($parsed_variable, (object) $field, 'Y-m-d H:i:s');
 
 													// Ensure parsed_variable_date is a date
 													if($parsed_variable_date !== false) {
@@ -3202,7 +3209,7 @@
 													$input_type_datetime = self::get_object_meta_value($field, 'input_type_datetime', 'date');
 
 													// Get input date
-													$parsed_variable_date = self::get_date_by_type($parsed_variable, (object) $field);
+													$parsed_variable_date = self::get_date_by_type($parsed_variable, (object) $field, 'Y-m-d H:i:s');
 
 													// Ensure parsed_variable_date is a date
 													if($parsed_variable_date !== false) {
@@ -3301,51 +3308,6 @@
 
 											break;
 
-										case 'date_format' :
-
-											// Get date
-											$date_input = $variable_attribute_array[0];
-
-													// Get date/time type
-													$input_type_datetime = self::get_object_meta_value($field, 'input_type_datetime', 'date');
-
-													// Get input date
-													$parsed_variable_date = self::get_date_by_type($parsed_variable, (object) $field);
-
-													// Ensure parsed_variable_date is a date
-													if($parsed_variable_date !== false) {
-
-														// Check for format
-														if(
-															isset($variable_attribute_array[2]) &&
-															($variable_attribute_array[2] != '')
-														) {
-
-															$format_date = $variable_attribute_array[2];
-
-														} else {
-
-															// Get date format
-															$format_date = self::get_object_meta_value($field, 'format_date_input', get_option('date_format'));
-														}
-
-														if(empty($format_date)) { $format_date = get_option('date_format'); }
-
-														// Check for offset
-														$seconds_offset = intval(self::parse_variables_process($variable_attribute_array[1], $form, $submit, $content_type, $scope, $section_repeatable_index, $section_row_number, $exclude_secure_nested_parse, $action_config, $depth + 1));
-
-														// Process date
-														$parsed_variable = gmdate($format_date, strtotime($parsed_variable_date) + $seconds_offset);
-													}
-
-											// Get format
-											$date_format = $variable_attribute_array[1];
-
-											// Format
-											$parsed_variable = gmdate($date_input, $date_format);
-
-											break;
-
 										case 'select_option_text' :
 										case 'checkbox_label' :
 										case 'radio_label' :
@@ -3393,13 +3355,106 @@
 
 										// Post and server date custom
 										case 'post_date_custom' :
+										case 'post_date_modified_custom' :
 										case 'server_date_custom' :
 
 											$seconds_offset = intval(isset($variable_attribute_array[1]) ? self::parse_variables_process($variable_attribute_array[1], $form, $submit, $content_type, $scope, $section_repeatable_index, $section_row_number, $exclude_secure_nested_parse, $action_config, $depth + 1) : 0);
 
 											$parsed_variable = gmdate($variable_attribute_array[0], strtotime($parse_variable_value) + $seconds_offset);
 
-											if($content_type == 'text/html') { $parsed_variable = htmlentities($parsed_variable); }
+											if($content_type == 'text/html') { $parsed_variable = esc_html($parsed_variable); }
+
+											break;
+
+										// Option - Get
+										case 'option_get' :
+
+											// Get option name
+											$option_name = $variable_attribute_array[0];
+
+											// Get option value
+											$option_value = get_option($option_name);
+
+											// Check for error with get_option
+											if($option_value === false) {
+
+												// Syntax error
+												self::throw_error(sprintf(
+
+													/* translators: %s: Option name */
+													__('Syntax error, option name %s not found in #option_get', 'ws-form'),
+													esc_html($option_name)
+												));
+
+												$option_value = '';
+											}
+
+											// Check if returned value is an object
+											if(is_object($option_value)) {
+
+												// Has a parameter been provided?
+												if(isset($variable_attribute_array[1])) {
+
+													$option_property = $variable_attribute_array[1];
+
+													if(property_exists($option_value, $option_property)) {
+
+														$option_value = $option_value->$option_property;
+
+													} else {
+
+														$option_value = '';
+													}
+
+												} else {
+
+													// Syntax error
+													self::throw_error(sprintf(
+
+														/* translators: %s: Option name */
+														__('Syntax error, option name %s is an object, missing parameter in #option_get', 'ws-form'),
+														esc_html($option_name)
+													));
+
+													$option_value = '';
+												}
+											}
+
+											// Check if returned value is an array
+											if(is_array($option_value)) {
+
+												// Has a parameter been provided?
+												if(isset($variable_attribute_array[1])) {
+
+													$option_property = $variable_attribute_array[1];
+
+													if(isset($option_value[$option_property])) {
+
+														$option_value = $option_value[$option_property];
+
+													} else {
+
+														$option_value = '';
+													}
+
+												} else {
+
+													// Syntax error
+													self::throw_error(sprintf(
+
+														/* translators: %s: Option name */
+														__('Syntax error, option name %s is an array, missing key in #option_get', 'ws-form'),
+														esc_html($option_name)
+													));
+
+													$option_value = '';
+												}
+											}
+
+											if(is_string($option_value)) {
+
+												$parsed_variable = $option_value;
+											}
 
 											break;
 
@@ -3412,7 +3467,7 @@
 
 											$parsed_variable = !empty($submit_date_added) ? get_date_from_gmt($submit_date_added, $date_format) : '';
 
-											if($content_type == 'text/html') { $parsed_variable = htmlentities($parsed_variable); }
+											if($content_type == 'text/html') { $parsed_variable = esc_html($parsed_variable); }
 
 											break;
 
@@ -3441,7 +3496,7 @@
 
 											$parsed_variable = gmdate($variable_attribute_array[0], current_time('timestamp') + $seconds_offset);
 
-											if($content_type == 'text/html') { $parsed_variable = htmlentities($parsed_variable); }
+											if($content_type == 'text/html') { $parsed_variable = esc_html($parsed_variable); }
 
 											break;
 
@@ -3487,6 +3542,11 @@
 										case 'slug' :
 										case 'hash_md5' :
 										case 'hash_sha256' :
+										case 'name_prefix' :
+										case 'name_first' :
+										case 'name_middle' :
+										case 'name_last' :
+										case 'name_suffix' :
 
 											// Get input value
 											$input_value = self::parse_variables_process($variable_attribute_array[0], $form, $submit, $content_type, $scope, $section_repeatable_index, $section_row_number, $exclude_secure_nested_parse, $action_config, $depth + 1);
@@ -3557,6 +3617,16 @@
 												case 'hash_sha256' :
 
 													$parsed_variable = hash('sha256', $input_value);
+													break;
+
+												// Name components
+												case 'name_prefix' :
+												case 'name_first' :
+												case 'name_middle' :
+												case 'name_last' :
+												case 'name_suffix' :
+
+													$parsed_variable = self::get_full_name_components($input_value)[$parse_variable];
 													break;
 											}
 
@@ -3636,11 +3706,14 @@
 					$variables['post_name'] = ($post_not_null ? $post->post_name : '');
 					$variables['post_content'] = ($post_not_null ? $post->post_content : '');
 					$variables['post_excerpt'] = ($post_not_null ? $post->post_excerpt : '');
+					$variables['post_parent'] = ($post_not_null ? $post->post_parent : '');
 					$variables['post_status'] = ($post_not_null ? $post->post_status : '');
 					$variables['post_url'] = ($post_not_null ? get_permalink($post->ID) : '');
 					$variables['post_url_edit'] = ($post_not_null ? get_edit_post_link($post->ID) : '');
 					$variables['post_date'] = ($post_not_null ? gmdate(get_option('date_format'), strtotime($post->post_date)) : '');
 					$variables['post_time'] = ($post_not_null ? gmdate(get_option('time_format'), strtotime($post->post_date)) : '');
+					$variables['post_date_modified'] = ($post_not_null ? gmdate(get_option('date_format'), strtotime($post->post_modified)) : '');
+					$variables['post_time_modified'] = ($post_not_null ? gmdate(get_option('time_format'), strtotime($post->post_modified)) : '');
 				}
 
 				// User
@@ -3655,8 +3728,22 @@
 					$variables['user_display_name'] = (($user_id > 0) ? $user->display_name : '');
 					$variables['user_url'] = (($user_id > 0) ? $user->user_url : '');
 					$variables['user_registered'] = (($user_id > 0) ? $user->user_registered : '');
-					$variables['user_first_name'] = (($user_id > 0) ? get_user_meta($user_id, 'first_name', true) : '');
-					$variables['user_last_name'] = (($user_id > 0) ? get_user_meta($user_id, 'last_name', true) : '');
+
+					// Build names
+					$user_full_name_array = array();
+
+					$user_first_name = (($user_id > 0) ? get_user_meta($user_id, 'first_name', true) : '');
+					if(!empty($user_first_name)) { $user_full_name_array[] = $user_first_name; }
+
+					$user_last_name = (($user_id > 0) ? get_user_meta($user_id, 'last_name', true) : '');
+					if(!empty($user_last_name)) { $user_full_name_array[] = $user_last_name; }
+
+					$user_full_name = implode(' ', $user_full_name_array);
+
+					$variables['user_first_name'] = $user_first_name;
+					$variables['user_last_name'] = $user_last_name;
+					$variables['user_full_name'] = $user_full_name;
+
 					$variables['user_bio'] = (($user_id > 0) ? get_user_meta($user_id, 'description', true) : '');
 					$variables['user_nickname'] = (($user_id > 0) ? get_user_meta($user_id, 'nickname', true) : '');
 					$variables['user_admin_color'] = (($user_id > 0) ? get_user_meta($user_id, 'admin_color', true) : '');
@@ -3705,10 +3792,10 @@
 					// Build submit admin URL and link
 					if($form_id && $submit_id) {
 
-						$submit_admin_url = get_admin_url(null, 'admin.php?page=ws-form-submit&id=' . $form_id . '#' . $submit_id);
+						$submit_admin_url = esc_url(get_admin_url(null, 'admin.php?page=ws-form-submit&id=' . $form_id . '#' . $submit_id));
 
 						$variables['submit_admin_url'] = $submit_admin_url;
-						$variables['submit_admin_link'] = sprintf('<a href="%1$s" target="_blank">%1$s</a>', $submit_admin_url);
+						$variables['submit_admin_link'] = sprintf('<a href="%s" target="_blank">%s</a>', esc_url($submit_admin_url), esc_html($submit_admin_url));
 					}
 
 					// Build submit URL and link
@@ -3745,7 +3832,7 @@
 
 					$variables['email_promo'] = sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Powered by %s.', 'ws-form'),
 
 						sprintf(($content_type == 'text/html') ? '<a href="%s" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">WS Form</a>' : 'WS Form %s', self::get_plugin_website_url('', 'email_footer'))
@@ -3870,9 +3957,20 @@
 
 			foreach($parse_variables_secure as $parse_variable_key) {
 
+				// Exact match
 				if(isset($variables[$parse_variable_key])) {
 
 					$variables[$parse_variable_key] = '&num;' . $parse_variable_key;
+					break;
+				}
+
+				// Variable has attributes
+				foreach($variables as $variable_key => $variable_value) {
+
+					if(strpos($variable_key, $parse_variable_key . '(') === 0) {
+
+						$variables[$variable_key] = '&num;' . $variable_key;
+					}
 				}
 			}
 
@@ -4041,33 +4139,54 @@
 			// HTML encode values
 			if($content_type == 'text/html' && !is_array($value)) {
 
-				if($html_encode) { $value = htmlentities($value); }
+				if($html_encode) { $value = esc_html($value); }
 
 				switch($type) {
 
 					case 'url' :
 
-						$value = sprintf('<a href="%1$s" target="_blank">%1$s</a>', $value);
+						$value_url = WS_Form_Common::get_url($value);
+						$value = !empty($value_url) ? sprintf(
+
+							'<a href="%s" target="_blank">%s</a>',
+							esc_url($value_url),
+							esc_html($value)
+
+						) : esc_html($value);
+
 						break;
 
 					case 'tel' :
 
-						$value = sprintf('<a href="tel:%1$s">%1$s</a>', $value);
+						$value_tel = WS_Form_Common::get_tel($value);
+						$value = !empty($value_tel) ? sprintf(
+
+							'<a href="%s">%s</a>',
+							esc_url('tel:' . $value_tel),
+							esc_html($value)
+
+						) : esc_html($value);
+
 						break;
 
 					case 'email' :
 
-						if(filter_var($value, FILTER_VALIDATE_EMAIL)) {
+						$value_email = WS_Form_Common::get_email($value);
+						$value = !empty($value_email) ? sprintf(
 
-							$value = sprintf('<a href="mailto:%1$s">%1$s</a>', $value);
-						}
+							'<a href="%s">%s</a>',
+							esc_url('mailto:' . $value_email),
+							esc_html($value)
+
+						) : esc_html($value);
+
 						break;
 
 					case 'ip' :
 
 						// Get lookup URL mask
 						$ip_lookup_url_mask = self::option_get('ip_lookup_url_mask');
-						if(empty($ip_lookup_url_mask)) { $value = htmlentities($value); break; }
+						if(empty($ip_lookup_url_mask)) { $value = esc_html($value); break; }
 
 						// Split IP (IP can be comma separated if proxy in use)
 						$ip_array = explode(',', $value);
@@ -4087,7 +4206,7 @@
 							// Build lookup URL
 							$ip_lookup_url = self::mask_parse($ip_lookup_url_mask, $ip_lookup_url_mask_values);
 
-							$value_array[] = '<a href="' . $ip_lookup_url . '" target="_blank">' . htmlentities($ip) . '</a>';
+							$value_array[] = sprintf('<a href="%s" target="_blank">%s</a>', esc_url($ip_lookup_url), esc_html($ip));
 						}
 
 						$value = implode('<br />', $value_array);
@@ -4100,7 +4219,7 @@
 
 							// Get lookup URL mask
 							$latlon_lookup_url_mask = self::option_get('latlon_lookup_url_mask');
-							if(empty($latlon_lookup_url_mask)) { $value = htmlentities($value); break; }
+							if(empty($latlon_lookup_url_mask)) { $value = esc_html($value); break; }
 
 							// Get #value for mask
 							$latlon_lookup_url_mask_values = array('value' => $value);
@@ -4108,7 +4227,7 @@
 							// Build lookup URL
 							$latlon_lookup_url = self::mask_parse($latlon_lookup_url_mask, $latlon_lookup_url_mask_values);
 
-							$value = '<a href="' . $latlon_lookup_url . '" target="_blank">' . htmlentities($value) . '</a>';
+							$value = sprintf('<a href="%s" target="_blank">%s</a>', esc_url($latlon_lookup_url), esc_html($value));
 
 						} else {
 
@@ -4175,30 +4294,30 @@
 
 						if(!is_array($file_object)) { continue; }
 
- 						// Get file handler
+						// Get file handler
 						$file_handler = isset($file_object['handler']) ? $file_object['handler'] : '';
- 						if($file_handler == '') { $file_handler = 'wsform'; }
- 						if(!isset(WS_Form_File_Handler::$file_handlers[$file_handler])) { continue; }
- 						$file_handler = WS_Form_File_Handler::$file_handlers[$file_handler];
+						if($file_handler == '') { $file_handler = 'wsform'; }
+						if(!isset(WS_Form_File_Handler::$file_handlers[$file_handler])) { continue; }
+						$file_handler = WS_Form_File_Handler::$file_handlers[$file_handler];
 
- 						// Get field ID
- 						$field_id = (($field !== false) && isset($field->id)) ? $field->id : false;
+						// Get field ID
+						$field_id = (($field !== false) && isset($field->id)) ? $field->id : false;
 
- 						// Get value array
- 						if(method_exists($file_handler, 'get_value_parse_variable')) {
+						// Get value array
+						if(method_exists($file_handler, 'get_value_parse_variable')) {
 
- 							// Get hash
- 							$hash = (($submit !== false) && isset($submit->hash)) ? $submit->hash : '';
+							// Get hash
+							$hash = (($submit !== false) && isset($submit->hash)) ? $submit->hash : '';
 
- 							// Use file handler to get the value for parse variables
-	 						$value_array[] = $file_handler->get_value_parse_variable($file_object, $field_id, $file_object_index, $hash, $file_links, $file_embed, $content_type, $file_description, $type);
+							// Use file handler to get the value for parse variables
+							$value_array[] = $file_handler->get_value_parse_variable($file_object, $field_id, $file_object_index, $hash, $file_links, $file_embed, $content_type, $file_description, $type);
 
-	 					} else {
+						} else {
 
-	 						// Fallback
+							// Fallback
 							$file_size = self::get_file_size($file_object['size']);
-	 						$value_array[] = sprintf('%s (%s)', $file_object['name'], $file_size);
-	 					}
+							$value_array[] = sprintf('%s (%s)', $file_object['name'], $file_size);
+						}
 					}
 	
 					$value = implode((($content_type == 'text/html') ? '<br />' : "\n"), $value_array);
@@ -4242,7 +4361,7 @@
 							// Build lookup URL
 							$latlon_lookup_url = self::mask_parse($latlon_lookup_url_mask, $latlon_lookup_url_mask_values);
 
-							$value = '<a href="' . $latlon_lookup_url . '" target="_blank">' . htmlentities($value) . '</a>';
+							$value = sprintf('<a href="%s" target="_blank">%s</a>', esc_url($latlon_lookup_url), esc_html($value));
 						}
 
 					} else {
@@ -4369,7 +4488,7 @@
 
 				foreach($ecommerce_rows as $ecommerce_row) {
 
-					$ecommerce_html .= '<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 10px;"><strong>' . htmlentities($ecommerce_row['label']) . '</strong><br />' . $ecommerce_row['value'] . '</p>';
+					$ecommerce_html .= '<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 10px;"><strong>' . esc_html($ecommerce_row['label']) . '</strong><br />' . $ecommerce_row['value'] . '</p>';
 				}
 			}
 			return $ecommerce_html;
@@ -4414,7 +4533,7 @@
 
 							case 'text/html' :
 
-								$groups_html .= $group_label_join . ($render_label ? '<h2>' . htmlentities($group->label) . "</h2>\n" : '');
+								$groups_html .= $group_label_join . ($render_label ? '<h2>' . esc_html($group->label) . "</h2>\n" : '');
 								$group_label_join = "<hr style=\"margin: 20px 0\" />\n";
 								break;
 
@@ -4549,12 +4668,7 @@
 							if($field_static === true) {
 
 								// If static set to true, we use the mask_field
-								$mask_field = isset($field_type_config['mask_field_static']) ? $field_type_config['mask_field_static'] : '';
-
-								if($mask_field == '') {
-
-									$mask_field = isset($field_type_config['mask_field']) ? $field_type_config['mask_field'] : '';
-								}
+								$mask_field = isset($field_type_config['mask_field_static']) ? $field_type_config['mask_field_static'] : (isset($field_type_config['mask_field']) ? $field_type_config['mask_field'] : '');
 
 								$fields_html .= self::parse_variables_process($mask_field, $form, $submit, $content_type);
 
@@ -4634,7 +4748,7 @@
 								// WPAutoP?
 								if($wpautop) { $value = wpautop($value); }
 
-								$fields_html .= '<div class="wsf-field">' . ($render_label ? ('<strong>' . htmlentities($label) . '</strong><br />') : '') . $value . "</div>\n";
+								$fields_html .= '<div class="wsf-field">' . ($render_label ? ('<strong>' . esc_html($label) . '</strong><br />') : '') . $value . "</div>\n";
 								break;
 
 							default :
@@ -4666,7 +4780,7 @@
 
 							case 'text/html' :
 
-								$sections_html .= $render_label ? '<h3>' . htmlentities($section->label) . "</h3>\n" : '';
+								$sections_html .= $render_label ? '<h3>' . esc_html($section->label) . "</h3>\n" : '';
 								break;
 
 							default :
@@ -4892,11 +5006,20 @@
 					// Check if value matches
 					$value_array_index = array_search($data[$value_column_index], $value_array);
 
-					if($value_array_index !== false) {
+					// Process each found instance of the input value_array (This ensure if a user selects the same value in a repeater that it returns both values)
+					while($value_array_index !== false) {
 
+						// Add column value to the return array
+						$return_array[] = $data[$return_column_index];
+
+						// Remove found value from input value_array
 						unset($value_array[$value_array_index]);
 
-						$return_array[] = $data[$return_column_index];
+						// Check if any other values exist
+						if(count($value_array) === 0) { break; }
+
+						// Check if another value matches
+						$value_array_index = array_search($data[$value_column_index], $value_array);
 					}
 				}
 			}
@@ -4905,7 +5028,7 @@
 			$return_array = array_merge($return_array, $value_array);
 
 			// Return unique values to avoid duplicates if there are duplicate values
-			$return_array = array_unique($return_array);
+//			$return_array = array_unique($return_array);
 
 			if(is_null($datagrid_delimiter)) {
 
@@ -4920,7 +5043,18 @@
 			return (($content_type == 'text/html') ? implode($delimiter_text_html, $return_array) : implode($delimiter_text_plain, $return_array));
 		}
 
-		// Check if user has WordPress capability (current_user_can not available on public side)
+		// Check if user is logged in
+		public static function logged_in() {
+
+			if(!function_exists('is_user_logged_in')) {
+
+				include(ABSPATH . 'wp-includes/pluggable.php'); 
+			}
+
+			return is_user_logged_in();
+		}
+
+		// Check if user has WordPress capability
 		public static function can_user($capability) {
 
 			if(!function_exists('wp_get_current_user')) {
@@ -4945,7 +5079,12 @@
 			} else {
 
 				// Throw error
-				throw new Exception(sprintf(__('Insufficient user capabilities (%s)', 'ws-form'), $capability));
+				throw new Exception(sprintf(
+
+					/* translators: %s: Capability */
+					__('Insufficient user capabilities (%s)', 'ws-form'),
+					$capability
+				));
 			}
 		}
 
@@ -4979,15 +5118,15 @@
 
 					sprintf(
 
-						/* translators: %s! = Presentable plugin name, e.g. WS Form PRO */
+						/* translators: %s: Presentable plugin name, e.g. WS Form PRO */
 						__('Thank you for using %s!', 'ws-form'),
 						WS_FORM_NAME_PRESENTABLE
 					),
 
 					sprintf(
 
-						/* translators: %s! = Presentable plugin name, e.g. WS Form PRO */
-						__('We hope you have enjoyed using the plugin. Positive reviews from awesome users like you help others to feel confident about choosing %1$s too. If convenient, we would greatly appreciate you sharing your happy experiences with the WordPress community. Thank you in advance for helping us out!', 'ws-form'),
+						/* translators: %s: Presentable plugin name, e.g. WS Form PRO */
+						__('We hope you have enjoyed using the plugin. Positive reviews from awesome users like you help others to feel confident about choosing %s too. If convenient, we would greatly appreciate you sharing your happy experiences with the WordPress community. Thank you in advance for helping us out!', 'ws-form'),
 						WS_FORM_NAME_PRESENTABLE
 					),
 
@@ -5175,8 +5314,9 @@
 					break;
 
 				case 'd.m.Y' :
+				case 'j.n.Y' :
 
-					// Convert / to - so that strtotime works with d/m/Y format
+					// Convert . to - so that strtotime works with d.m.Y or j.n.Y format
 					$date = str_replace('.', '-', $date);
 					break;
 			}
@@ -5232,7 +5372,7 @@
 		// Throw error
 		public static function throw_error($error) {
 			
-			throw new Exception($error);
+			throw new Exception(esc_html($error));
 		}
 
 		// Get system report
@@ -5251,7 +5391,7 @@
 
 				$system_report_html .= '<tbody>';
 
-				$system_report_html .= '<tr><th colspan="2"><h2>' . htmlentities($group['label']) . '</h2></th></tr>';
+				$system_report_html .= '<tr><th colspan="2"><h2>' . esc_html($group['label']) . '</h2></th></tr>';
 
 				foreach($group['variables'] as $item_id => $item) {
 
@@ -5268,7 +5408,7 @@
 					}
 
 					// Label
-					$system_report_html .= '><td><b>' . htmlentities($item['label']);
+					$system_report_html .= '><td><b>' . esc_html($item['label']);
 					if(isset($item['min'])) { $system_report_html .= ' (Min: ' . $item['min'] . ')'; }
 					$system_report_html .= '</b></td>';
 
@@ -5366,13 +5506,17 @@
 			// Check length
 			if(strlen($name) > 255) { $name = substr($name, 0, 255); }
 
-			if(strpos($name, '"') !== false) {
+			// Determine if double quotes and escaping of the name is required
+			if(preg_match('/[^\w\s!#$%&\'*+\/=?^_`{|}~.-]|^\s|\s$|\s{2,}/', $name)) {
 
-				// Escape double quotes in name
-				$name = str_replace('"', '\"', $name);
+				// Correct escaping of double quotes for name
+//				$name = str_replace('"', '\"', $name);
 
-				// Wrap in double quotes
-				$name = '"' . $name . '"';
+				// There is a bug in wp_mail that does not handle escaped double quotes properly, therefore we'll remove double quotes other wise double quotes turn into a forward slash
+				$name = str_replace('"', '', $name);
+
+				// Enclose in double quotes
+				$name = sprintf('"%s"', $name);
 			}
 
 			// Return full email address
@@ -5385,18 +5529,33 @@
 			$ws_form_encryption = new WS_Form_Encryption();
 			if($ws_form_encryption->key_found === false) {			
 
-				/* translators: %s = wp-config.php */
-				$encryption_status_html = '<p>' . sprintf(__('Copy and paste the following code into your %s file after the Authentication Unique Keys and Salts section.', 'ws-form'), '<strong>wp-config.php</strong>') . '</p>';
+				$encryption_status_html = '<p>' . sprintf(
 
-				$encryption_key = htmlentities($ws_form_encryption->create_random_key());
+					/* translators: %s: wp-config.php */
+					__('Copy and paste the following code into your %s file after the Authentication Unique Keys and Salts section.', 'ws-form'),
+					'<strong>wp-config.php</strong>'
+
+				) . '</p>';
+
+				$encryption_key = esc_html($ws_form_encryption->create_random_key());
 				$encryption_status_html .= "<textarea class=\"wsf-field wsf-encryption-snippet\" rows=\"6\" readonly>/** Encryption Key For WS Form */\ndefine('WS_FORM_ENCRYPTION_KEY', '$encryption_key');</textarea>";
 
-				$encryption_status_html .= sprintf('<p><strong style="color: #bb0000;">%s:</strong> %s</p>', __('Caution'), __('Once installed, do not change this key. Changing your encryption key at a later date will make it impossible to decrypt existing submission data. THIS KEY IS ONLY GENERATED ONCE. PLEASE ENSURE YOU DO NOT LOSE THIS KEY AND KEEP IT IN A SECURE PLACE. ENCRYPTED DATA AND KEYS CANNOT BE RECOVERED IF THE KEY IS LOST.'));
+				$encryption_status_html .= sprintf(
+
+					'<p><strong style="color: #bb0000;">%s:</strong> %s</p>',
+					__('Caution', 'ws-form'),
+					__('Once installed, do not change this key. Changing your encryption key at a later date will make it impossible to decrypt existing submission data. THIS KEY IS ONLY GENERATED ONCE. PLEASE ENSURE YOU DO NOT LOSE THIS KEY AND KEEP IT IN A SECURE PLACE. ENCRYPTED DATA AND KEYS CANNOT BE RECOVERED IF THE KEY IS LOST.', 'ws-form')
+				);
 
 			} else {
 
-				/* translators: %s = wp-config.php */
-				$encryption_status_html = '<p>' . sprintf(__('Key successfully found in %s', 'ws-form'), '<strong>wp-config.php</strong>') . '</p>';
+				$encryption_status_html = '<p>' . sprintf(
+
+					/* translators: %s: wp-config.php */
+					__('Key successfully found in %s', 'ws-form'),
+					'<strong>wp-config.php</strong>'
+
+				) . '</p>';
 
 				if($ws_form_encryption->can_encrypt) {
 
@@ -5412,15 +5571,35 @@
 		}
 
 		// Get preview URL
-		public static function get_preview_url($form_id, $skin_id = 'ws_form', $conversational = false, $submit_hash = false) {
+		public static function get_preview_url($form_id = 0, $template_id = false, $style_id = false, $styler = false, $conversational = false, $submit_hash = false, $skin_id = 'ws_form') {
 
-			$url = get_site_url(null, '/');
+			$url = get_home_url(null, '/');
 
 			// Form ID
 			$url = add_query_arg(sprintf('wsf_preview%s_form_id', ($conversational ? '_conversational' : '')), $form_id, $url);
 
+			// Template ID
+			if(!empty($template_id) && self::styler_enabled()) {
+
+				$url = add_query_arg('wsf_preview_template_id', $template_id, $url);
+			}
+
+			// Style ID
+			if(!empty($style_id) && self::styler_enabled()) {
+
+				$url = add_query_arg('wsf_preview_style_id', $style_id, $url);
+			} 
+
+			if($styler && self::styler_enabled()) {
+
+				$url = add_query_arg('wsf_preview_styler', 'true', $url);
+			}
+
 			// Skin ID
-			$url = add_query_arg('wsf_skin_id', $skin_id, $url);
+			if(!empty($skin_id) && !self::styler_enabled()) {
+
+				$url = add_query_arg('wsf_skin_id', $skin_id, $url);
+			}
 
 			// Submit hash
 			if($submit_hash !== false) {
@@ -5458,10 +5637,7 @@
 			$currency_position = self::option_get('currency_position');
 
 			// Get currency symbol
-			$currencies = WS_Form_Config::get_currencies();
-			$currency = self::option_get('currency', self::get_currency_default());
-			$currency_found = isset($currencies[$currency]) && isset($currencies[$currency]['s']);
-			$currency_symbol = $currency_found ? $currencies[$currency]['s'] : '$';
+			$currency_symbol = self::get_currency_symbol();
 
 			$return_array['prefix'] = $currency_symbol;
 			$return_array['suffix'] = '';
@@ -5496,6 +5672,19 @@
 			return $return_array;
 		}
 
+		public static function get_currency_symbol() {
+
+			$currencies = WS_Form_Config::get_currencies();
+			$currency = self::option_get('currency', self::get_currency_default());
+			$currency_found = isset($currencies[$currency]) && isset($currencies[$currency]['s']);
+			return ($currency_found ? $currencies[$currency]['s'] : '$');
+		}
+
+		public static function get_currency_default() {
+
+			return apply_filters('wsf_currency_default', 'USD');
+		}
+
 		public static function get_price($price_float, $currency = false, $currency_symbol_render = true) {
 
 			if($currency === false) { $currency = self::get_currency(); }
@@ -5503,11 +5692,6 @@
 			if(!is_numeric($price_float)) { $price_float = floatVal($price_float); }
 
 			return ($currency_symbol_render ? $currency['prefix'] : '') . number_format($price_float, absint($currency['decimals']), $currency['decimal_separator'], $currency['thousand_separator']) . ($currency_symbol_render ? $currency['suffix'] : '');
-		}
-
-		public static function get_currency_default() {
-
-			return apply_filters('wsf_currency_default', 'USD');
 		}
 
 		public static function get_admin_icon($color = '#a0a5aa', $base64 = true) {
@@ -5562,7 +5746,7 @@
 
 					sprintf(
 
-						/* translators: %s = WS Form */
+						/* translators: %s: WS Form */
 						__('Click here to learn more about %s', 'ws-form'),
 
 						esc_html(WS_FORM_NAME_GENERIC)
@@ -5685,6 +5869,52 @@
 
 			// Return if true
 			return in_array($input, $true_array);
+		}
+
+		// Convert any value to an array
+		public static function to_array($value) {
+
+			// If already an array, just return it
+			if (is_array($value)) {
+				return $value;
+			}
+
+			// If null, return an empty array
+			if (is_null($value)) {
+				return [];
+			}
+
+			// If object, cast to array
+			if (is_object($value)) {
+				return (array) $value;
+			}
+
+			// For scalar values (string, int, float, bool, resource), wrap in array
+			return [$value];
+		}
+
+		// Convert any value to an object
+		public static function to_object($value) {
+
+			// If already an object, return as-is
+			if (is_object($value)) {
+				return $value;
+			}
+
+			// If array, cast to object
+			if (is_array($value)) {
+				return (object) $value;
+			}
+
+			// If null, return an empty object
+			if (is_null($value)) {
+				return new stdClass();
+			}
+
+			// For scalar values (string, int, float, bool, resource), wrap in object
+			$obj = new stdClass();
+			$obj->scalar = $value;
+			return $obj;
 		}
 
 		// do_shortcode
@@ -5963,12 +6193,168 @@
 
 				foreach($forms as $form) {
 
-					/* translators: %s: Name of the form, %u: ID of the form */
-					$form_array[$form['id']] = sprintf(__('%s (ID: %u)', 'ws-form'), esc_html($form['label']), $form['id']);
+					$form_array[$form['id']] = sprintf(
+
+						'%s (%s: %u)',
+						esc_html($form['label']),
+						__('ID', 'ws-form'),
+						$form['id']
+					);
 				}
 			}
 
 			return $form_array;
+		}
+
+		// Sanitize keyword
+		public static function sanitize_keyword($keyword) {
+
+			// Keyword should be a string
+			if(!is_string($keyword)) { return ''; }
+
+			// Ensure keyword is lowercase for the purpose of searching
+			$keyword = mb_strtolower(trim($keyword));
+
+			// Sanitize
+			return sanitize_text_field($keyword);
+		}
+
+		// Sanitize keyword array
+		public static function sanitize_keyword_array($keywords) {
+
+			// Check keywords
+			if(!is_array($keywords)) { return array(); }
+
+			// Sanitize keywords
+			$keywords_sanitized = array();
+
+			foreach($keywords as $keyword) {
+
+				$keyword = self::sanitize_keyword($keyword);
+
+				if(!empty($keyword)) { $keywords_sanitized[] = $keyword; }
+			}
+
+			return $keywords_sanitized;
+		}
+
+		// Sanitize IP addresses
+		public static function sanitize_ip_address($ip) {
+
+			// IP address should be a string
+			if(!is_string($ip)) { return ''; }
+
+			// Ensure IP address is lowercase
+			// https://www.rfc-editor.org/rfc/rfc5952#section-4.3
+			$ip = mb_strtolower(trim($ip));
+
+			// Validate IP
+			return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '';
+		}
+
+		// Sanitize IP address array
+		public static function sanitize_ip_address_array($ips) {
+
+			// Check ips
+			if(!is_array($ips)) { return array(); }
+
+			// Sanitize IPs
+			$ips_sanitized = array();
+
+			foreach($ips as $ip) {
+
+				$ip = self::sanitize_ip_address($ip);
+
+				if(!empty($ip)) { $ips_sanitized[] = $ip; }
+			}
+
+			return $ips_sanitized;
+		}
+
+		// Sanitize phone numbers
+		public static function sanitize_tel($tel) {
+
+			// Check for malicious patterns
+			$patterns = [
+
+				'/javascript:/i',
+				'/data:/i',
+				'/<script.*?>.*?<\/script>/i',
+				'/<.*?>/i',
+				'/(onerror|onload)=/i',
+				'/(SELECT|INSERT|DELETE|UPDATE|DROP|UNION)/i',
+				'/[\|\;\&\`]/',
+				'/[\x00-\x1F\x7F]/',
+			];
+
+			foreach ($patterns as $pattern) {
+
+				if (preg_match($pattern, $tel)) {
+
+					return '';
+				}
+			}
+
+			// Strip characters
+			$tel = preg_replace('/[^0-9+\-\(\)\. \/\,\;xext\*\# ]/i', '', $tel);
+
+			// Trim
+			return rtrim($tel, ',; ');
+		}
+
+		// Sanitize CSS value
+		public static function sanitize_css_value($css_value, $pattern_match = false) {
+
+			if($css_value == '') { return ''; }
+
+			// Strip tags
+			$css_value = wp_strip_all_tags($css_value);
+
+			// Strip invalid UTF-8
+			$css_value = wp_check_invalid_utf8($css_value, true);
+
+			// Remove semi-colons
+			$css_value = str_replace(';', '', $css_value);
+
+			// Close open brackets
+			$css_value = self::close_open_brackets($css_value);
+
+			// Trim any whitespace from the value
+			$css_value = trim($css_value);
+
+			return $css_value;
+		}
+
+		// Close open brackets
+		public static function close_open_brackets($input) {
+
+			if(empty($input)) { return $input; }
+
+			// Count the number of open and close parentheses
+			$open_count = substr_count($input, '(');
+			$close_count = substr_count($input, ')');
+
+			// Determine how many closing parentheses are needed
+			$missing_closing = $open_count - $close_count;
+
+			// If there are missing closing parentheses, append them
+			if ($missing_closing > 0) {
+				$input .= str_repeat(')', $missing_closing);
+			}
+
+			return $input;
+		}
+
+		// Escape CSS output
+		public static function esc_css($css_value) {
+
+			// Strip tags
+			$css_value = wp_strip_all_tags($css_value);
+
+			// Strip invalid UTF-8
+			$css_value = wp_check_invalid_utf8($css_value, true);
+
+			return $css_value;
 		}
 
 		// Echo a string escaped using esc_html without a language domain
@@ -6006,7 +6392,17 @@
 		// Echo escaped CSS output
 		public static function echo_esc_css($css_value) {
 
+			if(empty($css_value)) { return ''; }
+
 			echo self::esc_css($css_value);
+		}
+
+		// Echo escaped CSS output inline
+		public static function echo_esc_css_inline($css_value) {
+
+			if(empty($css_value)) { return ''; }
+
+			echo '<style>' . self::esc_css($css_value) . '</style>';
 		}
 
 		// Echo urlencode
@@ -6015,13 +6411,25 @@
 			echo urlencode($url);
 		}
 
+		// Echo admin icon
+		public static function echo_get_admin_icon($color = '#a0a5aa', $base64 = true) {
+
+			echo self::get_admin_icon($color, $base64);
+		}
+
+		// Echo logo
+		public static function echo_logo() {
+
+			echo WS_Form_Config::get_logo_svg();
+		}
+
 		// Check form ID
 		public static function check_form_id($form_id) {
 
 			if(
 				(absint($form_id) === 0)
 			) {
-				self::throw_error(__('Invalid form ID', 'ws-form'));
+				self::throw_error(__('Invalid form ID (WS_Form_Common | check_form_id)', 'ws-form'));
 			}
 
 			return true;
@@ -6095,26 +6503,20 @@
 		// Get cookie raw
 		public static function cookie_get_raw($cookie_name, $default_value = '') {
 
-			if(
+			return (
 				($cookie_name === '') ||
 				!isset($_COOKIE) ||
 				!isset($_COOKIE[$cookie_name])
-			) {
-				return $default_value;
-			}
-
-			return $_COOKIE[$cookie_name];
+			) ? $default_value : $_COOKIE[$cookie_name];
 		}
 
-		// Get form_object from POST $_FILE
-		public static function get_form_object_from_post_file() {
-
-			// Get files
-			if(!isset($_FILES)) { self::throw_error(__('No files found', 'ws-form')); }
-			if(!isset($_FILES['file'])) { self::throw_error(__('No files found', 'ws-form')); }
+		// Get object from POST $_FILE
+		public static function get_object_from_post_file($object_type = false) {
 
 			// Run through files
-			$file = $_FILES['file'];
+			$file = (isset($_FILES) && isset($_FILES['file'])) ? $_FILES['file'] : false;
+
+			if($file === false) { self::throw_error(__('No files found', 'ws-form')); }
 
 			// Read file data
 			$file_name = $file['name'];
@@ -6129,36 +6531,49 @@
 
 			// Check file extension
 			$ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-			if($ext !== 'json') { self::throw_error(sprintf(__('Unsupported file extension: %s', 'ws-form') , $ext)); }
+			if($ext !== 'json') { self::throw_error(sprintf(
+
+				/* translators: %s: Extension */
+				__('Unsupported file extension: %s', 'ws-form'),
+				$ext
+			)); }
 
 			// Check file format
 			if(!file_exists($file_tmp_name)) { self::throw_error(__('Unable to read uploaded file', 'ws-form')); }
-			$form_json = file_get_contents($file_tmp_name);
+			$json = file_get_contents($file_tmp_name);
 
 			// Get form object from JSON
-			$form_object = self::get_form_object_from_json($form_json, true);
+			$object = self::get_object_from_json($json, true, $object_type);
 
-			return $form_object;
+			return $object;
 		}
 
-		// Get form object from JSON and check JSON is valid for a form
-		public static function get_form_object_from_json($form_json, $checksum_check = false) {
+		// Get object from JSON and check JSON is valid
+		public static function get_object_from_json($json, $checksum_check = false, $object_type = false) {
 
 			// Remove BOM if present
-			if(substr($form_json, 0,3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
+			if(substr($json, 0,3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
 
-				$form_json = substr($form_json, 3);
+				$json = substr($json, 3);
 			}
 
 			// Check form JSON format
-			$form_object = json_decode($form_json);
-			if(is_null($form_object)) { self::throw_error(sprintf(__('JSON corrupt (%s)', 'ws-form'), json_last_error_msg())); }
-			if(!is_object($form_object)) { self::throw_error(__('JSON corrupt (Not object)', 'ws-form')); }
+			$object = json_decode($json);
+			if(is_null($object)) {
+
+				self::throw_error(sprintf(
+
+					/* translators: %s: json_decode last error message */
+					__('JSON corrupt (%s)', 'ws-form'),
+					json_last_error_msg()
+				));
+			}
+			if(!is_object($object)) { self::throw_error(__('JSON corrupt (Not object)', 'ws-form')); }
 
 			// Checksum test
 			if(
 				$checksum_check &&
-				!self::form_object_checksum_check($form_object)
+				!self::object_checksum_check($object)
 			) {
 
 				self::throw_error(__('JSON corrupt (Checksum error)', 'ws-form'));
@@ -6166,30 +6581,39 @@
 
 			// Check identifier
 			if(
-				!isset($form_object->identifier) ||
-				($form_object->identifier !== WS_FORM_IDENTIFIER)
+				!isset($object->identifier) ||
+				($object->identifier !== WS_FORM_IDENTIFIER)
 			) {
 
 				self::throw_error(sprintf(
 
-					/* translators: %s = WS Form */
+					/* translators: %s: WS Form */
 					__('JSON corrupt (Not a %s JSON file)', 'ws-form'),
 
 					WS_FORM_NAME_GENERIC
 				));
 			}
 
+			// Check type
+			if(
+				($object_type !== false) &&
+				!empty($object->meta->export_object) &&
+				($object_type != $object->meta->export_object)
+			) {
+				self::throw_error(__('Import error (Invalid import type)', 'ws-form'));
+			}
+
 			// Check label
-			if(!isset($form_object->label)) { self::throw_error(__('JSON corrupt (No label)', 'ws-form')); }
+			if(!isset($object->label)) { self::throw_error(__('JSON corrupt (No label)', 'ws-form')); }
 
 			// Check meta
-			if(!isset($form_object->meta)) { self::throw_error(__('JSON corrupt (No meta data)', 'ws-form')); }
+			if(!isset($object->meta)) { self::throw_error(__('JSON corrupt (No meta data)', 'ws-form')); }
 
-			return $form_object;
+			return $object;
 		}
 
 		// Form object checksum check
-		public static function form_object_checksum_check($form_object) {
+		public static function object_checksum_check($object) {
 
 			// Should checksum be checked?
 			if(!apply_filters('wsf_form_checksum_check', true)) {
@@ -6197,24 +6621,24 @@
 				return true;
 			}
 
-			// Check integrity of form_object
+			// Check integrity of object
 			if(
-				!is_object($form_object) ||
-				!property_exists($form_object, 'checksum')
+				!is_object($object) ||
+				!property_exists($object, 'checksum')
 			) {
 				return false;
 			}
 
 			// Get checksum
-			$checksum = $form_object->checksum;
+			$checksum = $object->checksum;
 
 			// Build checksum
-			$form_object_checksum_check = clone $form_object;
-			unset($form_object_checksum_check->checksum);
-			$checksum_file = md5(wp_json_encode($form_object_checksum_check));
+			$object_checksum_check = clone $object;
+			unset($object_checksum_check->checksum);
+			$checksum_file = md5(wp_json_encode($object_checksum_check));
 
 			// Release memory
-			$form_object_checksum_check = null;
+			$object_checksum_check = null;
 
 			// Check checksum
 			return ($checksum == $checksum_file);
@@ -6298,7 +6722,7 @@
 		}
 
 		// Add dot notation value
-		public static function set_path_value(&$data, $path, $value, $dedupe = true) {
+		public static function set_path_value(&$data, $path, $value, $dedupe = true, $repeatable = false, $repeatable_index = 0) {
 
 			// Pre-process path
 			$path_processed = trim($path);
@@ -6321,10 +6745,25 @@
 					!is_array($data[$node]) &&
 					($path_array_index < $path_array_index_max)
 				) {
-					throw new Exception(sprintf(__('Node %s not valid or duplicate node.', 'ws-form'), $path));
+					throw new Exception(sprintf(
+
+						/* translators: %s: Node path */
+						__('Node %s not valid or duplicate node.', 'ws-form'),
+						$path
+					));
 				}
 
-				$data = &$data[$node];
+				if(
+					$repeatable &&
+					($path_array_index == $path_array_index_max)
+				) {
+					$data = &$data[$repeatable_index];
+					$data = &$data[$node];
+
+				} else {
+
+					$data = &$data[$node];
+				}
 			}
 
 			// Create array if value already exists
@@ -6336,7 +6775,7 @@
 					$data = array($data);
 				}
 
-				// Add element
+				// Set node
 				$data[] = $value;
 
 				// Make it unique
@@ -6378,7 +6817,12 @@
 
 					} else {
 
-						throw new Exception(sprintf(__('Node %s not found in response data.', 'ws-form'), $path));
+						throw new Exception(sprintf(
+
+							/* translators: %s: Node path */
+							__('Node %s not found in response data.', 'ws-form'),
+							$path
+						));
 					}
 
 				} else {
@@ -6389,7 +6833,12 @@
 
 					} else {
 
-						throw new Exception(sprintf(__('Node %s not found in response data.', 'ws-form'), $path));
+						throw new Exception(sprintf(
+
+							/* translators: %s: Node path */
+							__('Node %s not found in response data.', 'ws-form'),
+							$path
+						));
 					}
 				}
 			}
@@ -6968,7 +7417,8 @@
 			// Localize toolbar JS
 			wp_localize_script(WS_FORM_NAME . '-toolbar', 'ws_form_toolbar', array(
 
-				'api_url' => self::get_api_path('helper/debug/'),
+				'api_url_debug' => self::get_api_path('helper/debug/'),
+				'api_url_styler' => self::get_api_path('helper/styler/'),
 				'x_wp_nonce' => wp_create_nonce('wp_rest')
 			));
 
@@ -7032,7 +7482,7 @@
 			$filters = array();
 
 			// Get status
-			$status = WS_Form_Common::get_query_var('ws-form-status');
+			$status = self::get_query_var('ws-form-status');
 			if(!empty($status)) {
 
 				$filters[] = array(
@@ -7044,7 +7494,7 @@
 			}
 
 			// Get date from
-			$date_from = WS_Form_Common::get_query_var('date_from');
+			$date_from = self::get_query_var('date_from');
 			if(!empty($date_from)) {
 
 				$filters[] = array(
@@ -7056,7 +7506,7 @@
 			}
 
 			// Get date to
-			$date_to = WS_Form_Common::get_query_var('date_to');
+			$date_to = self::get_query_var('date_to');
 			if(!empty($date_to)) {
 
 				$filters[] = array(
@@ -7068,7 +7518,7 @@
 			}
 
 			// Get ids
-			$ids = WS_Form_Common::get_query_var('submit_ids');
+			$ids = self::get_query_var('submit_ids');
 			if(!empty($ids)) {
 
 				$filters[] = array(
@@ -7080,5 +7530,269 @@
 			}
 
 			return $filters;
+		}
+
+		public static function get_full_name_components($full_name) {
+
+			if(!is_string($full_name)) {
+
+				return array(
+
+					'name_prefix' => '',
+					'name_first' => '',
+					'name_middle' => '',
+					'name_last' => '',
+					'name_suffix' => ''
+				);
+			}
+
+			$parts = preg_split('/\s+/', trim($full_name));
+
+			$name_prefix = '';
+			$name_suffix = '';
+			$name_first = '';
+			$name_middle = '';
+			$name_last = '';
+
+			// Remove prefix
+			if(
+				!empty($parts) &&
+				in_array(
+
+					strtolower(rtrim($parts[0], '.')),
+					self::get_name_prefixes()
+				)
+			) {
+				$name_prefix = array_shift($parts);
+			}
+
+			// Remove suffix
+			if(
+				count($parts) > 1 &&
+				in_array(
+
+					strtolower(rtrim(end($parts), '.')),
+					self::get_name_suffixes()
+				)
+			) {
+				$name_suffix = array_pop($parts);
+			}
+
+			$count = count($parts);
+
+			if ($count === 1) {
+
+				$name_first = $parts[0];
+
+			} elseif ($count === 2) {
+
+				$name_first = $parts[0];
+				$name_last = $parts[1];
+
+			} elseif ($count > 2) {
+
+				$name_first = $parts[0];
+				$name_last = $parts[$count - 1];
+				$name_middle = implode(' ', array_slice($parts, 1, -1));
+			}
+
+			return array(
+
+				'name_prefix' => $name_prefix,
+				'name_first' => $name_first,
+				'name_middle' => $name_middle,
+				'name_last' => $name_last,
+				'name_suffix' => $name_suffix
+			);
+		}
+
+		public static function get_name_prefixes() {
+
+			return apply_filters('wsf_name_prefixes', array(
+
+				'mr', 'mrs', 'ms', 'miss', 'mx', 'dr', 'prof', 'rev', 'fr', 'sr', 'sra', 'br', 'srta', 'madam', 'mme', 'mlle',
+				'lord', 'lady', 'sir', 'dame', 'hon', 'judge', 'justice', 'pres', 'gov', 'amb', 'sec', 'min', 'supt', 'rep', 'sen',
+				'gen', 'lt', 'col', 'maj', 'capt', 'cmdr', 'cpl', 'sgt', 'adm', 'ens', 'pvt', 'officer', 'chief',
+				'rabbi', 'imam', 'pastor', 'bishop', 'cardinal', 'archbishop', 'elder', 'deacon',
+				'canon', 'monsignor', 'father', 'mother', 'brother', 'sister'
+			));
+		}
+
+		public static function get_name_suffixes() {
+
+			return apply_filters('wsf_name_suffixes', array(
+
+				'jr', 'sr', 'i', 'ii', 'iii', 'iv', 'v', 'vi',
+				'phd', 'md', 'jd', 'mba', 'ms', 'ma', 'ba', 'bs', 'bsc', 'msc', 'dphil', 'edd', 'dvm', 'od', 'do',
+				'esq', 'cpa', 'pe', 'esquire', 'rn', 'lpn', 'esq.',
+				'sj', 'osb', 'op', 'ofm', 'ocist',
+				'ret', 'usa', 'usaf', 'usmc', 'usn', 'uscg',
+				'kc', 'qc', 'cbe', 'obe', 'mbe', 'frcp', 'frcs', 'dds', 'dmd', 'esq'
+			));
+		}
+
+		// Label to autocomplete
+		public static function label_to_autocomplete($label) {
+
+			// Check by field type
+			switch(strtolower($label)) {
+
+				case 'first name' :
+				case 'given name' :
+
+					return 'given-name';
+
+				case 'family name' :
+				case 'last name' :
+				case 'surname' :
+
+					return 'family-name';
+
+				case 'email' :
+				case 'email address' :
+
+					return 'email';
+
+				case 'cell' :
+				case 'phone' :
+				case 'tel' :
+
+					return 'tel';
+
+				case 'url' :
+				case 'web site' :
+				case 'website' :
+
+					return 'url';
+
+				case 'company' :
+				case 'company name' :
+				case 'organization' :
+				case 'organization name' :
+
+					return 'organization';
+
+				case 'title' :
+				case 'company title' :
+				case 'job title' :
+				case 'role' :
+
+					return 'organization-title';
+
+				case 'address' :
+				case 'address 1' :
+				case 'address line 1' :
+
+					return 'address-line1';
+
+				case 'address 2' :
+				case 'address line 2' :
+
+					return 'address-line2';
+
+				case 'city' :
+				case 'town' :
+
+					return 'address-level2';
+
+				case 'county' :
+				case 'state' :
+				case 'state / county / province' :
+
+					return 'address-level1';
+
+				case 'post code' :
+				case 'postal code' :
+				case 'zip' :
+				case 'zip code' :
+				case 'zipcode' :
+
+					return 'postal-code';
+
+				case 'country' :
+
+					return 'country-name';
+
+				case 'date of birth' :
+
+					return 'bday';
+
+				default :
+
+					return false;
+			}
+		}
+
+		// Some hosting companies break serialized data when changing a hostname
+		// This function attempts to fix that if it occurs
+		public static function maybe_unserialize($serialized_string) {
+
+			// If we can't detect if the string is serialized, return it as is
+			if(!is_serialized($serialized_string)) { 
+				return $serialized_string; 
+			}
+
+			// Check for serialized false
+			if($serialized_string === 'b:0;') {
+				return false;
+			}
+
+			// Attempt a regular unserialize
+			$unserialized_string = @unserialize($serialized_string);
+
+			// If the unserialize fails, attempt to fix it
+			// If the fix fails, we ultimate have to return false
+			return ($unserialized_string === false) ? @unserialize(self::repair_serialized($serialized_string)) : $unserialized_string;
+		}
+
+		// Attempt to fix a serialized string if the lengths are wrong
+		public static function repair_serialized($serialized) {
+
+			$offset = 0;
+			$result = '';
+			
+			while(($pos = strpos($serialized, 's:', $offset)) !== false) {
+
+				// Add everything before this string
+				$result .= substr($serialized, $offset, $pos - $offset);
+				
+				// Find the length declaration
+				$length_start = $pos + 2;
+				$length_end = strpos($serialized, ':"', $length_start);
+				
+				if($length_end === false) {
+
+					// Malformed, just add the rest and break
+					$result .= substr($serialized, $pos);
+					break;
+				}
+				
+				$declared_length = (int)substr($serialized, $length_start, $length_end - $length_start);
+				$content_start = $length_end + 2;
+				
+				// Find the actual ending quote and semicolon
+				$actual_end = strpos($serialized, '";', $content_start);
+				
+				if($actual_end === false) {
+
+					// Malformed, just add the rest and break
+					$result .= substr($serialized, $pos);
+					break;
+				}
+				
+				$actual_content = substr($serialized, $content_start, $actual_end - $content_start);
+				$actual_length = strlen($actual_content);
+				
+				// Add the corrected string
+				$result .= 's:' . $actual_length . ':"' . $actual_content . '";';
+				
+				// Move offset past this string
+				$offset = $actual_end + 2;
+			}
+			
+			// Add any remaining content
+			$result .= substr($serialized, $offset);
+			
+			return $result;
 		}
 	}

@@ -20,11 +20,11 @@
 		// User capability check
 		if(WS_Form_Common::can_user('edit_form')) {
 ?>
-<a class="wsf-button wsf-button-small wsf-button-information" href="<?php WS_Form_Common::echo_esc_attr(admin_url('admin.php?page=ws-form-edit&id=' . $form_id)); ?>"><?php WS_Form_Common::render_icon_16_svg('edit'); ?> <?php esc_html_e('Edit', 'ws-form'); ?></a>
+<a class="wsf-button wsf-button-small wsf-button-information" href="<?php WS_Form_Common::echo_esc_url(admin_url('admin.php?page=ws-form-edit&id=' . $form_id)); ?>"><?php WS_Form_Common::render_icon_16_svg('edit'); ?> <?php esc_html_e('Edit', 'ws-form'); ?></a>
 <?php
 		}
 ?>
-<a class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_attr(WS_Form_Common::get_preview_url($form_id)); ?>" target="_blank"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview', 'ws-form'); ?></a>
+<a class="wsf-button wsf-button-small" href="<?php WS_Form_Common::echo_esc_url(WS_Form_Common::get_preview_url($form_id)); ?>" target="_blank"><?php WS_Form_Common::render_icon_16_svg('visible'); ?> <?php esc_html_e('Preview', 'ws-form'); ?></a>
 <?php
 
 		if($this->ws_form_wp_list_table_submit_obj->record_count() > 0) {
@@ -135,22 +135,16 @@
 		// On load
 		$(function() {
 
-			// Manually inject language strings (Avoids having to call the full config)
-			$.WS_Form.settings_form = [];
-			$.WS_Form.settings_form.language = [];
-			$.WS_Form.settings_form.language['starred_on'] = '<?php esc_html_e('Starred', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['starred_off'] = '<?php esc_html_e('Not Starred', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['viewed_on'] = '<?php esc_html_e('Mark as Unread', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['viewed_off'] = '<?php esc_html_e('Mark as Read', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['error_server'] = '<?php esc_html_e('500 Server error response from server.', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['error_bad_request_message'] = '<?php esc_html_e('400 Bad request response from server: %s', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['dismiss'] = '<?php esc_html_e('Dismiss', 'ws-form'); ?>';
-
 			// Initialize WS Form
 			var wsf_obj = new $.WS_Form();
 
+			// Partial initialization
 			wsf_obj.init_partial();
 
+			// Sidebar resizing
+			wsf_obj.sidebar_resize_init();
+
+			// Initialize submission table
 			wsf_obj.wp_list_table_submit(<?php WS_Form_Common::echo_esc_html($form_id); ?>);
 		});
 
@@ -162,10 +156,10 @@
 </div>
 
 <!-- Submit export process -->
-<div id="wsf-form-submit-export-popup" class="wsf-form-popup-progress">
-	<div class="wsf-form-popup-progress-backdrop"></div>
-	<div class="wsf-form-popup-progress-inner"><img src="<?php WS_Form_Common::echo_esc_attr(WS_FORM_PLUGIN_DIR_URL . 'admin/images/loader.gif'); ?>" class="wsf-responsive" width="256" height="256" alt="<?php esc_html_e('Your export is being created...', 'ws-form'); ?>" /><p><?php esc_html_e('Your export is being created...', 'ws-form'); ?></p>
-		<div class="wsf-form-popup-progress-bar"><progress class="wsf-progress" max="100" value="0"></progress></div>
+<div id="wsf-submit-export-popup" class="wsf-popup-progress">
+	<div class="wsf-popup-progress-backdrop"></div>
+	<div class="wsf-popup-progress-inner"><img src="<?php WS_Form_Common::echo_esc_attr(WS_FORM_PLUGIN_DIR_URL . 'admin/images/loader.gif'); ?>" class="wsf-responsive" width="256" height="256" alt="<?php esc_html_e('Your export is being created...', 'ws-form'); ?>" /><p><?php esc_html_e('Your export is being created...', 'ws-form'); ?></p>
+		<div class="wsf-popup-progress-bar"><progress class="wsf-progress" max="100" value="0"></progress></div>
 	</div>
 </div>
 <!-- /Submit export process -->
@@ -174,29 +168,10 @@
 	// Only render JavaScript if a form has been selected
 	if($form_id > 0) {
 
-		// Get config
-		$json_config = WS_Form_Config::get_config(false, array(), true);
-?>
-<script>
-<?php
-?>
-	// Embed config
-	var wsf_form_json_config = {};
-<?php
-
-		// Split up config (Fixes HTTP2 error on certain hosting providers that can't handle the full JSON string)
-		foreach($json_config as $key => $config) {
-
-?>	wsf_form_json_config.<?php WS_Form_Common::echo_esc_html($key); ?> = <?php WS_Form_Common::echo_wp_json_encode($config); ?>;
-<?php
-		}
-
-		$json_config = null;
-
 		// Get form data
 		try {
 
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->id = $form_id;
 			$form_object = $ws_form_form->db_read(true, true, false, true);
 			$json_form = wp_json_encode($form_object);
@@ -208,6 +183,7 @@
 
 		if($json_form) {
 ?>
+<script>
 
 	// Embed form data
 	var wsf_form_json = { <?php
@@ -217,14 +193,10 @@
 ?>: <?php
 
 		echo $json_form;	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-		$json_form = null;
-
 ?> };
-<?php
-		}
-?>
+
 </script>
 <?php
-
+		}
 	}
 ?>

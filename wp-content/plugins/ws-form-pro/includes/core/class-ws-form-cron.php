@@ -16,49 +16,49 @@
 				$schedules['wsf_minute'] = array(
 
 					'interval' => 60,
-					'display' => esc_html__( 'Once Every Minute' ),
+					'display' => 'Once Every Minute',
 				);
 
 				$schedules['wsf_quarter_hour'] = array(
 
 					'interval' => 900,
-					'display' => esc_html__( 'Once Every 15 Minutes' ),
+					'display' => 'Once Every 15 Minutes',
 				);
 
 				$schedules['wsf_half_hour'] = array(
 
 					'interval' => 1800,
-					'display' => esc_html__( 'Once Every 30 Minutes' ),
+					'display' => 'Once Every 30 Minutes',
 				);
 
 				$schedules['wsf_hour'] = array(
 
 					'interval' => 3600,
-					'display' => esc_html__( 'Once Every Hour' ),
+					'display' => 'Once Every Hour',
 				);
 
 				$schedules['wsf_twice_daily'] = array(
 
 					'interval' => 43200,
-					'display' => esc_html__( 'Once Every 12 Hours' ),
+					'display' => 'Once Every 12 Hours',
 				);
 
 				$schedules['wsf_daily'] = array(
 
 					'interval' => 86400,
-					'display' => esc_html__( 'Once Daily' ),
+					'display' => 'Once Daily',
 				);
 
 				$schedules['wsf_weekly'] = array(
 
 					'interval' => 604800,
-					'display' => esc_html__( 'Once Weekly' ),
+					'display' => 'Once Weekly',
 				);
 
 				$schedules['wsf_monthly'] = array(
 
 					'interval' => 2635200,	// Not precisely a month
-					'display' => esc_html__( 'Once Monthly' ),
+					'display' => 'Once Monthly',
 				);
 
 

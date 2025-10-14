@@ -29,6 +29,37 @@ Valid license key should be entered for the plugin to function and to receive au
 
 
 == Changelog ==
+= 3.3.7 ( AUG 29, 2025 )
+* FIX: Plain Classes: classes were updated only when "bulk edit" was active
+
+= 3.3.6 ( AUG 28, 2025 )
+* NEW: Strict Editor View: Hide Quick Access Bar in the Element Panel
+* NEW: Strict Editor View: Hide Search Box in the Element Panel
+* NEW: Strict Editor View: Hide Element States in the Structure Panel
+* NEW: Strict Editor View: Hide Header in the Element Panel
+* NEW: Strict Editor View: Hide Element Actions in the Preview Window
+* NEW: Strict Editor View: Disable Contextual Menus
+* IMPROVE: Plain Classes now supports Bulk Edit
+* IMPROVE: GPT-5 / GPT-Mini / GPT-Nano added to the AI models
+* IMPROVE: Removed StickyCSS, Visibility Bar, and Responsive Slider/Helper as active by default
+* IMPROVE: Advanced CSS: page.css code is now written in the base breakpoint only
+* IMPROVE: Content/Style Tabs & Control Group Contextual Menu: smarter handling of element settings when a global class is active
+* IMPROVE: Convert values to Logical Properties: new option in the converter to revert changes back to directional properties
+* FIX: Focus on First Unlocked Class: could miss the focus
+* FIX: Locked Class Indicator stopped working correctly
+* FIX: The class lock icon wasn’t clickable when Plain Classes was set as the default class picker
+* FIX: SuperPowerCSS: could fail to save the custom CSS
+* FIX: Generate Global Query wasn't showing up in the Query Popup anymore
+* FIX: Global Query List icon wasn't showing next to the Query Loop icon anymore
+* FIX: When opening the Class Manager, the custom CSS of the previously selected class could appear blank
+* FIX: Adding custom CSS to a class through the Class Manager could fail to render correctly
+* FIX: display:none applied on the Darkmode elements removed the element from the accessibility tree
+* FIX: Structure Generator: Dropping an image inside the dropzone wasn't correctly sending the image to the prompt
+* DEPRECATED: Strict Editor View: removed toolbar icons related to Role Capabilities (since Bricks 2.0)
+* DEPRECATED: Strict Editor View: Disable clickable elements in the iframe (since Bricks 2.0)
+* DEPRECATED: Strict Editor View: Reduce Left Panel Visibility
+* DEPRECATED: Code Element Tweaks (since Bricks 2.0)
+
 = 3.3.5 ( JUL 25, 2025 )
 * IMPROVE: Structure header icons got the same styles as the Left panel header icons
 * IMPROVE: Pasting from new contextual menu's is supporting bulk edit

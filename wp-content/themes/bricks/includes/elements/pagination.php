@@ -271,8 +271,8 @@ class Pagination extends Element {
 				]
 			);
 
-			// Support pagination for post, user and term query object type (@since 1.9.1)
-			if ( ! in_array( $query_obj->object_type, [ 'post','user','term' ] ) ) {
+			// Support pagination for post, user and term query object type
+			if ( ! in_array( $query_obj->object_type, [ 'post','user','term', 'api' ] ) ) {
 				return $this->render_element_placeholder(
 					[
 						'title' => esc_html__( 'This query type doesn\'t support pagination.', 'bricks' ),

@@ -326,7 +326,7 @@ class Settings_Page extends Settings_Base {
 			'group'       => 'social-media',
 			'label'       => esc_html__( 'Description', 'bricks' ),
 			'type'        => 'text',
-			'placeholder' => bricks_is_builder() ? get_the_excerpt() : '', // Avoid memory exhausted on plugin's hook (#86c48hete; 2.x)
+			'placeholder' => bricks_is_builder() ? get_the_excerpt() : '', // Avoid memory exhausted on plugin's hook (#86c48hete; @since 2.0.2)
 			'description' => esc_html__( 'Recommended length: 55 characters. Default: Post/page excerpt.', 'bricks' ),
 		];
 

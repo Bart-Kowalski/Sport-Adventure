@@ -89,6 +89,19 @@ class WC_Shortcode_My_Account {
 			/* translators: %s: logout url */
 			wc_add_notice( sprintf( __( 'Are you sure you want to log out? <a href="%s">Confirm and log out</a>', 'woocommerce' ), wc_logout_url() ) );
 		}
+
+		if ( get_user_option( 'default_password_nag' ) && ( wc_is_current_account_menu_item( 'dashboard' ) || wc_is_current_account_menu_item( 'edit-account' ) ) ) {
+			wc_add_notice(
+				sprintf(
+					// translators: %s: site name.
+					__( 'Your account with %s is using a temporary password. We emailed you a link to change your password.', 'woocommerce' ),
+					esc_html( wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ) )
+				),
+				'notice',
+				array(),
+				true
+			);
+		}
 	}
 
 	/**
@@ -293,12 +306,6 @@ class WC_Shortcode_My_Account {
 		}
 
 		if ( ! $user_data ) {
-			wc_add_notice( __( 'Invalid username or email.', 'woocommerce' ), 'error' );
-
-			return false;
-		}
-
-		if ( is_multisite() && ! is_user_member_of_blog( $user_data->ID, get_current_blog_id() ) ) {
 			wc_add_notice( __( 'Invalid username or email.', 'woocommerce' ), 'error' );
 
 			return false;

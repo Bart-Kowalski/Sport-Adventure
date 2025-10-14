@@ -1,6 +1,14 @@
+
+#bricks-toolbar li.max {
+    height: 32px;
+    margin-inline: 5px;
+    width: auto;
+    min-width: 40px;
+}
+
 #bricks-toolbar .logo img {
-    height: 16px;
-    width: 100%;
+    height: 100%;
+    width: auto;
     object-fit: contain;
 }
 
@@ -25,7 +33,7 @@
 #bricks-panel-elements{
     padding: 0 var(--builder-spacing)
 }
-.brx-draggable.bricks-draggable-handle,
+
 .brxe-video * {
     pointer-events: none;
 }
@@ -57,85 +65,95 @@
     opacity: 1;
  }
 /*------------------
-Deprecated since 1.4
+Hide Hide Quick Access in Element Panel
 -------------------*/
 
-/* .control-group:has(
-    div[data-controlkey="separatorHighlightContent"], 
-    div[data-controlkey="titleTag"], 
-    div[data-controlkey="tabs"],
-    div[data-controlkey="imagePosition"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="arrows"],
-    div[data-controlkey="dots"],
-    div[data-controlkey="slidesToShow"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="initialSlide"],
-    div[data-controlkey="imageLightbox"],
-    div[data-controlkey="widgetSeparator"],
-    div[data-controlkey="typeSpeed"],
-    div[data-controlkey="autoplaySeparator"],
-    div[data-controlkey="paginationActiveSeparator"],
-    ){
-    display: none !important;
-} */
+body.at-hide-quick-access-bar #bricks-panel-element-quick-access{
+    display: none
+}
 
+body.at-hide-quick-access-bar #bricks-panel-element{
+    margin-inline-start: 0px;
+}
 
-/* #bricks-panel-elements #bricks-panel-header,
-#bricks-panel-elements #bricks-panel-elements-categories,
-#bricks-panel #bricks-panel-inner #bricks-panel-element-classes,
-.control.control-textarea .description,
-[data-control-key="showUnder"],
-[data-control-key="featuresIconSize"],
-[data-control-key="featuresIconPosition"],
-[data-control-key="footerSeparator"],
-[data-control-key="buttonWidth"],
-[data-control-key="buttonSize"],
-[data-control-key="buttonStyle"],
-[data-control-key="ribbonPosition"],
-[data-control-key="titleTag"], 
-[data-controlkey="hasLoop"],
-[data-controlkey="linkSeparator"],
-[data-controlkey="linksSeparator"],
-[data-controlkey="linkToSeparator"],
-[data-controlkey="link"],
-[data-controlkey="linkRel"],
-[data-controlkey="newTab"],
-[data-controlkey="url"],
-[data-controlkey="popupSeparator"],
-[data-controlkey="popupIconDisable"],
-[data-controlkey="popupIcon"],
-[data-controlkey="tag"],
-[data-controlkey="size"],
-[data-controlkey="circle"],
-[data-controlkey="outline"],
-[data-controlkey="type"],
-[data-controlkey="style"],
-[data-controlkey="layout"],
-[data-controlkey="alignmentSeparator"],
-[data-controlkey="image"] ~ *,
-[data-controlkey="showPercentage"],
-[data-controlkey="fieldSeparator"],
-[data-controlkey="duration"],
-[data-controlkey="brandColors"],
-[data-controlkey="mobileMenu"],
-[data-control-key]:has(.bricks-control-preview),
-[data-control-key].type-spacing,
-[data-control-key].type-justify-content,
-[data-control-key].type-link,
-[data-control=image] .placeholder-description,
-.dynamic-tag-picker-button,
-ul.controls:has([data-controlkey="trackColor"]) [data-controlkey="percent"] ~ [data-controlkey],
-ul.controls:has([data-controlkey="profilePhotos"]) [data-controlkey="href"] ~ [data-controlkey],
-ul.controls:has([data-controlkey="imageRatio"]) [data-controlkey="items"] ~ [data-controlkey],
-ul.controls:has([data-controlkey="mobileMenu"]) ~ ul.control-groups,
-[type="image-gallery"] [data-control="text"]:has(.has-dynamic-picker) {
+body.at-hide-quick-access-bar #bricks-panel-element.show-shortcuts #bricks-panel-controls-search:not(.active) {
+    width: calc(100%);
+}
+
+/*------------------
+Hide Search Box in Element Panel
+-------------------*/
+
+body.at-hide-element-search-box #bricks-panel-controls-search{
     display: none !important;
 }
-[data-control-key="icon"]:has(.bricks-control-preview){
-    display: block !important;
-} */
 
+/*------------------
+Hide Element States in Structure Panel
+-------------------*/
+
+body.at-hide-element-states .element-states{
+    display: none !important;
+}
+
+/*------------------
+Hide Header in Element Panel
+-------------------*/
+
+body.at-hide-element-panel-header #bricks-panel-element #bricks-panel-header{
+    display: none !important;
+}
+
+body.at-hide-element-panel-header #bricks-panel-element{
+    padding-top: 8px;
+}
+
+/*------------------
+Hide Element Action in the Preview window
+-------------------*/
+
+body.at-hide-preview-element-actions #bricks-preview-element-actions{
+    display: none !important;
+}
+
+/*------------------
+Disable Contextual Menu
+-------------------*/
+
+body.at-disable-contextual-menu #bricks-builder-context-menu{
+    display: none !important;
+}
+
+/*------------------
+Hide ID/class Input
+-------------------*/
+body.at-hide-id-class #bricks-panel #bricks-panel-inner #bricks-panel-element-classes,#bricks-panel-sticky{
+    display: none !important;
+}
+
+/*------------------
+Hide Dymanic Tag
+-------------------*/
+body.at-hide-dynamic-data .dynamic-tag-picker-button,
+body.at-hide-dynamic-data .show-dynamic-picker,
+body.at-hide-dynamic-data .mce-tinymce #mceu_12{
+    display: none !important;
+}
+
+/*------------------
+Hide text/heading toolbar in Preview Window
+-------------------*/
+body.at-hide-text-toolbar #bricks-builder-contenteditable-toolbar{
+    display: none !important;
+}
+
+/*------------------
+Hide Structure Panel
+-------------------*/
+body.at-hide-structure-panel #bricks-structure,
+body.at-hide-structure-panel #bricks-toolbar li.structure{
+    display: none !important;
+}
+body.at-hide-structure-panel #bricks-preview.show-structure{
+    margin-right: 0 !important;
+}

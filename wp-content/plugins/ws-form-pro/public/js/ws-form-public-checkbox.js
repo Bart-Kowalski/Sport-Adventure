@@ -17,7 +17,6 @@
 				(typeof(checkbox_min) === 'undefined') &&
 				(typeof(checkbox_max) === 'undefined')
 			) {
-
 				return;
 			}
 

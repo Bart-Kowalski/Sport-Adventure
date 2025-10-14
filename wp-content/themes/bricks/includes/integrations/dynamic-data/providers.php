@@ -38,29 +38,43 @@ class Providers {
 	public static function register( $providers = [] ) {
 		$instance = new self( $providers );
 
+		// For Polylang without interfere other plugins. (#86c3htjt0)
+		$register_hook = apply_filters( 'bricks/dynamic_data/register_hook', 'init' );
+
+		// Register providers (priority 10000 due to CMB2 priority)
+		add_action( $register_hook, [ $instance, 'register_providers' ], 10000 );
+
+		// Register tags on init after register_providers (@since 1.9.8)
+		add_action( $register_hook, [ $instance, 'register_tags' ], 10001 );
+
+		// Trigger an action when all dynamic data tags are registered (@since 2.0)
+		add_action( $register_hook, [ $instance, 'tag_registered' ], 10002 );
+		// Keep 1 version for reference
 		// Register providers and tags for normal requests or Bricks REST API requests (@since 2.0) (#86c3htjt0)
-		if ( \Bricks\Api::is_bricks_rest_request() ) {
-			// Register providers during WP REST API call
-			// rest_api_init is too early and causing Poylang no language set, use rest_pre_dispatch which will run after rest_api_init and before callback. (@since 2.0)
-			// Note: rest_pre_dispatch will be running multiple times based on the number of registered REST API routes, so we need to check if the providers already registered (@since 2.0)
-			add_action( 'rest_pre_dispatch', [ $instance, 'register_providers' ], 10 );
+		// if ( \Bricks\Api::is_bricks_rest_request() ) {
+		// Register providers during WP REST API call
+		// rest_api_init is too early and causing Poylang no language set, use rest_pre_dispatch which will run after rest_api_init and before callback. (@since 2.0)
+		// Note: rest_pre_dispatch will be running multiple times based on the number of registered REST API routes, so we need to check if the providers already registered (@since 2.0)
+		// $register_hook = apply_filters( 'bricks/dynamic_data/register_hook', 'rest_pre_dispatch' );
 
-			// Register tags after register_providers and Polylang set language (priority 10) (@since 2.0)
-			add_action( 'rest_pre_dispatch', [ $instance, 'register_tags' ], 11 );
+		// add_action( $register_hook, [ $instance, 'register_providers' ], 10 );
 
-			// Trigger an action when all dynamic data tags are registered (@since 2.0)
-			add_action( 'rest_pre_dispatch', [ $instance, 'tag_registered' ], 12 );
+		// Register tags after register_providers and Polylang set language (priority 10) (@since 2.0)
+		// add_action( $register_hook, [ $instance, 'register_tags' ], 11 );
 
-		} else {
-			// Register providers (priority 10000 due to CMB2 priority)
-			add_action( 'init', [ $instance, 'register_providers' ], 10000 );
+		// Trigger an action when all dynamic data tags are registered (@since 2.0)
+		// add_action( $register_hook, [ $instance, 'tag_registered' ], 12 );
 
-			// Register tags on init after register_providers (@since 1.9.8)
-			add_action( 'init', [ $instance, 'register_tags' ], 10001 );
+		// } else {
+		// Register providers (priority 10000 due to CMB2 priority)
+		// add_action( 'init', [ $instance, 'register_providers' ], 10000 );
 
-			// Trigger an action when all dynamic data tags are registered (@since 2.0)
-			add_action( 'init', [ $instance, 'tag_registered' ], 10002 );
-		}
+		// Register tags on init after register_providers (@since 1.9.8)
+		// add_action( 'init', [ $instance, 'register_tags' ], 10001 );
+
+		// Trigger an action when all dynamic data tags are registered (@since 2.0)
+		// add_action( 'init', [ $instance, 'tag_registered' ], 10002 );
+		// }
 
 		// Register tags before wp_enqueue_scripts (but not before wp to get the post custom fields)
 		// Priority = 8 to run before Setup::init_control_options
@@ -176,10 +190,11 @@ class Providers {
 			$field = isset( $tag['field'] ) ? $tag['field'] : false;
 
 			$tag_data = [
-				'name'     => $tag['name'],
-				'label'    => $tag['label'],
-				'group'    => $tag['group'],
-				'provider' => $tag['provider'] ?? '', // @since 2.0,
+				'name'                   => $tag['name'],
+				'label'                  => $tag['label'],
+				'group'                  => $tag['group'],
+				'provider'               => $tag['provider'] ?? '', // @since 2.0,
+				'queryFiltersExcludeTag' => $tag['queryFiltersExcludeTag'] ?? false, // @since 2.0.2
 			];
 
 			// Add field type to the tag if available (@since 2.0)
@@ -389,6 +404,13 @@ class Providers {
 		$tag          = $parsed['tag'] ?? $tag;
 		$args         = $parsed['args'];
 		$original_tag = $parsed['original_tag'];
+
+		// Return original tag if "raw" argument is set (#86c5heted; @since 2.1)
+		if ( is_array( $args ) && in_array( 'raw', $args ) ) {
+			// Remove all :raw from original tag
+			$original_tag = str_replace( ':raw', '', $original_tag );
+			return '&#123;' . $original_tag . '&#125;'; // Use HTML entities to avoid parser rerun
+		}
 
 		$tags = $this->get_tags();
 

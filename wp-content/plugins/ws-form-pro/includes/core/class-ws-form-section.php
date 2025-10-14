@@ -78,7 +78,7 @@
 			$meta_data = (object) array_merge($meta_data, (array) $this->meta);
 
 			// Build meta data
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'section';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_update_from_object($meta_data);
@@ -177,7 +177,7 @@
 				$rows = $form_object_conditional->groups[0]->rows;
 
 				// Read conditional in existing form
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'form';
 				$ws_form_meta->parent_id = $this->form_id;
 				$conditional = $ws_form_meta->db_get_object_meta('conditional');
@@ -252,7 +252,7 @@
 			if($get_meta) {
 
 				// Read meta
-				$section_meta = New WS_Form_Meta();
+				$section_meta = new WS_Form_Meta();
 				$section_meta->object = 'section';
 				$section_meta->parent_id = $this->id;
 				$metas = $section_meta->db_read_all();
@@ -263,7 +263,7 @@
 			if($get_fields) {
 
 				// Read fields
-				$ws_form_field = New WS_Form_Field();
+				$ws_form_field = new WS_Form_Field();
 				$ws_form_field->section_id = $this->id;
 				$fields = $ws_form_field->db_read_all($get_meta);
 				$section_array['fields'] = $fields;
@@ -321,7 +321,7 @@
 					if($get_meta) {
 
 						// Get meta data for each section
-						$section_meta = New WS_Form_Meta();
+						$section_meta = new WS_Form_Meta();
 						$section_meta->object = 'section';
 						$section_meta->parent_id = $section['id'];
 						$metas = $section_meta->db_read_all($bypass_user_capability_check);
@@ -335,7 +335,7 @@
 					}
 
 					// Get fields
-					$ws_form_field = New WS_Form_Field();
+					$ws_form_field = new WS_Form_Field();
 					$ws_form_field->section_id = $section['id'];
 					$ws_form_field_return = $ws_form_field->db_read_all($get_meta, $checksum, $bypass_user_capability_check);
 					$sections[$key]['fields'] = $ws_form_field_return;
@@ -369,13 +369,13 @@
 			if($wpdb->query($sql) === false) { parent::db_wpdb_handle_error(__('Error deleting section', 'ws-form')); }
 
 			// Delete meta
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'section';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_delete_by_object();
 
 			// Delete section fields
-			$ws_form_field = New WS_Form_Field();
+			$ws_form_field = new WS_Form_Field();
 			$ws_form_field->form_id = $this->form_id;
 			$ws_form_field->section_id = $this->id;
 			$ws_form_field->db_delete_by_section(false);
@@ -383,7 +383,7 @@
 			// Repair conditional, actions and meta data to remove references to this deleted section
 			if($repair) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$ws_form_form->id = $this->form_id;
 				$ws_form_form->new_lookup['section'][$this->id] = '';
 				$ws_form_form->db_conditional_repair();
@@ -401,7 +401,7 @@
 
 			if($repair) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$ws_form_form->id = $this->form_id;
 			}
 
@@ -497,13 +497,13 @@
 			$section_id_new = $wpdb->insert_id;
 
 			// Clone meta data
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'section';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_clone_all($section_id_new);
 
 			// Clone fields
-			$ws_form_field = New WS_Form_Field();
+			$ws_form_field = new WS_Form_Field();
 			$ws_form_field->form_id = $this->form_id;
 			$ws_form_field->section_id = $this->id;
 			$ws_form_field->db_clone_all($section_id_new);
@@ -518,7 +518,7 @@
 			self::db_check_form_id();
 
 			// Calculate new form checksum
-			$form = New WS_Form_Form();
+			$form = new WS_Form_Form();
 			$form->id = $this->form_id;
 			$checksum = $form->db_checksum();
 
@@ -558,7 +558,7 @@
 			// Update meta
 			if(isset($section_object->meta)) {
 
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'section';
 				$ws_form_meta->parent_id = $this->id;
 				$ws_form_meta->db_update_from_object($section_object->meta, false, false, $replace_meta);
@@ -569,7 +569,7 @@
 				// Update fields
 				if(isset($section_object->fields)) {
 
-					$ws_form_field = New WS_Form_Field();
+					$ws_form_field = new WS_Form_Field();
 					$ws_form_field->section_id = $this->id;
 					$ws_form_field->db_update_from_array($section_object->fields, $new, $replace_meta);
 
@@ -629,7 +629,7 @@
 			// Update section child_count
 			$sql = $wpdb->prepare(
 
-				"UPDATE {$this->table_name} SET child_count = %u WHERE id = %d;",
+				"UPDATE {$this->table_name} SET child_count = %d WHERE id = %d;",
 				$child_count,
 				$this->id
 			);
@@ -708,7 +708,7 @@
 				$breakpoints = $frameworks['types'][$framework]['breakpoints'];
 
 				// Get breakpoints column counts
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'section';
 				$ws_form_meta->parent_id = $last_section_id;
 
@@ -1018,21 +1018,21 @@
 		// Check form_id
 		public function db_check_form_id() {
 
-			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID', 'ws-form')); }
+			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID (WS_Form_Section | db_check_form_id)', 'ws-form')); }
 			return true;
 		}
 
 		// Check form_id
 		public function db_check_group_id() {
 
-			if(absint($this->group_id) === 0) { parent::db_throw_error(__('Invalid group ID', 'ws-form')); }
+			if(absint($this->group_id) === 0) { parent::db_throw_error(__('Invalid group ID (WS_Form_Section | db_check_group_id)', 'ws-form')); }
 			return true;
 		}
 
 		// Check id
 		public function db_check_id() {
 
-			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid section ID', 'ws-form')); }
+			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid section ID (WS_Form_Section | db_check_id)', 'ws-form')); }
 			return true;
 		}
 

@@ -113,20 +113,25 @@ class Element_Image_Gallery extends Element {
 			'required'    => [ 'layout', '!=', [ 'masonry', 'metro' ] ],
 		];
 
-		$this->control_options['imageRatio']['custom'] = esc_html__( 'Custom', 'bricks' );
-
 		$this->controls['imageRatio'] = [
-			'tab'         => 'content',
-			'label'       => esc_html__( 'Image ratio', 'bricks' ),
-			'type'        => 'select',
-			'options'     => $this->control_options['imageRatio'],
-			'inline'      => true,
-			'placeholder' => esc_html__( 'Square', 'bricks' ),
-			'required'    => [ 'layout', '!=', [ 'masonry', 'metro' ] ],
+			'tab'      => 'content',
+			'label'    => esc_html__( 'Image ratio', 'bricks' ),
+			'desc'     => esc_html__( 'Example', 'bricks' ) . ': 4/3, 16/9, 1/1 (square)',
+			'type'     => 'text',
+			'css'      => [
+				[
+					'selector' => '.image',
+					'property' => 'aspect-ratio',
+				],
+			],
+			'inline'   => true,
+			'required' => [ 'layout', '!=', [ 'masonry', 'metro' ] ],
 		];
 
 		/**
 		 * Custom aspect ratio (remove control from style tab)
+		 *
+		 * NOTE: No longer in use @since 2.0.2 as 'imageRatio' is a "text" instead of a "select" control
 		 *
 		 * @since 1.9.7
 		 */
@@ -395,11 +400,6 @@ class Element_Image_Gallery extends Element {
 
 			if ( $layout !== 'masonry' ) {
 				$image_classes[] = 'bricks-layout-inner';
-			}
-
-			// Grid: Image ratio
-			if ( $layout === 'grid' && ! empty( $settings['imageRatio'] ) ) {
-				$image_classes[] = "bricks-aspect-{$settings['imageRatio']}";
 			}
 
 			// CSS filters

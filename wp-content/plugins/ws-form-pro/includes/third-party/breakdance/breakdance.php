@@ -1,23 +1,17 @@
 <?php 
 
-	if(defined('__BREAKDANCE_VERSION')) {
+	add_action('init', function() {
 
-		add_action('init', function() {
+		if(isset($_GET) && isset($_GET['breakdance_iframe'])) {	// phpcs:ignore WordPress.Security.NonceVerification
 
-			if(isset($_GET) && isset($_GET['breakdance_iframe'])) {	// phpcs:ignore WordPress.Security.NonceVerification
+			// Visual builder enqueues
+			do_action('wsf_enqueue_visual_builder');
+		}
+	});
 
-				// Set visual builder scripts to enqueue
-				do_action('wsf_enqueue_visual_builder');
-			}
-		});
+	try {
 
-		add_action('plugins_loaded', function () {
+		// Register element
+		include_once 'elements/ws-form-form/element.php';
 
-			try {
-
-				// Register element
-				include_once 'elements/ws-form-form/element.php';
-
-			} catch (Exception $e) {}
-		});
-	}
+	} catch (Exception $e) {}

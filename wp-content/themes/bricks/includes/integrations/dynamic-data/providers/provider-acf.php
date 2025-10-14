@@ -255,10 +255,11 @@ class Provider_Acf extends Base {
 	public function register_dynamic_function_tag() {
 		$dynamic_functions = [
 			'acf_get_row_layout' => [
-				'name'     => '{acf_get_row_layout}',
-				'label'    => esc_html__( 'ACF Get Row Layout', 'bricks' ),
-				'group'    => 'ACF',
-				'provider' => $this->name,
+				'name'                   => '{acf_get_row_layout}',
+				'label'                  => esc_html__( 'ACF Get Row Layout', 'bricks' ),
+				'group'                  => 'ACF',
+				'provider'               => $this->name,
+				'queryFiltersExcludeTag' => true, // Exclude from Query Filters integration dropdown (@since 2.0.2)
 			],
 		];
 

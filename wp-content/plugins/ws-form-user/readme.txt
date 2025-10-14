@@ -1,9 +1,9 @@
 === WS Form PRO - User Management ===
 Contributors: westguard
-Requires at least: 4.4
-Tested up to: 6.3
+Requires at least: 5.4
+Tested up to: 6.8
 Stable tag: trunk
-Requires PHP: 5.2.2
+Requires PHP: 5.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,38 @@ User Management add-on for WS Form PRO.
 For help installing this plugin, please see our [Installation](https://wsform.com/knowledgebase/installation/?utm_source=wp_plugins&utm_medium=readme) knowledgebase article.
 
 == Changelog ==
+
+= 1.6.8 - 07/02/2025 =
+* Bug Fix: Field mapping for custom field plugins now only shown for Register and Edit Profile methods
+
+= 1.6.7 - 06/30/2025 =
+* Changed: Disabled ACF validation by default
+
+= 1.6.6 - 01/04/2025 =
+* Added: WordPress 6.8 compatibility
+
+= 1.6.5 - 02/15/2025 =
+* Added: Custom table support for Meta Box
+
+= 1.6.4 - 11/11/2024 =
+* Bug Fix: Fixed load_plugin_textdomain warning
+
+= 1.6.3 - 06/03/2024 =
+* Bug Fix: Toolset user meta updates
+
+= 1.6.2 - 05/30/2024 =
+* Bug Fix: JetEngine field mapping context fix
+
+= 1.6.1 - 05/21/2024 =
+* Bug Fix: User ID variable in third party classes
+
+= 1.6.0 - 05/14/2024 =
+* Added: ACPT integration
+* Added: Restructured custom field integrations to improve performance
+
+= 1.5.17 - 04/17/2024 =
+* Changed: Period added to end of error messages to match WordPress error conventions
+* Bug Fix: Translatable strings for password matching
 
 = 1.5.16 - 11/28/2023 =
 * Bug Fix: Pods escaping

@@ -22,6 +22,10 @@
 	-moz-appearance: textfield;
 }
 
+[dir="rtl"] input[type="file"].dz-hidden-input {
+	display: none;
+}
+
 [data-wsf-hierarchy='1'] {
 	-webkit-margin-start: 1em;
 	margin-inline-start: 1em;
@@ -70,12 +74,6 @@
 [data-wsf-hierarchy='10'] {
 	-webkit-margin-start: 10em;
 	margin-inline-start: 10em;
-}
-
-.wsf-form .minicolors-theme-bootstrap .minicolors-swatch {
-	cursor: pointer;
-	height: 32px;
-	width: 32px;
 }
 
 .wsf-form input[type=text] ~ .dropzone {

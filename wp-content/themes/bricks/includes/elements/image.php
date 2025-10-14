@@ -10,6 +10,7 @@ class Element_Image extends Element {
 	public $icon              = 'ti-image';
 	public $tag               = 'figure';
 	public $custom_attributes = false;
+	public $wp_img_data       = []; // Image data for wp_get_attachment_image_src filter (@since 2.0.2)
 
 	public function get_label() {
 		return esc_html__( 'Image', 'bricks' );
@@ -139,7 +140,7 @@ class Element_Image extends Element {
 				'placeholder' => '',
 				'css'         => [
 					[
-						$img_css_selector,
+						'selector' => $img_css_selector,
 						'property' => 'aspect-ratio',
 					],
 				],
@@ -750,7 +751,15 @@ class Element_Image extends Element {
 			$image_caption = $image_data ? $image_data->post_excerpt : '';
 		}
 
-		$has_overlay = isset( $settings['popupOverlay'] );
+		$has_overlay = false;
+
+		// Check: Loop over settings that starts with 'popupOverlay' (@since 2.1)
+		foreach ( $settings as $key => $value ) {
+			if ( strpos( $key, 'popupOverlay' ) === 0 ) {
+				$has_overlay = true;
+				break;
+			}
+		}
 
 		$has_html_tag = $image_caption || $has_overlay || isset( $settings['_gradient'] ) || isset( $settings['tag'] );
 
@@ -1041,7 +1050,22 @@ class Element_Image extends Element {
 			$custom_attributes = $this->get_custom_attributes( $settings );
 			$image_attributes  = array_merge( $image_attributes, $custom_attributes );
 
+			if ( isset( $image_attributes['width'] ) || isset( $image_attributes['height'] ) ) {
+				$this->wp_img_data = [
+					'id'     => $image_id,
+					'width'  => isset( $image_attributes['width'] ) ? intval( $image_attributes['width'] ) : 0,
+					'height' => isset( $image_attributes['height'] ) ? intval( $image_attributes['height'] ) : 0,
+				];
+
+				add_filter( 'wp_get_attachment_image_src', [ $this, 'amend_image_src' ], 10, 2 );
+			}
+
 			$output .= wp_get_attachment_image( $image_id, $image_size, false, $image_attributes );
+
+			if ( isset( $image_attributes['width'] ) || isset( $image_attributes['height'] ) ) {
+				remove_filter( 'wp_get_attachment_image_src', [ $this, 'amend_image_src' ], 10, 2 );
+				$this->wp_img_data = [];
+			}
 		} elseif ( $image_url ) {
 			if ( ! $has_html_tag && ! $link ) {
 				foreach ( $this->attributes['_root'] as $key => $value ) {
@@ -1060,7 +1084,14 @@ class Element_Image extends Element {
 		}
 
 		if ( $image_caption ) {
-			$output .= '<figcaption class="bricks-image-caption">' . $image_caption . '</figcaption>';
+			// Assign a class to the caption element based on the theme style setting (@since 2.1)
+			if ( isset( $this->theme_styles['captionCustomStyles'] ) ) {
+				$this->set_attribute( 'figcaption', 'class', 'bricks-image-caption-custom' );
+			} else {
+				$this->set_attribute( 'figcaption', 'class', 'bricks-image-caption' );
+			}
+
+			$output .= "<figcaption {$this->render_attributes( 'figcaption' )}>" . $image_caption . '</figcaption>';
 		}
 
 		if ( $link ) {
@@ -1225,5 +1256,29 @@ class Element_Image extends Element {
 		}
 
 		return $element_settings;
+	}
+
+	/**
+	 * Amend image src with width and height attributes
+	 *
+	 * @param array $image Image attributes.
+	 * @param int   $attachment_id Attachment ID.
+	 *
+	 * @return array
+	 */
+	public function amend_image_src( $image, $attachment_id ) {
+		if ( ! isset( $this->wp_img_data['id'] ) || $this->wp_img_data['id'] !== $attachment_id ) {
+			return $image;
+		}
+
+		if ( isset( $this->wp_img_data['width'] ) && $this->wp_img_data['width'] > 0 ) {
+			$image[1] = $this->wp_img_data['width'];
+		}
+
+		if ( isset( $this->wp_img_data['height'] ) && $this->wp_img_data['height'] > 0 ) {
+			$image[2] = $this->wp_img_data['height'];
+		}
+
+		return $image;
 	}
 }

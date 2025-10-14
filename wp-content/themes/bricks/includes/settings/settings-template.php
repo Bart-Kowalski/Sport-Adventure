@@ -155,45 +155,45 @@ class Settings_Template extends Settings_Base {
 				// Logo
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-logo',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-logo',
 				],
 
 				// Nav Menu
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .bricks-nav-menu > li > a',
+					'selector' => '#brx-header.brx-sticky.scrolling .bricks-nav-menu > li > a',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .bricks-nav-menu > li > .brx-submenu-toggle > *',
+					'selector' => '#brx-header.brx-sticky.scrolling .bricks-nav-menu > li > .brx-submenu-toggle > *',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-nav-menu .bricks-mobile-menu-toggle',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-nav-menu .bricks-mobile-menu-toggle',
 				],
 
 				// Nav (Nestable)
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brx-nav-nested-items > li > a',
+					'selector' => '#brx-header.brx-sticky.scrolling .brx-nav-nested-items > li > a',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brx-nav-nested-items > li > .brx-submenu-toggle > *',
+					'selector' => '#brx-header.brx-sticky.scrolling .brx-nav-nested-items > li > .brx-submenu-toggle > *',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-nav-nested > .brxe-toggle .brxa-inner',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-nav-nested > .brxe-toggle .brxa-inner',
 				],
 
 				// Search
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-search',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-search',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-search button',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-search button',
 				],
 			],
 			'required' => [
@@ -211,45 +211,45 @@ class Settings_Template extends Settings_Base {
 				// Logo
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-logo:hover',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-logo:hover',
 				],
 
 				// Nav Menu
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .bricks-nav-menu > li > a:hover',
+					'selector' => '#brx-header.brx-sticky.scrolling .bricks-nav-menu > li > a:hover',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .bricks-nav-menu > li > .brx-submenu-toggle:hover > *',
+					'selector' => '#brx-header.brx-sticky.scrolling .bricks-nav-menu > li > .brx-submenu-toggle:hover > *',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-nav-menu .bricks-mobile-menu-toggle:hover',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-nav-menu .bricks-mobile-menu-toggle:hover',
 				],
 
 				// Nav (Nestable)
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brx-nav-nested-items > li > a:hover',
+					'selector' => '#brx-header.brx-sticky.scrolling .brx-nav-nested-items > li > a:hover',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brx-nav-nested-items > li > .brx-submenu-toggle:hover > *',
+					'selector' => '#brx-header.brx-sticky.scrolling .brx-nav-nested-items > li > .brx-submenu-toggle:hover > *',
 				],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-nav-nested > .brxe-toggle:hover .brxa-inner',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-nav-nested > .brxe-toggle:hover .brxa-inner',
 				],
 
 				// // Search
 				// [
 				// 'property' => 'color',
-				// 'selector' => '#brx-header.sticky.scrolling .brxe-search',
+				// 'selector' => '#brx-header.brx-sticky.scrolling .brxe-search',
 				// ],
 				[
 					'property' => 'color',
-					'selector' => '#brx-header.sticky.scrolling .brxe-search button:hover',
+					'selector' => '#brx-header.brx-sticky.scrolling .brxe-search button:hover',
 				],
 			],
 			'required' => [
@@ -266,10 +266,10 @@ class Settings_Template extends Settings_Base {
 				[
 					'property' => 'background',
 					'selector' => '
-						#brx-header.sticky.scrolling > .brxe-section,
-						#brx-header.sticky.scrolling > .brxe-container,
-						#brx-header.sticky.scrolling > .brxe-block,
-						#brx-header.sticky.scrolling > .brxe-div',
+						#brx-header.brx-sticky.scrolling > .brxe-section,
+						#brx-header.brx-sticky.scrolling > .brxe-container,
+						#brx-header.brx-sticky.scrolling > .brxe-block,
+						#brx-header.brx-sticky.scrolling > .brxe-div',
 				],
 			],
 			'required' => [
@@ -286,10 +286,10 @@ class Settings_Template extends Settings_Base {
 				[
 					'property' => 'box-shadow',
 					'selector' => '
-						#brx-header.sticky.scrolling:not(.slide-up) > .brxe-section,
-						#brx-header.sticky.scrolling:not(.slide-up) > .brxe-container,
-						#brx-header.sticky.scrolling:not(.slide-up) > .brxe-block,
-						#brx-header.sticky.scrolling:not(.slide-up) > .brxe-div',
+						#brx-header.brx-sticky.scrolling:not(.slide-up) > .brxe-section,
+						#brx-header.brx-sticky.scrolling:not(.slide-up) > .brxe-container,
+						#brx-header.brx-sticky.scrolling:not(.slide-up) > .brxe-block,
+						#brx-header.brx-sticky.scrolling:not(.slide-up) > .brxe-div',
 				],
 			],
 			'required' => [
@@ -306,63 +306,63 @@ class Settings_Template extends Settings_Base {
 			'hasDynamicData' => false,
 			'css'            => [
 				[
-					'selector' => '#brx-header.sticky',
+					'selector' => '#brx-header.brx-sticky',
 					'property' => 'transition',
 				],
 				[
 					'selector' => '
-						#brx-header.sticky > .brxe-section,
-						#brx-header.sticky > .brxe-container,
-						#brx-header.sticky > .brxe-block,
-						#brx-header.sticky > .brxe-div',
+						#brx-header.brx-sticky > .brxe-section,
+						#brx-header.brx-sticky > .brxe-container,
+						#brx-header.brx-sticky > .brxe-block,
+						#brx-header.brx-sticky > .brxe-div',
 					'property' => 'transition',
 				],
 
 				// Logo
 				[
-					'selector' => '#brx-header.sticky .brxe-logo',
+					'selector' => '#brx-header.brx-sticky .brxe-logo',
 					'property' => 'transition',
 				],
 
 				// Nav menu
 				[
-					'selector' => '#brx-header.sticky .bricks-nav-menu > li > a',
+					'selector' => '#brx-header.brx-sticky .bricks-nav-menu > li > a',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .bricks-nav-menu > li > .brx-submenu-toggle > a',
+					'selector' => '#brx-header.brx-sticky .bricks-nav-menu > li > .brx-submenu-toggle > a',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .bricks-nav-menu > li > .brx-submenu-toggle > button > *',
+					'selector' => '#brx-header.brx-sticky .bricks-nav-menu > li > .brx-submenu-toggle > button > *',
 					'property' => 'transition',
 				],
 
 				// Nav (Nestable)
 				[
-					'selector' => '#brx-header.sticky .brx-nav-nested-items > li > a',
+					'selector' => '#brx-header.brx-sticky .brx-nav-nested-items > li > a',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .brx-nav-nested-items > li > .brx-submenu-toggle',
+					'selector' => '#brx-header.brx-sticky .brx-nav-nested-items > li > .brx-submenu-toggle',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .brx-nav-nested-items > li > .brx-submenu-toggle > *',
+					'selector' => '#brx-header.brx-sticky .brx-nav-nested-items > li > .brx-submenu-toggle > *',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .brxe-nav-nested > .brxe-toggle .brxa-inner',
+					'selector' => '#brx-header.brx-sticky .brxe-nav-nested > .brxe-toggle .brxa-inner',
 					'property' => 'transition',
 				],
 
 				// Search
 				[
-					'selector' => '#brx-header.sticky .brxe-search',
+					'selector' => '#brx-header.brx-sticky .brxe-search',
 					'property' => 'transition',
 				],
 				[
-					'selector' => '#brx-header.sticky .brxe-search button',
+					'selector' => '#brx-header.brx-sticky .brxe-search button',
 					'property' => 'transition',
 				],
 			],

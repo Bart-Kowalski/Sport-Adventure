@@ -38,7 +38,7 @@
 
 					return self::api_export_error(sprintf(
 
-						/* translators: %s = CSV file name */
+						/* translators: %s: CSV file name */
 						__('Unable to create temporary file: %s', 'ws-form'),
 
 						$csv_file_name
@@ -51,7 +51,7 @@
 
 					return self::api_export_error(sprintf(
 
-						/* translators: %s = CSV file name */
+						/* translators: %s: CSV file name */
 						__('Unable to open temporary file %s', 'ws-form'),
 
 						$csv_file_name
@@ -62,7 +62,7 @@
 			}
 
 			// Build page
-			$ws_form_submit_export = New WS_Form_Submit_Export($form_id);
+			$ws_form_submit_export = new WS_Form_Submit_Export($form_id);
 			$db_export_csv_page_return = $ws_form_submit_export->get_csv_page(
 
 				$csv_file_pointer,
@@ -116,7 +116,7 @@
 			$csv_file_name = self::api_get_csv_file_name($hash);
 
 			// Check file name
-			if(!file_exists($csv_file_name)) { throw new Exception(__('CSV file not found', 'ws-form')); }
+			if(!file_exists($csv_file_name)) { throw new Exception(esc_html__('CSV file not found', 'ws-form')); }
 
 			// Check file size
 			$csv_file_size = filesize($csv_file_name);
@@ -132,7 +132,7 @@
 				$csv_file_name_base = WS_Form_Common::filename_datestamp('ws-form-submit', 'csv');
 
 				// Open zip file
-				if($zip->open($zip_file_name, ZipArchive::CREATE) !== true) { throw new Exception(__('Unable to create zip file', 'ws-form')); }
+				if($zip->open($zip_file_name, ZipArchive::CREATE) !== true) { throw new Exception(esc_html__('Unable to create zip file', 'ws-form')); }
 
 				// Add CSV file to zip
 				$zip->addFile($csv_file_name, $csv_file_name_base);
@@ -141,7 +141,7 @@
 				$zip->close();
 
 				// Delete old CSV file
-				unlink($csv_file_name);
+				wp_delete_file($csv_file_name);
 
 				// Set CSV file name to the ZIP file
 				$csv_file_name = $zip_file_name;
@@ -168,7 +168,7 @@
 			readfile($csv_file_name);
 
 			// Delete temporary file
-			unlink($csv_file_name);
+			wp_delete_file($csv_file_name);
 
 			exit;
 		}
@@ -177,7 +177,7 @@
 		public function api_get_csv_file_name($hash, $form_id = 0) {
 
 			// Check hash
-			if(!WS_Form_Common::check_submit_hash($hash)) { throw new Exception(__('Invalid CSV hash', 'ws-form')); }
+			if(!WS_Form_Common::check_submit_hash($hash)) { throw new Exception(esc_html__('Invalid CSV hash', 'ws-form')); }
 
 			// Get submit export directory
 			$submit_export_dir = WS_Form_Common::upload_dir_create(WS_FORM_SUBMIT_EXPORT_TMP_DIR);

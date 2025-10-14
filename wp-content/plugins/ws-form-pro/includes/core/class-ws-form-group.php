@@ -71,7 +71,7 @@
 			$meta_data = (object) array_merge($meta_data, (array) $this->meta);
 
 			// Build meta data
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'group';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_update_from_object($meta_data);
@@ -79,7 +79,7 @@
 			// Build first section
 			if($create_section) {
 
-				$ws_form_section = New WS_Form_Section();
+				$ws_form_section = new WS_Form_Section();
 				$ws_form_section->form_id = $this->form_id;
 				$ws_form_section->group_id = $this->id;
 				$ws_form_section->db_create();
@@ -114,7 +114,7 @@
 			if($get_meta) {
 
 				// Read meta
-				$section_meta = New WS_Form_Meta();
+				$section_meta = new WS_Form_Meta();
 				$section_meta->object = 'group';
 				$section_meta->parent_id = $this->id;
 				$metas = $section_meta->db_read_all($bypass_user_capability_check);
@@ -124,7 +124,7 @@
 			if($get_sections) {
 
 				// Read sections
-				$ws_form_section = New WS_Form_Section();
+				$ws_form_section = new WS_Form_Section();
 				$ws_form_section->group_id = $this->id;
 				$sections = $ws_form_section->db_read_all($get_meta, false, $bypass_user_capability_check);
 				$this->sections = $group_array['sections'] = $sections;
@@ -181,7 +181,7 @@
 				foreach($groups as $key => $group) {
 
 					// Get sections
-					$ws_form_section = New WS_Form_Section();
+					$ws_form_section = new WS_Form_Section();
 					$ws_form_section->group_id = $group['id'];
 					$ws_form_section_return = $ws_form_section->db_read_all($get_meta, $checksum, $bypass_user_capability_check);
 					$groups[$key]['sections'] = $ws_form_section_return;
@@ -195,7 +195,7 @@
 					if($get_meta) {
 
 						// Get meta data for each group
-						$group_meta = New WS_Form_Meta();
+						$group_meta = new WS_Form_Meta();
 						$group_meta->object = 'group';
 						$group_meta->parent_id = $group['id'];
 						$metas = $group_meta->db_read_all($bypass_user_capability_check);
@@ -275,7 +275,7 @@
 				$rows = $form_object_conditional->groups[0]->rows;
 
 				// Read conditional in existing form
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'form';
 				$ws_form_meta->parent_id = $this->form_id;
 				$conditional = $ws_form_meta->db_get_object_meta('conditional');
@@ -346,13 +346,13 @@
 			if($wpdb->query($sql) === false) { parent::db_wpdb_handle_error(__('Error deleting group', 'ws-form')); }
 
 			// Delete meta
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'group';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_delete_by_object();
 
 			// Delete groups sections
-			$ws_form_section = New WS_Form_Section();
+			$ws_form_section = new WS_Form_Section();
 			$ws_form_section->form_id = $this->form_id;
 			$ws_form_section->group_id = $this->id;
 			$ws_form_section->db_delete_by_group(false);
@@ -360,7 +360,7 @@
 			// Repair conditional, actions and meta data to remove references to this deleted field
  			if($repair) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$ws_form_form->id = $this->form_id;
 				$ws_form_form->new_lookup['group'][$this->id] = '';
 				$ws_form_form->db_conditional_repair();
@@ -383,7 +383,7 @@
 
 			if($repair) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$ws_form_form->id = $this->form_id;
 			}
 
@@ -476,13 +476,13 @@
 			$group_id_new = $wpdb->insert_id;
 
 			// Clone meta data
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'group';
 			$ws_form_meta->parent_id = $this->id;
 			$ws_form_meta->db_clone_all($group_id_new);
 
 			// Clone groups
-			$ws_form_section = New WS_Form_Section();
+			$ws_form_section = new WS_Form_Section();
 			$ws_form_section->form_id = $this->form_id;
 			$ws_form_section->group_id = $this->id;
 			$ws_form_section->db_clone_all($group_id_new);
@@ -497,7 +497,7 @@
 			self::db_check_form_id();
 
 			// Calculate new form checksum
-			$form = New WS_Form_Form();
+			$form = new WS_Form_Form();
 			$form->id = $this->form_id;
 			$checksum = $form->db_checksum();
 
@@ -829,7 +829,7 @@
 			// Update meta
 			if(isset($group_object->meta)) {
 
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'group';
 				$ws_form_meta->parent_id = $this->id;
 				$ws_form_meta->db_update_from_object($group_object->meta, false, false, $replace_meta);
@@ -840,7 +840,7 @@
 				// Update sections
 				if(isset($group_object->sections)) {
 
-					$ws_form_section = New WS_Form_Section();
+					$ws_form_section = new WS_Form_Section();
 					$ws_form_section->group_id = $this->id;
 					$ws_form_section->db_update_from_array($group_object->sections, $new, $replace_meta);
 
@@ -882,14 +882,14 @@
 		// Check form_id
 		public function db_check_form_id() {
 
-			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID', 'ws-form')); }
+			if(absint($this->form_id) === 0) { parent::db_throw_error(__('Invalid form ID (WS_Form_Group | db_check_form_id)', 'ws-form')); }
 			return true;
 		}
 
 		// Check id
 		public function db_check_id() {
 
-			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid group ID', 'ws-form')); }
+			if(absint($this->id) === 0) { parent::db_throw_error(__('Invalid group ID (WS_Form_Group | db_check_id)', 'ws-form')); }
 			return true;
 		}
 
@@ -912,7 +912,7 @@
 			$form_tab_index = absint(WS_Form_Common::get_query_var('wsf_fti', false, $parameters));
 			if($form_tab_index !== false) {
 
-				$group_meta = New WS_Form_Meta();
+				$group_meta = new WS_Form_Meta();
 				$group_meta->object = 'form';
 				$group_meta->parent_id = $this->form_id;
 				$group_meta->db_update_from_object((object) array('tab_index' => $form_tab_index));

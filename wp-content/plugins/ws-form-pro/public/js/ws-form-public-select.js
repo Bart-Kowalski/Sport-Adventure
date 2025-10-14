@@ -2,12 +2,25 @@
 
 	'use strict';
 
+	// Select
+	$.WS_Form.prototype.form_select = function() {
+
+		if(ws_form_settings.styler_enabled) {
+
+			// Add span for down arrow
+			$('select:not([multiple]):not([size]):not([data-wsf-select2])', this.form_canvas_obj).each(function () {
+
+				$(this).after('<span class="wsf-select-arrow"></span>');
+			});
+		}
+	}
+
 	// Select2
 	$.WS_Form.prototype.form_select2 = function(obj) {
 
-		if(typeof(obj) === 'undefined') { obj = $('[data-wsf-select2]', this.form_canvas_obj); }
-
 		var ws_this = this;
+
+		if(typeof(obj) === 'undefined') { obj = $('[data-wsf-select2]', this.form_canvas_obj); }
 
 		// Check Select2 is loaded
 		if(typeof(jQuery().select2) !== 'undefined') {
@@ -89,6 +102,13 @@
 					args.maximumInputLength = parseInt(maximum_input_length, 10);
 				}
 
+				// Theme
+				var theme = ws_this.get_object_meta_value(field, 'select2_theme', '');
+				if(theme != '') {
+
+					args.theme = theme;
+				}
+
 				// Use AJAX? (Cannot be used if cascading is enabling)
 				var cascade = (ws_this.get_object_meta_value(field, field.type + '_cascade', '') == 'on');
 				var select2_ajax = !cascade && (ws_this.get_object_meta_value(field, 'select2_ajax', '') == 'on');
@@ -96,7 +116,7 @@
 
 					var field_obj = $(this);
 
-					args['ajax'] = {
+					args.ajax = {
 
 						// AJAX URL
 						url: url,
@@ -178,7 +198,7 @@
 
 				if(multiple && select2_tags) {
 
-					args['tags'] = true;
+					args.tags = true;
 				}
 
 				// Max
@@ -190,7 +210,7 @@
 					var select_max = parseInt(select_max, 10);
 					if(select_max > 0) {
 
-						args['maximumSelectionLength'] = select_max;
+						args.maximumSelectionLength = select_max;
 					}
 				}
 
@@ -200,7 +220,12 @@
 				// Autofocus
 				select2_obj.on('select2:open', function (e) {
 
-					$('.select2-search__field', $(this).parent()).get(0).focus();
+					var select2_search_field_obj = $('.select2-search__field', $(this).parent());
+
+					if(select2_search_field_obj.length) {
+
+						select2_search_field_obj.get(0).focus();
+					}
 				});
 
 				// Check for pre-population

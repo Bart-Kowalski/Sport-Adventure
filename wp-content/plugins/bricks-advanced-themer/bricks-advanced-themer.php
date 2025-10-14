@@ -12,7 +12,7 @@
  * Author:      Maxime Beguin
  * Author URI:  https://advancedthemer.com/
  * Created:     12.04.2023
- * Version:     3.3.5
+ * Version:     3.3.7
  * Text Domain: bricks-advanced-themer
  * Domain Path: /lang
  * License:     GPL v2 or later
@@ -57,7 +57,7 @@ final class BricksAdvancedThemer {
     /**
      * @var string Plugin version
      */
-    public $version = '3.3.5';
+    public $version = '3.3.7';
 
     /**
      * @var string Plugin file path
@@ -87,10 +87,9 @@ final class BricksAdvancedThemer {
         'AT__Class_Importer'    => 'classes/class_importer.php',
         'AT__Frontend'          => 'classes/frontend.php',
         'AT__Builder'           => 'classes/builder.php',
-        'AT__Integrations'      => 'classes/integrations.php',
         'AT__Ajax'              => 'classes/ajax.php',
         'AT__Conversion'        => 'classes/conversion.php',
-        'AT__Framework'        => 'classes/framework.php',
+        'AT__Framework'         => 'classes/framework.php',
     ];
 
     /**

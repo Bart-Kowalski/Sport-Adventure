@@ -1,5 +1,8 @@
 <?php
 
+$slug = 'test-options-page';
+
+
 	class WS_Form_JetEngine {
 
 		public static $jetengine_fields = array();
@@ -12,20 +15,43 @@
 
 			$fields_found = false;
 
-			// If retrieving user context then object should be null
-			if($context == 'user') { $object = null; }
-
 			// Get JetEngine groups
 			if($context !== false) {
 
-				$jetengine_groups = jet_engine()->meta_boxes->get_fields_for_context($context, $object);
+				switch($context) {
+
+					case 'post_type' :
+
+						// Get groups
+						$jetengine_groups = jet_engine()->meta_boxes->get_fields_for_context('post_type', $object);
+
+						break;
+
+					case 'user' :
+
+						// Get groups
+						$jetengine_groups = jet_engine()->meta_boxes->get_fields_for_context('user', null);
+
+						// If retrieving user context then object should always be null
+						$object = null;
+
+						break;
+
+					case 'options_pages' :
+
+						// Get groups
+						$jetengine_groups = self::jetengine_get_jetengine_options_pages_fields($object);
+
+						break;
+				}
 
 			} else {
 
 				$jetengine_groups = array_merge(
 
 					jet_engine()->meta_boxes->get_fields_for_context('post_type', null),
-					jet_engine()->meta_boxes->get_fields_for_context('user', null)
+					jet_engine()->meta_boxes->get_fields_for_context('user', null),
+					self::jetengine_get_jetengine_options_pages_fields(null)
 				);
 			}
 
@@ -34,11 +60,23 @@
 				$jetengine_groups = array($object => $jetengine_groups);
 			}
 
-			if($context !== 'user') {
+			// Get data for group names
+			switch($context) {
 
-				$post_types = get_post_types([], 'objects');
+				case 'post_type' :
+	
+					// Get post types
+					$post_types = get_post_types([], 'objects');
+					break;
+
+				case 'options_pages' :
+
+					// Get options pages
+					$options_pages = self::jetengine_get_jetengine_options_pages();
+					break;
 			}
 
+			// Process JetEngine groups
 			foreach($jetengine_groups as $object => $jetengine_fields) {
 
 				// Has fields?
@@ -47,6 +85,18 @@
 				// Group name
 				switch($context) {
 
+					case 'options_pages' :
+
+						$labels = maybe_unserialize($options_pages[$object]['labels']);
+
+						$jetengine_field_group_name = isset($labels['name']) ? $labels['name'] : __('Unknown', 'ws-form');
+						break;
+
+					case 'post_type' :
+
+						$jetengine_field_group_name = isset($post_types[$object]) ? $post_types[$object]->labels->singular_name : __('Unknown', 'ws-form');
+						break;
+
 					case 'user' :
 
 						$jetengine_field_group_name = __('User', 'ws-form');;
@@ -54,7 +104,7 @@
 
 					default :
 
-						$jetengine_field_group_name = isset($post_types[$object]) ? $post_types[$object]->labels->singular_name : __('Unknown', 'ws-form');
+						$jetengine_field_group_name = __('Unknown', 'ws-form');;
 				}
 
 				// Process fields
@@ -62,6 +112,57 @@
 			}
 
 			return $has_fields ? $fields_found : $options_jetengine;
+		}
+
+		// Get fields for options pages
+		public static function jetengine_get_jetengine_options_pages_fields($object = false) {
+
+			$options_pages = jet_engine()->options_pages->data->get_items();
+
+			$jetengine_groups = array();
+
+			foreach($options_pages as $options_page) {
+
+				if(
+					!isset($options_page['slug']) ||
+					!isset($options_page['meta_fields'])
+				) {
+					continue;
+				}
+
+				$slug = $options_page['slug'];
+
+				if(!empty($object) && ($slug == $object)) {
+
+					return maybe_unserialize($options_page['meta_fields']);
+				}
+
+				$jetengine_groups[$slug] = maybe_unserialize($options_page['meta_fields']);
+			}
+
+			return $jetengine_groups;
+		}
+
+		// Get options pages
+		public static function jetengine_get_jetengine_options_pages() {
+
+			$options_pages = jet_engine()->options_pages->data->get_items();
+
+			$options_pages_return = array();
+
+			foreach($options_pages as $options_page) {
+
+				if(
+					!isset($options_page['slug']) ||
+					!isset($options_page['labels'])
+				) {
+					continue;
+				}
+
+				$options_pages_return[$options_page['slug']] = $options_page;
+			}
+
+			return $options_pages_return;
 		}
 
 		// Get fields
@@ -198,6 +299,12 @@
 
 			$return_array = array();
 
+			if($context == 'options_pages') {
+
+				$options_page = jet_engine()->options_pages->registered_pages[$object];
+				if(empty($options_page)) { return $return_array; }
+			}
+
 			foreach($fields as $field) {
 
 				$field_name = $field['name'];
@@ -215,6 +322,11 @@
 					case 'user' :
 
 						$field_value = get_user_meta($object_id, $field_name, true);
+						break;
+
+					case 'options_pages' :
+
+						$field_value = $options_page->get($field_name);
 						break;
 				}
 
@@ -1045,6 +1157,8 @@
 				case 'time' :
 				case 'datetime-local' :
 
+					if($meta_value == '') { return ''; }
+
 					$jetengine_field_settings = self::jetengine_get_field_settings($jetengine_field_name, $context);
 					if($jetengine_field_settings === false) { return ''; }
 
@@ -1089,7 +1203,7 @@
 
 				case 'switcher' :
 
-					return empty($meta_value) ? 'false' : 'true';
+					return WS_Form_Common::is_true($meta_value) ? 'true' : 'false';
 
 				case 'select' :
 				case 'posts' :

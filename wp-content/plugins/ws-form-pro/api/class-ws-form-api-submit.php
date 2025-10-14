@@ -10,7 +10,7 @@
 		public function __construct() {
 
 			// Initialize
-			$this->ws_form_submit = New WS_Form_Submit();
+			$this->ws_form_submit = new WS_Form_Submit();
 			$this->duration_server_start = microtime(true);
 			$this->spam_level = null;
 
@@ -115,11 +115,8 @@
 				// Set up action
 				add_action('wsf_actions_post_complete', array($this, 'api_post_complete'), 10, 2);
 
-				// Get action_id
-				$action_id = absint(WS_Form_Common::get_query_var_nonce('wsf_action_id'));
-
 				// Process all actions
-				do_action('wsf_actions_post', $form_object, $this->ws_form_submit, 'wsf_actions_post_complete', $action_id, false, true);
+				do_action('wsf_actions_post', $form_object, $this->ws_form_submit, 'wsf_actions_post_complete', $this->ws_form_submit->row_id_filter, false, true);
 
 			} catch(\Throwable $e) {
 
@@ -263,7 +260,6 @@
 
 			return array('error' => false);
 		}
-
 		// API - PUT
 		public function api_put($parameters) {
 

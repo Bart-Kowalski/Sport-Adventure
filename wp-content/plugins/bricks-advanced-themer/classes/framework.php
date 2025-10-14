@@ -4,8 +4,7 @@ if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 
 
-class AT__Framework
-{
+class AT__Framework {
     static public $at_framework = [
         "values" => [
             "variables_cat" => '
@@ -11892,4 +11891,56 @@ class AT__Framework
                 ]'
         ]
     ];
+
+    public static function manage_stagger_class( $attributes, $key, $element ) {
+        if ( $key !== '_root' ) {
+            return $attributes;
+        }
+    
+        if ( ! is_object( $element ) || ! isset( $element->element ) || ! is_array( $element->element ) ) {
+            return $attributes;
+        }
+    
+        $element_data = $element->element;
+        $element_settings = $element_data['settings'] ?? [];
+        $element_global_classes = $element_settings['_cssGlobalClasses'] ?? [];
+    
+        if ( ! is_array( $element_global_classes ) || empty( $element_global_classes ) ) {
+            return $attributes;
+        }
+    
+        $trigger_classes = [ 'at_anim-stagger' ];
+        $has_trigger_class = ! empty( array_intersect( $trigger_classes, $element_global_classes ) );
+    
+        if ( ! $has_trigger_class ) {
+            return $attributes;
+        }
+    
+        $element_children = $element_data['children'] ?? [];
+    
+        if ( ! is_array( $element_children ) || empty( $element_children ) ) {
+            return $attributes;
+        }
+    
+        $index = 0;
+    
+        foreach ( $element_children as $child_id ) {
+            add_filter( 'bricks/element/render_attributes', function( $attributes, $key, $element ) use ( $child_id, &$index ) {
+                if ( $key !== '_root' || ! is_object( $element ) || $element->id !== $child_id ) {
+                    return $attributes;
+                }
+    
+                if ( isset( $attributes['_root']['style'] ) ) {
+                    $attributes['_root']['style'] = rtrim( $attributes['_root']['style'], ';' ) . ";--at-index:{$index};";
+                } else {
+                    $attributes['_root']['style'] = "--at-index:{$index};";
+                }
+    
+                $index++;
+                return $attributes;
+            }, 10, 3 );
+        }
+    
+        return $attributes;
+    }
 }

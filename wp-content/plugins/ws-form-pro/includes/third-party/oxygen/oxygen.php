@@ -1,14 +1,8 @@
 <?php 
 
-	add_action('plugins_loaded', function () {
+	try {
 
-		if(class_exists('OxyEl')) {
+		include_once 'class-ws-form-oxygen.php';
+		include_once 'elements/class-oxyel-ws-form-form.php';
 
-			try {
-
-				include_once 'class-ws-form-oxygen.php';
-				include_once 'elements/class-oxyel-ws-form-form.php';
-
-			} catch (Exception $e) {}
-		}
-	});
+	} catch (Exception $e) {}

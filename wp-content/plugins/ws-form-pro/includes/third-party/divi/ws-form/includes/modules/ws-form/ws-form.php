@@ -4,6 +4,7 @@
 
 		public $slug       = 'ws_form_divi';
 		public $vb_support = 'on';
+		public $icon_path  = '';
 
 		public function init() {
 
@@ -47,7 +48,9 @@
 
 					'label'				=> __('Form', 'ws-form'),
 					'type'				=> 'select',
-					'options'			=> array('0' => __('Select form...', 'ws-form')) + WS_Form_Common::get_forms_array(false),
+
+					// In Divi, if the first array element has a key of '0' or <blank>, then Divi renders the options with values that matches the labels, so we have to put 'Select form...' as last element (?!)
+					'options'			=> WS_Form_Common::get_forms_array(false) + array('0' => __('Select form...', 'ws-form')),
 					'option_category'	=> 'basic_option',
 					'description'		=> __('Select the form that you would like to use for this Divi module.', 'ws-form'),
 					'toggle_slug'		=> 'ws_form_divi_form_id'

@@ -68,6 +68,7 @@ class Builder_Permissions {
 					'access_theme_styles'              => esc_html__( 'Access theme styles', 'bricks' ),
 					'edit_color_palettes'              => esc_html__( 'Access color palettes', 'bricks' ),
 					'access_variable_manager'          => esc_html__( 'Access variable manager', 'bricks' ),
+					'access_query_manager'             => esc_html__( 'Access query manager', 'bricks' ),
 					'access_class_manager'             => esc_html__( 'Access class manager', 'bricks' ),
 					'create_global_classes'            => esc_html__( 'Create global classes', 'bricks' ),
 					'edit_global_classes'              => esc_html__( 'Edit global classes', 'bricks' ),

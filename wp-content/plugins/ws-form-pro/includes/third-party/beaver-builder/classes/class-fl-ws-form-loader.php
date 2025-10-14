@@ -11,7 +11,7 @@ class FL_WS_Form_Loader {
 	 */
 	static public function init() {
 
-		add_action( 'plugins_loaded', __CLASS__ . '::setup_hooks' );
+		self::setup_hooks();
 	}
 	
 	/**
@@ -30,7 +30,7 @@ class FL_WS_Form_Loader {
 			// Disable debug
 			add_filter('wsf_debug_enabled', function($debug_render) { return false; }, 10, 1);
 
-			// Enqueue all WS Form scripts
+			// Visual builder enqueues
 			add_action('wp_enqueue_scripts', function() { do_action('wsf_enqueue_core'); });
 		}
 		
@@ -49,7 +49,7 @@ class FL_WS_Form_Loader {
 	static public function get_forms() {
 
 		// Build form list
-		$ws_form_form = New WS_Form_Form();
+		$ws_form_form = new WS_Form_Form();
 		$forms = $ws_form_form->db_read_all('', "NOT (status = 'trash')", 'label ASC', '', '', false, true);
 		$form_array = array('0' => __('Select form...', 'ws-form'));
 

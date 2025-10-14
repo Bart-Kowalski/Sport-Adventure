@@ -37,9 +37,10 @@ class Init {
 			);
 		}
 
-		$form_element_id = isset( $_POST['formId'] ) ? sanitize_text_field( $_POST['formId'] ) : '';
-		$post_id         = isset( $_POST['postId'] ) ? absint( $_POST['postId'] ) : 0;
-		$loop_post_id    = isset( $submitted_data['loopId'] ) ? absint( $submitted_data['loopId'] ) : 0; // Get query loop post ID to parse dynamic data (@since 1.11.1)
+		$form_element_id   = isset( $_POST['formId'] ) ? sanitize_text_field( $_POST['formId'] ) : '';
+		$form_component_id = isset( $_POST['componentId'] ) ? sanitize_text_field( $_POST['componentId'] ) : ''; // (@since 2.1)
+		$post_id           = isset( $_POST['postId'] ) ? absint( $_POST['postId'] ) : 0;
+		$loop_post_id      = isset( $submitted_data['loopId'] ) ? absint( $submitted_data['loopId'] ) : 0; // Get query loop post ID to parse dynamic data (@since 1.11.1)
 
 		$this->form_settings = \Bricks\Helpers::get_element_settings( $post_id, $form_element_id );
 		$this->form_id       = $form_element_id;
@@ -47,9 +48,37 @@ class Init {
 
 		// No form settings found: Try to get from component element (@since 1.12.2)
 		if ( empty( $this->form_settings ) ) {
+			// Find the element from component data
 			$component_element = \Bricks\Helpers::get_component_element_by_id( $form_element_id );
-			if ( ! empty( $component_element['settings'] ) ) {
+
+			// This form element is a component as well (@since 2.1)
+			if ( $form_component_id && $component_element ) {
+				// Get the component instance settings (@since 2.1)
+				$component_instance_settings = \Bricks\Helpers::get_component_instance( $component_element, 'settings' );
+
+				if ( ! empty( $component_instance_settings ) ) {
+					$this->form_settings = $component_instance_settings;
+				}
+			}
+
+			// This is a normal form inside a component
+			elseif ( isset( $component_element['settings'] ) ) {
 				$this->form_settings = $component_element['settings'];
+			}
+
+			// Fallback: Special handling for components as blocks
+			if ( empty( $this->form_settings ) && $form_component_id && strpos( $form_element_id, $form_component_id . '-' ) === 0 ) {
+				// Get form settings directly from component
+				$component = \Bricks\Helpers::get_component_by_cid( $form_component_id );
+
+				if ( $component && isset( $component['elements'] ) ) {
+					foreach ( $component['elements'] as $element ) {
+						if ( isset( $element['name'] ) && $element['name'] === 'form' && isset( $element['settings'] ) ) {
+							$this->form_settings = $element['settings'];
+							break;
+						}
+					}
+				}
 			}
 		}
 
@@ -374,6 +403,14 @@ class Init {
 		// STEP: Run selected form submit 'actions'
 		$available_actions = self::get_available_actions();
 
+		// Always set 'redirect' as last action if enabled (@since 2.1)
+		if ( in_array( 'redirect', $this->form_settings['actions'], true ) ) {
+			// Remove 'redirect' from actions
+			$this->form_settings['actions'] = array_diff( $this->form_settings['actions'], [ 'redirect' ] );
+			// Add 'redirect' as last action
+			$this->form_settings['actions'][] = 'redirect';
+		}
+
 		foreach ( $this->form_settings['actions'] as $form_action ) {
 			// Skip if not a valid built-in action and no custom action handler exists (@since 1.12.2)
 			if ( ! array_key_exists( $form_action, $available_actions ) && ! has_action( "bricks/form/action/{$form_action}" ) ) {
@@ -450,6 +487,11 @@ class Init {
 			'type'    => 'success',
 			'message' => isset( $form_settings['successMessage'] ) ? $this->render_data( $form_settings['successMessage'] ) : esc_html__( 'Success', 'bricks' ),
 		];
+
+		// Action 'updatePost': Set reset to false (@since 2.1)
+		if ( ! empty( $this->form_settings['actions'] ) && is_array( $this->form_settings['actions'] ) && in_array( 'update-post', $this->form_settings['actions'], true ) ) {
+			$response['reset'] = false;
+		}
 
 		if ( empty( $this->results ) ) {
 			wp_send_json_success( $response );
@@ -927,6 +969,8 @@ class Init {
 			'registration'   => esc_html__( 'User registration', 'bricks' ),
 			'lost-password'  => esc_html__( 'Lost password', 'bricks' ),
 			'reset-password' => esc_html__( 'Reset password', 'bricks' ),
+			'create-post'    => esc_html__( 'Create post', 'bricks' ), // @since 2.1
+			'update-post'    => esc_html__( 'Update post', 'bricks' ), // @since 2.1
 		];
 
 		if ( \Bricks\Database::get_setting( 'passwordProtectionEnabled', false ) ) {
@@ -1079,5 +1123,62 @@ class Init {
 	 */
 	public static function get_submission_url_param( $parameter ) {
 		return self::$submission_url_params[ $parameter ] ?? '';
+	}
+
+	/**
+	 * Get ACF field key from meta key
+	 *
+	 * @since 2.1
+	 */
+	public static function get_acf_field_key_from_meta_key( $meta_key = '', $post_id = '', $post_type = '' ) {
+		$acf_field_key = '';
+
+		// Return empty if ACF is not active
+		if ( ! function_exists( 'acf_get_field_groups' ) ) {
+			return $acf_field_key;
+		}
+
+		// Get field key from field groups associated with the post
+		$group_query_args = [];
+
+		if ( ! empty( $post_id ) ) {
+			$group_query_args['post_id'] = $post_id;
+		}
+
+		if ( ! empty( $post_type ) ) {
+			$group_query_args['post_type'] = $post_type;
+		}
+
+		$groups = acf_get_field_groups( $group_query_args );
+		foreach ( $groups as $group ) {
+			$fields = ! empty( $group['key'] ) ? acf_get_fields( $group['key'] ) : [];
+			foreach ( $fields as $field ) {
+				if ( ! empty( $field['name'] ) && $field['name'] === $meta_key ) {
+					$acf_field_key = $field['key'];
+				}
+			}
+		}
+
+		return $acf_field_key;
+	}
+
+	/**
+	 * Get Meta Box field key from meta key
+	 *
+	 * @since 2.1
+	 */
+	public static function get_meta_box_field_key_from_meta_key( $meta_key, $post_id ) {
+		// Return empty if Meta Box is not active
+		if ( ! function_exists( 'rwmb_get_object_fields' ) ) {
+			return '';
+		}
+
+		// Check if meta key exists in Meta Box fields
+		$groups = rwmb_get_object_fields( $post_id );
+		if ( isset( $groups[ $meta_key ] ) ) {
+			return $meta_key;
+		}
+
+		return '';
 	}
 }

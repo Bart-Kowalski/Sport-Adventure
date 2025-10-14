@@ -21,17 +21,8 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Search', 'ws-form');
-
-			// Set label for actions pull down
-			$this->label_action = __('Run WordPress Search', 'ws-form');
-
 			// Events
 			$this->events = array('submit');
-
-			// Register action
-			parent::register($this);
 
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
@@ -41,6 +32,21 @@
 				// Search filters
 				add_filter('pre_get_posts', array($this, 'pre_get_posts'));
 			}
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Search', 'ws-form');
+
+			// Set label for actions pull down
+			$this->label_action = __('Run WordPress Search', 'ws-form');
+
+			// Register action
+			parent::register($this);
 		}
 
 		public function pre_get_posts($query) {
@@ -55,7 +61,7 @@
 			// Read form
 			$ws_form_form = new WS_Form_Form();
 			$ws_form_form->id = $form_id;
-			$form_object = $ws_form_form->db_read();
+			$form_object = $ws_form_form->db_read(true, false, false, false, true);
 
 			// Get search action
 			$actions = WS_Form_Action::get_form_actions($form_object, false, 0, $this->id);
@@ -107,12 +113,18 @@
 			$search_url = sprintf('/?%s', http_build_query($params));
 
 			// Redirect
-			parent::success(sprintf(__('Search added to queue: %s', 'ws-form'), $search_query), array(
+			parent::success(sprintf(
+
+				/* translators: %s: Search query */
+				__('Search added to queue: %s', 'ws-form'),
+				esc_html($search_query)
+
+			), array(
 
 				array(
 
 					'action'					=> 'redirect',
-					'url' 						=> WS_Form_Common::parse_variables_process($search_url, $form, $submit),
+					'url' 						=> esc_url(WS_Form_Common::parse_variables_process($search_url, $form, $submit)),
 				)
 			));
 		}

@@ -12,6 +12,9 @@ class Templates {
 	// All generated inline CSS identifiers (@since 1.9.1)
 	public static $generated_inline_identifier = [];
 
+	// Flag to avoid assigning templates to hooks multiple times (@since 2.0.2)
+	private static $assigned_templates_to_hooks = false;
+
 	public function __construct() {
 		add_filter( 'init', [ $this, 'register_post_type' ] );
 
@@ -498,11 +501,34 @@ class Templates {
 	 *
 	 * @since 1.0
 	 */
-	public static function get_remote_template_settings() {
+	public static function get_remote_template_settings( $template_source = '' ) {
 		$all_remote_templates = [];
 
+		// Group: Bricks
+		$all_remote_templates[] = [
+			'url'  => 'bricksTemplatesGroupTitle',
+			'name' => 'Bricks',
+		];
+
+		// Bricks: Wireframes
+		$all_remote_templates[] = [
+			'id'   => 'wireframes',
+			'name' => esc_html__( 'Wireframes', 'bricks' ),
+			'info' => esc_html__( 'Wireframes provide basic structural templates that serve as a starting point for designing a layout. They are based on classes and variables.', 'bricks' ) . ' (' . Helpers::article_link( 'wireframe-templates', esc_html__( 'Learn more', 'bricks' ) ) . ')',
+		];
+
+		// Bricks: Design sets (Karlson, Auron, Velora, etc.)
+		$all_remote_templates[] = [
+			'id'   => 'design-sets',
+			'name' => esc_html__( 'Design sets', 'bricks' ),
+		];
+
 		// Get community templates
-		$all_remote_templates[] = [ 'url' => BRICKS_REMOTE_URL ];
+		// TODO NEXT: Delete when Bricks community wireframes & design sets are ready!
+		$all_remote_templates[] = [
+			'id'   => 'community-templates',
+			'name' => esc_html__( 'Community templates', 'bricks' ),
+		];
 
 		// Get single remote template (Bricks > Settings > Templates) @pre 1.9.4
 		$single_remote_template_url      = Database::get_setting( 'remoteTemplatesUrl' );
@@ -518,9 +544,38 @@ class Templates {
 		// Get remote templates (Bricks > Settings > Templates) @since 1.9.4
 		$remote_templates = Database::get_setting( 'remoteTemplates' ) ?? false;
 
-		if ( is_array( $remote_templates ) ) {
-			// Append remote templates to all remote templates
-			$all_remote_templates = array_merge( $all_remote_templates, $remote_templates );
+		if ( is_array( $remote_templates ) && ! empty( $remote_templates ) ) {
+			// Group: Remote templates
+			$all_remote_templates[] = [
+				'name' => esc_html__( 'Remote templates', 'bricks' ),
+				'url'  => 'remoteTemplatesGroupTitle',
+			];
+
+			foreach ( $remote_templates as $remote_template ) {
+				if ( ! empty( $remote_template['url'] ) ) {
+					// Add remote template to all remote templates
+					$all_remote_templates[] = [
+						'name'     => $remote_template['name'] ?? '',
+						'url'      => $remote_template['url'] ?? '',
+						'password' => $remote_template['password'] ?? '',
+					];
+				}
+			}
+		}
+
+		// Return specific template by source (url, id)
+		if ( $template_source ) {
+			$template = null;
+			foreach ( $all_remote_templates as $remote_template ) {
+				if ( ! empty( $remote_template['url'] ) && $remote_template['url'] === $template_source || ! empty( $remote_template['id'] ) && $remote_template['id'] === $template_source ) {
+					$template = $remote_template;
+					break;
+				}
+			}
+
+			if ( $template ) {
+				return $template;
+			}
 		}
 
 		return $all_remote_templates;
@@ -534,37 +589,31 @@ class Templates {
 	 * @since 1.0
 	 */
 	public static function get_remote_templates_data() {
-		$source                   = $_POST['source'] ?? '';
-		$remote_template_settings = self::get_remote_template_settings();
-		$remote_template_url      = '';
-		$remote_template_password = '';
+		$template_source   = $_POST['templateSource'] ?? '';
+		$template_settings = self::get_remote_template_settings( $template_source );
 
-		// Get remote template 'url' and 'password'
-		foreach ( $remote_template_settings as $template_settings ) {
-			if ( isset( $template_settings['url'] ) && $template_settings['url'] === $source ) {
-				$remote_template_url      = $template_settings['url'];
-				$remote_template_password = $template_settings['password'] ?? '';
-			}
-		}
+		$request_url = Api::get_endpoint( 'get-templates-data', $template_source );
 
-		$request_url = Api::get_endpoint( 'get-templates-data', $source );
-		$request_url = add_query_arg( [ 'site' => get_site_url() ], $request_url );
+		// Is a Bricks template request
+		$template_source_id = $template_settings['id'] ?? ''; // wireframes, design-sets, community-templates, etc. (@since 2.0)
+		if ( $template_source_id ) {
+			$request_url = Api::get_endpoint( 'get-templates-data', BRICKS_REMOTE_URL );
 
-		if ( $remote_template_password ) {
-			$request_url = add_query_arg( [ 'password' => urlencode( $remote_template_password ) ], $request_url );
-		}
+			$request_url = add_query_arg( [ 'source' => $template_source_id ], $request_url );
 
-		// Community templates: Send license key
-		// TODO NOTE: Currently not being checked on Bricks community templates site
-		if ( $source == BRICKS_REMOTE_URL ) {
+			// Send license key for verification (no active license key, no templates)
 			$request_url = add_query_arg( [ 'licenseKey' => License::$license_key ], $request_url );
 		}
 
-		$request_url = add_query_arg( [ 'time' => time() ], $request_url );
+		// Add site URL to the request URL
+		$request_url = add_query_arg( [ 'site' => get_site_url() ], $request_url );
 
-		if ( strpos( $request_url, 'bricksbuilder.io/wp-json' ) !== false ) {
-			$request_url = str_replace( 'bricksbuilder.io/wp-json', 'bricksbuilder.io/api/', $request_url );
+		// Add password if provided
+		if ( ! empty( $template_settings['password'] ) ) {
+			$request_url = add_query_arg( [ 'password' => urlencode( $template_settings['password'] ) ], $request_url );
 		}
+
+		$request_url = add_query_arg( [ 'time' => time() ], $request_url );
 
 		$response = Helpers::remote_get( $request_url );
 
@@ -2113,6 +2162,13 @@ class Templates {
 		// Return: In builder
 		if ( bricks_is_builder() ) {
 			return;
+		}
+
+		// Avoid assigning template to hooks multiple times (@since 2.0.2)
+		if ( ! self::$assigned_templates_to_hooks ) {
+			self::$assigned_templates_to_hooks = true;
+		} else {
+			return; // Already assigned templates to hooks
 		}
 
 		// Get all available templates once in case Database::set_active_templates not triggered (#86c417v88)

@@ -24,9 +24,6 @@ class AT__Admin{
     }
 
     public static function add_plugin_links($links) {
-
-        global $brxc_acf_fields;
-
         if( AT__Helpers::return_user_role_check() === true ) {
             // Setting Page
             $url_settings = esc_url( add_query_arg(
@@ -97,222 +94,11 @@ class AT__Admin{
         );
 
         $admin_bar->add_node( $args );
-        
     }
 
-    public static function color_palette_cpt_init() {
-
-        global $brxc_acf_fields;
-
-        if ( !AT__Helpers::is_global_colors_category_activated() ) {
-
-            return;
-
-        }
-
-        $args = [
-            'label'  => esc_html__( 'Color Palettes', 'text-domain' ),
-            'labels' => [
-                'menu_name'          => esc_html__( 'Color Palettes', 'bricks-advanced-themer' ),
-                'name_admin_bar'     => esc_html__( 'Color Palette', 'bricks-advanced-themer' ),
-                'add_new'            => esc_html__( 'Add Color Palette', 'bricks-advanced-themer' ),
-                'add_new_item'       => esc_html__( 'Add new Color Palette', 'bricks-advanced-themer' ),
-                'new_item'           => esc_html__( 'New Color Palette', 'bricks-advanced-themer' ),
-                'edit_item'          => esc_html__( 'Edit Color Palette', 'bricks-advanced-themer' ),
-                'view_item'          => esc_html__( 'View Color Palette', 'bricks-advanced-themer' ),
-                'update_item'        => esc_html__( 'View Color Palette', 'bricks-advanced-themer' ),
-                'all_items'          => esc_html__( 'AT - Color Palettes', 'bricks-advanced-themer' ),
-                'search_items'       => esc_html__( 'Search Color Palettes', 'bricks-advanced-themer' ),
-                'parent_item_colon'  => esc_html__( 'Parent Color Palette', 'bricks-advanced-themer' ),
-                'not_found'          => esc_html__( 'No Color Palettes found', 'bricks-advanced-themer' ),
-                'not_found_in_trash' => esc_html__( 'No Color Palettes found in Trash', 'bricks-advanced-themer' ),
-                'name'               => esc_html__( 'Color Palettes', 'bricks-advanced-themer' ),
-                'singular_name'      => esc_html__( 'Color Palette', 'bricks-advanced-themer' ),
-            ],
-            'public'              => false,
-            'exclude_from_search' => true,
-            'publicly_queryable'  => false,
-            'show_ui'             => true,
-            'show_in_nav_menus'   => true,
-            'show_in_admin_bar'   => false,
-            'show_in_rest'        => false,
-            'capability_type'     => 'post',
-            'hierarchical'        => false,
-            'has_archive'         => false,
-            'query_var'           => false,
-            'can_export'          => true,
-            'rewrite_no_front'    => false,
-            'menu_icon'           => 'dashicons-art',
-            'show_in_menu'        => false,
-            'supports'            => array( 'title', 'revisions'),
-            'rewrite' => true
-        ];
-
-        if (!AT__Helpers::return_user_role_check() === true){
-
-            unset($args['show_in_menu']);
-            $args['show_in_nav_menus'] = false;
-            $args['show_ui'] = false;
-
-        }
-    
-        register_post_type( 'brxc_color_palette', $args );
-
-    }
     public static function remove_theme_settings_from_bricks_menu( $menu_order ) {
-
         if (AT__Helpers::return_user_role_check() === false){
-
             remove_submenu_page('bricks', 'bricks-advanced-themer');
-
-        }
-
-    }
-
-    // public static function remove_templates_from_menu() {
-
-    //     if (!class_exists('Bricks\Capabilities')) {
-    //         return;
-    //     }
-
-    //     global $brxc_acf_fields;
-    //     if(\Bricks\Capabilities::current_user_has_full_access() !== true && AT__Helpers::is_strict_editor_view_elements_tab_activated() && AT__Helpers::in_array('remove-template-settings-links', $brxc_acf_fields, 'strict_editor_view_tweaks')){
-    //         remove_menu_page( 'bricks' );
-
-    //     }
-    // }
-
-    // public static function remove_templates_from_toolbar() {
-
-    //     if (!class_exists('Bricks\Capabilities')) {
-    //         return;
-    //     }
-
-    //     global $brxc_acf_fields;
-    //     global $wp_admin_bar;
-
-    //     if(!\Bricks\Capabilities::current_user_has_full_access() === true && AT__Helpers::is_strict_editor_view_elements_tab_activated() && AT__Helpers::in_array('remove-template-settings-links', $brxc_acf_fields, 'strict_editor_view_tweaks')){
-
-    //         $wp_admin_bar->remove_menu('edit_with_bricks_header');
-    //         $wp_admin_bar->remove_menu('edit_with_bricks_footer');
-    //         $wp_admin_bar->remove_menu('bricks_settings');
-    //         $wp_admin_bar->remove_menu('bricks_templates');
-    //         $wp_admin_bar->remove_menu('editor_mode');
-
-    //     }
-
-    // }
-
-    /* ADD THE CUSTOM COLUMN INSIDE THE Before/After image CPT */
-    public static function manage_brxc_color_palette_posts_columns_callback($columns) {
-
-        // Deprecated in 1.4
-        global $brxc_acf_fields;
-
-        if($brxc_acf_fields['color_cpt_deprecated']) return;
-        //
-
-        $new = array(
-        "cb" => "<input type=\"checkbox\" />",
-        );
-
-        foreach( $columns as $key => $title ) {
-
-            if ( $key=='title' ) {
-
-                $new[$key] = $title;
-
-            }
-
-            if ( $key=='date' ) {
-
-                $new['colors'] = 'Colors';
-
-                $new['shades'] = 'Shades';
-
-                $new['darkmode'] = 'Darkmode';
-
-                $new['json'] = 'JSON';
-
-                $new['prefix'] = 'Prefix';
-
-                $new[$key] = $title;
-
-            }
-
-        }
-
-        return $new;
-
-    }
-
-    
-    /* POPULATE THE ACF VALUE INSIDE EACH COLUMN */
-    public static function colors_custom_column( $column, $post_id ) {
-
-        // Deprecated in 1.4
-        global $brxc_acf_fields;
-
-        if($brxc_acf_fields['color_cpt_deprecated']) return;
-        //
-
-        switch ( $column ) {
-
-            case 'colors':
-
-                echo '<style>.brxc-colors-wrapper{display:flex;flex-wrap:wrap;gap:.3rem;}.brxc-color-div{width:30px;height:30px;border-radius:50%;}</style>';
-
-                echo '<div class="brxc-colors-wrapper">';
-
-                if( have_rows( 'brxc_colors_repeater' ) ) :
-
-                    while( have_rows( 'brxc_colors_repeater' ) ):
-
-                        the_row();
-
-                        $color = get_sub_field( 'brxc_color_hex' );
-
-                        echo (isset($color) && $color) ? '<div class="brxc-color-div" style="background-color: ' . sanitize_hex_color( $color ) . ' "></div>' : '';
-
-                    endwhile;
-
-                endif;
-
-                echo '</div>';
-
-            break;
-
-            case 'shades':
-
-                $shades = get_field('brxc_enable_shapes');
-
-                echo (isset($shades) && $shades) ? 'Enabled' : 'Disabled';
-
-            break;
-
-            case 'darkmode':
-
-                $darkmode = get_field('brxc_enable_dark_mode');
-
-                echo (isset($darkmode) && $darkmode) ? 'Enabled' : 'Disabled';
-
-            break;
-
-            case 'json':
-
-                $json = get_field('brxc_import_from_json');
-
-                echo (isset($json) && $json) ? 'Yes' : 'No';
-
-            break;
-
-            case 'prefix':
-
-                $prefix = get_field('brxc_variable_prefix');
-
-                echo ( isset($prefix) && $prefix ) ? '"' . $prefix . '"' : 'Disabled';
-
-            break;
 
         }
 
@@ -396,133 +182,89 @@ class AT__Admin{
 
         wp_add_inline_style( 'bricks-advanced-themer-backend', $gutenberg_colors_frontend_css );
     }
-    public static function enqueue_builder_scripts() {
 
-        if (!class_exists('Bricks\Capabilities') || !function_exists('bricks_is_builder') || !bricks_is_builder()) {
-            
+    public static function enqueue_builder_scripts_strict_editor() {
+        if (!class_exists('Bricks\Capabilities') || !function_exists('bricks_is_builder') || !bricks_is_builder() || \Bricks\Capabilities::current_user_has_full_access()) {
             return;
         }
 
         global $brxc_acf_fields;
 
-        if( \Bricks\Capabilities::current_user_has_full_access() !== true){
-            wp_enqueue_style( 'bricks-advanced-themer' );
+        wp_enqueue_style( 'bricks-advanced-themer' );
+        
+
+        // Return if the Strict Editor View isn't enabled
+        if( !AT__Helpers::is_strict_editor_view_category_activated()) {
+            return;
         }
 
-        if( \Bricks\Capabilities::current_user_has_full_access() !== true && AT__Helpers::is_strict_editor_view_category_activated()) {
-            wp_enqueue_style( 'bricks-strict-editor-view' );
+        wp_enqueue_style( 'bricks-strict-editor-view' );
 
-            $index = 0;
-            $custom_css = '';
+        $custom_css = '';
 
-            // Strict Editor Builder Tweaks
-            if( AT__Helpers::is_array($brxc_acf_fields, 'strict_editor_view_tweaks') ){
-                
-                // Hide
-                if(in_array('hide-id-class',  $brxc_acf_fields['strict_editor_view_tweaks'])) {$custom_css .= '#bricks-panel #bricks-panel-inner #bricks-panel-element-classes,#bricks-panel-sticky,';}
-                if(in_array('hide-dynamic-data',  $brxc_acf_fields['strict_editor_view_tweaks'])) {$custom_css .= '.dynamic-tag-picker-button,.show-dynamic-picker,.mce-tinymce #mceu_12,';}
-                if(in_array('hide-text-toolbar',  $brxc_acf_fields['strict_editor_view_tweaks'])) {$custom_css .= '#bricks-builder-contenteditable-toolbar,';}
-                if(in_array('hide-structure-panel',  $brxc_acf_fields['strict_editor_view_tweaks'])) {$custom_css .= '#bricks-structure,#bricks-toolbar li.structure,';}
+        // Custom CSS Tweak
+        if(AT__Helpers::in_array('custom-css',  $brxc_acf_fields, 'strict_editor_view_tweaks') && AT__Helpers::is_value($brxc_acf_fields, 'strict_editor_view_custom_css') ) {
+            $custom_css .= $brxc_acf_fields['strict_editor_view_custom_css'];
+        }
+        
 
-                $custom_css .= '.brxc-unexisting-class{display:none}';
-
-                // Display
-                $custom_css .= '.brxc-unexisting-class, #bricks-panel-history #bricks-panel-sticky{display:block}';
-
-                // Custom
-                if(in_array('hide-structure-panel',  $brxc_acf_fields['strict_editor_view_tweaks'])) {
-                    $custom_css .= '#bricks-preview.show-structure{margin-right: 0 !important;}';
+        if(AT__Helpers::is_value($brxc_acf_fields, 'change_accent_color') ){
+            $custom_css .= 'html body{--builder-color-accent:';
+            $custom_css .= $brxc_acf_fields['change_accent_color'];
+            $custom_css .= '}#bricks-toolbar .logo{background-color:';
+            $custom_css .= $brxc_acf_fields['change_accent_color'];
+            $custom_css .= '}';
+        }
+        if(AT__Helpers::is_array($brxc_acf_fields, 'disable_toolbar_icons')){
+            $toolbar_items = [
+                ['logo','#bricks-toolbar li.logo'],
+                ['pages','#bricks-toolbar li.pages'],
+                ['command-palette','#bricks-toolbar li.command-palette'],
+                ['breakpoints','#bricks-toolbar li.breakpoint '],
+                ['dimensions','#bricks-toolbar li.preview-dimension'],
+                ['undo-redo','#bricks-toolbar li.undo, #bricks-toolbar li.redo'],
+                ['edit','#bricks-toolbar li.wordpress'],
+                ['new-tab','#bricks-toolbar li.new-tab'],
+                ['preview','#bricks-toolbar li.preview']
+            ];
+            $temp_css = [];
+            foreach ($toolbar_items as $item){
+                if(AT__Helpers::in_array($item[0], $brxc_acf_fields, 'disable_toolbar_icons')){
+                    $temp_css[] = $item[1];
                 }
-
-                // Custom CSS Tweak
-                if(in_array('custom-css',  $brxc_acf_fields['strict_editor_view_tweaks']) && AT__Helpers::is_value($brxc_acf_fields, 'strict_editor_view_custom_css') ) {
-                    $custom_css .= $brxc_acf_fields['strict_editor_view_custom_css'];
-                }
             }
 
-            // Elements
-            if (AT__Helpers::is_strict_editor_view_elements_tab_activated() && AT__Helpers::is_array($brxc_acf_fields, 'strict_editor_view_elements') ){
-
-                // Draggable
-                $element_values = array_map(function($element) {
-                    return '.brx-draggable.bricks-draggable-handle .brxe-' . $element;
-                }, $brxc_acf_fields['strict_editor_view_elements']);
-                $custom_css .= implode(',', $element_values);
-                $custom_css .= '{pointer-events: auto;}[class*=brxe-].builder-active-element:not(';
-                
-                // Outline
-                $element_values = array_map(function($element) {
-                    return '.brxe-' . $element;
-                }, $brxc_acf_fields['strict_editor_view_elements']);
-                $custom_css .= implode(',', $element_values);
-                $custom_css .= '){outline: 0 !important;outline-offset: 0 !important;}';
-
-            }
-
-            if(AT__Helpers::is_strict_editor_view_white_label_tab_activated() && AT__Helpers::is_value($brxc_acf_fields, 'change_accent_color') ){
-                $custom_css .= 'html body{--builder-color-accent:';
-                $custom_css .= $brxc_acf_fields['change_accent_color'];
-                $custom_css .= '}#bricks-toolbar .logo{background-color:';
-                $custom_css .= $brxc_acf_fields['change_accent_color'];
-                $custom_css .= '}';
-            }
-            if(AT__Helpers::is_strict_editor_view_toolbar_tab_activated() && AT__Helpers::is_array($brxc_acf_fields, 'disable_toolbar_icons')){
-                $toolbar_items = [
-                    ['logo','#bricks-toolbar li.logo'],
-                    ['help','#bricks-toolbar li.docs'],
-                    ['pages','#bricks-toolbar li.pages'],
-                    ['revisions','#bricks-toolbar li.history'],
-                    ['class-manager','#bricks-toolbar li.classes'],
-                    ['settings','#bricks-toolbar li.settings'],
-                    ['breakpoints','#bricks-toolbar li.breakpoint '],
-                    ['dimensions','#bricks-toolbar li.preview-dimension'],
-                    ['undo-redo','#bricks-toolbar li.undo, #bricks-toolbar li.redo'],
-                    ['edit','#bricks-toolbar li.wordpress'],
-                    ['new-tab','#bricks-toolbar li.new-tab'],
-                    ['preview','#bricks-toolbar li.preview']
-                ];
-                $temp_css = [];
-                foreach ($toolbar_items as $item){
-
-                    if(AT__Helpers::in_array($item[0], $brxc_acf_fields, 'disable_toolbar_icons')){
-                        $temp_css[] = $item[1];
-                    }
-                }
-
-                $custom_css .= implode(",", $temp_css) . '{display: none !important;}';
-
-            }
-            if (AT__Helpers::is_strict_editor_view_elements_tab_activated() && AT__Helpers::in_array('reduce-left-panel-visibility',$brxc_acf_fields, 'strict_editor_view_tweaks') ){
-
-                $custom_css .= '#bricks-panel{width:0!important;transition: width .1s linear;}';
-                $custom_css .= '#bricks-panel.visible{width: 400px !important;}';
-            }
-            
-            // if (AT__Helpers::is_strict_editor_view_elements_tab_activated() && AT__Helpers::in_array('disable-header-footer-edit-button-on-hover',$brxc_acf_fields, 'strict_editor_view_tweaks')){
-
-            //     $custom_css .= 'body #brx-header.builder-active-element,body #brx-footer.builder-active-element{outline:0!important}body #brx-header .bricks-area-label,body #brx-footer .bricks-area-label{display:none!important;}';
-            // }
+            $custom_css .= implode(",", $temp_css) . '{display: none !important;}';
             
             wp_enqueue_script( 'bricks-strict-editor-view' );
             wp_add_inline_style('bricks-strict-editor-view', wp_strip_all_tags($custom_css), 'after');
 
 
-            if(AT__Helpers::is_strict_editor_view_white_label_tab_activated() ){
-                $image_url = isset($brxc_acf_fields['change_logo_img']) && !empty($brxc_acf_fields['change_logo_img']) ? wp_get_attachment_url($brxc_acf_fields['change_logo_img']) : '';
-                $options = [
-                    'change_logo' => $image_url
-                ];
+            // Logo
+            $image_url = isset($brxc_acf_fields['change_logo_img']) && !empty($brxc_acf_fields['change_logo_img']) ? wp_get_attachment_url($brxc_acf_fields['change_logo_img']) : '';
+            $options = [
+                'change_logo' => $image_url,
+                'builderTweaks' =>  $brxc_acf_fields['strict_editor_view_tweaks']
+            ];
 
-                wp_localize_script( 'bricks-builder', 'brxcStrictOptions', $options );
-            }
+            wp_localize_script( 'bricks-builder', 'brxcStrictOptions', $options );
+        }
+    }
 
+    public static function enqueue_builder_scripts() {
 
+        if (!class_exists('Bricks\Capabilities') || !function_exists('bricks_is_builder') || !bricks_is_builder()) {
             return;
         }
-        
 
+        wp_enqueue_style( 'bricks-advanced-themer' );
+        
+        if( \Bricks\Capabilities::current_user_has_full_access() !== true) {
+            return;
+        }
+
+        global $brxc_acf_fields;
         wp_enqueue_script( 'contrast' );
-        //wp_enqueue_style( 'bricks-advanced-themer' );
         wp_enqueue_style( 'bricks-advanced-themer-builder' );
 
         $custom_css = '';
@@ -592,38 +334,4 @@ class AT__Admin{
         wp_enqueue_script( 'brxc-builder-emmet-codemirror', \BRICKS_ADVANCED_THEMER_URL . 'assets/js/emmet.js', [], filemtime( \BRICKS_ADVANCED_THEMER_PATH . 'assets/js/emmet.js' ) );
         wp_localize_script( 'brxc-builder', 'openai_ajax_req', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'nonce' => wp_create_nonce( 'openai_ajax_nonce' ) ) );
     }
-
-    public static function uninstall_method() {
-        $remove_data = get_option('bricks-advanced-themer__brxc_remove_data_uninstall');
-    
-        if (isset($remove_data) && $remove_data === 1) {
-            global $wpdb;
-    
-            $all_post_ids = get_posts(array(
-                'posts_per_page' => -1,
-                'post_type'      => 'brxc_color_palette'
-            ));
-    
-            if (AT__Helpers::is_array($all_post_ids)) {
-                foreach ($all_post_ids as $post) {
-                    wp_delete_post($post->ID, true);
-                }
-            }
-    
-            // Delete postmeta data associated with 'brxc_color_palette'
-            $result_postmeta = $wpdb->query("DELETE FROM $wpdb->postmeta WHERE post_id IN (SELECT ID FROM $wpdb->posts WHERE post_type = 'brxc_color_palette')");
-    
-            // Delete options from wp_options table with 'bricks-advanced-themer' in option_name
-            $sql = "SELECT option_name FROM $wpdb->options WHERE option_name LIKE '%bricks-advanced-themer%'";
-            $result = $wpdb->get_results($sql, 'ARRAY_A');
-
-            if($result && is_array($result)) {
-                foreach($result as $row) {
-                    delete_option($row['option_name']);
-                }
-            }
-        }
-    }
-
 }
-

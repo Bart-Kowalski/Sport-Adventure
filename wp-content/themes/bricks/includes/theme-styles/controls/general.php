@@ -24,16 +24,16 @@ $controls['siteLayoutBoxedMaxWidth'] = [
 		],
 		[
 			'property' => 'max-width',
-			'selector' => '.brx-boxed #brx-header.sticky',
+			'selector' => '.brx-boxed #brx-header.brx-sticky',
 		],
 		[
 			'property' => 'margin-left',
-			'selector' => '.brx-boxed #brx-header.sticky',
+			'selector' => '.brx-boxed #brx-header.brx-sticky',
 			'value'    => 'auto',
 		],
 		[
 			'property' => 'margin-right',
-			'selector' => '.brx-boxed #brx-header.sticky',
+			'selector' => '.brx-boxed #brx-header.brx-sticky',
 			'value'    => 'auto',
 		],
 	],

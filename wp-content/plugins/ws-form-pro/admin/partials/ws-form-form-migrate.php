@@ -147,13 +147,11 @@
 <tr>
 <th scope="row"><label for="wsf-migrate-form-id-source"><?php
 
-	/* translators: %s = Form label */
 	WS_Form_Common::echo_esc_html(sprintf(
 
+		/* translators: %s: Form label */
 		__('%s Form:', 'ws-form'),
-
 		$migrate_name
-
 	));
 
 ?></label></th>
@@ -201,7 +199,7 @@
 	) {
 
 		// Select form
-		$ws_form_form = New WS_Form_Form();
+		$ws_form_form = new WS_Form_Form();
 		$forms = $ws_form_form->db_read_all('', "NOT (status = 'trash')", 'label, id', '', '', false);
 
 		if($forms) {
@@ -211,7 +209,7 @@
 
 	WS_Form_Common::echo_esc_html(sprintf(
 
-		/* translators: %s = WS Form */
+		/* translators: %s: WS Form */
 		__('Import to %s:', 'ws-form'),
 
 		WS_FORM_NAME_GENERIC
@@ -232,9 +230,17 @@
 <?php
 		} else {
 
-			echo '<p>';		// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-			WS_Form_Common::echo_esc_html(sprintf(__('You first need to migrate or create a form in %s to migrate submission data into.', 'ws-form'), WS_FORM_NAME_GENERIC));
-			echo '</p>';	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+?><p><?php
+			WS_Form_Common::echo_esc_html(
+
+				sprintf(
+
+					/* translators: %s: WS Form */
+					__('You first need to migrate or create a form in %s to migrate submission data into.', 'ws-form'),
+					WS_FORM_NAME_GENERIC
+				)
+			);
+?></p><?php
 		}
 	}
 
@@ -278,18 +284,16 @@
 <tr>
 <th><?php WS_Form_Common::echo_esc_html(sprintf(
 
-	/* translators: %s = Migration form plugin */
-	__('%s Field', 'ws-form'),
-
-	$migrate_name
+	'%s %s',
+	$migrate_name,
+	__('Field', 'ws-form')
 
 )); ?></th>
 <th><?php WS_Form_Common::echo_esc_html(sprintf(
 
-	/* translators: %s = WS Form */
-	__('%s Field', 'ws-form'),
-
-	WS_FORM_NAME_GENERIC
+	'%s %s',
+	WS_FORM_NAME_GENERIC,
+	__('Field', 'ws-form')
 
 )); ?></th>
 <th data-icon></th>
@@ -368,25 +372,23 @@
 			$.WS_Form.settings_form.language['migrate_success_form'] = '<?php esc_html_e('Successfully imported form:', 'ws-form'); ?>';
 			$.WS_Form.settings_form.language['migrate_created'] = '<?php 
 
-						/* translators: %s = Submission records */
+						/* translators: %s: Submission records */
 						esc_html_e('%s created.', 'ws-form');
 			?>';
 			$.WS_Form.settings_form.language['migrate_updated'] = '<?php
 
-						/* translators: %s = Submission records */
+						/* translators: %s: Submission records */
 						esc_html_e('%s updated.', 'ws-form');
 			?>';
 			$.WS_Form.settings_form.language['migrate_ignored'] = '<?php
 
-						/* translators: %s = Submission records */
+						/* translators: %s: Submission records */
 						esc_html_e('%s ignored.', 'ws-form');
 			?>';
 			$.WS_Form.settings_form.language['migrate_view_submissions'] = '<?php esc_html_e('View Submissions', 'ws-form'); ?>';
 			$.WS_Form.settings_form.language['migrate_edit_form'] = '<?php esc_html_e('Edit Form', 'ws-form'); ?>';
 			$.WS_Form.settings_form.language['migrate_import_submissions'] = '<?php esc_html_e('Import Submissions', 'ws-form'); ?>';
 			$.WS_Form.settings_form.language['migrate_error'] = '<?php esc_html_e('An error occurred during the import.', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['error_server'] = '<?php esc_html_e('500 Server error response from server.', 'ws-form'); ?>';
-			$.WS_Form.settings_form.language['error_bad_request_message'] = '<?php esc_html_e('400 Bad request response from server: %s', 'ws-form'); ?>';
 			$.WS_Form.settings_form.language['dismiss'] = '<?php esc_html_e('Dismiss', 'ws-form'); ?>';
 
 			wsf_import_button();

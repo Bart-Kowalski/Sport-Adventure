@@ -19,6 +19,16 @@ class Auth_Redirects {
 		add_action( 'wp_login', [ $this, 'clear_bypass_auth_cookie' ] );
 		add_filter( 'retrieve_password_message', [ $this, 'modify_reset_password_email' ], 10, 4 );
 		add_filter( 'logout_redirect', [ $this, 'handle_logout_redirect' ], 10, 3 ); // @since 1.12.2
+
+		// If user activation is enabled (@since 2.1)
+		if ( Database::get_setting( 'userActivationEnabled' ) ) {
+
+			// Check user activation status on login
+			add_filter( 'authenticate', [ $this, 'check_user_activation_status' ], 999, 3 );
+
+			// Send activation email on user registration
+			add_action( 'user_register', [ $this, 'on_user_registration' ], 10, 1 );
+		}
 	}
 
 	/**
@@ -456,4 +466,56 @@ class Auth_Redirects {
 
 		return $redirect_to;
 	}
+
+
+	/**
+	 * Check user activation status (filter)
+	 *
+	 * @since 2.1
+	 */
+	public function check_user_activation_status( $user, $username, $password ) {
+
+		// If there are errors, retun them
+		if ( is_wp_error( $user ) ) {
+			return $user;
+		}
+
+		// Check if user activation is enabled
+		if ( ! Database::get_setting( 'userActivationEnabled' ) ) {
+			return $user;
+		}
+
+		// Check  if the user is valid
+		// If the user is not valid, return it
+		if ( ! $user || ! is_a( $user, 'WP_User' ) || ! $user->exists() ) {
+			return $user;
+		}
+
+		$user_status = get_user_meta( $user->ID, 'bricks_user_activation_status', true );
+
+		// To allow users to log in, the user status can be 'active' or empty (empty means the user was there before the activation was added)
+		if ( $user_status === 'active' || empty( $user_status ) ) {
+			return $user;
+		}
+
+		// User is not activated: Show login error message
+		$error_message = '<strong>' . __( 'Error', 'bricks' ) . ':</strong> ' . __( 'Your account is inactive', 'bricks' ) . '</strong>';
+
+		// Set the error
+		$user = new \WP_Error( 'user_activation_error', $error_message );
+
+		return $user;
+	}
+
+	/**
+	 * Send activation email on user registration
+	 *
+	 * @since 2.1
+	 */
+	public function on_user_registration( $user_id ) {
+
+		Helpers::set_activation_meta( $user_id );
+		\Bricks\Helpers::send_user_activation_email( $user_id, 'activation' );
+	}
+
 }

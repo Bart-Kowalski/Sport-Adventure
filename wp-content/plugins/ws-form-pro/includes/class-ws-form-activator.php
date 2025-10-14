@@ -7,7 +7,7 @@
 
 			// These are set here to avoid problems if someone has both plugins installed and migrates from basic to PRO without de-activating the basic edition first. This ensures the PRO options are set up.
 			$ws_form_edition = 'pro';
-			$ws_form_version = '1.9.244';
+			$ws_form_version = '1.10.59';
 
 			$run_version_check = true;
 
@@ -26,24 +26,41 @@
 			// Get current plug-in version
 			$version = $version_old = WS_Form_Common::option_get('version');
 
+			// Is this a fresh install?
+			$fresh_install = empty($version_old);
+
 			// Set initial install timestamp if one does not exist
 			WS_Form_Common::option_get('install_timestamp', time(), true);
+
+			// Check capabilities
+			self::capabilities_check();
 
 			// Debug - Uncomment this to force activation scripts to run
 //			$run_version_check = false;
 
 			// Check version numbers
-			if($run_version_check && ($version !== false) && ($version !== '')) {
+			if(
+				$run_version_check &&
+				($version !== false) &&
+				($version !== '') &&
 
 				// Installed value is current, so do not run install script
-				if(WS_Form_Common::version_compare($version, $ws_form_version) == 0) { return true; }
+				(WS_Form_Common::version_compare($version, $ws_form_version) == 0)
+			) {
+				return true;
 			}
 
 			// Set version
 			WS_Form_Common::option_set('version', $ws_form_version);
 
-			// Force CSS rebuild
-			WS_Form_Common::option_set('css_rebuild', true);
+			// Set options initialization
+			WS_Form_Common::option_set('options_init', true);
+
+			// Set styler initialization
+			WS_Form_Common::option_set('styler_init', $fresh_install ? 'fresh_install' : 'existing_install');
+
+			// Set CSS initialization
+			WS_Form_Common::option_set('css_init', true);
 
 			// Flush cache
 			wp_cache_flush();
@@ -53,12 +70,6 @@
 
 			// Upgrade
 			self::upgrade_init($version_old);
-
-			// Initialize options
-			self::options_init();
-
-			// Initialize roles and capabilities
-			self::capabilities_init();
 
 			// Run action
 			do_action('wsf_activate');
@@ -261,7 +272,9 @@
 				KEY viewed (viewed),
 				KEY hash (hash),
 				KEY status (status),
-				KEY token (token)
+				KEY token (token),
+				KEY form_id_status (form_id, status),
+				KEY form_id_viewed_status (form_id, viewed, status)
 			) $charset_collate;";
 			dbDelta($table_sql);
 
@@ -282,104 +295,98 @@
 				KEY field_id (field_id)
 			) $charset_collate;";
 			dbDelta($table_sql);
+
+			// Table: Style
+			$table_name = $table_prefix . 'style';
+			$table_sql = "CREATE TABLE $table_name (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				user_id bigint(20) unsigned NOT NULL,
+				label varchar(1024) NOT NULL,
+				date_added datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+				date_updated datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+				date_publish datetime,
+				status varchar(16) DEFAULT 'publish' NOT NULL,
+				`default` tinyint(1) DEFAULT 0 NOT NULL,
+				default_conv tinyint(1) DEFAULT 0 NOT NULL,
+				published longtext NOT NULL,
+				published_checksum varchar(32) DEFAULT '' NOT NULL,
+				checksum varchar(32) DEFAULT '' NOT NULL,
+				version varchar(32) DEFAULT '' NOT NULL,
+				PRIMARY KEY (id),
+				KEY label (label(191)),
+				KEY date_added (date_added),
+				KEY status (status),
+				KEY `default` (`default`)
+			) $charset_collate;";
+			dbDelta($table_sql);
+
+			// Table: Style Meta
+			$table_name = $table_prefix . 'style_meta';
+			$table_sql = "CREATE TABLE $table_name (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				parent_id bigint(20) unsigned NOT NULL,
+				meta_key varchar(191) NOT NULL,
+				meta_value longtext NOT NULL,
+				PRIMARY KEY (id),
+				KEY parent_id (parent_id),
+				KEY meta_key (meta_key)
+			) $charset_collate;";
+			dbDelta($table_sql);
 		}
 
-		public static function options_init() {
+		public static function capabilities_check() {
 
-			// Get mode
-			$mode = WS_Form_Common::option_get('mode', 'basic', true);
-
-			// Default options
-			$options = WS_Form_Config::get_options(false);
-
-			// Set up options with default values
-			foreach($options as $tab => $attributes) {
-
-				if(isset($attributes['fields'])) {
-
-					$fields = $attributes['fields'];
-					self::options_set($mode, $fields);
-				}
-
-				if(isset($attributes['groups'])) {
-
-					$groups = $attributes['groups'];
-
-					foreach($groups as $group) {
-
-						$fields = $group['fields'];
-						self::options_set($mode, $fields);
-					}
-				}
-			}
-
-			// Set skin option defaults
-			$ws_form_css = new WS_Form_CSS();
-			$ws_form_css->option_set_defaults();
-
-			// Clear compiled CSS
-			WS_Form_Common::option_set('css_public_layout', '');
-		}
-
-		private static function options_set($mode, $fields) {
-
-			// File upload checks
-			$upload_checks = WS_Form_Common::uploads_check();
-			$max_upload_size = $upload_checks['max_upload_size'];
-			$max_uploads = $upload_checks['max_uploads'];
-
-			foreach($fields as $key => $attributes) {
-
-				if(
-					isset($attributes['type']) && 
-					($attributes['type'] != 'static')
-				) { 
-	
-					if(
-						isset($attributes['mode']) &&
-						isset($attributes['mode'][$mode])
-					) {
-
-						// Use mode specific values
-						$value = $attributes['mode'][$mode];
-
-						WS_Form_Common::option_set($key, $value, false);
-
-					} else if(isset($attributes['default'])) {
-
-						// Use default value
-						$value = $attributes['default'];
-
-						// Value parsing
-						if($value === '#max_upload_size') { $value = $max_upload_size; }
-						if($value === '#max_uploads') { $value = $max_uploads; }
-
-						WS_Form_Common::option_set($key, $value, false);
-					}
-				}
-			}
-		}
-
-		private static function capabilities_init() {
-
-			// Set up WS Form roles
-			global $wp_roles;
-
-			// Create administrator capabilities
 			$role = get_role('administrator');
+			if (!$role) {
+				return;
+			}
 
-			$role->add_cap('create_form');
-			$role->add_cap('delete_form');
-			$role->add_cap('edit_form');
-			$role->add_cap('export_form');
-			$role->add_cap('import_form');
-			$role->add_cap('publish_form');
-			$role->add_cap('read_form');
-			$role->add_cap('delete_submission');
-			$role->add_cap('edit_submission');
-			$role->add_cap('export_submission');
-			$role->add_cap('read_submission');
-			$role->add_cap('manage_options_wsform');
+			$caps = array(
+
+				// Form
+				'create_form',
+				'delete_form',
+				'edit_form',
+				'export_form',
+				'import_form',
+				'publish_form',
+				'read_form',
+
+				// Submission
+				'delete_submission',
+				'edit_submission',
+				'export_submission',
+				'read_submission',
+
+				// Form style
+				'create_form_style',
+				'delete_form_style',
+				'edit_form_style',
+				'export_form_style',
+				'import_form_style',
+				'publish_form_style',
+				'read_form_style',
+
+				// Options
+				'manage_options_wsform',
+			);
+
+			$changed = false;
+
+			foreach ($caps as $cap) {
+
+				if (!$role->has_cap($cap)) {
+
+					$role->add_cap($cap);
+					$changed = true;
+				}
+			}
+
+			// Refresh current user caps only if something was added
+			if ($changed && is_user_logged_in()) {
+
+				wp_get_current_user()->get_role_caps();
+			}
 		}
 
 		private static function upgrade_init($version_old) {

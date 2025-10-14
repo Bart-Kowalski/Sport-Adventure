@@ -13,34 +13,6 @@ class AT__ACF{
         return $permissions;
     }
 
-    public static function acf_settings_path( $path ) {
-
-        $acf_path = \BRICKS_ADVANCED_THEMER_PATH . 'plugins/acf-pro/';
-
-        return $acf_path;
-
-    }
-
-    public static function acf_settings_dir( $path ) {
-
-        $acf_path = \BRICKS_ADVANCED_THEMER_URL . '/plugins/acf-pro/';
-
-        return $acf_path;
-
-    }
-
-    public static function stop_acf_update_notifications( $value ) {
-        // Do not modify ACF update notifications during uninstallation.
-        if (defined('WP_UNINSTALL_PLUGIN') && WP_UNINSTALL_PLUGIN) {
-            return $value;
-        }
-
-        unset( $value->response[ \BRICKS_ADVANCED_THEMER_URL . '/plugins/acf-pro/acf.php' ] );
-
-        return $value;
-
-    }
-
     private static function check_nested_acf_fields( $post_data, &$errors, $parent_labels = array() ) {
         foreach ( $post_data as $field_key => $value ) {
             $field = get_field_object( $field_key );
@@ -58,35 +30,14 @@ class AT__ACF{
         }
     }
 
-    public static function validate_save_post() {
-        $errors = array();
-    
-        // Check if $_POST contains ACF data
-        if ( isset( $_POST['acf'] ) && is_array( $_POST['acf'] ) ) {
-            self::check_nested_acf_fields( $_POST['acf'], $errors );
-        }
-        
-        // Check if there are any errors
-        if ( !empty( $errors ) ) {
-            // Create an HTML list with errors
-            $error_list = '<ul><li>' . implode( '</li><li>', $errors ) . '</li></ul>';
-            
-            // Combine the error message and the list
-            $error_message = 'Oops! You forgot to enter a value for the following required fields:' . $error_list;
-            
-            // Display the error message using acf_add_validation_error()
-            acf_add_validation_error( '', $error_message );
-        }
-    }
-
     public static function create_advanced_themer_option_page() {
 
-        // Check function exists.
-        if( function_exists( 'acf_add_options_sub_page' )) {
+        if( !function_exists( 'acf_add_options_sub_page' )) {
+            return;
+        }
 
-            // Register options page.
-            $option_page = acf_add_options_sub_page(
-                array(
+        acf_add_options_sub_page(
+            array(
                 'page_title'    => __( 'Theme Settings' ),
                 'menu_title'    => __( 'AT - Theme Settings' ),
                 'menu_slug'     => 'bricks-advanced-themer',
@@ -96,9 +47,8 @@ class AT__ACF{
                 'position'      => '98',
                 'update_button' => __('Save Settings', 'acf'),
                 'post_id' => 'bricks-advanced-themer',
-                )
-            );
-        }
+            )
+        );    
     }
 
     // Get a list of editable user roles
@@ -131,51 +81,16 @@ class AT__ACF{
         $roles = self::get_editable_roles();
 
         if ( !$roles || !is_array( $roles ) ){
-
             return;
-
         }
 
         $field['choices'] = [];
-
-        $default = [];
       
         foreach ( $roles as $role ) {
-
             $field['choices'][strtolower( $role['name'] )] = $role['name'];
-
         }
 
         return $field;
-
-    }
-
-    public static function load_post_types_inside_select_field( $field ){
-
-        $post_types_arr = self::return_array_all_post_types();
-
-        if ( !$post_types_arr || !is_array( $post_types_arr ) ) {
-
-            return;
-
-        }
-
-        $field['choices'] = [];
-
-        $default = [];
-      
-        foreach ( $post_types_arr as $post_type ){
-
-            $field['choices'][strtolower( $post_type )] = $post_type;
-
-            $default[] = strtolower( $post_type );
-
-        }
-        
-        $field['default_value'] = $default;
-
-        return $field;
-
     }
 
     public static function load_human_readable_text_value($value, $post_id, $field) {
@@ -198,18 +113,16 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
         }
     
         return $value;
-
     }
 
     public static function change_flexible_layout_no_value_msg( $no_value_message, $field) {
-        if($field['key'] !== 'field_63dd12891d1d9') return $no_value_message = __('Click the "%s" button below to start creating your layout','acf');;
+        if($field['key'] !== 'field_63dd12891d1d9') return $no_value_message = __('Click the "%s" button below to start creating your layout','acf');
 
         $no_value_message = __('Click the "%s" button below to start creating your own CSS variables','acf');
 
         return $no_value_message;
     }
-    
-    //openaAI Password
+
     public static function load_openai_password($value, $post_id, $field) {
 
 
@@ -219,11 +132,9 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
             $decryption_iv = 'UrsV9aENFT*IRfhr';
             $decryption_key = "#34x*R8zmVK^IFG4#a4B3BVYIb";
             $value = openssl_decrypt ($value, $ciphering, $decryption_key, $options, $decryption_iv);
-
         }
         
         return $value;
-
     }
 
     public static function save_openai_password(){
@@ -236,54 +147,19 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
 
         // Check if a specific value was updated.
         if( isset($_POST['acf']['field_63dd51rkj633r']['field_64018efb660fb']) && !empty($_POST['acf']['field_63dd51rkj633r']['field_64018efb660fb'])) {
-
             $ciphering = "AES-128-CTR";
-            $iv_length = openssl_cipher_iv_length($ciphering);
             $options = 0;
             $encryption_iv = 'UrsV9aENFT*IRfhr';
             $encryption_key = "#34x*R8zmVK^IFG4#a4B3BVYIb";
             $_POST['acf']['field_63dd51rkj633r']['field_64018efb660fb'] = openssl_encrypt($_POST['acf']['field_63dd51rkj633r']['field_64018efb660fb'], $ciphering, $encryption_key, $options, $encryption_iv);
-
-        }
-    
-    }
-
-    public static function save_inline_css_in_db() {
-        // Check if this is a save_post action or on "bricks-advanced-themer" screen
-        $should_save = false;
-        $post_id = 0;
-        
-        if (function_exists('get_current_screen')) {
-            $screen = get_current_screen();
-            if ($screen && strpos($screen->id, "bricks-advanced-themer") !== false) {
-                $should_save = true;
-            }
-        }
-
-        if (isset($_POST['action']) && ($_POST['action'] == 'editpost' || $_POST['action'] == 'inline-save')) {
-            $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : 0;
-            if ($post_id && (get_post_type($post_id) === 'brxc_color_palette')) {
-                $should_save = true;
-            }
-        }
-
-        if ($should_save) {
-            self::update_inline_css_in_db($post_id);
         }
     }
-
-    private static function update_inline_css_in_db($post_id) {
-        $custom_css = AT__Frontend::generate_css_for_frontend();
-        update_option('bricks-advanced-themer_frontend_styles', $custom_css);
-    }
-
 
     // ACF fields from Option Page
     public static function load_global_acf_variable() {
         global $brxc_acf_fields, $wpdb;
     
         $brxc_acf_fields = [];
-    
         $option_name = 'bricks-advanced-themer%';
     
         $acf_data = $wpdb->get_results(
@@ -302,11 +178,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                 $field['option_value'] = maybe_unserialize($field['option_value']);
             }
         }
-        // echo '<pre>';
-        // var_dump($acf_data);
-        // echo '</pre>';
-    
-        $brxc_acf_fields['color_cpt_deprecated'] = get_option('advanced_themer_color_palette_converted') ?: null;
         
         /** Setting Group **/
         self::load_acf_group_fields('field_63daa58ccc209', [
@@ -411,13 +282,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                 'default' => '',
                 'type' => 'string',
             ],
-            // Builder Elements
-            // [
-            //     'key' => 'disable_bricks_elements',
-            //     'acf' => 'brxc_enable_disable_bricks_elements_updated',
-            //     'default' => [],
-            //     'type' => 'array'
-            // ],
             [
                 'key' => 'disable_bricks_elements_on_server',
                 'acf' => 'brxc_disable_bricks_elements_on_server',
@@ -539,18 +403,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                 'type' => 'string',
             ]
         ], $acf_data);
-    
-        /** Classes & Styles Group **/
-        self::load_acf_group_fields('field_63b59j871b209', [
-            [
-                'key' => 'classes_and_styles_general',
-                'acf' => 'brxc_enable_class_and_styles_features',
-                'default' => array(
-                    'grids',
-                ),
-                'type' => 'array'
-            ]
-        ], $acf_data);
 
         /** Builder Tweaks Group **/
         self::load_acf_group_fields('field_63daa58w1b209', [
@@ -584,11 +436,9 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                     'variable-picker',
                     'autocomplete-variable',
                     'autocomplete-variable-preview-hover',
-                    //'highlight-classes',
                     'count-classes',
                     'color-preview',
                     'class-preview',
-                    //'class-indicator',
                     'locked-class-indicator',
                     'focus-on-first-class',
                     'sync-label',
@@ -642,7 +492,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                 'default' => array(
                     'lorem-ipsum',
                     'close-accordion-tabs',
-                    //'hide-inactive-accordion-panel',
                     'disable-borders-boxshadows',
                     'resize-elements-icons',
                     'superpower-custom-css',
@@ -657,7 +506,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                     'focus-point',
                     'mask-helper',
                     'dynamic-data-modal',
-                    'code-element-tweaks',
                 ),
                 'type' => 'array'
             ],
@@ -733,8 +581,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                 'default' => false,
                 'type' => 'true_false'
             ],
-            
-            // 'default_spacing_controls' => 'field_63a843dssxtd5',
             [
                 'key' => 'elements_shortcut_icons',
                 'acf' => 'brxc_builder_tweaks_shortcuts_icons',
@@ -924,17 +770,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
 
         /** Strict Editor **/
         self::load_acf_group_fields('field_63dd51rddtr57', [
-            // General
-            [
-                'key' => 'strict_editor_view_general',
-                'acf' => 'brxc_enable_strict_editor_view_features',
-                'default' => array(
-                    'toolbar',
-                    'elements',
-                ),
-                'type' => 'array',
-            ],
-
             // White Label
             [
                 'key' => 'change_logo_img',
@@ -958,10 +793,11 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                     'pages',
                     'revisions',
                     'class-manager',
+                    'command-palette',
                     'settings',
                     'breakpoints',
                     'dimensions',
-                    'undo-redo' => 'Undo / Redo',
+                    'undo-redo',
                     'edit',
                     'new-tab',
                     'preview',
@@ -970,62 +806,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
             ],
 
             // Elements
-            [
-                'key' => 'strict_editor_view_elements',
-                'acf' => 'brxc_enable_strict_editor_view_elements',
-                'default' => array(
-                    'heading',
-                    'text-basic',
-                    'text',
-                    'text-link',
-                    'button',
-                    'icon',
-                    'image',
-                    'video',
-                    'icon-box',
-                    'social-icons',
-                    'list',
-                    'animated-typing',
-                    'countdown',
-                    'counter',
-                    'progress-bar',
-                    'pie-chart',
-                    'team-members',
-                    'testimonials',
-                    'facebook-page',
-                    'image-gallery',
-                    'audio',
-                ),
-                'type' => 'array',
-            ],
-            [
-                'key' => 'enable_left_visibility_elements',
-                'acf' => 'brxc_enable_left_visibility_elements',
-                'default' => array(
-                    'heading',
-                    'text-basic',
-                    'text',
-                    'text-link',
-                    'button',
-                    'icon',
-                    'image',
-                    'video',
-                    'icon-box',
-                    'social-icons',
-                    'list',
-                    'animated-typing',
-                    'countdown',
-                    'counter',
-                    'progress-bar',
-                    'pie-chart',
-                    'team-members',
-                    'testimonials',
-                    'facebook-page',
-                    'image-gallery',
-                    'audio',
-                ),
-                'type' => 'array',
-            ],
             [
                 'key' => 'strict_editor_view_tweaks',
                 'acf' => 'brxc_strict_editor_view_tweaks',
@@ -1107,10 +887,6 @@ Witty',
         $brxc_acf_fields['ai_models']['completion'] = $ai_models;
         $brxc_acf_fields['ai_models']['edit'] = $ai_models;
         $brxc_acf_fields['ai_models']['code'] = $ai_models;
-
-        // echo '<pre>';
-        // var_dump($brxc_acf_fields);
-        // echo '</pre>';
     }
     
     private static function load_acf_group_fields($group_key, $fields_map, $acf_data) {
@@ -1199,308 +975,10 @@ Witty',
 
     }
 
-    // public static function acf_color_palettes_fields(){
-
-    //     if( function_exists('acf_add_local_field_group') ):
-
-    //         acf_add_local_field_group(array(
-    //             'key' => 'group_6389e81fa2085',
-    //             'title' => 'Color Palette Post Type',
-    //             'fields' => array(
-    //                 array(
-    //                     'key' => 'field_63956fca26ebb',
-    //                     'label' => 'Colors',
-    //                     'name' => '',
-    //                     'aria-label' => '',
-    //                     'type' => 'tab',
-    //                     'instructions' => '',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => '',
-    //                         'id' => '',
-    //                     ),
-    //                     'placement' => 'top',
-    //                     'endpoint' => 0,
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_6383d6f67641b',
-    //                     'label' => 'Colors',
-    //                     'name' => 'brxc_colors_repeater',
-    //                     'aria-label' => '',
-    //                     'type' => 'repeater',
-    //                     'instructions' => 'Add the colors to your palette here. Choose a unique name for each label in order to avoid CSS conflicts, or make sure to set a prefix value in the settings tab.',
-    //                     'required' => 1,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => 'color-repeater',
-    //                         'id' => '',
-    //                     ),
-    //                     'layout' => 'block',
-    //                     'pagination' => 0,
-    //                     'min' => 1,
-    //                     'max' => 0,
-    //                     'collapsed' => '',
-    //                     'button_label' => 'Add a New Color',
-    //                     'rows_per_page' => 20,
-    //                     'sub_fields' => array(
-    //                         array(
-    //                             'key' => 'field_638728339e15f',
-    //                             'label' => 'Label',
-    //                             'name' => 'brxc_color_label',
-    //                             'aria-label' => '',
-    //                             'type' => 'text',
-    //                             'instructions' => '',
-    //                             'required' => 1,
-    //                             'conditional_logic' => 0,
-    //                             'wrapper' => array(
-    //                                 'width' => '40',
-    //                                 'class' => '',
-    //                                 'id' => '',
-    //                             ),
-    //                             'parent_repeater' => 'field_6383d6f67641b',
-    //                         ),
-    //                         array(
-    //                             'key' => 'field_638344c95efcf',
-    //                             'label' => 'Color',
-    //                             'name' => 'brxc_color_hex',
-    //                             'aria-label' => '',
-    //                             'type' => 'color_picker',
-    //                             'instructions' => '',
-    //                             'required' => 0,
-    //                             'conditional_logic' => 0,
-    //                             'wrapper' => array(
-    //                                 'width' => '60',
-    //                                 'class' => '',
-    //                                 'id' => '',
-    //                             ),
-    //                             'default_value' => '',
-    //                             'enable_opacity' => 0,
-    //                             'return_format' => 'string',
-    //                             'parent_repeater' => 'field_6383d6f67641b',
-    //                         ),
-    //                         array(
-    //                             'key' => 'field_63958c871e42e',
-    //                             'label' => 'ID',
-    //                             'name' => 'brxc_color_id',
-    //                             'aria-label' => '',
-    //                             'type' => 'text',
-    //                             'instructions' => '',
-    //                             'required' => 0,
-    //                             'conditional_logic' => 0,
-    //                             'wrapper' => array(
-    //                                 'width' => '',
-    //                                 'class' => 'hidden',
-    //                                 'id' => '',
-    //                             ),
-    //                             'default_value' => '',
-    //                             'maxlength' => '',
-    //                             'placeholder' => '',
-    //                             'prepend' => '',
-    //                             'append' => '',
-    //                             'parent_repeater' => 'field_6383d6f67641b',
-    //                         ),
-    //                     ),
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_63956fe226ebc',
-    //                     'label' => 'Settings',
-    //                     'name' => '',
-    //                     'aria-label' => '',
-    //                     'type' => 'tab',
-    //                     'instructions' => '',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => '',
-    //                         'id' => '',
-    //                     ),
-    //                     'placement' => 'top',
-    //                     'endpoint' => 0,
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_639570d626ec1',
-    //                     'label' => 'Add a prefix to your CSS variables',
-    //                     'name' => 'brxc_variable_prefix',
-    //                     'aria-label' => '',
-    //                     'type' => 'text',
-    //                     'instructions' => 'The prefix will be automatically added to all your colors (including shades). Example of variable generated with "p1" as prefix: --brxc-p1-primary-color.<br><strong>Note that if you already added a global prefix inside the theme settings, it will apply on the color variable. So if you add it here as well, you\'ll create duplicated prefixes.</strong>',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => 'prefix-css',
-    //                         'id' => '',
-    //                     ),
-    //                     'default_value' => '',
-    //                     'maxlength' => '',
-    //                     'placeholder' => '',
-    //                     'prepend' => '',
-    //                     'append' => '',
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_6395700626ebd',
-    //                     'label' => 'Enable Shades',
-    //                     'name' => 'brxc_enable_shapes',
-    //                     'aria-label' => '',
-    //                     'type' => 'true_false',
-    //                     'instructions' => 'If this field is checked, the plugin will automatically generate 12 different shades for each color: 6 light and 6 dark variations. They will appear inside the Bricks builder.',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => '',
-    //                         'id' => '',
-    //                     ),
-    //                     'message' => '',
-    //                     'default_value' => 0,
-    //                     'ui_on_text' => '',
-    //                     'ui_off_text' => '',
-    //                     'ui' => 1,
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_6395707d26ec0',
-    //                     'label' => 'Enable Dark Mode',
-    //                     'name' => 'brxc_enable_dark_mode',
-    //                     'aria-label' => '',
-    //                     'type' => 'true_false',
-    //                     'instructions' => 'Check this field if you plan to implement a dark mode on your website.',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => '',
-    //                         'id' => '',
-    //                     ),
-    //                     'message' => '',
-    //                     'default_value' => 0,
-    //                     'ui_on_text' => '',
-    //                     'ui_off_text' => '',
-    //                     'ui' => 1,
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_63882c3f1215b',
-    //                     'label' => 'Import custom shapes/colors (JSON)',
-    //                     'name' => 'brxc_import_from_json',
-    //                     'aria-label' => '',
-    //                     'type' => 'textarea',
-    //                     'instructions' => 'Paste here the JSON object generated by the export function of the playground GUI.',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => '',
-    //                         'id' => '',
-    //                     ),
-    //                     'default_value' => '',
-    //                     'maxlength' => '',
-    //                     'rows' => '',
-    //                     'placeholder' => '',
-    //                     'new_lines' => '',
-    //                 ),
-    //                 array(
-    //                     'key' => 'field_6395702f26ebe',
-    //                     'label' => 'Color Palette Key',
-    //                     'name' => 'brxc_color_palette_key',
-    //                     'aria-label' => '',
-    //                     'type' => 'text',
-    //                     'instructions' => '',
-    //                     'required' => 0,
-    //                     'conditional_logic' => 0,
-    //                     'wrapper' => array(
-    //                         'width' => '',
-    //                         'class' => 'hidden',
-    //                         'id' => '',
-    //                     ),
-    //                     'default_value' => '',
-    //                     'maxlength' => '',
-    //                     'placeholder' => '',
-    //                     'prepend' => '',
-    //                     'append' => '',
-    //                 ),
-    //             ),
-    //             'location' => array(
-    //                 array(
-    //                     array(
-    //                         'param' => 'post_type',
-    //                         'operator' => '==',
-    //                         'value' => 'brxc_color_palette',
-    //                     ),
-    //                 ),
-    //             ),
-    //             'menu_order' => 0,
-    //             'position' => 'normal',
-    //             'style' => 'default',
-    //             'label_placement' => 'top',
-    //             'instruction_placement' => 'label',
-    //             'hide_on_screen' => '',
-    //             'active' => true,
-    //             'description' => '',
-    //             'show_in_rest' => 0,
-    //         ));
-            
-    //         endif;				
-
-    // }
-
-    private static function is_global_css_vars_deprecated($call_back) {
-        $condition = BRICKS_ADVANCED_THEMER_CSS_VARIABLES_CONVERTED;
-        return !$condition && $call_back !== false ? $call_back : [];
-    }
-
     public static function acf_settings_fields() {
     
 
         if( function_exists('acf_add_local_field_group') ):
-            global $brxc_active_elements;
-            global $brxc_acf_fields;
-            $brxc_acf_fields['builder_elements'] = get_option('bricks-advanced-themer__list_active_elements', []);
-            $brxc_acf_fields['builder_elements_left_visibility'] = [
-                "heading" => "heading",
-                "text-basic" => "text-basic",
-                "text" => "text",
-                "text-link" => "text-link",
-                "button" => "button",
-                "icon" => "icon",
-                "image" => "image",
-                "video" => "video",
-                "nav-nested" => "nav-nested",
-                "dropdown" => "dropdown",
-                "offcanvas" => "offcanvas",
-                "toggle" => "toggle",
-                "divider" => "divider",
-                "icon-box" => "icon-box",
-                "social-icons" => "social-icons",
-                "list" => "list",
-                "accordion" => "accordion",
-                "accordion-nested" => "accordion-nested",
-                "tabs" => "tabs",
-                "tabs-nested" => "tabs-nested",
-                "form" => "form",
-                "map" => "map",
-                "alert" => "alert",
-                "animated-typing" => "animated-typing",
-                "countdown" => "countdown",
-                "counter" => "counter",
-                "pricing-tables" => "pricing-tables",
-                "progress-bar" => "progress-bar",
-                "pie-chart" => "pie-chart",
-                "team-members" => "team-members",
-                "testimonials" => "testimonials",
-                "template" => "template",
-                "logo" => "logo",
-                "facebook-page" => "facebook-page",
-                "breadcrumbs" => "breadcrumbs",
-                "image-gallery" => "image-gallery",
-                "audio" => "audio",
-                "carousel" => "carousel",
-                "slider" => "slider",
-                "slider-nested" => "slider-nested",
-                "instagram-feed" => "instagram-feed",
-            ];
 
             $default_dummy_content = 'This is just placeholder text. We will change this out later. It’s just meant to fill space until your content is ready.
 Don’t be alarmed, this is just here to fill up space since your finalized copy isn’t ready yet.
@@ -1513,23 +991,6 @@ There are other placeholder text alternatives like Hipster Ipsum, Zombie Ipsum, 
 While often hilarious, these placeholder passages can also lead to much of the same confusion.
 If you’re curious, this is Website Ipsum. It was specifically developed for the use on development websites.
 Other than being less confusing than other Ipsum’s, Website Ipsum is also formatted in patterns more similar to how real copy is formatted on the web today.';
-            
-            $css_variables_tabs = self::is_global_css_vars_deprecated(false) ? array(
-                'typography' => '<span>Typography.</span>',
-                'spacing' => '<span>Spacing.</span>',
-                'border' => '<span>Border.</span>',
-                'border-radius' => '<span>Border-Radius.</span>',
-                'box-shadow' => '<span>Box-Shadow.</span>',
-                'width' => '<span>Width.</span>',
-                'custom-variables' => '<span>Custom Variables.</span>',
-                'import-framework' => '<span>Import Framework. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The import function let you upload your existing variable\'s labels and integrate them inside the builder functions (such as the variable picker)"></a></span>',
-                'theme-variables' => '<span>Theme Variables. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The theme variables are CSS variables attached to a specific theme style. They are managed inside the builder through the variable manager."></a></span>',
-
-            ) : array(
-                'import-framework' => '<span>Import Framework. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The import function let you upload your existing variable\'s labels and integrate them inside the builder functions (such as the variable picker)"></a></span>',
-                'theme-variables' => '<span>Theme Variables. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The theme variables are CSS variables attached to a specific theme style. They are managed inside the builder through the variable manager."></a></span>',
-
-            );
 
             acf_add_local_field_group(array(
                 'key' => 'group_638315a281bf1',
@@ -1620,7 +1081,7 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'choices' => array(
                                     'global-colors' => '<span>Global Colors. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Enable this option to activate advanced functions related to the Bricks Color palettes."></a></span></span>',
                                     'css-variables' => '<span>CSS Variables.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Enable this option to create Theme CSS variables or import your own CSS Variable framework."></a></span></span>',
-                                    'classes-and-styles' => '<span>CSS Classes.</span>',
+                                    'classes-and-styles' => '<span>Class Importer.</span>',
                                     'builder-tweaks' => '<span>Builder Tweaks.</span>',
                                     'strict-editor-view' => '<span>Strict Editor View. </span>',
                                     'ai' => '<span>AI.</span>',
@@ -2114,65 +1575,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
 }',
                                 'new_lines' => '',
                             ),
-                            // array(
-                            //     'key' => 'field_23dddd45eexib6',
-                            //     'label' => 'Builder Elements ',
-                            //     'name' => '',
-                            //     'aria-label' => '',
-                            //     'type' => 'tab',
-                            //     'instructions' => '',
-                            //     'required' => 0,
-                            //     'conditional_logic' => 0,
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => '',
-                            //         'id' => '',
-                            //     ),
-                            //     'placement' => 'left',
-                            //     'endpoint' => 0,
-                            // ),
-                            // array(
-                            //     'key' => 'field_63aabb0hgh4dz',
-                            //     'label' => 'Disable any Bricks Element. ',
-                            //     'name' => 'brxc_enable_disable_bricks_elements_updated',
-                            //     'aria-label' => '',
-                            //     'type' => 'checkbox',
-                            //     'instructions' => '<strong>Check the elements you want to disable.</strong>By default, the checked elements will be hidden inside the builder using CSS declarations. However, you can completely unload the elements from the server by toggling the next option.',
-                            //     'required' => 0,
-                            //     'conditional_logic' => 0,
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => 'vertical-field checkbox-5-col',
-                            //         'id' => '',
-                            //     ),
-                            //     'choices' => $brxc_acf_fields['builder_elements'],
-                            //     'default_value' => '',
-                            //     'return_format' => 'value',
-                            //     'allow_custom' => 0,
-                            //     'layout' => 'vertical',
-                            //     'toggle' => 1,
-                            //     'save_custom' => 0,
-                            // ),
-                            // array(
-                            //     'key' => 'field_63a8765frfdx5',
-                            //     'label' => 'Disable Bricks elements on the server. ',
-                            //     'name' => 'brxc_disable_bricks_elements_on_server',
-                            //     'aria-label' => '',
-                            //     'type' => 'true_false',
-                            //     'instructions' => 'Disabling the elements on the server means all the data related to the unchecked elements won\'t be loaded at all on your site. If you just want to hide elements in the builder\'s list, keep this option unchecked.<div class="helpful-links">Keep in mind that disabling existing elements on your page will generate an error on frontend, so make sure to delete them inside the builder.</div>',
-                            //     'required' => 0,
-                            //     'conditional_logic' => 0,
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => 'vertical-field',
-                            //         'id' => '',
-                            //     ),
-                            //     'message' => '',
-                            //     'default_value' => 0,
-                            //     'ui_on_text' => '',
-                            //     'ui_off_text' => '',
-                            //     'ui' => 1,
-                            // ),
                             array(
                                 'key' => 'field_23der44tyexib6',
                                 'label' => 'Permissions',
@@ -2754,10 +2156,10 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'conditional_logic' => '',
                                 'wrapper' => array(
                                     'width' => '',
-                                    'class' => 'hide-border-top vertical-field',
+                                    'class' => 'hide-border-top vertical-field btn-container',
                                     'id' => '',
                                 ),
-                                'message' => '<a id="brxcConvertToLogical" href="#" class="button button-primary button-large">Convert Now</a>',
+                                'message' => '<a id="brxcConvertToDirectional" href="#" class="button button-secondary button-large">Restore Directional Properties</a><a id="brxcConvertToLogical" href="#" class="button button-primary button-large">Convert Now</a>',
                                 'new_lines' => '',
                                 'esc_html' => 0,
                             ),
@@ -3162,7 +2564,10 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'class' => 'vertical-field checkbox-3-col',
                                     'id' => '',
                                 ),
-                                'choices' => $css_variables_tabs,
+                                'choices' => [
+                                    'import-framework' => '<span>Import Framework. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The import function let you upload your existing variable\'s labels and integrate them inside the builder functions (such as the variable picker)"></a></span>',
+                'theme-variables' => '<span>Theme Variables. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="The theme variables are CSS variables attached to a specific theme style. They are managed inside the builder through the variable manager."></a></span>'
+                                ],
                                 'default_value' => array(),
                                 'return_format' => 'value',
                                 'allow_custom' => 0,
@@ -3170,1132 +2575,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'toggle' => 1,
                                 'save_custom' => 0,
                             ),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63ab121136eb9',
-                                'label' => 'Add a prefix to your global CSS variables',
-                                'name' => 'brxc_global_prefix',
-                                'aria-label' => '',
-                                'type' => 'text',
-                                'instructions' => 'The prefix will be automatically added to all your CSS variables. Example of variable generated with "p1" as prefix: --p1-gap-1.',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'prefix-css',
-                                    'id' => '',
-                                ),
-                                'default_value' => '',
-                                'maxlength' => '',
-                                'placeholder' => '',
-                                'prepend' => '',
-                                'append' => '',
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63a6a4d97c8b6',
-                                'label' => 'Typography',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'typography',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_6443f5y8765db',
-                                'label' => 'Typography Instruction',
-                                'name' => 'brxc_typography_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Typography Scale</h3>In the following repeater, you can add/edit/remove your global typography variables. Each row requires a label, a min value, and a max value. The label is used to create your CSS variable like var(--label). The min value is set in Pixels and represents the default value applied when reaching the minimum viewport width set in the Setting tab. The max value is also set in Pixels and represents the default max value when reaching the maximum viewport width. Keep in mind that all the pixels values will be converted in CQI/REM on the frontend.<br><br><strong>The default values are set according to the <a href="https://utopia.fyi/type/calculator/">Utopia\'s fluid type scale calculator</a>.</strong>',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63a6a58831bbe',
-                                'label' => 'Typography Variables',
-                                'name' => 'brxc_typography_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'typography-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a58831bbf',
-                                'button_label' => 'Add a new typography variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63a6a58831bbf',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_typography_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63a6a58831bbe',
-                                    ),
-                                    array(
-                                        'key' => 'field_63a6a58831bc0',
-                                        'label' => 'Min Value',
-                                        'name' => 'brxc_typography_min_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'min-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 32,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63a6a58831bbe',
-                                    ),
-                                    array(
-                                        'key' => 'field_63a844885697c',
-                                        'label' => 'Max Value',
-                                        'name' => 'brxc_typography_max_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 48,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63a6a58831bbe',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c79e51022d8',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="typography-preview">Bricks is awesome.</div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63a6a58831bbe',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63a6a4d17c8b5',
-                                'label' => 'Spacing',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'spacing',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_644f5w8x765db',
-                                'label' => 'Spacing Instruction',
-                                'name' => 'brxc_spacing_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Spacing Scale</h3>In the following repeater, you can add/edit/remove your global spacing variables. Each row requires a label, a min value, and a max value. The label is used to create your CSS variable like var(--label). The min value is set in Pixels and represents the default value applied when reaching the minimum viewport width set in the Setting tab. The max value is also set in Pixels and represents the default max value when reaching the maximum viewport width. Keep in mind that all the pixels values will be converted in CQI/REM on the frontend.<br><br><strong>The default values are set according to the <a href="https://utopia.fyi/type/calculator/">Utopia\'s fluid space calculator</a>.</strong>',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63a6a51731bbb',
-                                'label' => 'Spacing Variables',
-                                'name' => 'brxc_spacing_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'spacing-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a53f31bbc',
-                                'button_label' => 'Add a new spacing variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63a6a53f31bbc',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_spacing_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63a6a51731bbb',
-                                    ),
-                                    array(
-                                        'key' => 'field_63a6a55c31bbd',
-                                        'label' => 'Min Value',
-                                        'name' => 'brxc_spacing_min_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'min-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 10,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63a6a51731bbb',
-                                    ),
-                                    array(
-                                        'key' => 'field_63a82e7791041',
-                                        'label' => 'Max Value',
-                                        'name' => 'brxc_spacing_max_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 20,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63a6a51731bbb',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c7dc4a42516',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="spacing-preview">
-                    <div class="spacing-preview-1"></div>
-                    <div class="spacing-preview-2"></div>
-                    </div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63a6a51731bbb',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f16xcx58m',
-                                'label' => 'Border',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'border',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_644f5d5uuy876',
-                                'label' => 'Border Instruction',
-                                'name' => 'brxc_border_simple_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Borders</h3>In the following repeater, you can add/edit/remove your global border variables. Each row requires a label and a value. The label is used to create your CSS variable like var(--label). The value need to be a proper CSS border value (example: 1px solid #000000). ',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f17ytr545',
-                                'label' => 'Border Variables',
-                                'name' => 'brxc_border_simple_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'border-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a53f31bbc',
-                                'button_label' => 'Add a new border variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63c8f17ttrt81',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_border_simple_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17ytr545',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17ytr44n',
-                                        'label' => 'Value',
-                                        'name' => 'brxc_border_simple_value',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => "3px solid #1061a3",
-                                        'placeholder' => '3px solid #1061a3',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17ytr545',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17dfdr41',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="border-preview">
-                    </div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63c8f17ytr545',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f16e5e2ec',
-                                'label' => 'Border-radius',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'border-radius',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_644f5d55r89db',
-                                'label' => 'Border-radius Instruction',
-                                'name' => 'brxc_border_radius_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Border-Radius</h3>In the following repeater, you can add/edit/remove your global border-radius variables. Each row requires a label, a min value, and a max value. The label is used to create your CSS variable like var(--label). The min value is set in Pixels and represents the default value applied when reaching the minimum viewport width set in the Setting tab. The max value is also set in Pixels and represents the default max value when reaching the maximum viewport width. Keep in mind that all the pixels values will be converted in CQI/REM on the frontend.',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f17f5e2ed',
-                                'label' => 'Border-radius Variables',
-                                'name' => 'brxc_border_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'border-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a53f31bbc',
-                                'button_label' => 'Add a new border-radius variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63c8f17f5e2ee',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_border_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17f5e2ed',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17f5e2ef',
-                                        'label' => 'Min Value',
-                                        'name' => 'brxc_border_min_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'min-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 10,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63c8f17f5e2ed',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17f5e2f0',
-                                        'label' => 'Max Value',
-                                        'name' => 'brxc_border_max_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 20,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63c8f17f5e2ed',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17f5e2f1',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="border-preview">
-                    </div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63c8f17f5e2ed',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f16ede55m',
-                                'label' => 'Box-Shadow',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'box-shadow',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            ),
-                            array(
-                                'key' => 'field_644f5d5dz55bo',
-                                'label' => 'Box-Shadow Instruction',
-                                'name' => 'brxc_box_shadow_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Box-Shadow</h3>In the following repeater, you can add/edit/remove your global box-shadow variables. Each row requires a label and a value. The label is used to create your CSS variable like var(--label). The value need to be a proper CSS box-shadow value (example: 0px 20px 40px #000).',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f17s4stt6',
-                                'label' => 'Box-Shadow Variables',
-                                'name' => 'brxc_box_shadow_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'border-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a53f31bbc',
-                                'button_label' => 'Add a new box_shadow variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63c8f17wewty5',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_box_shadow_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17s4stt6',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17oioep4',
-                                        'label' => 'Value',
-                                        'name' => 'brxc_box_shadow_value',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => "0px 0px 20px #00000030",
-                                        'placeholder' => '0px 0px 20px #00000030',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17s4stt6',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f1787y8rp',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="border-preview">
-                    </div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63c8f17s4stt6',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f16gh51vg',
-                                'label' => 'Width',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'width',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_644f5d5ty85c6',
-                                'label' => 'Width Instruction',
-                                'name' => 'brxc_width_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Width</h3>In the following repeater, you can add/edit/remove your global width variables. Each row requires a label, a min value, and a max value. The label is used to create your CSS variable like var(--label). The min value is set in Pixels and represents the default value applied when reaching the minimum viewport width set in the Setting tab. The max value is also set in Pixels and represents the default max value when reaching the maximum viewport width. Keep in mind that all the pixels values will be converted in CQI/REM on frontend.',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63c8f17ppo69i',
-                                'label' => 'Width Variables',
-                                'name' => 'brxc_width_variables_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'border-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63a6a53f31bbc',
-                                'button_label' => 'Add a new width variable',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63c8f17trt527',
-                                        'label' => 'Label',
-                                        'name' => 'brxc_width_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '50',
-                                            'class' => 'label',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63c8f17ppo69i',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17werd63',
-                                        'label' => 'Min Value',
-                                        'name' => 'brxc_width_min_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'min-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 100,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63c8f17ppo69i',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17pydk54',
-                                        'label' => 'Max Value',
-                                        'name' => 'brxc_width_max_value',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => 'max-value',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => 200,
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 0.01,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63c8f17ppo69i',
-                                    ),
-                                    array(
-                                        'key' => 'field_63c8f17696dpi',
-                                        'label' => 'Preview',
-                                        'name' => '',
-                                        'aria-label' => '',
-                                        'type' => 'message',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '100',
-                                            'class' => 'preview',
-                                            'id' => '',
-                                        ),
-                                        'message' => '<div class="border-preview">
-                    </div>',
-                                        'new_lines' => 'wpautop',
-                                        'esc_html' => 0,
-                                        'parent_repeater' => 'field_63c8f17ppo69i',
-                                    ),
-                                ),
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_63a84218b5268',
-                                'label' => 'Custom Variables',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferwtt57v',
-                                            'operator' => '==',
-                                            'value' => 'custom-variables',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_6ss5fd85r89db',
-                                'label' => 'Custom Variables Instruction',
-                                'name' => 'brxc_custom_variables_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Custom CSS Variables</h3>In the following repeater, you can add/edit/remove your global custom variables. First, create a category where the variable will be stored. The category label will be shown inside the Variable Picker. Each row requires a label and a value. The label is used to create your CSS variable like var(--label). Choose between a static or a fluid (clamp) variable.',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            )),
-                            self::is_global_css_vars_deprecated(array(
-                                'key' => 'field_64066a105f7ec',
-                                'label' => 'Custom Variables',
-                                'name' => 'brxc_misc_category_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'spacing-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_64066a535f7ed',
-                                'button_label' => 'Add a Category',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_64066a535f7ed',
-                                        'label' => 'Category Label',
-                                        'name' => 'brxc_misc_category_label',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '',
-                                            'class' => '',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_64066a105f7ec',
-                                    ),
-                                    array(
-                                        'key' => 'field_63dd12891d1d9',
-                                        'label' => 'CSS Variables',
-                                        'name' => 'brxc_misc_variables_repeater',
-                                        'aria-label' => '',
-                                        'type' => 'flexible_content',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '',
-                                            'class' => 'misc-repeater',
-                                            'id' => '',
-                                        ),
-                                        'layouts' => array(
-                                            'layout_63dd12920c84c' => array(
-                                                'key' => 'layout_63dd12920c84c',
-                                                'name' => 'brxc_misc_fluid_variable',
-                                                'label' => 'Fluid Variable',
-                                                'display' => 'block',
-                                                'sub_fields' => array(
-                                                    array(
-                                                        'key' => 'field_63dd12dd1d1dc',
-                                                        'label' => 'Label',
-                                                        'name' => 'brxc_misc_fluid_label',
-                                                        'aria-label' => '',
-                                                        'type' => 'text',
-                                                        'instructions' => '',
-                                                        'required' => 1,
-                                                        'conditional_logic' => 0,
-                                                        'wrapper' => array(
-                                                            'width' => '',
-                                                            'class' => 'label',
-                                                            'id' => '',
-                                                        ),
-                                                        'default_value' => '',
-                                                        'maxlength' => '',
-                                                        'placeholder' => '',
-                                                        'prepend' => '',
-                                                        'append' => '',
-                                                    ),
-                                                    array(
-                                                        'key' => 'field_63dd12e61d1dd',
-                                                        'label' => 'Min Value',
-                                                        'name' => 'brxc_misc_fluid_min_value',
-                                                        'aria-label' => '',
-                                                        'type' => 'number',
-                                                        'instructions' => '',
-                                                        'required' => 1,
-                                                        'conditional_logic' => 0,
-                                                        'wrapper' => array(
-                                                            'width' => '31',
-                                                            'class' => 'min-value',
-                                                            'id' => '',
-                                                        ),
-                                                        'default_value' => 10,
-                                                        'min' => 1,
-                                                        'max' => '',
-                                                        'placeholder' => '',
-                                                        'step' => 0.01,
-                                                        'prepend' => '',
-                                                        'append' => 'px',
-                                                    ),
-                                                    array(
-                                                        'key' => 'field_63dd12f21d1de',
-                                                        'label' => 'Max Value',
-                                                        'name' => 'brxc_misc_fluid_max_value',
-                                                        'aria-label' => '',
-                                                        'type' => 'number',
-                                                        'instructions' => '',
-                                                        'required' => 1,
-                                                        'conditional_logic' => 0,
-                                                        'wrapper' => array(
-                                                            'width' => '31',
-                                                            'class' => 'max-value',
-                                                            'id' => '',
-                                                        ),
-                                                        'default_value' => 20,
-                                                        'min' => 1,
-                                                        'max' => '',
-                                                        'placeholder' => '',
-                                                        'step' => 0.01,
-                                                        'prepend' => '',
-                                                        'append' => 'px',
-                                                    ),
-                                                ),
-                                                'min' => '',
-                                                'max' => '',
-                                            ),
-                                            'layout_63dd13191d1e0' => array(
-                                                'key' => 'layout_63dd13191d1e0',
-                                                'name' => 'brxc_misc_static_variable',
-                                                'label' => 'Static Variable',
-                                                'display' => 'block',
-                                                'sub_fields' => array(
-                                                    array(
-                                                        'key' => 'field_63dd13341d1e1',
-                                                        'label' => 'Label',
-                                                        'name' => 'brxc_misc_static_label',
-                                                        'aria-label' => '',
-                                                        'type' => 'text',
-                                                        'instructions' => '',
-                                                        'required' => 1,
-                                                        'conditional_logic' => 0,
-                                                        'wrapper' => array(
-                                                            'width' => '',
-                                                            'class' => '',
-                                                            'id' => '',
-                                                        ),
-                                                        'default_value' => '',
-                                                        'maxlength' => '',
-                                                        'placeholder' => '',
-                                                        'prepend' => '',
-                                                        'append' => '',
-                                                    ),
-                                                    array(
-                                                        'key' => 'field_63dd135e1d1e2',
-                                                        'label' => 'Value',
-                                                        'name' => 'brxc_misc_static_value',
-                                                        'aria-label' => '',
-                                                        'type' => 'text',
-                                                        'instructions' => '',
-                                                        'required' => 1,
-                                                        'conditional_logic' => 0,
-                                                        'wrapper' => array(
-                                                            'width' => '75',
-                                                            'class' => '',
-                                                            'id' => '',
-                                                        ),
-                                                        'default_value' => '',
-                                                        'maxlength' => '',
-                                                        'placeholder' => '',
-                                                        'prepend' => '',
-                                                        'append' => '',
-                                                    ),
-                                                ),
-                                                'min' => '',
-                                                'max' => '',
-                                            ),
-                                        ),
-                                        'min' => '',
-                                        'max' => '',
-                                        'button_label' => 'Add a Variable',
-                                        'parent_repeater' => 'field_64066a105f7ec',
-                                    ),
-                                ),
-                            )),
                             array(
                                 'key' => 'field_63a8rrtg15268',
                                 'label' => 'Import Framework',
@@ -4609,7 +2888,7 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                     ),
                     array(
                         'key' => 'field_63bf7z2w1b209',
-                        'label' => 'CSS Classes',
+                        'label' => 'Class Importer',
                         'name' => '',
                         'aria-label' => '',
                         'type' => 'tab',
@@ -4657,249 +2936,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'instructions' => '',
                                 'required' => 0,
                                 'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            ),
-                            array(
-                                'key' => 'field_6schh1cquc519',
-                                'label' => 'Classes Instruction',
-                                'name' => 'brxc_classes_and_styles_global_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>CSS Classes</h3>Improve the way you\'re handling classes inside the Bricks Builder.<br><div class="helpful-links"><span>ⓘ helpful links: </span><a href="https://advancedthemer.com/category/styles-classes/" target="_blank">Official website</a></div>',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            ), 
-                            array(
-                                'key' => 'field_641aferxdk11m',
-                                'label' => 'Enable CSS Classes Features',
-                                'name' => 'brxc_enable_class_and_styles_features',
-                                'aria-label' => '',
-                                'type' => 'checkbox',
-                                'instructions' => 'Enable the following features related to your CSS classes inside the Bricks Builder.',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'vertical-field checkbox-3-col',
-                                    'id' => '',
-                                ),
-                                'choices' => array(
-                                    'class-importer' => '<span>Class Importer.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Import the classes from a CSS file and use them directly inside the builder."></a></span>',
-                                ),
-                                'default_value' => array(),
-                                'return_format' => 'value',
-                                'allow_custom' => 0,
-                                'layout' => 'vertical',
-                                'toggle' => 1,
-                                'save_custom' => 0,
-                            ),
-                            array(
-                                'key' => 'field_63b48c521b209',
-                                'label' => 'Grid Utility Classes',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferxdk11m',
-                                            'operator' => '==',
-                                            'value' => 'grids',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            ),
-                            array(
-                                'key' => 'field_6sdr88tyr89db',
-                                'label' => 'Grids Instruction',
-                                'name' => 'brxc_grids_message',
-                                'aria-label' => '',
-                                'type' => 'message',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'fullwidth-message',
-                                    'id' => '',
-                                ),
-                                'message' => '<h3>Grid Utility Classes</h3>In the following repeater, you can add/edit/remove your grid utility classes. Each row requires a class name (without dots), a gap value, a maximum number of columns, and a minimum column width (expressed in pixels). Once saved, the classes will be available inside the Builder. Note that grids are already fully responsive.<br><div class="helpful-links">The gap field accepts 2 different values for column-gap/row-gap. The script parse the value if any space is included. If you\'re using a css function to create your gaps (clamp(), minmax(), etc...), make sure to remove any space in it.</div>',
-                                'new_lines' => '',
-                                'esc_html' => 0,
-                            ),
-                            array(
-                                'key' => 'field_63b48c6f1b20a',
-                                'label' => 'Grid Classes',
-                                'name' => 'brxc_grid_builder_repeater',
-                                'aria-label' => '',
-                                'type' => 'repeater',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'grid-repeater',
-                                    'id' => '',
-                                ),
-                                'layout' => 'block',
-                                'pagination' => 0,
-                                'min' => 0,
-                                'max' => 0,
-                                'collapsed' => 'field_63b48c6f1b20b',
-                                'button_label' => 'Add a new grid class',
-                                'rows_per_page' => 20,
-                                'sub_fields' => array(
-                                    array(
-                                        'key' => 'field_63b49e528fc9c',
-                                        'label' => 'ID',
-                                        'name' => 'brxc_grid_id',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '',
-                                            'class' => 'hidden',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63b48c6f1b20a',
-                                    ),
-                                    array(
-                                        'key' => 'field_63b48c6f1b20b',
-                                        'label' => 'Class',
-                                        'name' => 'brxc_grid_class',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => '',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '.',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63b48c6f1b20a',
-                                    ),
-                                    array(
-                                        'key' => 'field_63b48d7e1b20e',
-                                        'label' => 'Gap',
-                                        'name' => 'brxc_grid_gap',
-                                        'aria-label' => '',
-                                        'type' => 'text',
-                                        'instructions' => '',
-                                        'required' => 0,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => '',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '2rem',
-                                        'maxlength' => '',
-                                        'placeholder' => '',
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63b48c6f1b20a',
-                                    ),
-                                    array(
-                                        'key' => 'field_63b48c6f1b20c',
-                                        'label' => 'Max N° of Cols',
-                                        'name' => 'brxc_grid_max_col',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => '',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'min' => 1,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 1,
-                                        'prepend' => '',
-                                        'append' => '',
-                                        'parent_repeater' => 'field_63b48c6f1b20a',
-                                    ),
-                                    array(
-                                        'key' => 'field_63b48c6f1b20d',
-                                        'label' => 'Min Col Width',
-                                        'name' => 'brxc_grid_min_width',
-                                        'aria-label' => '',
-                                        'type' => 'number',
-                                        'instructions' => '',
-                                        'required' => 1,
-                                        'conditional_logic' => 0,
-                                        'wrapper' => array(
-                                            'width' => '25',
-                                            'class' => '',
-                                            'id' => '',
-                                        ),
-                                        'default_value' => '',
-                                        'min' => 0,
-                                        'max' => '',
-                                        'placeholder' => '',
-                                        'step' => 1,
-                                        'prepend' => '',
-                                        'append' => 'px',
-                                        'parent_repeater' => 'field_63b48c6f1b20a',
-                                    ),
-                                ),
-                            ),
-                            array(
-                                'key' => 'field_63b4bd4816ac0',
-                                'label' => 'Class Importer',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641aferxdk11m',
-                                            'operator' => '==',
-                                            'value' => 'class-importer',
-                                        ),
-                                    ),
-                                ),
                                 'wrapper' => array(
                                     'width' => '',
                                     'class' => '',
@@ -5266,17 +3302,14 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'variable-color-picker'  => '<span>Color Variables Picker <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll enable a new right-click event on all the color inputs inside the builder. This action will open a color variable picker where you can visually select the color to apply to your control."></a></span>',
                                     'autocomplete-variable' => '<span>Suggestions Dropdown for CSS Variables. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, a dropdown will show up at the bottom of each field when typing with the suggestion list of all the matching CSS variables."></a></span>',
                                     'autocomplete-variable-preview-hover' => '<span>Autocomplete Suggestions on Hover. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, hovering a CSS variable inside the suggestion dropdown will temporarily apply it the field in order to preview the value inside the builder iframe."></a></span>',
-                                    //'highlight-classes' => '<span>Highlight Classes. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, a blue outline will appear on all the elements that share the same class when you select it inside the builder. It\'s a great way to localize where your classes are applied."></a></span>',
                                     'count-classes' => '<span>Count Classes & Navigation. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, a new counter will show up next to the class name that indicates the number of times the class is used on the page. Clicking on the counter will scroll the page to each element that is using the active class."></a></span>',
                                     'color-preview' => '<span>Color Preview on hover.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked and the color grid of any element is open, hovering on each color will temporarily apply the color to the element. This is a great way to preview your colors inside the builder."></a></span>',
                                     'class-preview' => '<span>Class Preview on hover.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked and the class dropdown of any element is open, hovering on each class will temporarily apply the class to the element. This is a great way to preview the impact of a class to your elements inside the builder."></a></span>',
-                                    //'class-indicator' => '<span>Indicators of styles inherited from a class. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new blue dot on the left of all the controls that have a style generated from an active class."></a></span>',
                                     'breakpoint-indicator' => '<span>Breakpoint Indicator. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new small device icon next to each group that has style set on different breakpoint inside the style tab."></a></span>',
                                     'locked-class-indicator' => '<span>Locked Class Indicator. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the locked classes will appear with red background inside the builder. The unlocked ones will be displayed with a green background."></a></span>',
                                     'focus-on-first-class'  => '<span>Auto-focus on the First Unlocked Class.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the first unlocked class of the selected element will be enabled instead of the ID style level."></a></span>',
                                     'sync-label'  => '<span>Sync Element\'s label with the first Global Class name. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, as soon as you add a global class to an element, it will synch the elements label based on the class name."></a></span>',
                                     'autoformat-field-values' => '<span>Autoformat your control values. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, AT will autoformat your control values with CSS functions such as: var(), calc(), clamp(), min(), max() and PX to REM converter (as soon as you unfocus the control)."></a></span>',
-                                    //'scoped-variables' => '<span>Scoped Variables.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, a new repeater control will be available inside the CSS tab where you can set scoped variables."></a></span>',
         
                                 ),
                                 'default_value' => array(
@@ -5285,11 +3318,9 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'variable-picker',
                                     'autocomplete-variable',
                                     'autocomplete-variable-preview-hover',
-                                    //'highlight-classes',
                                     'count-classes',
                                     'color-preview',
                                     'class-preview',
-                                    //'class-indicator',
                                     'breakpoint-indicator',
                                     'locked-class-indicator',
                                     'focus-on-first-class',
@@ -5501,7 +3532,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'lorem-ipsum' => '<span>Enable Lorem Ipsum Generator.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new icon popping up on the relevant text/textarea fields inside the Bricks builder. When clicked on it, the script will automatically generate dummy content for that specific field."></a></span>',
                                     'diable-pin-on-elements' => '<span>Disable the PIN Icon on the elements list. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, The PIN icon inside the Elements List will be hidden."></a></span>',
                                     'close-accordion-tabs' => '<span>Close all open Style accordions by default. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, all the tabs of the Style panel will be closed by default. This allows you to avoid closing the layout tab continuously when styling an element."></a></span>',
-                                    //'hide-inactive-accordion-panel' => '<span>Hide inactive Style accordion panel. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, all the inactive accordion panels inside the Style tab will be hidden and only the opened accordion panel will show up."></a></span>',
                                     'disable-borders-boxshadows' => '<span>Disable element\'s outline when styling Borders and Box-shadow. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the green outline that surrounds the active element will be removed to consent you to easily style both borders and box-shadows."></a></span>',
                                     'resize-elements-icons' => '<span>Elements Columns & Collapse/Expand. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see new icons on the top-right of the global elements panel that will allow you to control the grid\'s column number and to collapse/expand the different categories."></a></span>',
                                     'superpower-custom-css' => '<span>Superpower the Custom CSS control.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the custom css controls will integrate new functionalities such as: match brackets, auto-indent, search function, css variable autocomplete, etc..."></a></span>',
@@ -5518,13 +3548,10 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'focus-point' => '<span>Focus Point.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option will add a new icon next to the background-position and the object-position controls. Clicking on it will open a new modal where you can set the exact focus point of your images."></a></span>',
                                     'mask-helper' => '<span>Mask Helper.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option will add a new icon next to the mask controls. Clicking on it will open a new modal where you can preview all the existing masks included in Bricks on your image."></a></span>',
                                     'dynamic-data-modal' => '<span>Dynamic Data Modal.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option will replace the core Bricks dynamic data dropdown by a fullscreen filterable modal"></a></span>',
-                                    'code-element-tweaks' => '<span>Code Element tweaks. <span class="improved-feature">IMPROVED</span><a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new icons popping up inside the native Code Element"></a></span>',
-
                                 ),
                                 'default_value' => array(
                                     'lorem-ipsum',
                                     'close-accordion-tabs',
-                                    //'hide-inactive-accordion-panel',
                                     'disable-borders-boxshadows',
                                     'resize-elements-icons',
                                     'superpower-custom-css',
@@ -5539,8 +3566,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'focus-point',
                                     'mask-helper',
                                     'dynamic-data-modal',
-                                    // 'code-element-tweaks',
-
                                 ),
                                 'return_format' => 'value',
                                 'allow_custom' => 0,
@@ -5653,7 +3678,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 ),
                                 'choices' => array(
                                     'class-contextual-menu' => '<span>Class Contextual Menu. <span class="new-feature">RECOMMENDED</span><a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is enabled, a new icon will show up next to the class input. When clicked on the icon, a new menu will be displayed with tons of improvements for your classes and styles."></a></span>',
-                                    //'tabs-shortcuts' => '<span>Left Tabs Shortcuts. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to enable the left-panel shorcuts to quickly access to your style groups."></a></span>',
                                     'pseudo-shortcut' => '<span>Pseudo-Elements. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, new icon shortcuts will display next to the Condtions and Interactions icons."></a></span>',
                                     'css-shortcut' => '<span>Element CSS Shortcut. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new icon popping up on the left panel of each element. Clicking on this icon open the CSS tab of the current element/class."></a></span>',
                                     'parent-shortcut' => '<span>Go to Parent. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, you\'ll see a new icon popping up on the left panel of each element. Clicking on this icon will activate the parent element."></a></span>',
@@ -5686,98 +3710,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'toggle' => 1,
                                 'save_custom' => 0,
                             ),
-                            // array(
-                            //     'key' => 'field_63a843d56ff8x',
-                            //     'label' => 'Left Tabs Shortcuts - Top Offset',
-                            //     'name' => 'brxc_shortcuts_top_offset',
-                            //     'aria-label' => '',
-                            //     'type' => 'number',
-                            //     'instructions' => 'Insert the distance between the Bricks logo and the first icon shortcut.',
-                            //     'required' => 0,
-                            //     'conditional_logic' => array(
-                            //         array(
-                            //             array(
-                            //                 'field' => 'field_64074geddhxir',
-                            //                 'operator' => '==',
-                            //                 'value' => 'tabs-shortcuts',
-                            //             ),
-                            //         ),
-                            //     ),
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => '',
-                            //         'id' => '',
-                            //     ),
-                            //     'default_value' => 159.5,
-                            //     'min' => '',
-                            //     'max' => '',
-                            //     'placeholder' => '',
-                            //     'step' => 0.1,
-                            //     'prepend' => '',
-                            //     'append' => 'px',
-                            // ),
-                            // array(
-                            //     'key' => 'field_6426786feb84a',
-                            //     'label' => 'Left Tabs Shortcuts ',
-                            //     'name' => 'brxc_enable_shortcuts_tabs',
-                            //     'aria-label' => '',
-                            //     'type' => 'checkbox',
-                            //     'instructions' => 'Select the shortcut icons you want to display inside each element panel. This will create an icon for each Content/Style Tab to quickly access the accordion tab when styling an element inside the Builder',
-                            //     'required' => 0,
-                            //     'conditional_logic' => array(
-                            //         array(
-                            //             array(
-                            //                 'field' => 'field_64074geddhxir',
-                            //                 'operator' => '==',
-                            //                 'value' => 'tabs-shortcuts',
-                            //             ),
-                            //         ),
-                            //     ),
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => 'checkbox-3-col',
-                            //         'id' => '',
-                            //     ),
-                            //     'choices' => array(
-                            //         'content' => 'Content',
-                            //         'layout' => 'Layout',
-                            //         'typography' => 'Typography',
-                            //         'background' => 'Background',
-                            //         'border' => 'Borders',
-                            //         'gradient' => 'Gradient',
-                            //         'shapes' => 'Shape Dividers',
-                            //         'transform' => 'Transform',
-                            //         'filter' => 'Filters / Transitions',
-                            //         'animation' => 'Animations ',
-                            //         'css' => 'CSS',
-                            //         'classes' => 'Classes / ID',
-                            //         'attributes' => 'Attributes',
-                            //         'generated-code' => 'Generated Code',
-                            //         'pageTransition' => 'Page Transition ',
-                            //     ),
-                            //     'default_value' => array(
-                            //         'content',
-                            //         'layout',
-                            //         'typography',
-                            //         'background',
-                            //         'border',
-                            //         'gradient',
-                            //         'shapes',
-                            //         'transform',
-                            //         'filter',
-                            //         'animation',
-                            //         'css',
-                            //         'classes',
-                            //         'attributes',
-                            //         'generated-code',
-                            //         'pageTransition',
-                            //     ),
-                            //     'return_format' => '',
-                            //     'allow_custom' => 0,
-                            //     'layout' => '',
-                            //     'toggle' => 1,
-                            //     'save_custom' => 0,
-                            // ),
                             array(
                                 'key' => 'field_6420a42b78413',
                                 'label' => 'Pseudo Elements Shortcuts',
@@ -5865,8 +3797,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'image-caption-off' => '<span>Set caption as "No caption" for Images. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to set No caption as the default caption value for all the image elements."></a></span>',
                                     'button-button' => '<span>Set "button" as the default HTML tag for Buttons. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to set the default HTML tag of all the button elements as a button."></a></span>',
                                     'heading-textarea' => '<span>Set text input as a textarea for Headings. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to set text input of all the heading elements as a textarea."></a></span>',
-                                    // 'icon-svg' => '<span>Set SVG as the default library for Icons. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to set the default Icon library to SVG (make sure you set the right permission for SVG upload in the Bricks Settings)."></a></span>',
-                                    //'remove-icon-library-options' => '<span>Remove Default Libraries for Icons. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to remove the default Icon libraries (Themify, ion, etc..) within the Icon element. Make sure you set the right permission for SVG upload in the Bricks Settings."></a></span>',
                                     'filter-tab' => '<span>New Filters / Transitions Tab. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to create a new accordion called \'Filters / Transitions\' in the style tab of each element."></a></span>',
                                     'classes-tab' => '<span>New Classes / ID Tab. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to to create a new accordion called \'Classes / ID\' in the style tab of each element.."></a></span>',
                                     'overflow-dropdown' => '<span>Set the Overflow control as a dropdown. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to transform the overflow control in a dropdown control with predefined values."></a></span>',
@@ -5881,7 +3811,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'break' => '<span class="attention-text">New "break" controls. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to add the break settings (break-before, break-inside, break-after) to your style layout settings."></a></span>',
                                     'transform' => '<span class="attention-text">New "transform" & "perspective" controls. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to add advanced transform properties (style, box, perspective, perspective-origin, backface-visibility) to your transform settings."></a></span>',
                                     'css-filters' => '<span class="attention-text">New "backdrop-filter" controls. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Check this option to add the backdrop-filter property to your Filters settings."></a></span>',
-                                    //'hide-remove-element' => '<span class="attention-text">New "Hide/Remove Element" controls.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option allows you to hide any element inside the builder, and/or remove the element from the DOM on the frontend."></a></span>',
                                     'logical-properties' => '<span class="attention-text">Logical Properties.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option allows you to add all logical properties controls"></a></span>',
                                     'remove-style-controls' => '<span class="danger-text">Remove All Styling Controls. <span class="new-feature">NEW</span><a href="#" class="dashicons dashicons-info acf-js-tooltip" title="This option allows you to remove all the styling controls in the builder. Toggle this option if you plan to use 100% custom CSS."></a></span>',
                                     
@@ -5931,34 +3860,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'ui_off_text' => '',
                                 'ui' => 1,
                             ),
-                            // array(
-                            //     'key' => 'field_6395700565hfh',
-                            //     'label' => 'Hide/Remove Element - Floating Bar visible by default ',
-                            //     'name' => 'brxc_default_floating_bar',
-                            //     'aria-label' => '',
-                            //     'type' => 'true_false',
-                            //     'instructions' => 'If this field is checked, a floating bar will be visible by default at the bottom of the Structure Panel. This bar makes it easy to toggle elements visibility.',
-                            //     'required' => 0,
-                            //     'conditional_logic' => array(
-                            //         array(
-                            //             array(
-                            //                 'field' => 'field_64074gedhc99o',
-                            //                 'operator' => '==',
-                            //                 'value' => 'hide-remove-element',
-                            //             ),
-                            //         ),
-                            //     ),
-                            //     'wrapper' => array(
-                            //         'width' => '',
-                            //         'class' => '',
-                            //         'id' => '',
-                            //     ),
-                            //     'message' => '',
-                            //     'default_value' => 1,
-                            //     'ui_on_text' => '',
-                            //     'ui_off_text' => '',
-                            //     'ui' => 1,
-                            // ),
                             array(
                                 'key' => 'field_6395700sxsmoh',
                                 'label' => 'Logical Properties - Remove Directional Properties',
@@ -6694,67 +4595,13 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'class' => 'fullwidth-message',
                                     'id' => '',
                                 ),
-                                'message' => '<h3>Strict Editor View</h3>The Strict Sditor View restricts style access inside the builder for your clients. It also adds numerous improvements to the overall Bricks experience for non-techy users.<br><div class="helpful-links"><span>ⓘ helpful links: </span><a href="https://advancedthemer.com/category/strict-editor-view/" target="_blank">Official website</a></div>',
+                                'message' => '<h3>Strict Editor View</h3>Strict Editor View limits access to style controls in the builder for your clients, while also introducing several enhancements that improve the overall Bricks experience for non-technical users. <br><br><strong>Please note: the settings below apply to all editor roles (as opposed to full-access roles), regardless of whether you’re using the custom capabilities introduced in Bricks 2.0.</strong><br><div class="helpful-links"><span>ⓘ helpful links: </span><a href="https://advancedthemer.com/category/strict-editor-view/" target="_blank">Official website</a></div>',
                                 'new_lines' => '',
                                 'esc_html' => 0,
                             ),   
                             array(
-                                'key' => 'field_641afertt51dg',
-                                'label' => 'Enable Strict Editor View Features',
-                                'name' => 'brxc_enable_strict_editor_view_features',
-                                'aria-label' => '',
-                                'type' => 'checkbox',
-                                'instructions' => 'Enable the following features for your clients when using the Strict Editor View.',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'vertical-field checkbox-4-col',
-                                    'id' => '',
-                                ),
-                                'choices' => array(
-                                    'white-label' => '<span>White Label. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Customize the look and feel of the builder for your clients."></a></span>',
-                                    'toolbar' => '<span>Toolbar. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Choose which icon should be enabled inside the builder\'s toolbar."></a></span>',
-                                    'elements' => '<span>Elements. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="Choose which bricks element should selectable/editable by your client inside the builder."></a></span>',
-                                ),
-                                'default_value' => array(
-                                    'toolbar',
-                                    'elements',
-                                ),
-                                'return_format' => 'value',
-                                'allow_custom' => 0,
-                                'layout' => 'vertical',
-                                'toggle' => 1,
-                                'save_custom' => 0,
-                            ),
-                            array(
-                                'key' => 'field_23df21d33gxib6',
-                                'label' => 'White label',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641afertt51dg',
-                                            'operator' => '==',
-                                            'value' => 'white-label',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            ),
-                            array(
                                 'key' => 'field_64066003f4140',
-                                'label' => 'Change Logo Image in the Builder',
+                                'label' => 'Change Tobbar Logo Image',
                                 'name' => 'brxc_change_logo_img_skip_export',
                                 'aria-label' => '',
                                 'type' => 'image',
@@ -6779,7 +4626,7 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                             ),
                             array(
                                 'key' => 'field_640660aee91e4',
-                                'label' => 'Change the Accent Color in Editor Mode',
+                                'label' => 'Change Accent Color',
                                 'name' => 'brxc_change_accent_color',
                                 'aria-label' => '',
                                 'type' => 'color_picker',
@@ -6794,31 +4641,6 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'default_value' => '#ffd64f',
                                 'enable_opacity' => 0,
                                 'return_format' => 'string',
-                            ),
-                            array(
-                                'key' => 'field_23df21d3ttr857',
-                                'label' => 'Toolbar',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641afertt51dg',
-                                            'operator' => '==',
-                                            'value' => 'toolbar',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
                             ),
                             array(
                                 'key' => 'field_64065d4de47ca',
@@ -6836,11 +4658,8 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 ),
                                 'choices' => array(
                                     'logo' => 'Logo',
-                                    'help' => 'Help',
                                     'pages' => 'Pages',
-                                    'revisions' => 'Revisions',
-                                    'class-manager' => 'Class Manager',
-                                    'settings' => 'Settings',
+                                    'command-palette' => 'Command Palette',
                                     'breakpoints' => 'Breakpoints',
                                     'dimensions' => 'Dimensions',
                                     'undo-redo' => 'Undo / Redo',
@@ -6868,64 +4687,8 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'save_custom' => 0,
                             ),
                             array(
-                                'key' => 'field_23df21d3gkp1l9',
-                                'label' => 'Elements',
-                                'name' => '',
-                                'aria-label' => '',
-                                'type' => 'tab',
-                                'instructions' => '',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_641afertt51dg',
-                                            'operator' => '==',
-                                            'value' => 'elements',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => '',
-                                    'id' => '',
-                                ),
-                                'placement' => 'left',
-                                'endpoint' => 0,
-                            ),       
-                            array(
-                                'key' => 'field_63e0ccbf3f5d0',
-                                'label' => 'Enable the following elements on Strict Editor View ',
-                                'name' => 'brxc_enable_strict_editor_view_elements',
-                                'aria-label' => '',
-                                'type' => 'checkbox',
-                                'instructions' => 'All the following checked elements will be selectable by your clients inside the editor and, thus, partially editable. All the others will be in read-only mode.',
-                                'required' => 0,
-                                'conditional_logic' => 0,
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'vertical-field checkbox-5-col big-title',
-                                    'id' => '',
-                                ),
-                                'choices' => $brxc_acf_fields['builder_elements'],
-                                'default_value' => array(
-                                    'heading',
-                                    'text-basic',
-                                    'text',
-                                    'text-link',
-                                    'button',
-                                    'icon',
-                                    'image',
-                                    'video',
-                                ),
-                                'return_format' => 'array',
-                                'allow_custom' => 0,
-                                'layout' => 'vertical',
-                                'toggle' => 1,
-                                'save_custom' => 0,
-                            ),
-                            array(
                                 'key' => 'field_64065d4ttv4z2',
-                                'label' => 'Builder Tweaks for Editors',
+                                'label' => 'Builder Tweaks',
                                 'name' => 'brxc_strict_editor_view_tweaks',
                                 'aria-label' => '',
                                 'type' => 'checkbox',
@@ -6934,69 +4697,35 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                 'conditional_logic' => 0,
                                 'wrapper' => array(
                                     'width' => '',
-                                    'class' => 'vertical-field checkbox-3-col big-title separation',
+                                    'class' => 'vertical-field checkbox-3-col',
                                     'id' => '',
                                 ),
                                 'choices' => array(
-                                    'disable-all-controls' => '<span>Disable All controls by default.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, all the controls for each element are disabled in the Editor View. You will need to manually enable the controls you want to show to the editors inside the Builder using the Strict Editor builder tweak."></a></span>',
-                                    'hide-id-class' => '<span>Hide the ID/Class control.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the control that shows the ID/Class of each element is hidden (inside the element window)."></a></span>',
-                                    'hide-dynamic-data' => '<span>Hide the Dynamic Data trigger. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the dynamic data icon won\'t show up inside the controls that allow dynamic data."></a></span>',
-                                    'hide-text-toolbar' => '<span>Hide the Text/Heading Toolbar.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the text toolbar will be hidden when clicking on texts inside the preview window."></a></span>',
-                                    'hide-structure-panel' => '<span>Hide the Structure panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the right structure panel will be hidden and the preview window will take all the available space in the builder."></a></span>',
-                                    'reduce-left-panel-visibility' => '<span>Reduce Left Panel Visibility. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the left panel will be hidden most of the time. It will show up when strictly necessary (changing an image or a setting that can\'t be edited from the iframe)."></a></span>',
-                                    //'disable-header-footer-edit-button-on-hover' => '<span>Disable Header & Footer edit button on hover. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is enabled, editors won\'t have access to the Header & Footer edit link when hovering over the sections."></a></span>',
-                                    //'remove-template-settings-links' => '<span>Remove Template & Settings Links. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is enabled, all the links referring to Bricks templates and Settings will be removed for the editors. That include the Bricks Admin menu item and the Toolbar"></a></span>',
+                                    'hide-quick-access-bar' => '<span>Hide Quick Access Bar in the Element Panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the quick access bar that allows to switch between style tabs is hidden."></a></span>',
+                                    'hide-element-panel-header' => '<span>Hide Header in the Element Panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the elements header within the element panel is hidden."></a></span>',
+                                    'hide-id-class' => '<span>Hide ID/Class control in the Element Panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the control that shows the ID/Class of each element is hidden (inside the element window)."></a></span>',
+                                    'disable-all-controls' => '<span class="danger-text">Disable All controls in the Element Panel by default.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, all the controls for each element are disabled in the Editor View. You will need to manually enable the controls you want to show to the editors inside the Builder using the Strict Editor Settings tweak (AT Main Menu - Strict Editor Settings) in the admin builder view."></a></span>',
+                                    'hide-dynamic-data' => '<span>Hide Dynamic Data trigger in the Element Panel. <a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the dynamic data icon won\'t show up inside the controls that allow dynamic data."></a></span>',
+                                    'hide-element-search-box' => '<span>Hide Search Box in the Element Panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the search box at the bottom of the element panel is hidden."></a></span>',
+                                    'hide-structure-panel' => '<span>Hide Structure panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the right structure panel will be hidden and the preview window will take all the available space in the builder."></a></span>',
+                                    'hide-element-states' => '<span>Hide Elements States in the Structure Panel.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the elements states (icons on the right of each element) will be hidden in the Structure Panel."></a></span>',
+                                    'hide-preview-element-actions' => '<span>Hide Elements Actions within the Preview Iframe.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the elements actions (icons on the bottom of each element) will be hidden in the Preview Iframe."></a></span>',
+                                    'hide-text-toolbar' => '<span>Hide Text/Heading Toolbar in the Preview Iframe.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, the text toolbar will be hidden when clicking on texts inside the preview window."></a></span>',
+                                    'disable-contextual-menu' => '<span>Disable Contextual Menu\'s.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is checked, right-clicking within the Preview Iframe or within the Structure Panel won\'t trigger the corresponding Contextual Menu."></a></span>',
                                     'custom-css' => '<span>Inject Custom CSS.<a href="#" class="dashicons dashicons-info acf-js-tooltip" title="When this option is enabled, you\'ll be able to add Custom CSS that will only apply inside the Builder Editor view."></a></span>',
 
                                 ),
                                 'default_value' => array(
-                                    'disable-all-controls',
+                                    'hide-quick-access-bar',
+                                    'hide-element-panel-header',
                                     'hide-id-class',
                                     'hide-dynamic-data',
-                                    'hide-text-toolbar',
+                                    'hide-element-search-box',
                                     'hide-structure-panel',
-                                    'reduce-left-panel-visibility',
-                                    //'disable-header-footer-edit-button-on-hover',
-                                    //'remove-template-settings-links',
-                                ),
-                                'return_format' => 'value',
-                                'allow_custom' => 0,
-                                'layout' => 'vertical',
-                                'toggle' => 1,
-                                'save_custom' => 0,
-                            ),
-                            array(
-                                'key' => 'field_63aabb0rgrci4',
-                                'label' => 'Elements with left panel visibility enabled. ',
-                                'name' => 'brxc_enable_left_visibility_elements',
-                                'aria-label' => '',
-                                'type' => 'checkbox',
-                                'instructions' => 'Select the Elements with left panel visibility enabled. When these elements will be active, the left element panel will slide-right and the editor will be able to manage the elements options.',
-                                'required' => 0,
-                                'conditional_logic' => array(
-                                    array(
-                                        array(
-                                            'field' => 'field_64065d4ttv4z2',
-                                            'operator' => '==',
-                                            'value' => 'reduce-left-panel-visibility',
-                                        ),
-                                    ),
-                                ),
-                                'wrapper' => array(
-                                    'width' => '',
-                                    'class' => 'vertical-field checkbox-5-col',
-                                    'id' => '',
-                                ),
-                                'choices' => $brxc_acf_fields['builder_elements'],
-                                'default_value' => array(
-                                    'heading',
-                                    'text-basic',
-                                    'text',
-                                    'text-link',
-                                    'button',
-                                    'icon',
-                                    'image',
-                                    'video',
+                                    'hide-element-states',
+                                    'hide-preview-element-actions',
+                                    'hide-text-toolbar',
+                                    'disable-contextual-menu'
                                 ),
                                 'return_format' => 'value',
                                 'allow_custom' => 0,
@@ -7144,6 +4873,9 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'id' => '',
                                 ),
                                 'choices' => array(
+                                    'gpt-5' => 'gpt-5',
+                                    'gpt-5-mini' => 'gpt-5-mini',
+                                    'gpt-5-nano' => 'gpt-5-nano',
                                     'gpt-4.1' => 'gpt-4.1',
                                     'gpt-4.1-mini' => 'gpt-4.1-mini',
                                     'gpt-4.1-nano' => 'gpt-4.1-nano',
@@ -7158,7 +4890,7 @@ Other than being less confusing than other Ipsum’s, Website Ipsum is also form
                                     'gpt-4-turbo' => 'gpt-4-turbo',
                                     'gpt-3.5-turbo' => 'gpt-3.5-turbo',
                                 ),
-                                'default_value' => 'gpt-4.1',
+                                'default_value' => 'gpt-5-mini',
                                 'return_format' => 'value',
                                 'multiple' => 0,
                                 'allow_null' => 0,

@@ -123,7 +123,7 @@ class Filter_Checkbox extends Filter_Element {
 
 		echo "<ul {$this->render_attributes('_root')}>";
 
-		foreach ( $this->populated_options as $index => $option ) {
+		foreach ( $this->get_populated_options() as $index => $option ) {
 			/**
 			 * Skip empty text options
 			 *

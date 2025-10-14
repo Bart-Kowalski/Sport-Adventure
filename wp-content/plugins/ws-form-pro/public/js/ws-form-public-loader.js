@@ -136,22 +136,22 @@
 		// On calculate when shown
 		if(!this.form_obj.hasClass('wsf-form-loader-show')) { return; }
 
+		// Get loader obj
+		var loader_obj = $('.wsf-loader', this.form_canvas_obj);
+		if(!loader_obj.length) { return; }
+
 		// Get form width
 		var width = this.form_canvas_obj.width();
 
 		// Get form height
 		var height = this.form_canvas_obj.height();
 
-		// Get loader obj
-		var loader_obj = $('.wsf-loader', this.form_canvas_obj);
-		if(!loader_obj) { return; }
-
 		// Set loader width and height
 		loader_obj.width(width).height(height);
 
 		// Get loader inner obj
 		var loader_inner_obj = $('.wsf-loader-inner', loader_obj);
-		if(!loader_inner_obj) { return; }
+		if(!loader_inner_obj.length) { return; }
 
 		// Get loader inner width
 		var loader_inner_width = loader_inner_obj.width();
@@ -167,7 +167,14 @@
 			// Calculate always visible offset
 			var document_scroll_top = $(document).scrollTop();
 			var window_height = $(window).height();
-			if(typeof(loader_obj.position) !== 'function') { return false; }
+			if(
+				!loader_obj.position ||
+				(typeof(loader_obj.position) !== 'function') ||
+				(typeof(loader_obj.position()) !== 'object')
+			) {
+				return false;
+			}
+
 			var loader_obj_top = loader_obj.position().top;
 			var loader_obj_height = loader_obj.height();
 			var loader_obj_bottom = loader_obj_top + loader_obj_height;

@@ -46,8 +46,6 @@
 			}
 		}
 
-		// Progress for tabs
-		if(typeof(this.form_progress_tabs) === 'function') { this.form_progress_tabs(index); }
 		// If we are using the WS Form framework, then we need to run our own tabs script
 		if($.WS_Form.settings_plugin.framework === 'ws-form') {
 
@@ -63,7 +61,10 @@
 			this.form_tab_group_index_set(index);
 		}
 
-		var framework_tabs = this.framework['tabs']['public'];
+		// Progress for tabs
+		if(typeof(this.form_progress_tabs) === 'function') { this.form_progress_tabs(); }
+
+		var framework_tabs = this.framework.tabs.public;
 
 		if(typeof(framework_tabs.event_js) !== 'undefined') {
 
@@ -107,7 +108,7 @@
 				}
 
 				// Progress for tabs
-				if(typeof(ws_this.form_progress_tabs) === 'function') { ws_this.form_progress_tabs(tab_index); }
+				if(typeof(ws_this.form_progress_tabs) === 'function') { ws_this.form_progress_tabs(); }
 
 				// Redraw signatures
 				if(typeof(ws_this.signatures_redraw) === 'function') { ws_this.signatures_redraw(tab_index); }
@@ -346,7 +347,7 @@
 		// Check that tabs exist
 		if(Object.keys(this.form.groups).length <= 1) { return false; }
 
-		var framework_tabs = this.framework['tabs']['public'];
+		var framework_tabs = this.framework.tabs.public;
 
 		if(typeof(framework_tabs.activate_js) !== 'undefined') {
 
@@ -367,7 +368,7 @@
 		}
 
 		// Progress by tabs
-		if(typeof(this.form_progress_tabs) === 'function') { this.form_progress_tabs(group_index); }
+		if(typeof(this.form_progress_tabs) === 'function') { this.form_progress_tabs(); }
 
 		// Log
 		this.log('log_group_index', group_index);

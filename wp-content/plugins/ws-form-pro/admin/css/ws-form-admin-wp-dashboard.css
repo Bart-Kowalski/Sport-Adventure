@@ -53,7 +53,7 @@ input[type=date].wsf-field, input[type=datetime-local].wsf-field, input[type=mon
   margin: 0;
   padding: 5.1px 6px;
   touch-action: manipulation;
-  transition: background-color 200ms ease-in-out,border-color 200ms ease-in-out,background-image 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out, background-image 200ms ease-in-out;
   width: 100%;
 }
 
@@ -98,7 +98,7 @@ input[type=date].wsf-field:focus, input[type=datetime-local].wsf-field:focus, in
   border-color: #39d;
 }
 
-button.wsf-button, input[type="button"].wsf-button, input[type="submit"].wsf-button, input[type="reset"].wsf-button, a.wsf-button {
+button.wsf-button, input[type=button].wsf-button, input[type=submit].wsf-button, input[type=reset].wsf-button, a.wsf-button {
   background-color: #CECED2;
   border: 1px solid #CECED2;
   border-radius: 4px;
@@ -113,7 +113,7 @@ button.wsf-button, input[type="button"].wsf-button, input[type="submit"].wsf-but
   padding: 5.1px 6px;
   text-align: center;
   text-decoration: none;
-  transition: background-color 200ms ease-in-out,border-color 200ms ease-in-out,opacity 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out, opacity 200ms ease-in-out;
   touch-action: manipulation;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -122,7 +122,7 @@ button.wsf-button, input[type="button"].wsf-button, input[type="submit"].wsf-but
   vertical-align: middle;
 }
 
-button.wsf-button.wsf-button-small, input[type="button"].wsf-button.wsf-button-small, input[type="submit"].wsf-button.wsf-button-small, input[type="reset"].wsf-button.wsf-button-small, a.wsf-button.wsf-button-small {
+button.wsf-button.wsf-button-small, input[type=button].wsf-button.wsf-button-small, input[type=submit].wsf-button.wsf-button-small, input[type=reset].wsf-button.wsf-button-small, a.wsf-button.wsf-button-small {
   border-radius: 3px;
   font-size: 12px;
   height: 29px;
@@ -130,25 +130,25 @@ button.wsf-button.wsf-button-small, input[type="button"].wsf-button.wsf-button-s
   padding-right: 4px;
 }
 
-button.wsf-button.wsf-button-information, input[type="button"].wsf-button.wsf-button-information, input[type="submit"].wsf-button.wsf-button-information, input[type="reset"].wsf-button.wsf-button-information, a.wsf-button.wsf-button-information {
+button.wsf-button.wsf-button-information, input[type=button].wsf-button.wsf-button-information, input[type=submit].wsf-button.wsf-button-information, input[type=reset].wsf-button.wsf-button-information, a.wsf-button.wsf-button-information {
   background-color: #39d;
   border-color: #39d;
   color: #fff;
 }
 
-button.wsf-button.wsf-button-information:hover, input[type="button"].wsf-button.wsf-button-information:hover, input[type="submit"].wsf-button.wsf-button-information:hover, input[type="reset"].wsf-button.wsf-button-information:hover, a.wsf-button.wsf-button-information:hover {
+button.wsf-button.wsf-button-information:hover, input[type=button].wsf-button.wsf-button-information:hover, input[type=submit].wsf-button.wsf-button-information:hover, input[type=reset].wsf-button.wsf-button-information:hover, a.wsf-button.wsf-button-information:hover {
   background-color: #207ebd;
   border-color: #207ebd;
   color: #fff;
 }
 
-button.wsf-button.wsf-button-information:focus, button.wsf-button.wsf-button-information:active, input[type="button"].wsf-button.wsf-button-information:focus, input[type="button"].wsf-button.wsf-button-information:active, input[type="submit"].wsf-button.wsf-button-information:focus, input[type="submit"].wsf-button.wsf-button-information:active, input[type="reset"].wsf-button.wsf-button-information:focus, input[type="reset"].wsf-button.wsf-button-information:active, a.wsf-button.wsf-button-information:focus, a.wsf-button.wsf-button-information:active {
+button.wsf-button.wsf-button-information:focus, button.wsf-button.wsf-button-information:active, input[type=button].wsf-button.wsf-button-information:focus, input[type=button].wsf-button.wsf-button-information:active, input[type=submit].wsf-button.wsf-button-information:focus, input[type=submit].wsf-button.wsf-button-information:active, input[type=reset].wsf-button.wsf-button-information:focus, input[type=reset].wsf-button.wsf-button-information:active, a.wsf-button.wsf-button-information:focus, a.wsf-button.wsf-button-information:active {
   background-color: #186192;
   border-color: #186192;
   color: #fff;
 }
 
-button.wsf-button svg, input[type="button"].wsf-button svg, input[type="submit"].wsf-button svg, input[type="reset"].wsf-button svg, a.wsf-button svg {
+button.wsf-button svg, input[type=button].wsf-button svg, input[type=submit].wsf-button svg, input[type=reset].wsf-button svg, a.wsf-button svg {
   display: inline-block;
   height: 16px;
   position: relative;
@@ -157,16 +157,16 @@ button.wsf-button svg, input[type="button"].wsf-button svg, input[type="submit"]
   width: 16px;
 }
 
-button.wsf-button.wsf-button-small svg, input[type="button"].wsf-button.wsf-button-small svg, input[type="submit"].wsf-button.wsf-button-small svg, input[type="reset"].wsf-button.wsf-button-small svg, a.wsf-button.wsf-button-small svg {
+button.wsf-button.wsf-button-small svg, input[type=button].wsf-button.wsf-button-small svg, input[type=submit].wsf-button.wsf-button-small svg, input[type=reset].wsf-button.wsf-button-small svg, a.wsf-button.wsf-button-small svg {
   height: 14px;
   width: 14px;
 }
 
-button.wsf-button svg path, input[type="button"].wsf-button svg path, input[type="submit"].wsf-button svg path, input[type="reset"].wsf-button svg path, a.wsf-button svg path {
+button.wsf-button svg path, input[type=button].wsf-button svg path, input[type=submit].wsf-button svg path, input[type=reset].wsf-button svg path, a.wsf-button svg path {
   fill: #000;
 }
 
-button.wsf-button.wsf-button-information svg path, input[type="button"].wsf-button.wsf-button-information svg path, input[type="submit"].wsf-button.wsf-button-information svg path, input[type="reset"].wsf-button.wsf-button-information svg path, a.wsf-button.wsf-button-information svg path {
+button.wsf-button.wsf-button-information svg path, input[type=button].wsf-button.wsf-button-information svg path, input[type=submit].wsf-button.wsf-button-information svg path, input[type=reset].wsf-button.wsf-button-information svg path, a.wsf-button.wsf-button-information svg path {
   fill: #fff;
 }
 

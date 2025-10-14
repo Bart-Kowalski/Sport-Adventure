@@ -8,9 +8,14 @@ use Automattic\WooCommerce\Admin\PluginsHelper;
 use Automattic\WooCommerce\Admin\Features\PaymentGatewaySuggestions\Init as Suggestions;
 use Automattic\WooCommerce\Admin\Features\PaymentGatewaySuggestions\DefaultPaymentGateways;
 use Automattic\WooCommerce\Internal\Admin\WcPayWelcomePage;
+use WC_Gateway_BACS;
+use WC_Gateway_Cheque;
+use WC_Gateway_COD;
 
 /**
- * WooCommercePayments Task
+ * WooCommercePayments Task.
+ *
+ * @deprecated 9.9.0 The WooPayments onboarding task is deprecated and will be removed in a future version of WooCommerce.
  */
 class WooCommercePayments extends Task {
 	/**
@@ -235,7 +240,7 @@ class WooCommercePayments extends Task {
 	 * @return \WC_Payments|null
 	 */
 	private static function get_gateway() {
-		$payment_gateways = WC()->payment_gateways->payment_gateways();
+		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		if ( isset( $payment_gateways['woocommerce_payments'] ) ) {
 			return $payment_gateways['woocommerce_payments'];
 		}
@@ -250,14 +255,14 @@ class WooCommercePayments extends Task {
 	 * @return bool
 	 */
 	public static function has_other_ecommerce_gateways(): bool {
-		$gateways         = WC()->payment_gateways->get_available_payment_gateways();
+		$gateways         = WC()->payment_gateways()->payment_gateways;
 		$enabled_gateways = array_filter(
 			$gateways,
 			function ( $gateway ) {
 				// Filter out any WooPayments-related or offline gateways.
 				return 'yes' === $gateway->enabled
 					&& 0 !== strpos( $gateway->id, 'woocommerce_payments' )
-					&& ! in_array( $gateway->id, array( 'bacs', 'cheque', 'cod' ), true );
+					&& ! in_array( $gateway->id, array( WC_Gateway_BACS::ID, WC_Gateway_Cheque::ID, WC_Gateway_COD::ID ), true );
 			}
 		);
 

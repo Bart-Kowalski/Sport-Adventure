@@ -10,8 +10,7 @@
 
 		// API - GET
 		public function api_get() {
-			
-			// Run actions
+
 			try {
 
 				// Send JSON response

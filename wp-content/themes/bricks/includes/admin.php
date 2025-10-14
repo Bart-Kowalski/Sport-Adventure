@@ -38,6 +38,14 @@ class Admin {
 		add_filter( 'manage_' . BRICKS_DB_TEMPLATE_SLUG . '_posts_columns', [ $this, 'bricks_template_posts_columns' ] );
 		add_action( 'manage_' . BRICKS_DB_TEMPLATE_SLUG . '_posts_custom_column', [ $this, 'bricks_template_posts_custom_column' ], 10, 2 );
 
+		// Additional filters for user activation (@since 2.1)
+		if ( Database::get_setting( 'userActivationEnabled' ) ) {
+
+			// Add new column to user list
+			add_filter( 'manage_users_columns', [ $this, 'add_user_activation_status_column' ] );
+			add_filter( 'manage_users_custom_column', [ $this, 'user_activation_status_column_content' ], 10, 3 );
+		}
+
 		// Export template
 		add_filter( 'bulk_actions-edit-bricks_template', [ $this, 'bricks_template_bulk_action_export' ] );
 		add_filter( 'handle_bulk_actions-edit-bricks_template', [ $this, 'bricks_template_handle_bulk_action_export' ], 10, 3 );
@@ -94,6 +102,11 @@ class Admin {
 
 		// Fix filter element database (@since 1.12)
 		add_action( 'wp_ajax_bricks_fix_filter_element_db', [ $this, 'bricks_fix_filter_element_db' ] );
+
+		// User activation actions (@since 2.1)
+		if ( Database::get_setting( 'userActivationEnabled' ) ) {
+			add_action( 'admin_action_bricks_user_activation', [ $this, 'bricks_user_activation_action' ] );
+		}
 	}
 
 	/**
@@ -579,6 +592,11 @@ class Admin {
 				}
 			}
 
+			// Email content settings
+			elseif ( in_array( $key, [ 'userActivationLinkEmailContent' ] ) ) {
+				// Do nothing?
+			}
+
 			// Textarea settings
 			elseif ( in_array( $key, [ 'myTemplatesWhitelist', 'builderModeCss', ] ) ) {
 				$value = sanitize_textarea_field( $value );
@@ -741,8 +759,10 @@ class Admin {
 			}
 		}
 
-		// Unset container (= mandatory element)
-		unset( $elements['container'] );
+		foreach ( Elements::mandatory_elements() as $element_name ) {
+			// Unset mandatory elements
+			unset( $elements[ $element_name ] );
+		}
 
 		// STEP: Update or delete element manger in options table
 		if ( count( $elements ) ) {
@@ -1061,7 +1081,7 @@ class Admin {
 
 					if ( isset( $template_condition['main'] ) ) {
 						if ( $template_condition['main'] === 'hook' ) {
-							// Backwards compatibility // @since 1.9.2
+							// Backwards compatibility
 							$main_condition = esc_html__( 'Entire website', 'bricks' );
 						} else {
 							$main_condition = $settings_template_controls['templateConditions']['fields']['main']['options'][ $template_condition['main'] ];
@@ -1233,7 +1253,44 @@ class Admin {
 	public function gutenberg_scripts() {
 		if ( Helpers::is_post_type_supported() && Capabilities::current_user_can_use_builder() ) {
 			wp_enqueue_style( 'bricks-admin', BRICKS_URL_ASSETS . 'css/admin.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/admin.min.css' ) );
+
 			wp_enqueue_script( 'bricks-gutenberg', BRICKS_URL_ASSETS . 'js/gutenberg.min.js', [ 'jquery' ], filemtime( BRICKS_PATH_ASSETS . 'js/gutenberg.min.js' ), true );
+		}
+
+		// Enqueue component-related scripts, if the components in the block editor are enabled (@since 2.1)
+		if ( Database::get_setting( 'bricksComponentsInBlockEditor' ) ) {
+			// Register a dummy handle and add scoped CSS inline
+			wp_register_style( 'bricks-frontend-gutenberg', false );
+			wp_enqueue_style( 'bricks-frontend-gutenberg' );
+
+			// Scope frontend CSS to Gutenberg editor canvas
+			// Preserve :root variables, @font-face, @keyframes at root level
+			if ( Database::get_setting( 'cssLoading' ) !== 'file' ) {
+				$frontend_css_file = BRICKS_PATH_ASSETS . 'css/frontend-layer.min.css';
+			} else {
+				$frontend_css_file = BRICKS_PATH_ASSETS . 'css/frontend.min.css';
+			}
+
+			if ( file_exists( $frontend_css_file ) ) {
+				$frontend_css = file_get_contents( $frontend_css_file );
+				if ( $frontend_css ) {
+					$scoped_css = \Bricks\Integrations\Block_Editor::scope_css_for_gutenberg( $frontend_css );
+					wp_add_inline_style( 'bricks-frontend-gutenberg', $scoped_css );
+				}
+			}
+
+			wp_enqueue_script( 'bricks-scripts', BRICKS_URL_ASSETS . 'js/bricks.min.js', [], filemtime( BRICKS_PATH_ASSETS . 'js/bricks.min.js' ), true );
+
+			// Enqueue icon fonts for Gutenberg editor
+			wp_enqueue_style( 'bricks-font-awesome-6', BRICKS_URL_ASSETS . 'css/libs/font-awesome-6.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/libs/font-awesome-6.min.css' ) );
+			wp_enqueue_style( 'bricks-font-awesome-6-brands', BRICKS_URL_ASSETS . 'css/libs/font-awesome-6-brands.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/libs/font-awesome-6-brands.min.css' ) );
+			wp_enqueue_style( 'bricks-ionicons', BRICKS_URL_ASSETS . 'css/libs/ionicons.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/libs/ionicons.min.css' ) );
+			wp_enqueue_style( 'bricks-themify-icons', BRICKS_URL_ASSETS . 'css/libs/themify-icons.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/libs/themify-icons.min.css' ) );
+
+			wp_enqueue_script( 'bricks-gutenberg-components', BRICKS_URL_ASSETS . 'js/integrations/gutenberg-components.min.js', [ 'jquery' ], filemtime( BRICKS_PATH_ASSETS . 'js/integrations/gutenberg-components.min.js' ), true );
+
+			// Enqueue icon font data for Gutenberg controls
+			wp_enqueue_script( 'bricks-gutenberg-icon-fonts-bridge', BRICKS_URL_ASSETS . 'js/integrations/gutenberg/controls/icon-fonts-bridge.js', [ 'bricks-gutenberg-components' ], filemtime( BRICKS_PATH_ASSETS . 'js/integrations/gutenberg/controls/icon-fonts-bridge.js' ), true );
 		}
 
 		/**
@@ -1258,15 +1315,112 @@ class Admin {
 			}
 		}
 
+		$global_classes = get_option( BRICKS_DB_GLOBAL_CLASSES, [] );
+
+		// Retrieve only the classes names & IDs
+		$global_classes_names_ids = [];
+		foreach ( $global_classes as $class ) {
+			$global_classes_names_ids[] = [
+				'name' => $class['name'],
+				'id'   => $class['id'],
+			];
+		}
+
+		// Get icon sets and custom icons for Gutenberg
+		$icon_sets          = get_option( BRICKS_DB_ICON_SETS, [] );
+		$custom_icons       = get_option( BRICKS_DB_CUSTOM_ICONS, [] );
+		$disabled_icon_sets = Database::get_setting( 'disabledIconSets', [] );
+
+		$components            = [];
+		$enabled_component_ids = [];
+
+		if ( Database::get_setting( 'bricksComponentsInBlockEditor' ) ) {
+			$all_components = get_option( BRICKS_DB_COMPONENTS, [] );
+
+			// Process components to inherit select options for properties without options
+			$components = $this->process_components_for_gutenberg( $all_components );
+
+			// Get list of enabled component IDs for JavaScript logic
+			if ( \Bricks\Database::get_setting( 'bricksComponentsInBlockEditor' ) === 'all' ) {
+				// All components are enabled
+				foreach ( $all_components as $component ) {
+					if ( ! empty( $component['id'] ) ) {
+						$enabled_component_ids[] = $component['id'];
+					}
+				}
+			} else {
+				// Only manually enabled components (have blockEditor property set)
+				foreach ( $all_components as $component ) {
+					if ( ! empty( $component['id'] ) && ! empty( $component['blockEditor'] ) ) {
+						$enabled_component_ids[] = $component['id'];
+					}
+				}
+			}
+		}
+
+		$i18n = I18n::get_admin_i18n();
+
+		// Merge builder i18n
+		$i18n = array_merge( $i18n, I18n::get_builder_i18n() );
+
+		$all_section_templates = Templates::get_templates_list( [ 'section' ], get_the_ID() );
+
+		$gutenberg_data = [
+			'globalClassesNamesIds' => $global_classes_names_ids,
+			'iconSets'              => $icon_sets,
+			'customIcons'           => $custom_icons,
+			'disabledIconSets'      => $disabled_icon_sets,
+			'postTypes'             => Helpers::get_registered_post_types(),
+			'taxonomies'            => get_taxonomies( [ 'public' => true ], 'objects' ),
+			'userRoles'             => wp_roles()->get_names(),
+			'components'            => $components,
+			'enabledComponentIds'   => $enabled_component_ids,
+			'sectionTemplates'      => $all_section_templates,
+		];
+
+		// Always localize data for Gutenberg
+		// Use wp-blocks which is always available in the block editor
 		wp_localize_script(
-			'bricks-gutenberg',
-			'bricksData',
-			[
-				'builderEditLink'     => Helpers::get_builder_edit_link(),
-				'i18n'                => I18n::get_admin_i18n(),
-				'showBuiltWithBricks' => $show_built_with_bricks,
-			]
+			'wp-blocks',
+			'bricksGutenbergData',
+			$gutenberg_data
 		);
+	}
+
+	/**
+	 * Process components to inherit select options for Gutenberg
+	 *
+	 * @param array $components Array of components.
+	 * @return array Processed components with inherited select options.
+	 */
+	private function process_components_for_gutenberg( $components ) {
+		if ( ! class_exists( '\Bricks\Integrations\Block_Editor' ) ) {
+			return $components;
+		}
+
+		$block_editor         = new \Bricks\Integrations\Block_Editor();
+		$processed_components = [];
+
+		foreach ( $components as $component ) {
+			$processed_component = $component;
+
+			// Process properties to inherit select options
+			if ( isset( $component['properties'] ) && is_array( $component['properties'] ) ) {
+				foreach ( $component['properties'] as $index => $property ) {
+					// For select properties without options, try to inherit from connected elements
+					if ( isset( $property['type'] ) && $property['type'] === 'select' && empty( $property['options'] ) ) {
+						$inherited_options = $block_editor->get_select_options_from_connected_elements( $property, $component['elements'] );
+						if ( $inherited_options ) {
+							$processed_component['properties'][ $index ]['options'] = $inherited_options;
+						}
+					}
+				}
+			}
+
+			$processed_components[] = $processed_component;
+		}
+
+		return $processed_components;
 	}
 
 	/**
@@ -1274,7 +1428,7 @@ class Admin {
 	 *
 	 * @since 1.0
 	 */
-	public function admin_enqueue_scripts() {
+	public function admin_enqueue_scripts( $hook ) {
 		wp_enqueue_style( 'bricks-admin', BRICKS_URL_ASSETS . 'css/admin.min.css', [], filemtime( BRICKS_PATH_ASSETS . 'css/admin.min.css' ) );
 
 		if ( is_rtl() ) {
@@ -1316,6 +1470,46 @@ class Admin {
 			}
 		}
 
+		/**
+		 * STEP: Add script to modify Bricks theme data in the themes.php page
+		 *
+		 * @since 2.0.2
+		 */
+		if ( $hook === 'themes.php' ) {
+			add_action(
+				'admin_footer',
+				function() {
+					?>
+			<script>
+				jQuery(document).ready(function($) {
+					// Modify Bricks theme data
+					if (Array.isArray(wp.themes.data.themes)) {
+						// Find the Bricks theme and modify its update string
+						wp.themes.data.themes.forEach(theme => {
+							if (theme.id === 'bricks') {
+								// Get first URL in theme.update string
+								const urlMatch = theme.update.match(/https?:\/\/[^\s]+/)
+								if (urlMatch) {
+									const url = urlMatch[0];
+									// Add target="_blank" to the URL in theme.update string
+									theme.update = theme.update.replace(url, url + '/" target="_blank" ')
+
+									// Remove any URL parameters
+									theme.update = theme.update.replace(/(\?|\&)[^"]+/, '')
+								}
+
+								// Remove 'thickbox' from theme.update string
+								theme.update = theme.update.replace(/thickbox/g, '')
+							}
+						})
+					}
+				})
+			</script>
+					<?php
+				}
+			);
+		}
+
 		// Add filterByUnused parameter to the data if it exists
 		$filter_by_unused = isset( $_GET['unused'] ) && $_GET['unused'] ? 'true' : 'false';
 
@@ -1328,7 +1522,7 @@ class Admin {
 				'builderParam'                 => BRICKS_BUILDER_PARAM,
 				'postId'                       => get_the_ID(),
 				'nonce'                        => wp_create_nonce( 'bricks-nonce-admin' ),
-				'i18n'                         => I18n::get_admin_i18n(),
+				'i18n'                         => I18n::get_all_i18n(),
 				'renderWithBricks'             => $render_with_bricks,
 				'builderAccessPermissions'     => Builder_Permissions::get_sections( true ), // @since 2.0
 				'defaultCapabilities'          => Builder_Permissions::DEFAULT_CAPABILITIES, // @since 2.0
@@ -2886,5 +3080,116 @@ class Admin {
 		}
 
 		return $code_review_elements;
+	}
+
+	/**
+	 * Add custom column to the WordPress users list (used for account activation status)
+	 *
+	 * @since 2.1
+	 */
+	public function add_user_activation_status_column( $columns ) {
+		$columns['activation_status'] = esc_html__( 'Activation status', 'bricks' ) . ' (Bricks)';
+
+		return $columns;
+	}
+
+	/**
+	 * Add content to the custom column in the WordPress users list (used for account activation status)
+	 *
+	 * @since 2.1
+	 */
+	public function user_activation_status_column_content( $content, $column_name, $user_id ) {
+		if ( $column_name !== 'activation_status' ) {
+			return $content;
+		}
+
+		$actions = [
+			'mark_active'   => sprintf(
+				'<a href="%s">%s</a>',
+				wp_nonce_url( admin_url( 'admin.php?action=bricks_user_activation&type=activate&user_id=' . $user_id . '&status=active' ), 'bricks-nonce-admin' ),
+				esc_html__( 'Mark as active', 'bricks' )
+			),
+			'mark_inactive' => sprintf(
+				'<a href="%s">%s</a>',
+				wp_nonce_url( admin_url( 'admin.php?action=bricks_user_activation&type=deactivate&user_id=' . $user_id . '&status=pending' ), 'bricks-nonce-admin' ),
+				esc_html__( 'Mark as inactive', 'bricks' )
+			),
+			'resend'        => sprintf(
+				'<a href="%s">%s</a>',
+				wp_nonce_url( admin_url( 'admin.php?action=bricks_user_activation&type=resend_activation&user_id=' . $user_id ), 'bricks-nonce-admin' ),
+				esc_html__( 'Resend activation email', 'bricks' )
+			),
+		];
+
+		// User activation status: active, pending
+		$activation_status = get_user_meta( $user_id, 'bricks_user_activation_status', true );
+
+		// Activation status is empty: Old user account, active before activation feature was added
+		// if ( empty( $activation_status ) ) {
+		// $content  = '<span style="color: gray;">' . esc_html__( 'Old user', 'bricks' ) . '</span>';
+		// $content .= '<div class="row-actions">';
+		// $content .= $actions['mark_active'] . ' | ' . $actions['resend'];
+		// $content .= '</div>';
+		// }
+
+		// Active user: No activation (user registered before user activation was required OR status is 'active'
+		if ( ! $activation_status || $activation_status === 'active' ) {
+			$content  = '<span style="color: green;">' . esc_html__( 'Active', 'bricks' ) . '</span>';
+			$content .= '<div class="row-actions">';
+			$content .= $actions['mark_inactive'];
+			$content .= '</div>';
+		}
+
+		// Inactive user: Activation status is 'pending'
+		else {
+			$content  = '<span style="color: red;">' . esc_html__( 'Inactive', 'bricks' ) . '</span>';
+			$content .= '<div class="row-actions">';
+			$content .= $actions['mark_active'] . ' | ' . $actions['resend'];
+			$content .= '</div>';
+		}
+
+		return $content;
+	}
+
+	/**
+	 * User activation / deactivation / resend activation email actions
+	 *
+	 * @since 2.1
+	 */
+	public function bricks_user_activation_action() {
+		// Check nonce
+		Ajax::verify_nonce( 'bricks-nonce-admin' );
+
+		// Get post
+		$user_id = isset( $_GET['user_id'] ) ? absint( $_GET['user_id'] ) : 0;
+		$type    = isset( $_GET['type'] ) ? sanitize_text_field( $_GET['type'] ) : false;
+
+		if ( ! $user_id || ! $type ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid request', 'bricks' ) ] );
+		}
+
+		// If type is not one of (activate, deactivate, resend_activation), return error
+		if ( ! in_array( $type, [ 'activate', 'deactivate', 'resend_activation' ] ) ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid request - wrong action type: ' . $type, 'bricks' ) ] );
+		}
+
+		switch ( $type ) {
+			case 'activate':
+				delete_user_meta( $user_id, 'bricks_user_activation_key' );
+				update_user_meta( $user_id, 'bricks_user_activation_status', 'active' );
+				break;
+
+			case 'deactivate':
+				delete_user_meta( $user_id, 'bricks_user_activation_key' );
+				update_user_meta( $user_id, 'bricks_user_activation_status', 'pending' );
+				break;
+
+			case 'resend_activation':
+				Helpers::set_activation_meta( $user_id );
+				\Bricks\Helpers::send_user_activation_email( $user_id, 'resend-activation' );
+				break;
+		}
+
+		wp_safe_redirect( wp_get_referer() );
 	}
 }

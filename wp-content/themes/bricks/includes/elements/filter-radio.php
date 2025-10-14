@@ -161,7 +161,7 @@ class Filter_Radio extends Filter_Element {
 
 		echo "<ul {$this->render_attributes('_root')}>";
 
-		foreach ( $this->populated_options as $index => $option ) {
+		foreach ( $this->get_populated_options() as $index => $option ) {
 			// Skip the "All" option is set (@since 1.11)
 			if ( $hide_all_option && isset( $option['is_all'] ) && $option['is_all'] ) {
 				continue;

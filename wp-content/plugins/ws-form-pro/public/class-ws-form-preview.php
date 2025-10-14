@@ -6,27 +6,22 @@
 	class WS_Form_Preview {
 
 		protected $form_id = 0;
-		protected $ws_form_form;
+		protected $form_label = '';
 		protected $conversational = false;
 
 		public function __construct() {
 
 			// Get form_id
-			$this->form_id = ((isset($_GET) && isset($_GET['wsf_preview_form_id'])) ? absint($_GET['wsf_preview_form_id']) : 0);	// phpcs:ignore WordPress.Security.NonceVerification
+			$this->form_id = $this->form_id = ((isset($_GET) && isset($_GET['wsf_preview_form_id'])) ? absint($_GET['wsf_preview_form_id']) : 0);	// phpcs:ignore WordPress.Security.NonceVerification
 			if($this->form_id === 0) { return false; }
 
 			if(!WS_Form_Common::can_user('edit_form')) { return false; }
 
-			// Load form
-			$this->ws_form_form = New WS_Form_Form();
-			$this->ws_form_form->id = $this->form_id;
-
-			try {
-
-				$this->ws_form_form->db_read(false);
-
-			} catch(Exception $e) {}
-
+			// Load form to get label
+			$ws_form_form = new WS_Form_Form();
+			$ws_form_form->id = $this->form_id;
+			$form_object = $ws_form_form->db_read(false, false, false, false, false, true);
+			$this->form_label = $form_object->label;
 			// Get wsf_submit_hash
 			$wsf_submit_hash = ((isset($_GET) && isset($_GET['wsf_submit_hash'])) ? $_GET['wsf_submit_hash'] : 0);	// phpcs:ignore WordPress.Security.NonceVerification
 			if(
@@ -77,7 +72,10 @@
 			$post->post_author = 1;
 			$post->post_date = current_time('mysql');
 			$post->post_date_gmt = current_time('mysql', 1);
-			$post->post_title = sprintf(__('%s Preview', 'ws-form'), $this->ws_form_form->label);
+
+			/* translators: %s is the form label */
+			$post->post_title = sprintf(__('%s Preview', 'ws-form'), $this->form_label);
+
 			$post->post_content = do_shortcode(sprintf('[%s id="%u" published="false" preview="true"]', WS_FORM_SHORTCODE, esc_attr($this->form_id)));
 			$post->post_status = 'publish';
 			$post->comment_status = 'closed';

@@ -21,7 +21,7 @@
 				load_plugin_textdomain(
 					'ws-form',
 					false,
-					dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+					dirname( plugin_basename( WS_FORM_PLUGIN_ROOT_FILE ) ) . '/languages'
 				);
 			}
 		}

@@ -159,7 +159,11 @@
 				if($license_transient === false) {
 
 					// Check license
-					self::check();
+					if(!self::check()) {
+
+						// Network issue occured so lets stop the transient check
+						return false;
+					}
 
 					// Store license status in case we want to pull it from the transient
 					$license_status = array(
@@ -209,8 +213,8 @@
 				'sslverify'		=> WS_Form_Common::get_request_sslverify(),
 			);
 
-			// Call the EDD 
-			$response = wp_remote_post(self::LICENSE_ENDPOINT, $args);
+			// Call the EDD license endpoint
+			$response = WS_Form_Common::wp_remote_post_clean(self::LICENSE_ENDPOINT, $args);
 
 			// Check for errors
 			if(is_wp_error($response) || (200 !== wp_remote_retrieve_response_code($response))) {
@@ -251,6 +255,7 @@
 
 							sprintf(
 
+								/* translators: %s: License key expiry date */
 								__('Your license key expired on %s.', 'ws-form'),
 							
 								get_date_from_gmt(
@@ -281,7 +286,12 @@
 
 					case 'item_name_mismatch' :
 
-						return self::error(sprintf(__('This appears to be an invalid license key for %s.', 'ws-form'), $this->name));
+						return self::error(sprintf(
+
+							/* translators: %s: Plugin name */
+							__('This appears to be an invalid license key for %s.', 'ws-form'),
+							$this->name
+						));
 
 					case 'no_activations_left' :
 
@@ -341,7 +351,7 @@
 			);
 
 			// Call the EDD 
-			$response = wp_remote_post(self::LICENSE_ENDPOINT, $args);
+			$response = WS_Form_Common::wp_remote_post_clean(self::LICENSE_ENDPOINT, $args);
 
 			// Check for errors
 			if(is_wp_error($response) || (200 !== wp_remote_retrieve_response_code($response))) {
@@ -410,23 +420,39 @@
 			);
 
 			// Call the custom API.
-			$response = wp_remote_post(self::LICENSE_ENDPOINT, $args);
+			$response = WS_Form_Common::wp_remote_post_clean(self::LICENSE_ENDPOINT, $args);
 
-			// Check for errors
-			if(is_wp_error($response) || (200 !== wp_remote_retrieve_response_code($response))) { return false; }
+			// Check for network errors
+			if(
+				is_wp_error($response) ||
+				(200 !== wp_remote_retrieve_response_code($response))
+			) {
+				return false;
+			}
 
 			// Get response body
 			$response_body = wp_remote_retrieve_body($response);
 
 			// Decode license data
-			$license_data = json_decode($response_body);
+			try {
+
+				$license_data = json_decode($response_body);
+
+			} catch (Exception $e) {
+
+				// JSON decode error
+				return false;
+			}
 
 			// Check returned license data
 			if(
 				is_null($license_data) ||
 				!isset($license_data->success) ||
 				!isset($license_data->license) 
-			) { return false; }
+			) {
+				// License data response error
+				return false;
+			}
 
 			if($license_data->success) {
 
@@ -542,7 +568,18 @@
 			if(!self::license_activated()) {
 
 				// If license is not activated, show a nag
-				WS_Form_Common::admin_message_push(sprintf(__('%s is not licensed. Please enter your license key <a href="%s">here</a> to receive software updates and support.', 'ws-form'), $this->name, WS_Form_Common::get_admin_url('ws-form-settings', false, 'tab=' . $this->tab_license)), 'notice-warning', false, true);
+				WS_Form_Common::admin_message_push(
+					sprintf(
+						/* translators: %1$s: Plugin name, %2$s: Opening anchor tag, %3$s: Closing anchor tag */
+						__('%1$s is not licensed. Please enter your license key in %2$ssettings%3$s to receive software updates and support.', 'ws-form'),
+						$this->name,
+						'<a href="' . esc_url( WS_Form_Common::get_admin_url( 'ws-form-settings', false, 'tab=' . $this->tab_license ) ) . '">',
+						'</a>'
+					),
+					'notice-warning',
+					false,
+					true
+				);
 			}
 		}
 

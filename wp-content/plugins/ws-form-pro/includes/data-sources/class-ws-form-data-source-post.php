@@ -23,12 +23,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('Posts', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving Posts...', 'ws-form');
-
 			// ACF
 			$this->acf_activated = class_exists('ACF');
 
@@ -41,9 +35,6 @@
 			// Toolset
 			$this->toolset_activated = defined('TYPES_VERSION');
 
-			// Register action
-			parent::register($this);
-
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 
@@ -52,6 +43,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('Posts', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving Posts...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -211,7 +217,7 @@
 				'meta_value',
 				'meta_value_num'
 
-			))) { return self::error(__('Invalid order by method'), $field_id, $this, $api_request); }
+			))) { return self::error(__('Invalid order by method', 'ws-form'), $field_id, $this, $api_request); }
 
 			// Check meta key
 			switch($this->data_source_post_order_by) {
@@ -221,7 +227,7 @@
 
 					if($this->data_source_post_meta_key == '') {
 
-						return self::error(__('Invalid meta key'), $field_id, $this, $api_request);
+						return self::error(__('Invalid meta key', 'ws-form'), $field_id, $this, $api_request);
 					}
 			}
 
@@ -237,9 +243,9 @@
 				'DECIMAL',
 				'SIGNED',
 				'TIME',
-				'UNSIGNEd'
+				'UNSIGNED'
 
-			))) { return self::error(__('Invalid meta type'), $field_id, $this, $api_request); }
+			))) { return self::error(__('Invalid meta type', 'ws-form'), $field_id, $this, $api_request); }
 
 			// Columns
 			$columns = array();
@@ -275,6 +281,7 @@
 					case 'excerpt' : $label = __('Excerpt', 'ws-form'); break;
 					case 'content' : $label = __('Content', 'ws-form'); break;
 					case 'featured_image' : $label = __('Featured Image', 'ws-form'); break;
+					case 'author_id' : $label = __('Author ID', 'ws-form'); break;
 					case 'terms' : $label = __('Terms', 'ws-form'); break;
 					default : $label = __('Unknown', 'ws-form');
 				}
@@ -647,6 +654,7 @@
 							case 'permalink' : $column_value = get_permalink($post_id); break;
 							case 'excerpt' : $column_value = $post->post_excerpt; break;
 							case 'content' : $column_value = $post->post_content; break;
+							case 'author_id' : $column_value = $post->post_author; break;
 
 							case 'featured_image' : 
 
@@ -768,6 +776,8 @@
 							if(is_array($meta_box_field)) {
 
 								foreach($meta_box_field as $meta_box_field_single) {
+
+									if(!is_array($meta_box_field_single)) { continue; }
 
 									$full_url = isset($meta_box_field_single['full_url']) ? $meta_box_field_single['full_url'] : false;
 
@@ -1325,6 +1335,7 @@
 						array('value' => 'excerpt', 'text' => __('Excerpt', 'ws-form')),
 						array('value' => 'content', 'text' => __('Content', 'ws-form')),
 						array('value' => 'featured_image', 'text' => __('Featured Image', 'ws-form')),
+						array('value' => 'author_id', 'text' => __('Author ID', 'ws-form')),
 						array('value' => 'terms', 'text' => __('Terms', 'ws-form')),
 					),
 					'options_blank'				=>	__('Select...', 'ws-form')
@@ -1377,7 +1388,7 @@
 					'label'						=>	__('ACF Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	is_admin() ? WS_Form_ACF::acf_get_fields_all(false, false, false, true, false) : array(),
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 
@@ -1406,7 +1417,7 @@
 					'label'						=>	__('Meta Box Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	is_admin() ? WS_Form_Meta_Box::meta_box_get_fields_all('post', false, false, false, true, false) : array(),
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 
@@ -1435,7 +1446,7 @@
 					'label'						=>	__('Pods Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	is_admin() ? WS_Form_Pods::pods_get_fields_all('post_type', false, false, false, true, false) : array(),
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 
@@ -1464,7 +1475,7 @@
 					'label'						=>	__('Toolset Field', 'ws-form'),
 					'type'						=>	'select',
 					'options'					=>	is_admin() ? WS_Form_Toolset::toolset_get_fields_all(array('domain' => Toolset_Element_Domain::POSTS), false, false, true, false) : array(),
-					'options_blank'				=>	__('Select...', 'ws-form-post')
+					'options_blank'				=>	__('Select...', 'ws-form')
 				);
 			}
 
@@ -1499,7 +1510,14 @@
 				if(!isset($taxonomy_lookups[$term->taxonomy])) { continue; }
 				$taxonomy_label = $taxonomy_lookups[$term->taxonomy];
 
-				$results[] = array('id' => $term->term_id, 'text' => sprintf('%s: %s (ID: %u)', $taxonomy_label, $term->name, $term->term_id));
+				$results[] = array('id' => $term->term_id, 'text' => sprintf(
+
+					'%s: %s (%s: %u)',
+					$taxonomy_label,
+					$term->name,
+					__('ID', 'ws-form'),
+					$term->term_id
+				));
 			}
 
 			return array('results' => $results);
@@ -1525,7 +1543,14 @@
 
 				$taxonomy_label = $taxonomy_lookups[$term->taxonomy];
 
-				$return_array[$term_id] = sprintf('%s: %s (ID: %u)', $taxonomy_label, $term->name, $term->term_id);
+				$return_array[$term_id] = sprintf(
+
+					'%s: %s (%s: %u)',
+					$taxonomy_label,
+					$term->name,
+					__('ID', 'ws-form'),
+					$term->term_id
+				);
 			}
 
 			return $return_array;

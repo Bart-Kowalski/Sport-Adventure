@@ -86,6 +86,19 @@ class Element_Tabs extends Element {
 			'placeholder' => esc_html__( 'Horizontal', 'bricks' ),
 		];
 
+		$breakpoints         = Breakpoints::get_breakpoints();
+		$breakpoints_options = array_column( $breakpoints, 'label', 'key' );
+
+		$this->controls['accordionLayoutAtBreakpoint'] = [
+			'tab'         => 'content',
+			'label'       => esc_html__( 'Accordion layout at breakpoint', 'bricks' ),
+			'type'        => 'select',
+			'options'     => $breakpoints_options,
+			'inline'      => true,
+			'small'       => true,
+			'placeholder' => esc_html__( 'None', 'bricks' ),
+		];
+
 		$this->controls['openTabOn'] = [
 			'label'       => esc_html__( 'Open tab on', 'bricks' ),
 			'type'        => 'select',
@@ -256,7 +269,7 @@ class Element_Tabs extends Element {
 			'css'     => [
 				[
 					'property' => 'padding',
-					'selector' => '.tab-content',
+					'selector' => '.tab-content .tab-pane', // NOTE: Now using '.tab-content .tab-pane' instead of '.tab-content' to avoid adding padding to the accordion title
 				],
 			],
 			'default' => [
@@ -336,6 +349,16 @@ class Element_Tabs extends Element {
 	public function render() {
 		$settings = $this->settings;
 
+		// Check: Accordion on mobile enabled (@since 2.1)
+		$accordion_layout_at_breakpoint = ! empty( $settings['accordionLayoutAtBreakpoint'] );
+		if ( $accordion_layout_at_breakpoint ) {
+			$breakpoint = Breakpoints::get_breakpoint_by( 'key', $settings['accordionLayoutAtBreakpoint'] );
+
+			if ( ! empty( $breakpoint['width'] ) ) {
+				$this->set_attribute( '_root', 'data-accordion-breakpoint', $breakpoint['width'] );
+			}
+		}
+
 		if ( empty( $settings['tabs'] ) ) {
 			return $this->render_element_placeholder(
 				[
@@ -377,8 +400,6 @@ class Element_Tabs extends Element {
 			$tabindex = $index === 0 ? '0' : '-1';
 
 			$this->set_attribute( "tab-title-$index", 'class', $tab_title_classes );
-
-			$this->set_attribute( "tab-title-$index", 'class', $tab_title_classes );
 			$this->set_attribute( "tab-title-$index", 'role', 'tab' );
 			$this->set_attribute( "tab-title-$index", 'aria-selected', $selected );
 			$this->set_attribute( "tab-title-$index", 'aria-controls', "panel-$this->id-$index" );
@@ -406,6 +427,41 @@ class Element_Tabs extends Element {
 		$output .= '<ul class="tab-content" role="presentation">';
 
 		foreach ( $settings['tabs'] as $index => $tab ) {
+			// If accordion is enabled, add the accordion title right above the tab content
+			if ( $accordion_layout_at_breakpoint ) {
+				$accordion_title_classes = [ 'tab-title', 'repeater-item' ];
+
+				if ( ! empty( $tab['iconPosition'] ) ) {
+					$accordion_title_classes[] = "icon-{$tab['iconPosition']}";
+				}
+
+				$this->set_attribute( "accordion-title-$index", 'class', $accordion_title_classes );
+				$this->set_attribute( "accordion-title-$index", 'role', 'button' );
+				$this->set_attribute( "accordion-title-$index", 'aria-expanded', $index === 0 ? 'true' : 'false' );
+				$this->set_attribute( "accordion-title-$index", 'aria-controls', "panel-$this->id-$index" );
+				$this->set_attribute( "accordion-title-$index", 'tabindex', '0' );
+
+				// Accordion layout on mobile (@since 2.1)
+				$this->set_attribute( "accordion-title-$index", 'data-brx-tab-mode', 'accordion' );
+
+				$output .= "<li {$this->render_attributes( "accordion-title-$index" )}>";
+
+				// Icon
+				$icon = ! empty( $tab['icon'] ) ? self::render_icon( $tab['icon'] ) : false;
+				if ( $icon ) {
+					$output .= $icon;
+				}
+
+				/*
+					NOTE: No need to render the title here, since it's already rendered in the tab title
+					if ( ! empty( $tab['title'] ) ) {
+						$output .= "<span>{$tab['title']}</span>";
+					}
+				*/
+
+				$output .= '</li>';
+			}
+
 			$tab_pane_classes = [ 'tab-pane' ];
 
 			$this->set_attribute( "tab-pane-$index", 'class', $tab_pane_classes );

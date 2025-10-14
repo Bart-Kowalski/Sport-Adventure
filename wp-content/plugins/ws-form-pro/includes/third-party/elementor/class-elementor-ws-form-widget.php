@@ -138,7 +138,7 @@
 <div class="wsf-elementor-form-selector">
 <?php
 					// Output WS Form SVG Logo
-					echo WS_Form_Config::get_logo_svg();	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+					WS_Form_Common::echo_logo();
 
 					// Get forms
 					$forms = WS_Form_Common::get_forms_array();

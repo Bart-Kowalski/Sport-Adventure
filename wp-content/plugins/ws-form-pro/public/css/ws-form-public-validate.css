@@ -1,0 +1,44 @@
+.wsf-form [data-wsf-validate] {
+  background-color: var(--wsf-field-validate-color-background);
+  border-color: var(--wsf-field-validate-border-color);
+  border-radius: var(--wsf-field-validate-border-radius);
+  border-style: var(--wsf-field-validate-border-style);
+  border-width: var(--wsf-field-validate-border-width);
+  color: var(--wsf-field-validate-color);
+  font-family: var(--wsf-field-validate-font-family);
+  font-size: var(--wsf-field-validate-font-size);
+  font-style: var(--wsf-field-validate-font-style);
+  font-weight: var(--wsf-field-validate-font-weight);
+  letter-spacing: var(--wsf-field-validate-letter-spacing);
+  line-height: var(--wsf-field-validate-line-height);
+  margin: 0;
+  padding: var(--wsf-field-validate-padding-vertical) var(--wsf-field-validate-padding-horizontal);
+  -webkit-text-decoration: var(--wsf-field-validate-text-decoration);
+          text-decoration: var(--wsf-field-validate-text-decoration);
+  text-transform: var(--wsf-field-validate-text-transform);
+}
+.wsf-form [data-wsf-validate] h1, .wsf-form [data-wsf-validate] h2, .wsf-form [data-wsf-validate] h3, .wsf-form [data-wsf-validate] h4, .wsf-form [data-wsf-validate] h5, .wsf-form [data-wsf-validate] h6, .wsf-form [data-wsf-validate] p, .wsf-form [data-wsf-validate] li, .wsf-form [data-wsf-validate] a {
+  color: var(--wsf-field-validate-color);
+  font-family: var(--wsf-field-validate-font-family);
+  font-size: var(--wsf-field-validate-font-size);
+  font-style: var(--wsf-field-validate-font-style);
+  font-weight: var(--wsf-field-validate-font-weight);
+  line-height: var(--wsf-field-validate-line-height);
+  margin-bottom: var(--wsf-field-texteditor-p-margin-bottom);
+  margin-top: 0;
+  padding: 0;
+}
+.wsf-form [data-wsf-validate] li {
+  margin-bottom: var(--wsf-field-validate-li-gap);
+}
+.wsf-form [data-wsf-validate] li:last-child,
+.wsf-form [data-wsf-validate] > *:last-child {
+  margin-bottom: 0;
+}
+.wsf-form [data-type=validate] {
+  display: none;
+}
+.wsf-form.wsf-validated [data-type=validate]:not(.wsf-validate-hidden),
+.wsf-form .wsf-validated [data-type=validate]:not(.wsf-validate-hidden) {
+  display: block;
+}

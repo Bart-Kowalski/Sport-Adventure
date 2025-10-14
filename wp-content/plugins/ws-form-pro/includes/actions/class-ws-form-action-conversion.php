@@ -26,6 +26,7 @@
 
 		// Config - Data Layer
 		public $data_layer_variables;
+		public $data_layer_reset;
 
 		// Config - Fathom
 		public $fathom_event;
@@ -50,20 +51,26 @@
 
 		public function __construct() {
 
+			// Events
+			$this->events = array('submit');
+
+			// Register config filters
+			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
+
+			// Register init action
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = __('Conversion Tracking', 'ws-form');
 
 			// Set label for actions pull down
 			$this->label_action = __('Conversion Tracking', 'ws-form');
 
-			// Events
-			$this->events = array('submit');
-
 			// Register action
 			parent::register($this);
-
-			// Register config filters
-			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 		}
 
 		public function post($form, &$submit, $config) {
@@ -107,9 +114,10 @@
 
 						array(
 
-							'action' 		=> $this->id,
-							'type' 			=> $this->type,
-							'parse_values' 	=> $parse_values
+							'action'			=> $this->id,
+							'type'				=> $this->type,
+							'parse_values'		=> $parse_values,
+							'data_layer_reset'	=> $this->data_layer_reset
 						)
 					));
 
@@ -140,7 +148,8 @@
 
 							'action' 		=> $this->id,
 							'type' 			=> $this->type,
-							'parse_values' 	=> $parse_values
+							'parse_values' 	=> $parse_values,
+							'data_layer_reset'	=> $this->data_layer_reset
 						)
 					));
 
@@ -333,6 +342,7 @@
 
 			// Data Layer
 			$this->data_layer_variables = parent::get_config($config, 'action_' . $this->id . '_data_layer_variables');
+			$this->data_layer_reset = (parent::get_config($config, 'action_' . $this->id . '_data_layer_reset') == 'on');
 
 			// Fathom
 			$this->fathom_event = parent::get_config($config, 'action_' . $this->id . '_fathom_event');
@@ -373,6 +383,7 @@
 
 					// Data Layer
 					'action_' . $this->id . '_data_layer_variables',
+					'action_' . $this->id . '_data_layer_reset',
 
 					// Fathom
 					'action_' . $this->id . '_fathom_event',
@@ -559,6 +570,32 @@
 
 					'label'			=>	__('Value', 'ws-form'),
 					'type'			=>	'text'
+				),
+
+				// Data layer - Reset
+				'action_' . $this->id . '_data_layer_reset'	=> array(
+
+					'label'				=>	__('Reset Data Layer', 'ws-form'),
+					'type'				=>	'checkbox',
+					'help'				=>	__('If checked the data layer will be reset prior to variables being added. <strong>Warning:</strong> May break tracking and prevent conversions. Use only if necessary.', 'ws-form'),
+					'default'			=>	'',
+					'condition'			=>	array(
+
+						array(
+
+							'logic'				=>	'==',
+							'meta_key'			=>	'action_' . $this->id . '_type',
+							'meta_value'		=>	'google'
+						),
+
+						array(
+
+							'logic'				=>	'==',
+							'logic_previous'	=>	'||',
+							'meta_key'			=>	'action_' . $this->id . '_type',
+							'meta_value'		=>	'data_layer'
+						)
+					)
 				),
 
 				// Fathom - Event code

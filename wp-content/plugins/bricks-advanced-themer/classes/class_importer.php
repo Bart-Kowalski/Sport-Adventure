@@ -37,8 +37,6 @@ class AT__Class_Importer{
     }
 
     public static function enqueue_uploaded_css() {
-        if (!AT__Helpers::is_class_importer_tab_activated()) return;
-    
         if (have_rows('field_63b59j871b209', 'bricks-advanced-themer')) :
             while (have_rows('field_63b59j871b209', 'bricks-advanced-themer')) : the_row();
                 if (have_rows('field_63b4bd5c16ac1', 'bricks-advanced-themer')) :
@@ -73,5 +71,4 @@ class AT__Class_Importer{
             endwhile;
         endif;
     }
-
 }

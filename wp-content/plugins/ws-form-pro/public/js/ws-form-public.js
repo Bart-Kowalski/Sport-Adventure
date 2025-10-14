@@ -22,7 +22,7 @@
 		if($.WS_Form.debug_rendered) {
 
 			// Form data source debug
-			if(this.submit_auto_populate !== false) { this.log('debug_action_get', this.submit_auto_populate['action_label']); }
+			if(this.submit_auto_populate !== false) { this.log('debug_action_get', this.submit_auto_populate.action_label); }
 			if(this.submit !== false) { this.log('debug_submit_loaded'); }
 		}
 
@@ -46,7 +46,7 @@
 		}
 
 		// Get current framework
-		this.framework_fields = this.framework['fields']['public'];
+		this.framework_fields = this.framework.fields.public;
 
 		// Custom action URL
 		if(typeof(this.form_obj.attr('action')) !== 'undefined') {
@@ -176,13 +176,18 @@
 		// Build error message
 		var error_message = this.language(language_id, variable, false).replace(/%s/g, variable);
 
-		return $.WS_Form.debug_rendered ? this.debug_audit_add('error', error_message, error_class) : false;
+		if($.WS_Form.debug_rendered) {
+
+			this.debug_audit_add('error', error_message, error_class);
+		}
+
+		return error_message;
 	}
 
 	// Render any interface elements that rely on the form object
 	$.WS_Form.prototype.form_render = function() {
 
-		// Timer
+		// Form timer
 		this.form_timer();
 
 		// Calculation log
@@ -241,6 +246,12 @@
 		this.turnstiles = [];
 		this.turnstiles_default = [];
 
+		// Set style ID if not set (Used by site builders that don't have form object available when rendering)
+		if(this.form.meta.style_id && typeof(this.form_obj.attr('data-wsf-style-id')) === 'undefined') {
+
+			this.form_obj.attr('data-wsf-style-id', this.form.meta.style_id);
+		}
+
 		// Initialize framework
 		this.form_framework();
 
@@ -261,6 +272,9 @@
 
 		// Client side form validation
 		this.form_validation();
+
+		// Select
+		if(typeof(this.form_select) === 'function') { this.form_select(); }
 
 		// Select min max
 		if(typeof(this.form_select_min_max) === 'function') { this.form_select_min_max(); }
@@ -295,6 +309,9 @@
 		// Signatures
 		if(typeof(this.form_signature) === 'function') { this.form_signature(); }
 
+		// SSNs
+		if(typeof(this.form_ssn) === 'function') { this.form_ssn(); }
+
 		// Honeypot
 		this.form_honeypot();
 
@@ -307,8 +324,14 @@
 		// Turnstile
 		if(typeof(this.form_turnstile) === 'function') { this.form_turnstile(); }
 
+		// Email
+		if(typeof(this.form_email) === 'function') { this.form_email(); }
+
 		// Label
 		this.form_label();
+
+		// CSS vars
+		this.form_css_var();
 		// Legal
 		if(typeof(this.form_legal) === 'function') { this.form_legal(); }
 
@@ -345,6 +368,9 @@
 		// Text areas
 		if(typeof(this.form_textarea) === 'function') { this.form_textarea(); }
 
+		// Consent
+		if(typeof(this.form_consent) === 'function') { this.form_consent(); }
+
 		// Required
 		this.form_required();
 
@@ -374,6 +400,10 @@
 
 		// Form validation - Real time
 		this.form_validate_real_time();
+
+		// Form validation - Field
+		if(typeof(this.form_validate_field) === 'function') { this.form_validate_field('init'); }
+
 		// Calculations
 		if(typeof(this.form_calc) === 'function') { this.form_calc(); }
 
@@ -387,6 +417,13 @@
 		if(typeof(this.form_geo) === 'function') { this.form_geo(); }
 		// Tab validation
 		if(typeof(this.form_tab_validation) === 'function') { this.form_tab_validation(); }
+
+		// Accessibility
+		this.form_accessibility();
+
+		// Section repeatable hidden field (This triggers repeatable section events also)
+		if(typeof(this.section_repeatable_hidden_field) === 'function') { this.section_repeatable_hidden_field(); }
+
 		// Log
 		this.log('debug_form_rendered');
 
@@ -396,17 +433,17 @@
 			this.form_loader_hide(false);
 		}
 
-		// Accessibility
-		this.form_accessibility();
-
 		// Trigger rendered event
 		this.trigger('rendered');
 
-		// Section repeatable hidden field (This triggers repeatable section events also)
-		if(typeof(this.section_repeatable_hidden_field) === 'function') { this.section_repeatable_hidden_field(); }
-
 		// Set data-wsf-rendered attribute
 		this.form_obj.attr('data-wsf-rendered', '');
+
+		// Styler (Runs here to ensure this.conversational is set)
+		if(typeof(this.styler) === 'function') { this.styler() };
+
+		// Styler scheme (Runs here to ensure this.conversational is set)
+		if(typeof(this.styler_scheme) === 'function') { this.styler_scheme(!this.visual_editor, true); }
 	}
 
 	// Form timer
@@ -499,7 +536,7 @@
 		this.trigger('reset-before');
 
 		// Unmark as validated
-		this.form_obj.removeClass(this.class_validated);
+		this.form_canvas_obj.removeClass(this.class_validated);
 
 		// HTML form reset
 		this.form_obj[0].reset();
@@ -535,9 +572,11 @@
 
 					field_obj.each(function() {
 
-						if($(this).hasClass('minicolors-input')) {
+						$(this).trigger(trigger);
 
-							$(this).minicolors('value', $(this).val()).trigger(trigger);
+						if(typeof(Coloris) !== 'undefined') {
+
+							$(this)[0].dispatchEvent(new Event('input', { bubbles: true }));
 						}
 					});
 
@@ -599,7 +638,7 @@
 		this.trigger('clear-before');
 
 		// Unmark as validated
-		this.form_obj.removeClass(this.class_validated);
+		this.form_canvas_obj.removeClass(this.class_validated);
 
 		// Clear fields
 		for(var key in this.field_data_cache) {
@@ -670,9 +709,9 @@
 
 							$(this).val('').trigger(trigger);
 
-							if($(this).hasClass('minicolors-input')) {
+							if(typeof(Coloris) !== 'undefined') {
 
-								$(this).minicolors('value', '');
+								$(this)[0].dispatchEvent(new Event('input', { bubbles: true }));
 							}
 						}
 					});
@@ -798,6 +837,12 @@
 		// Empty form object
 		this.form_canvas_obj.empty();
 
+		// Initialize loader
+		if(typeof(this.form_loader) === 'function') { this.form_loader(); }
+
+		// Show loader
+		if(typeof(this.form_loader_show) === 'function') { this.form_loader_show('render'); }
+
 		// Build form
 		this.form_build();
 	}
@@ -836,7 +881,7 @@
 			var transform_method = $(this).attr('data-wsf-transform');
 
 			// Event handler
-			$(this).on('change input paste', function() {
+			$(this).on('change input', function() {
 
 				ws_this.form_transform_process($(this), transform_method);
 			})
@@ -951,6 +996,90 @@
 				}
 			});
 		});
+	}
+
+	// Form email
+	$.WS_Form.prototype.form_email = function() {
+
+		var ws_this = this;
+
+		// Regular file fields
+		$('inputa[type="email"]:not([data-init-email])', this.form_canvas_obj).each(function() {
+
+			// Get field data
+			var field = ws_this.get_field($(this));
+
+			// Check for allow / deny
+			var field_allow_deny = ws_this.get_object_meta_value(field, 'allow_deny', '');
+			var field_allow_deny_values = ws_this.get_object_meta_value(field, 'allow_deny_values', []);
+			if(
+				(field_allow_deny !== '') &&
+				(['allow', 'deny'].indexOf(field_allow_deny) !== -1) &&
+				(typeof(field_allow_deny_values) === 'object')
+			) {
+
+				// Initial check
+				ws_this.form_email_allow_deny($(this));
+
+				// Event handler
+				$(this).on('change', function() {
+
+					ws_this.form_email_allow_deny($(this));
+				});
+			}
+
+			// Set attribute so this field is not initialized again
+			$(this).attr('data-init-email', '');
+		});
+	}
+
+	$.WS_Form.prototype.form_email_allow_deny = function(obj) {
+
+		// Get field value
+		var field_value = obj.val();
+		if(field_value == '') { return; }
+
+		// Get field data
+		var field = this.get_field(obj);
+
+		// Check for allow / deny
+		var field_allow_deny = this.get_object_meta_value(field, 'allow_deny', '');
+
+		// Values
+		var field_allow_deny_values = this.get_object_meta_value(field, 'allow_deny_values', []);
+
+		// Default value
+		var field_value_allowed = (field_allow_deny === 'deny');
+
+		// Execute hooks and pass form_valid to them
+		for(var field_allow_deny_values_index in field_allow_deny_values) {
+
+			if(!field_allow_deny_values.hasOwnProperty(field_allow_deny_values_index)) { continue; }
+
+			var row = field_allow_deny_values[field_allow_deny_values_index];
+
+			var field_allow_deny_value = row.allow_deny_value;
+			var field_allow_deny_regex = new RegExp(field_allow_deny_value.replace('*', '.*') + '$');
+			if (field_allow_deny_regex.test(field_value)) {
+
+				field_value_allowed = (field_allow_deny === 'allow');
+			}
+		}
+
+		if(!field_value_allowed) {
+
+			// Get message
+			var allow_deny_message = this.get_object_meta_value(field, 'allow_deny_message', '');
+			if(!allow_deny_message) { allow_deny_message = this.language('email_allow_deny_message'); }
+
+			// Set invalid feedback
+			this.set_invalid_feedback(obj, allow_deny_message);
+
+		} else {
+
+			// Reset invalid feedback
+			this.set_invalid_feedback(obj, '');
+		}
 	}
 
 	// Form navigation
@@ -1156,6 +1285,16 @@
 		return (typeof(group_id) !== 'undefined') ? parseInt(group_id, 10) : false;
 	}
 
+	// Get section object resides in
+	$.WS_Form.prototype.get_section = function(obj) {
+
+		// Get section
+		var section_single = obj.closest('fieldset');
+		if(section_single.length == 0) { return false; }
+
+		return section_single;
+	}
+
 	// Get section id from object
 	$.WS_Form.prototype.get_section_id = function(obj) {
 
@@ -1222,6 +1361,19 @@
 		return (typeof(field_type) !== 'undefined') ? field_type : false;
 	}
 
+	// Get object row id from object
+	$.WS_Form.prototype.get_field_object_row_id = function(obj) {
+
+		// Get row wrapper
+		var object_row_wrapper = obj.closest('[data-row-radio][data-row-id],[data-row-checkbox][data-row-id]');
+		if(object_row_wrapper.length == 0) { return false; }
+
+		// Get row ID
+		var object_row_id = object_row_wrapper.attr('data-row-id');
+
+		return (typeof(object_row_id) !== 'undefined') ? parseInt(object_row_id, 10) : false;
+	}
+
 	// Get label object
 	$.WS_Form.prototype.get_label_obj = function(obj) {
 
@@ -1240,6 +1392,30 @@
 		return $('#' + this.form_id_prefix + 'checkbox-min-max-' + field_id + section_repeatable_suffix, this.form_canvas_obj);
 	}
 
+	// Get checkbox row count
+	$.WS_Form.prototype.get_checkbox_row_count = function(obj) {
+
+		// Get field wrapper
+		var field_wrapper = this.get_field_wrapper(obj);
+
+		// Get checkboxes
+		var checkbox_objs = $('[data-row-checkbox]:not([style*="display: none"]) input:not([data-hidden],[data-hidden-section],[data-hidden-group])', field_wrapper);
+
+		return checkbox_objs ? checkbox_objs.length : 0;
+	}
+
+	// Get radio row count
+	$.WS_Form.prototype.get_radio_row_count = function(obj) {
+
+		// Get field wrapper
+		var field_wrapper = this.get_field_wrapper(obj);
+
+		// Get radios
+		var radio_objs = $('[data-row-radio]:not([style*="display: none"]) input:not([data-hidden],[data-hidden-section],[data-hidden-group])', field_wrapper);
+
+		return radio_objs ? radio_objs.length : 0;
+	}
+
 	// Get help from object
 	$.WS_Form.prototype.get_help_obj = function(obj) {
 
@@ -1250,18 +1426,19 @@
 	}
 
 	// Get invalid feedback object
-	$.WS_Form.prototype.get_invalid_feedback_obj = function(obj) {
+	$.WS_Form.prototype.get_invalid_feedback_obj = function(obj, object_row_id) {
 
-		return $('#' + this.get_invalid_feedback_id(obj));
+		return $('#' + this.get_invalid_feedback_id(obj, object_row_id));
 	}
 
 	// Get invalid feedback ID
-	$.WS_Form.prototype.get_invalid_feedback_id = function(obj) {
+	$.WS_Form.prototype.get_invalid_feedback_id = function(obj, object_row_id) {
 
 		var field_id = this.get_field_id(obj);
 		var section_repeatable_suffix = this.get_section_repeatable_suffix(obj);
+		var row_suffix = (object_row_id ? '-row-' + object_row_id : '');
 
-		return this.form_id_prefix + 'invalid-feedback-' + field_id + section_repeatable_suffix;
+		return this.form_id_prefix + 'invalid-feedback-' + field_id + row_suffix + section_repeatable_suffix;
 	}
 
 	// Get invalid feedback from object
@@ -1283,8 +1460,16 @@
 		// Check for object row ID
 		if(this.is_not_number(object_row_id)) { object_row_id = 0; }
 
+		// Check if object_row_id is an object
+		if(
+			(typeof(object_row_id) === 'object') &&
+			(typeof(object_row_id[0]) !== 'undefined')
+		) {
+			object_row_id = object_row_id[0];
+		}
+
 		// Get invalid feedback obj
-		var invalid_feedback_obj = this.get_invalid_feedback_obj(obj);
+		var invalid_feedback_obj = this.get_invalid_feedback_obj(obj, object_row_id);
 
 		// Get section ID
 		var section_id = this.get_section_id(obj);
@@ -1297,8 +1482,6 @@
 
 		// Check for false message
 		if(message === false) { message = invalid_feedback_obj.html(); }
-
-		var message_invalid_feedback = message;
 
 		// HTML 5 custom validity
 		if(obj.length && obj[0].willValidate) {
@@ -1392,7 +1575,7 @@
 			// Build honeypot input
 			var framework_type = $.WS_Form.settings_plugin.framework;
 			var framework = $.WS_Form.frameworks.types[framework_type];
-			var fields = this.framework['fields']['public'];
+			var fields = this.framework.fields.public;
 			var honeypot_attributes = (typeof(fields.honeypot_attributes) !== 'undefined') ? ' ' + fields.honeypot_attributes.join(' ') : '';
 
 			// Add to form
@@ -1401,6 +1584,42 @@
 
 			// Debug
 			this.log('log_honeypot', '', 'spam-protect');
+		}
+	}
+
+	// Get CSS var
+	$.WS_Form.prototype.get_css_var = function(css_var, default_value) {
+
+		if(typeof(default_value) === 'undefined') { default_value = ''; }
+
+		var computed_style = getComputedStyle(this.form_obj[0]);
+		if(!computed_style) { return default_value; }
+
+		var property_value = computed_style.getPropertyValue(css_var);
+		if(typeof(property_value) === 'undefined') { return default_value; }
+
+		return property_value.trim();
+	}
+
+	// Addition styling for field borders
+	$.WS_Form.prototype.form_css_var = function() {
+
+		// Field label inside mode
+		switch(this.get_css_var('--wsf-field-label-inside-mode', 'move')) {
+
+			case 'hide' :
+
+				this.form_obj.addClass('wsf-label-position-inside-hide');
+				break;
+		}
+
+		// Field border placement
+		switch(this.get_css_var('--wsf-field-border-placement', 'all')) {
+
+			case 'bottom' :
+
+				this.form_obj.addClass('wsf-field-border-placement-bottom');
+				break;
 		}
 	}
 
@@ -1417,8 +1636,11 @@
 			// Get prefix object
 			var prefix_obj = $('.wsf-input-group-prepend', $(this));
 
-			// Check if a prefix exists
-			if(prefix_obj.length) {
+			// Check if ITI enabled on field
+			var iti_obj = $('.iti', $(this));
+
+			// Check if a prefix exists and it is not an ITI enabled field (ITI changes the DOM structure)
+			if(prefix_obj.length && !iti_obj.length) {
 
 				// Get label object
 				var label_obj = $('label', $(this));
@@ -1490,7 +1712,7 @@
 			// Use framework mask_required_label
 			var framework_type = $.WS_Form.settings_plugin.framework;
 			var framework = $.WS_Form.frameworks.types[framework_type];
-			var fields = this.framework['fields']['public'];
+			var fields = this.framework.fields.public;
 
 			if(typeof(fields.mask_required_label) === 'undefined') { return false; }
 			var label_mask_required = fields.mask_required_label;
@@ -1584,19 +1806,7 @@
 		$('input[type="number"]:not([step]):not([data-step-bypass])', this.form_canvas_obj).attr('step', 1);
 
 		// Process attributes that should be bypassed if a field is hidden
-		var attributes = {
-
-			'required':						{'bypass': 'data-required-bypass', 'not': '[type="hidden"]'},
-			'aria-required':				{'bypass': 'data-aria-required-bypass', 'not': '[type="hidden"]'},
-			'min':							{'bypass': 'data-min-bypass', 'not': '[type="hidden"],[type="range"]'},
-			'max':							{'bypass': 'data-max-bypass', 'not': '[type="hidden"],[type="range"]'},
-			'minlength':					{'bypass': 'data-minlength-bypass', 'not': '[type="hidden"]'},
-			'maxlength':					{'bypass': 'data-maxlength-bypass', 'not': '[type="hidden"]'},
-			'pattern':						{'bypass': 'data-pattern-bypass', 'not': '[type="hidden"]'},
-			'step':							{'bypass': 'data-step-bypass', 'not': '[type="hidden"],[type="range"]', 'replace': 'any'},
-			'data-ecommerce-price':			{'bypass': 'data-ecommerce-price-bypass', 'not': '[data-ecommerce-persist]'},
-			'data-ecommerce-cart-price':	{'bypass': 'data-ecommerce-cart-price-bypass', 'not': '[data-ecommerce-persist]'}
-		};
+		var attributes = this.form_bypass_attributes();
 
 		for(var attribute_source in attributes) {
 
@@ -1667,13 +1877,27 @@
 			// If field is visible, add validation attributes back that have a bypass data tag
 			if($('[' + attribute_bypass + ']', this.form_canvas_obj).length) {
 
-				$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox]:not([style*="display:none"],[style*="display: none"]) > input[type="checkbox"] [' + attribute_bypass + ']:not(' + attribute_not + ')', this.form_canvas_obj).attr(attribute_source, function() { return ws_this.form_bypass_visible($(this), attribute_bypass); }).removeAttr(attribute_bypass);
+				$('[id^="' + this.form_id_prefix + 'field-wrapper-"]:not([style*="display:none"],[style*="display: none"]) [data-row-checkbox]:not([style*="display:none"],[style*="display: none"]) > input[type="checkbox"] [' + attribute_bypass + ']:not(' + attribute_not + ')', this.form_canvas_obj).attr(attribute_source, function() { return ws_this.form_bypass_visible($(this), attribute_bypass); }).removeAttr(attribute_bypass);
 			}
 
 			// If field is not visible, add contain validation attributes, add bypass attributes
 			if($('[' + attribute_source + ']', this.form_canvas_obj).length) {
 
-				$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox][style*="display:none"] > input[type="checkbox"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + ']), [id^="' + this.form_id_prefix + 'field-wrapper-"] [style*="display: none"] input[type="checkbox"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + '])', this.form_canvas_obj).attr(attribute_bypass, function() { return ws_this.form_bypass_hidden($(this), attribute_source, attribute_replace); });
+				$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox][style*="display:none"] > input[type="checkbox"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + ']), [id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox][style*="display: none"] > input[type="checkbox"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + '])', this.form_canvas_obj).attr(attribute_bypass, function() { return ws_this.form_bypass_hidden($(this), attribute_source, attribute_replace); });
+			}
+
+			// Rows - Radio
+
+			// If field is visible, add validation attributes back that have a bypass data tag
+			if($('[' + attribute_bypass + ']', this.form_canvas_obj).length) {
+
+				$('[id^="' + this.form_id_prefix + 'field-wrapper-"]:not([style*="display:none"],[style*="display: none"]) [data-row-radio]:not([style*="display:none"],[style*="display: none"]) > input[type="radio"] [' + attribute_bypass + ']:not(' + attribute_not + ')', this.form_canvas_obj).attr(attribute_source, function() { return ws_this.form_bypass_visible($(this), attribute_bypass); }).removeAttr(attribute_bypass);
+			}
+
+			// If field is not visible, add contain validation attributes, add bypass attributes
+			if($('[' + attribute_source + ']', this.form_canvas_obj).length) {
+
+				$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-radio][style*="display:none"] > input[type="radio"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + ']), [id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-radio][style*="display: none"] > input[type="radio"][' + attribute_source + ']:not(' + attribute_not + ',[' + attribute_bypass + '])', this.form_canvas_obj).attr(attribute_bypass, function() { return ws_this.form_bypass_hidden($(this), attribute_source, attribute_replace); });
 			}
 		}
 
@@ -1711,12 +1935,23 @@
 		});
 
 		// Process custom validity messages - Rows - Checkbox
-		$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox]:not([style*="display:none"],[style*="display: none"]) input[type="checkbox"]', this.form_canvas_obj).each(function() {
+		$('[id^="' + this.form_id_prefix + 'field-wrapper-"]:not([style*="display:none"],[style*="display: none"]) [data-row-checkbox]:not([style*="display:none"],[style*="display: none"]) input[type="checkbox"]', this.form_canvas_obj).each(function() {
 
 			ws_this.form_bypass_process($(this), '', false);
 		});
 
 		$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox][style*="display:none"] input[type="checkbox"], [id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-checkbox][style*="display: none"] input[type="checkbox"]', this.form_canvas_obj).each(function() {
+
+			ws_this.form_bypass_process($(this), '', true);
+		});
+
+		// Process custom validity messages - Rows - Radio
+		$('[id^="' + this.form_id_prefix + 'field-wrapper-"]:not([style*="display:none"],[style*="display: none"]) [data-row-radio]:not([style*="display:none"],[style*="display: none"]) input[type="radio"]', this.form_canvas_obj).each(function() {
+
+			ws_this.form_bypass_process($(this), '', false);
+		});
+
+		$('[id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-radio][style*="display:none"] input[type="radio"], [id^="' + this.form_id_prefix + 'field-wrapper-"] [data-row-radio][style*="display: none"] input[type="radio"]', this.form_canvas_obj).each(function() {
 
 			ws_this.form_bypass_process($(this), '', true);
 		});
@@ -1736,6 +1971,53 @@
 		this.form_validate_real_time_process(conditional_initiated, false);
 
 		return true;
+	}
+
+	// Form bypass - Attributes
+	$.WS_Form.prototype.form_bypass_attributes = function() {
+
+		return {
+			'required':						{'bypass': 'data-required-bypass', 'not': '[type="hidden"]'},
+			'aria-required':				{'bypass': 'data-aria-required-bypass', 'not': '[type="hidden"]'},
+			'min':							{'bypass': 'data-min-bypass', 'not': '[type="hidden"],[type="range"]'},
+			'max':							{'bypass': 'data-max-bypass', 'not': '[type="hidden"],[type="range"]'},
+			'minlength':					{'bypass': 'data-minlength-bypass', 'not': '[type="hidden"]'},
+			'maxlength':					{'bypass': 'data-maxlength-bypass', 'not': '[type="hidden"]'},
+			'pattern':						{'bypass': 'data-pattern-bypass', 'not': '[type="hidden"]'},
+			'step':							{'bypass': 'data-step-bypass', 'not': '[type="hidden"],[type="range"]', 'replace': 'any'},
+			'data-ecommerce-price':			{'bypass': 'data-ecommerce-price-bypass', 'not': '[data-ecommerce-persist]'},
+			'data-ecommerce-cart-price':	{'bypass': 'data-ecommerce-cart-price-bypass', 'not': '[data-ecommerce-persist]'}
+		};
+	}
+
+	// Form bypass - Reset on object back to its original state ready for form_bypass to be reprocessed on it
+	$.WS_Form.prototype.form_bypass_obj_reset = function(obj) {
+
+		var attributes = this.form_bypass_attributes();
+
+		for(var attribute_source in attributes) {
+
+			if(!attributes.hasOwnProperty(attribute_source)) { continue; }
+
+			var attribute_config = attributes[attribute_source];
+
+			var attribute_bypass = attribute_config.bypass;
+
+			if(obj.attr(attribute_bypass + '-group')) {
+
+				obj.attr(attribute_source, obj.attr(attribute_bypass + '-group')).removeAttr(attribute_bypass + '-group');;
+			}
+
+			if(obj.attr(attribute_bypass + '-section')) {
+
+				obj.attr(attribute_source, obj.attr(attribute_bypass + '-section')).removeAttr(attribute_bypass + '-section');
+			}
+
+			if(obj.attr(attribute_bypass)) {
+
+				obj.attr(attribute_source, obj.attr(attribute_bypass)).removeAttr(attribute_bypass);
+			}
+		}
 	}
 
 	// Form bypass - Hidden
@@ -1762,29 +2044,41 @@
 	}
 
 	// Form bypass process
-	$.WS_Form.prototype.form_bypass_process = function(obj, attr_suffix, set) {
+	$.WS_Form.prototype.form_bypass_process = function(obj, attr_suffix, set_hidden) {
 
+		// Get section ID
 		var section_id = this.get_section_id(obj);
+
+		// Get section repeatable index
 		var section_repeatable_index = this.get_section_repeatable_index(obj);
+
+		// Get field ID
 		var field_id = this.get_field_id(obj);
 
-		if(set) {
+		// Get object row ID (0 if not found)
+		var object_row_id = this.get_field_object_row_id(obj);
+		if(!object_row_id) { object_row_id = 0; }
 
-			if(obj[0].willValidate) {
+		// Get object element
+		var obj_el = obj[0];
 
-				var validation_message = obj[0].validationMessage;
+		if(set_hidden) {
 
-				if(validation_message !== '') {
+			// Cache custom validation message if set
+			if(
+				obj_el.willValidate &&
+				obj_el.validity &&
+				obj_el.validity.customError &&
+				(obj_el.validationMessage !== '')
+			) {
+				if(typeof(this.validation_message_cache[section_id]) === 'undefined') { this.validation_message_cache[section_id] = []; }
+				if(typeof(this.validation_message_cache[section_id][section_repeatable_index]) === 'undefined') { this.validation_message_cache[section_id][section_repeatable_index] = []; }
+				if(typeof(this.validation_message_cache[section_id][section_repeatable_index][field_id]) === 'undefined') { this.validation_message_cache[section_id][section_repeatable_index][field_id] = []; }
 
-					if(typeof(this.validation_message_cache[section_id]) === 'undefined') { this.validation_message_cache[section_id] = []; }
-					if(typeof(this.validation_message_cache[section_id][section_repeatable_index]) === 'undefined') { this.validation_message_cache[section_id][section_repeatable_index] = []; }
-					if(typeof(this.validation_message_cache[section_id][section_repeatable_index][field_id]) === 'undefined') { this.validation_message_cache[section_id][section_repeatable_index][field_id] = []; }
+				this.validation_message_cache[section_id][section_repeatable_index][field_id][object_row_id] = obj_el.validationMessage;
 
-					this.validation_message_cache[section_id][section_repeatable_index][field_id][0] = validation_message;
-
-					// Set custom validation message to blank
-					obj[0].setCustomValidity('');
-				}
+				// Set custom validation message to blank
+				obj_el.setCustomValidity('');
 			}
 
 			// Add data-hidden attribute
@@ -1792,19 +2086,20 @@
 
 		} else {
 
+			// Recall custom validation message if cached
 			if(
-				obj[0].willValidate &&
+				obj_el.willValidate &&
 				(typeof(this.validation_message_cache[section_id]) !== 'undefined') &&
 				(typeof(this.validation_message_cache[section_id][section_repeatable_index]) !== 'undefined') &&
 				(typeof(this.validation_message_cache[section_id][section_repeatable_index][field_id]) !== 'undefined') &&
-				(typeof(this.validation_message_cache[section_id][section_repeatable_index][field_id][0]) !== 'undefined')
+				(typeof(this.validation_message_cache[section_id][section_repeatable_index][field_id][object_row_id]) !== 'undefined')
 			) {
 
-				// Recall custom validation message
-				obj[0].setCustomValidity(this.validation_message_cache[section_id][section_repeatable_index][field_id][0]);
+				// Recall custom validation message from cache
+				obj_el.setCustomValidity(this.validation_message_cache[section_id][section_repeatable_index][field_id][object_row_id]);
 
 				// Delete from cache
-				delete this.validation_message_cache[section_id][section_repeatable_index][field_id][0];
+				delete this.validation_message_cache[section_id][section_repeatable_index][field_id][object_row_id];
 			}
 
 			// Remove data-hidden attribute
@@ -1829,7 +2124,7 @@
 				if(typeof($(this).attr('data-inputmask-validate')) !== 'undefined') {
 
 					// Validate on change
-					$(this).on('input change paste', function() {
+					$(this).on('change input', function() {
 
 						ws_this.form_inputmask_validate($(this));
 					});
@@ -1915,8 +2210,8 @@
 			this.form_ecommerce_calculate();
 		}
 
-		// Mark form as validated
-		this.form_obj.addClass(this.class_validated);
+		// Mark form as validatefd
+		this.form_canvas_obj.addClass(this.class_validated);
 
 		// Check validity of form
 		if(this.form_validate(this.form_obj)) {
@@ -1950,6 +2245,8 @@
 
 		} else {
 
+			// Form validation - Field
+			if(typeof(this.form_validate_field) === 'function') { this.form_validate_field('submit'); }
 			// Trigger
 			this.trigger(post_mode + '-validate-fail');
 		}
@@ -2227,6 +2524,8 @@
 			}
 		}
 
+		// Form validation - Field
+		if(typeof(this.form_validate_field) === 'function') { this.form_validate_field('real_time'); }
 		return this.form_valid;
 	}
 
@@ -2300,6 +2599,10 @@
 
 				// aria-describedby - Remove invalid feedback ID
 				ws_this.attribute_remove_item($(this), 'aria-describedby', ws_this.get_invalid_feedback_id($(this)));
+
+				// aria-hidden - Add to invalid feedback ID
+				var invalid_feedback_obj = ws_this.get_invalid_feedback_obj($(this));
+				invalid_feedback_obj.attr('aria-hidden', 'true');
 			}
 		});
 
@@ -2312,6 +2615,10 @@
 
 				// aria-describedby - Add invalid feedback ID
 				ws_this.attribute_add_item($(this), 'aria-describedby', ws_this.get_invalid_feedback_id($(this)));
+
+				// aria-hidden - Remove from invalid feedback ID
+				var invalid_feedback_obj = ws_this.get_invalid_feedback_obj($(this));
+				invalid_feedback_obj.removeAttr('aria-hidden');
 			}
 		});	
 	}
@@ -2569,10 +2876,14 @@
 					var val_new = field_clear ? '' : $(this).prop('defaultValue');
 					var trigger = $(this).val() !== val_new;
 					$(this).val(val_new);
-					if($(this).hasClass('minicolors-input')) {
-						$(this).minicolors('value', {color: val_new});
+					if(trigger) {
+						$(this).trigger('change');
+
+						if(typeof(Coloris) !== 'undefined') {
+
+							$(this)[0].dispatchEvent(new Event('input', { bubbles: true }));
+						}
 					}
-					if(trigger) { $(this).trigger('change'); }
 				});
 				break;
 
@@ -2637,10 +2948,10 @@
 	}
 
 	// Form - Post
-	$.WS_Form.prototype.form_post = function(post_mode, action_id) {
+	$.WS_Form.prototype.form_post = function(post_mode, row_id_filter) {
 
 		if(typeof(post_mode) == 'undefined') { post_mode = 'save'; }
-		if(typeof(action_id) == 'undefined') { action_id = 0; }
+		if(typeof(row_id_filter) == 'undefined') { row_id_filter = 0; }
 
 		// Determine if this is a submit
 		var submit = (post_mode == 'submit');
@@ -2701,12 +3012,32 @@
 			// Strip brackets (For select, radio and checkboxes)
 			name = name.replace('[]', '');
 
+			// For radio and checkboxes, we should only mark it as hidden if all the rows are hidden
+			switch(ws_this.get_field_type($(this))) {
+
+				case 'checkbox' :
+				case 'price_checkbox' :
+
+					if(ws_this.get_checkbox_row_count($(this))) { return ''; }
+					break;
+
+				case 'radio' :
+				case 'price_radio' :
+
+					if(ws_this.get_radio_row_count($(this))) { return ''; }
+					break;
+			}
+
 			return name;
 
 		}).get();
 		hidden_array = hidden_array.filter(function(value, index, self) { 
 
-			return self.indexOf(value) === index;
+			return (
+
+				(self.indexOf(value) === index) &&
+				(value !== '')
+			);
 		});
 		var hidden = hidden_array.join();
 		this.form_add_hidden_input('wsf_hidden', hidden);
@@ -2784,7 +3115,7 @@
 		if(typeof(this.signature_form_post) === 'function') { this.signature_form_post(); }
 
 		// Clear action processing
-		$('input[type="hidden"][name="wsf_actions_run[]"]').remove();
+		$('input[type="hidden"][name="wsf_actions_run[]"]', this.form_canvas_obj).remove();
 
 		// Action processing (Conditional)
 		var actions_run = [];
@@ -2792,12 +3123,19 @@
 
 			if(!submit && (this.conditional_actions_run_save.length > 0)) { actions_run = this.conditional_actions_run_save; }
 			if(submit && (this.conditional_actions_run_submit.length > 0)) { actions_run = this.conditional_actions_run_submit; }
+
 			for(var actions_run_index in actions_run) {
 
 				if(!actions_run.hasOwnProperty(actions_run_index)) { continue; }
 
 				var action_run_id = actions_run[actions_run_index];
 				if(actions_run.indexOf(action_run_id) == actions_run_index) { this.form_add_hidden_input('wsf_actions_run[]', action_run_id); }
+			}
+
+			// Run no actions
+			if($('input[type="hidden"][name="wsf_actions_run[]"]', this.form_canvas_obj).length == 0) {
+
+				this.form_add_hidden_input('wsf_actions_run[]', -1);
 			}
 		}
 
@@ -2807,7 +3145,7 @@
 		// Do not run AJAX
 		if(
 			submit &&
-			(action_id == 0) &&
+			(row_id_filter == 0) &&
 			(this.form_ajax === false)
 		) {
 
@@ -2830,10 +3168,10 @@
 		// Build form data
 		var form_data = new FormData(this.form_obj[0]);
 
-		// Action ID (Inject into form_data so that it doesn't stay on the form)
-		if(action_id > 0) {
+		// Row ID filter (Inject into form_data so that it doesn't stay on the form)
+		if(row_id_filter > 0) {
 
-			form_data.append('wsf_action_id', action_id);
+			form_data.append('wsf_row_id_filter', row_id_filter);
 		}
 
 		// If this is not a submit, there are some form data elements we should remove to avoid conflicting with WooCommerce
@@ -3000,7 +3338,7 @@
 			ws_this.trigger(post_mode + '-error');
 			ws_this.trigger('error');
 
-		}, (action_id > 0) || !submit);
+		}, (row_id_filter > 0) || !submit);
 	}
 
 	// Form lock
@@ -3159,11 +3497,14 @@
 
 		var ws_this = this;
 
-		// Debug
-		if($.WS_Form.debug_rendered) {
+		// Timer - Start
+		var timer_start = new Date();
 
-			// Timer - Start
-			var timer_start = new Date();
+		// Check permalinks
+		if(ws_form_settings.use_rest_route) {
+
+			var ajax_path_parts = ajax_path.split('?');
+			ajax_path = encodeURIComponent(ajax_path_parts[0]) + (ajax_path_parts[1] ? '&' + ajax_path_parts[1] : '');
 		}
 
 		// Make AJAX request
@@ -3190,7 +3531,6 @@
 			) &&
 			(ws_form_settings.wsf_nonce)
 		) {
-
 			params.append(ws_form_settings.wsf_nonce_field_name, ws_form_settings.wsf_nonce);
 		}
 
@@ -3220,6 +3560,9 @@
 
 			method: method,
 			url: url,
+			contentType: false,
+			processData: (method === 'GET'),
+
 			beforeSend: function(xhr) {
 
 				// Nonce (X-WP-Nonce)
@@ -3228,122 +3571,15 @@
 					xhr.setRequestHeader('X-WP-Nonce', ws_form_settings.x_wp_nonce);
 				}
 			},
-			contentType: false,
-			processData: (method === 'GET'),
- 			statusCode: {
 
-				// Success
-				200: function(response) {
+			success: function(response) {
 
-					// Handle hash response
-					var hash_ok = ws_this.api_call_hash(response);
-
-					// Debug
-					if(hash_ok && $.WS_Form.debug_rendered) {
-
-						// Timer - Duration
-						var timer_duration = new Date() - timer_start;
-
-						ws_this.debug_info('debug_info_submit_count', response.data.count);
-						ws_this.debug_info('debug_info_submit_duration_user', ws_this.get_nice_duration(response.data.submit_duration_user));
-						ws_this.debug_info('debug_info_submit_duration_client', timer_duration + ' ms');
-						ws_this.debug_info('debug_info_submit_duration_server', response.data.submit_duration_server + ' ms');
-					}
-
-					// Check for action logs and errors (These are returned from the action system to tell the debugger to log the message)
-					if($.WS_Form.debug_rendered) {
-
-						if(typeof(response.data) !== 'undefined') {
-
-							if(typeof(response.data.logs) === 'object') {
-
-								for(var logs_index in response.data.logs) {
-
-									if(!response.data.logs.hasOwnProperty(logs_index)) { continue; }
-
-									ws_this.log('log_action', response.data.logs[logs_index], 'action');
-								}
-							}
-
-							if(typeof(response.data.errors) === 'object') {
-
-								for(var errors_index in response.data.errors) {
-
-									if(!response.data.errors.hasOwnProperty(errors_index)) { continue; }
-
-									// Get error message
-									var error_message = response.data.errors[errors_index];
-
-									// Check error message and log error
-									if(error_message) {
-
-										ws_this.error('error_action', error_message, 'action');
-
-									} else {
-
-										ws_this.error('error_action_no_message', '', 'action');
-									}
-								}
-							}
-						}
-					}
-					// Check for new nonce values
-					if(typeof(response.x_wp_nonce) !== 'undefined') { ws_form_settings.x_wp_nonce = response.x_wp_nonce; }
-					if(typeof(response.wsf_nonce) !== 'undefined') { ws_form_settings.wsf_nonce = response.wsf_nonce; }
-
-					// Call success function
-					var success_callback_result = (typeof(success_callback) === 'function') ? success_callback(response) : true;
-
-					// Check for data to process
-					if(
-						(typeof(response.data) !== 'undefined') &&
-						success_callback_result
-					) {
-
-						// Check for action_js (These are returned from the action system to tell the browser to do something)
-						if(typeof(response.data.js) === 'object') { ws_this.action_js_init(response.data.js); }
-					}
-				},
-
-				// Bad request
-				400: function(response) {
-
-					// Process error
-					ws_this.api_call_error_handler(response, 400, url, error_callback);
-				},
-
-				// Unauthorized
-				401: function(response) {
-
-					// Process error
-					ws_this.api_call_error_handler(response, 401, url, error_callback);
-				},
-
-				// Forbidden
-				403: function(response) {
-
-					// Process error
-					ws_this.api_call_error_handler(response, 403, url, error_callback);
-				},
-
-				// Not found
-				404: function(response) {
-
-					// Process error
-					ws_this.api_call_error_handler(response, 404, url, error_callback);
-				},
-
-				// Server error
-				500: function(response) {
-
-					// Process error
-					ws_this.api_call_error_handler(response, 500, url, error_callback);
-				}
+				ws_this.api_call_hander_success(response, success_callback, timer_start);
 			},
 
-			complete: function() {
+			error: function(jq_xhr, text_status, error_thrown) {
 
-				this.api_call_handle = false;
+				ws_this.api_call_handler_error(jq_xhr, text_status, error_thrown, success_callback, error_callback, timer_start, url);
 			}
 		};
 
@@ -3366,35 +3602,170 @@
 		return $.ajax(ajax_request);
 	};
 
-	// API call - Process error
-	$.WS_Form.prototype.api_call_error_handler = function(response, status, url, error_callback) {
+	// API call - Success
+	$.WS_Form.prototype.api_call_hander_success = function(response, success_callback, timer_start) {
 
-		// Get response data
-		var data = (typeof(response.responseJSON) !== 'undefined') ? response.responseJSON : false;
+		// Handle hash response
+		var hash_ok = this.api_call_hash(response);
 
-		// Process WS Form API error message
-		if(data && data.error) {
+		// Debug
+		if(hash_ok && $.WS_Form.debug_rendered) {
 
-			if(data.error_message) {
+			// Timer - Duration
+			var timer_duration = new Date() - timer_start;
 
-				this.error('error_api_call_' + status, data.error_message);
-
-			} else {
-
-				this.error('error_api_call_' + status, url);
-			}
-
-		} else {
-
-			// Fallback
-			this.error('error_api_call_' + status, url);
+			this.debug_info('debug_info_submit_count', response.data.count);
+			this.debug_info('debug_info_submit_duration_user', this.get_nice_duration(response.data.submit_duration_user));
+			this.debug_info('debug_info_submit_duration_client', timer_duration + ' ms');
+			this.debug_info('debug_info_submit_duration_server', response.data.submit_duration_server + ' ms');
 		}
 
-		// Call error call back
+		// Check for action logs and errors (These are returned from the action system to tell the debugger to log the message)
+		if($.WS_Form.debug_rendered) {
+
+			if(typeof(response.data) !== 'undefined') {
+
+				if(typeof(response.data.logs) === 'object') {
+
+					for(var logs_index in response.data.logs) {
+
+						if(!response.data.logs.hasOwnProperty(logs_index)) { continue; }
+
+						this.log('log_action', response.data.logs[logs_index], 'action');
+					}
+				}
+
+				if(typeof(response.data.errors) === 'object') {
+
+					for(var errors_index in response.data.errors) {
+
+						if(!response.data.errors.hasOwnProperty(errors_index)) { continue; }
+
+						// Get error message
+						var error_message = response.data.errors[errors_index];
+
+						// Check error message and log error
+						if(error_message) {
+
+							this.error('error_action', error_message, 'action');
+
+						} else {
+
+							this.error('error_action_no_message', '', 'action');
+						}
+					}
+				}
+			}
+		}
+		// Check for new nonce values
+		if(typeof(response.x_wp_nonce) !== 'undefined') { ws_form_settings.x_wp_nonce = response.x_wp_nonce; }
+		if(typeof(response.wsf_nonce) !== 'undefined') { ws_form_settings.wsf_nonce = response.wsf_nonce; }
+
+		// Call success function
+		var success_callback_result = (typeof(success_callback) === 'function') ? success_callback(response) : true;
+
+		// Check for data to process
+		if(
+			(typeof(response.data) !== 'undefined') &&
+			success_callback_result
+		) {
+
+			// Check for action_js (These are returned from the action system to tell the browser to do something)
+			if(typeof(response.data.js) === 'object') { this.action_js_init(response.data.js); }
+		}
+
+		return true;
+	}
+
+	// API call - Process AJAX error
+	$.WS_Form.prototype.api_call_handler_error = function(jq_xhr, text_status, error_thrown, success_callback, error_callback, timer_start, url) {
+
+		// Get response JSON
+		var response_json = (typeof(jq_xhr.responseJSON) !== 'undefined') ? jq_xhr.responseJSON : false;
+
+		// Get status
+		var status = jq_xhr.status;
+
+		// Error message
+		var error_message = this.language('error_api_call_unknown');
+
+		// Process by status code
+		switch(status) {
+
+			case 200:
+
+				// Process error thrown
+				if(typeof(error_thrown) === 'string') {
+
+					error_message = this.error('error_api_call_response_error', error_thrown);
+
+				} else if(error_thrown instanceof Error) {
+
+					error_message = this.error('error_api_call_response_error', error_thrown.message);
+
+				} else {
+
+					try {
+
+						error_message = this.error('error_api_call_response_error', JSON.stringify(error_thrown));
+
+					} catch (e) {
+
+						error_message = this.error('error_api_call_response_error', this.language('error_api_call_unknown'));
+					}
+				}
+
+				// Log response text
+				this.error('error_api_call_response_text', this.esc_html(jq_xhr.responseText));
+
+				// Build response
+				response_json = {
+
+					error: true,
+					error_message: error_message
+				};
+
+				break;
+
+			case 400:
+			case 401:
+			case 403:
+			case 404:
+			case 500:
+
+				// Process WS Form API error message
+				if(response_json && response_json.error) {
+
+					if(response_json.error_message) {
+
+						error_message = this.error('error_api_call_' + status, response_json.error_message);
+
+					} else {
+
+						error_message = this.error('error_api_call_' + status, url);
+					}
+
+				} else {
+
+					// Fallback
+					error_message = this.error('error_api_call_' + status, url);
+
+					// Build response
+					response_json = {
+
+						error: true,
+						error_message: error_message
+					};
+				}
+
+				break;
+		}
+
+		// Call error callback
 		if(typeof(error_callback) === 'function') {
 
 			// Run error callback
-			error_callback(data);
+			error_callback(response_json);
 		}
 	}
 
@@ -3503,7 +3874,7 @@
 			case 'redirect' :
 
 				var url = this.js_action_get_parameter(js_action, 'url');
-				if(url !== false) { location.href = js_action['url']; }
+				if(url !== false) { location.href = js_action.url; }
 
 				// Actions end at this point because of the redirect
 				return true;
@@ -3533,8 +3904,9 @@
 
 					var type = this.js_action_get_parameter(js_action, 'type');
 					var parse_values = this.js_action_get_parameter(js_action, 'parse_values');
+					var data_layer_reset = this.js_action_get_parameter(js_action, 'data_layer_reset');
 
-					this.action_conversion(type, parse_values);
+					this.action_conversion(type, parse_values, data_layer_reset);
 				}
 
 				break;
@@ -3566,7 +3938,7 @@
 				var ws_this = this;
 
 				// Reset if field modified
-				field_obj.one('change input keyup paste', function() {
+				field_obj.one('change input', function() {
 
 					// Reset invalid feedback
 					ws_this.set_invalid_feedback($(this), '');
@@ -3604,14 +3976,16 @@
 				}
 
 				// Mark form as validated
-				this.form_obj.addClass(this.class_validated);
+				this.form_canvas_obj.addClass(this.class_validated);
 
 				// Process accessibility
 				this.form_accessibility();
 
-          		// Process next action
+				// Process next action
 				this.action_js_process_next();
 
+				// Form validation - Field
+				if(typeof(this.form_validate_field) === 'function') { this.form_validate_field('field_invalid_feedback'); }
 				break;
 
 			// Field value
@@ -3659,7 +4033,7 @@
 
 				// Log event
 				this.log('log_field_dropzonejs_file_objects', field_id);
-          		// Process next action
+				// Process next action
 				this.action_js_process_next();
 
 				break;
@@ -3781,13 +4155,11 @@
 
 			case 'color' :
 
-				if(obj.hasClass('minicolors-input')) {
+				obj.attr('data-value-old', function() { return $(this).val(); }).val(value).filter(function() { return $(this).val() !== $(this).attr('data-value-old') }).trigger('change').removeAttr('data-value-old');
 
-					obj.attr('data-value-old', function() { return $(this).val(); }).minicolors('value', {color: value}).filter(function() { return $(this).val() !== $(this).attr('data-value-old') }).trigger('change').removeAttr('data-value-old');
+				if(typeof(Coloris) !== 'undefined') {
 
-				} else {
-
-					obj.attr('data-value-old', function() { return $(this).val(); }).val(value).filter(function() { return $(this).val() !== $(this).attr('data-value-old') }).trigger('change').removeAttr('data-value-old');
+					obj[0].dispatchEvent(new Event('input', { bubbles: true }));
 				}
 
 				break;
@@ -3857,13 +4229,13 @@
 			this.error('error_api_call_framework_invalid');
 			return false;
 		}
-		if(typeof(this.framework[object]['public']) === 'undefined') {
+		if(typeof(this.framework[object].public) === 'undefined') {
 			this.error('error_api_call_framework_invalid');
 			return false;
 		}
-		if(typeof(this.framework[object]['public'][meta_key]) === 'undefined') { return false; }
+		if(typeof(this.framework[object].public[meta_key]) === 'undefined') { return false; }
 
-		return this.framework[object]['public'][meta_key];
+		return this.framework[object].public[meta_key];
 	}
 
 	// JS Action - Message
@@ -3896,7 +4268,7 @@
 		var types = this.get_framework_config_value('message', 'types');
 
 		var type = (typeof(types[type]) !== 'undefined') ? types[type] : false;
-		var mask_wrapper_class = (typeof(type['mask_wrapper_class']) !== 'undefined') ? type['mask_wrapper_class'] : '';
+		var mask_wrapper_class = (typeof(type.mask_wrapper_class) !== 'undefined') ? type.mask_wrapper_class : '';
 
 		// Clear other messages
 		if(clear) {
@@ -3930,14 +4302,33 @@
 
 		var mask_wrapper_values = {
 
-			'message':				message,
-			'mask_wrapper_class':	mask_wrapper_class 
+			'message':            message,
+			'mask_wrapper_class': mask_wrapper_class
 		};
+
+		// Add style ID
+		var style_id = (typeof(this.form_canvas_obj.attr('data-wsf-style-id')) !== 'undefined') ? this.form_canvas_obj.attr('data-wsf-style-id') : false;
+
+		if(style_id) {
+
+			mask_wrapper_values.style_id = style_id;
+		}
 
 		var message_div = $('<div/>', { html: this.mask_parse(mask_wrapper, mask_wrapper_values) });
 		message_div.attr('role', 'alert');
 		message_div.attr('data-wsf-message', '');
 		message_div.attr('data-wsf-instance-id', this.form_instance_id);
+
+		// Add style ID
+		if(style_id) {
+
+			// Check if styler is present
+			if($('#wsf-styler').length) {
+
+				// Inherit modified styles
+				message_div.attr('style', this.form_canvas_obj.attr('style'));
+			}
+		}
 
 		// Hide form?
 		if(form_hide) {
@@ -4065,7 +4456,7 @@
 
 					if(ws_this.form_character_word_count_process($(this))) {
 
-						$(this).on('keyup change paste', function() { ws_this.form_character_word_count_process($(this)); });
+						$(this).on('change input', function() { ws_this.form_character_word_count_process($(this)); });
 					}
 				});
 			}
@@ -4154,6 +4545,9 @@
 			this.set_invalid_feedback(obj, '');
 		}
 
+		// Process form bypass
+		this.form_bypass();
+
 		// Process help
 		var help = this.get_object_meta_value(field, 'help', '', false, true);
 
@@ -4238,42 +4632,142 @@
 		}
 	}
 
-	// Google Maps API (Used by all the Google enqueues)
-	$.WS_Form.prototype.form_google_maps_api_init = function() {
+	// Google Maps API JS - Await
+	$.WS_Form.prototype.form_google_maps_js_api_await = function(field_type) {
 
-		// Check API key
-		var api_key_google_map = $.WS_Form.settings_plugin.api_key_google_map;
-		if(api_key_google_map == '') {
+		var ws_this = this;
 
-			// API key empty
-			this.error('error_google_key_missing');
+		var total_ms_start = new Date().getTime();
 
-			return false;
-		}
+		return new Promise(function(resolve) {
 
-		// Should header script be loaded
-		if(!$('#wsf-google-map-script-head').length) {
+			function check() {
 
-			var google_map_script_head = '<script id="wsf-google-map-script-head">';
-			google_map_script_head += 'var wsf_google_maps_loaded = false;';
-			google_map_script_head += 'function wsf_google_maps_api_onload() {';
-			google_map_script_head += 'wsf_google_maps_loaded = true;';
-			google_map_script_head += '}';
-			google_map_script_head += '</script>';
+				// Timeout check
+				if((new Date().getTime() - total_ms_start) > ws_this.timeout_google_maps) {
 
-			$('head').append(google_map_script_head);
-		}
+					ws_this.error('error_timeout_google_maps_api_js', field_type);
 
-		// Should Google Maps script be called?
-		if(!(window.google && window.google.maps) && !$('#wsf-google-map-script-body').length) {
+					return resolve(false);
+				}
 
-			// Get Google Maps JS API key
-			var google_map_script_body = '<script id="wsf-google-map-script-body" src="https://maps.googleapis.com/maps/api/js?key=' + api_key_google_map + '&callback=wsf_google_maps_api_onload&libraries=places,marker&v=weekly&loading=async" async defer></script>';
-			$('body').append(google_map_script_body);
-		}
+				// Base check
+				var not_loaded = (!window.google || !window.google.maps);
 
-		return true;
-	}
+				switch($.WS_Form.settings_plugin.google_maps_js_api_version) {
+
+					case '2' :
+
+						// Only do base check, library loading done after this
+						break;
+
+					default :
+
+						switch(field_type) {
+
+							case 'googleaddress' :
+
+								not_loaded = not_loaded || (
+
+									!window.google.maps.Geocoder ||
+									!window.google.maps.places ||
+									!window.google.maps.places.Autocomplete
+								);
+
+								break;
+
+							case 'googlemap' :
+
+								not_loaded = not_loaded || (
+
+									!window.google ||
+									!window.google.maps ||
+									!window.google.maps.Geocoder ||
+									!window.google.maps.marker ||
+									!window.google.maps.marker.AdvancedMarkerElement ||
+									!window.google.maps.places ||
+									!window.google.maps.places.SearchBox
+								);
+
+								break;
+
+							case 'googleroute' :
+
+								not_loaded = not_loaded || (
+
+									!window.google ||
+									!window.google.maps ||
+									!window.google.maps.DirectionsRenderer ||
+									!window.google.maps.DirectionsService
+								);
+
+								break;
+						}
+				}
+
+				if(not_loaded) {
+
+					// Not loaded
+					setTimeout(check, ws_this.timeout_interval);
+
+					return;
+				}
+
+				// Loaded
+				ws_this.log('log_google_maps_api_js_init_complete', field_type, 'google-maps-js-api');
+
+				return resolve(true);
+			}
+
+			check();
+		});
+
+	};
+
+	$.WS_Form.prototype.form_google_maps_js_api_import_libraries = function(field_type) {
+
+		var ws_this = this;
+
+		return (async function() {
+
+			ws_this.log('log_google_maps_api_js_init', field_type, 'google-maps-js-api');
+
+			switch($.WS_Form.settings_plugin.google_maps_js_api_version) {
+
+				case '2' :
+
+					switch(field_type) {
+
+						case 'googleaddress':
+
+							await google.maps.importLibrary('geocoding');
+							await google.maps.importLibrary('places');
+
+							break;
+
+						case 'googlemap':
+
+							await google.maps.importLibrary('geocoding');
+							await google.maps.importLibrary('maps');
+							await google.maps.importLibrary('marker');
+							await google.maps.importLibrary('places');
+
+							break;
+
+						case 'googleroute':
+
+							await google.maps.importLibrary('routes');
+
+							break;
+					}
+
+					ws_this.log('log_google_maps_api_js_library_import', field_type, 'google-maps-js-api');
+
+					break;
+			}
+
+		})();
+	};
 
 	// Initialize forms function
 	window.wsf_form_instances = [];
@@ -4291,7 +4785,7 @@
 			var forms = $('.wsf-form', container);
 		}
 
-		if(!$('.wsf-form').length) { return; }
+		if(!forms.length) { return; }
 
 		// Get highest instance ID
 		var set_instance_id = 0;
@@ -4362,7 +4856,7 @@
 				// Render
 				ws_form.render({
 
-					'obj' :			'#' + id,
+					'obj' :			$(this),
 					'form_id':		form_id
 				});
 			}

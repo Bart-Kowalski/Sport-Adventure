@@ -7,7 +7,7 @@
 
 			// Get form column count
 			$columns = absint(WS_Form_Common::option_get('framework_column_count', 0));
-			if($columns == 0) { self::db_throw_error(__('Invalid framework column count', 'ws-form')); }
+			if($columns == 0) { throw new Exception(__('Invalid framework column count', 'ws-form')); }
 
 			// Read frameworks
 			$frameworks = WS_Form_Config::get_frameworks();
@@ -58,7 +58,12 @@
 
 						if(!isset($breakpoint_outer['admin_max_width'])) {
 
-							self::db_throw_error(sprintf(__('Admin max width not defined: %s', 'ws-form'), $breakpoint_outer_id));
+							throw new Exception(sprintf(
+
+								/* translators: %s: Breakpoint outer ID */
+								__('Admin max width not defined: %s', 'ws-form'),
+								$breakpoint_outer_id
+							));
 
 						} else {
 

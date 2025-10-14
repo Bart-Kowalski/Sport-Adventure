@@ -3,7 +3,7 @@
 	class WS_Form_ACF {
 
 		// Get fields all
-		public static function acf_get_fields_all($acf_get_field_groups_filter = array(), $choices_filter = false, $raw = false, $traverse = false, $has_fields = false) {
+		public static function acf_get_fields_all($acf_get_field_groups_filter = array(), $choices_filter = false, $raw = false, $traverse = false, $has_fields = false, $option_fields = false) {
 
 			if($acf_get_field_groups_filter === false) { $acf_get_field_groups_filter = array(); }
 
@@ -17,6 +17,55 @@
 
 			// Process each ACF field group
 			foreach($acf_field_groups as $acf_field_group) {
+
+				// Option field filtering
+				if(
+					isset($acf_field_group['location']) &&
+					is_array($acf_field_group['location'])
+				) {
+					$acf_field_group_exclude = false; 
+
+					foreach($acf_field_group['location'] as $locations) {
+
+						if(is_array($locations)) {
+
+							foreach($locations as $location) {
+
+								if(
+									isset($location['param']) &&
+									is_string($location['param'])
+								) {
+									if($option_fields) {
+
+										if($location['param'] == 'options_page') {
+
+											$acf_field_group_exclude = false;
+											break 2;
+
+										} else {
+
+											$acf_field_group_exclude = true;
+										}
+
+									} else {
+
+										if($location['param'] == 'options_page') {
+
+											$acf_field_group_exclude = true;
+
+										} else {
+
+											$acf_field_group_exclude = false;
+											break 2;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					if($acf_field_group_exclude) { continue; }
+				}
 
 				// Get fields
 				$acf_fields = acf_get_fields($acf_field_group);
@@ -180,7 +229,7 @@
 				// Adjust label if blank
 				if($field['label'] == '') {
 
-					$field['label'] = __('(no label)', 'acf');
+					$field['label'] = __('(no label)', 'ws-form');
 					$meta['label_render'] = '';
 				}
 
@@ -194,6 +243,20 @@
 						$field_index = 1;
 
 						continue 2;
+				}
+
+				// Required
+				switch($action_type) {
+
+					case 'checkbox' :
+
+						$required = false;
+
+						break;
+
+					default :
+
+						$required = (isset($field['required']) ? ($field['required'] == 1) : false);
 				}
 
 				// Section names
@@ -249,7 +312,7 @@
 					'label_field' => 		$field['label'], 
 					'type' => 				$type,
 					'action_type' =>		$action_type,
-					'required' => 			(isset($field['required']) ? ($field['required'] == 1) : false),
+					'required' => 			$required,
 					'default_value' => 		(isset($field['default_value']) ? $field['default_value'] : ''),
 					'pattern' => 			(isset($field['pattern']) ? $field['pattern'] : ''),
 					'placeholder' => 		(isset($field['placeholder']) ? $field['placeholder'] : ''),
@@ -412,7 +475,9 @@
 								);
 							}
 
+							// Choices
 							$choices = array();
+
 							break;
 
 						case 'taxonomy' :
@@ -473,7 +538,9 @@
 								);
 							}
 
+							// Choices
 							$choices = array();
+
 							break;
 
 						case 'user' :
@@ -520,7 +587,9 @@
 								);
 							}
 
+							// Choices
 							$choices = array();
+
 							break;
 
 						case 'select' :
@@ -556,7 +625,9 @@
 								}
 							}
 
+							// Choices
 							$choices = isset($field['choices']) ? $field['choices'] : array();
+
 							break;
 
 						case 'checkbox' :
@@ -580,7 +651,17 @@
 								$meta_return['select_all'] = 'on';
 							}
 
+							// Required
+							$required = isset($field['required']) ? $field['required'] : false;
+
+							if($required) {
+
+								$meta_return['checkbox_min'] = '1';
+							}
+
+							// Choices
 							$choices = isset($field['choices']) ? $field['choices'] : array();
+
 							break;
 
 						case 'radio' :
@@ -595,7 +676,9 @@
 							$meta_return['data_source_id'] = 'acf';
 							$meta_return['data_source_acf_field_key'] = $field['key'];
 
+							// Choices
 							$choices = isset($field['choices']) ? $field['choices'] : array();
+
 							break;
 
 						case 'true_false' :
@@ -612,7 +695,9 @@
 								$meta_return['class_field'] = 'wsf-switch';
 							}
 
+							// Choices
 							$choices = array('on' => $field['label']);
+
 							break;
 
 						case 'button_group' :
@@ -628,7 +713,9 @@
 							$meta_return['data_source_id'] = 'acf';
 							$meta_return['data_source_acf_field_key'] = $field['key'];
 
+							// Choices
 							$choices = isset($field['choices']) ? $field['choices'] : array();
+
 							break;
 					}
 
@@ -693,7 +780,7 @@
 						($field['min'] != '')
 					) {
 
-						$meta_return['min'] = absint($field['min']);
+						$meta_return['min'] = floatval($field['min']);
 					}
 
 					if(
@@ -701,7 +788,7 @@
 						($field['max'] != '')
 					) {
 
-						$meta_return['max'] = absint($field['max']);
+						$meta_return['max'] = floatval($field['max']);
 					}
 
 					if(
@@ -709,7 +796,7 @@
 						($field['step'] != '')
 					) {
 
-						$meta_return['step'] = absint($field['step']);
+						$meta_return['step'] = floatval($field['step']);
 					}
 
 					return $meta_return;
@@ -1335,10 +1422,6 @@
 
 					break;
 
-				case 'true_false' :
-
-					return empty($meta_value) ? 0 : 1;
-
 				case 'post_object' :
 				case 'page_link' :
 				case 'relationship' :
@@ -1378,7 +1461,7 @@
 
 				case 'true_false' :
 
-					return WS_Form_Common::is_true($meta_value);
+					return WS_Form_Common::is_true($meta_value) ? 1 : 0;
 
 				case 'number' :
 
@@ -1563,7 +1646,8 @@
 					'action' 					=> 'field_invalid_feedback',
 					'field_id' 					=> $field_id,
 					'section_repeatable_index' 	=> $section_repeatable_index,
-					'message' 					=> sprintf(__('%s value is required', 'acf'), $field['label'])
+					/* translators: %s: Field label */
+					'message' 					=> sprintf(__('%s value is required', 'ws-form'), $field['label'])
 				);
 
 			} else {

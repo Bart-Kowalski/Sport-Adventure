@@ -9,20 +9,26 @@
 
 		public function __construct() {
 
+			// Create intial file handler
+			add_filter('wsf_file_handler_' . $this->id, array($this, 'handler'), 10, 5);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = sprintf(
 
-				/* translators: %s = WS Form */
+				/* translators: %s: WS Form */
 				__('%s (Public)', 'ws-form'),
 
 				WS_FORM_NAME_GENERIC
 			);
 
-			// Register action
+			// Register file handler
 			parent::register($this);
-
-			// Create intial file handler
-			add_filter('wsf_file_handler_' . $this->id, array($this, 'handler'), 10, 5);
 		}
 
 		// Handler
@@ -221,7 +227,7 @@
 			if(filesize($file_to_delete) !== $size) { return false; }
 
 			// Delete file
-			if(!@unlink($file_to_delete)) { return false; }
+			if(!@wp_delete_file($file_to_delete)) { return false; }
 
 			return true;
 		}

@@ -44,7 +44,7 @@
 
 			$meta_object = new stdClass();
 
-			if(absint($this->parent_id) === 0) { parent::db_throw_error(__('Parent ID not set')); }
+			if(absint($this->parent_id) === 0) { parent::db_throw_error(__('Parent ID not set', 'ws-form')); }
 
 			$sql = $wpdb->prepare(
 
@@ -56,14 +56,8 @@
 			$meta_value = $wpdb->get_var($sql);
 			if(is_null($meta_value)) { return false; }
 
-			if(is_serialized($meta_value)) {
-
-				return unserialize($meta_value);
-
-			} else {
-
-				return $meta_value;
-			}
+			// Maybe unserialize
+			return WS_Form_Common::maybe_unserialize($meta_value);
 		}
 
 		// Read all meta data
@@ -76,7 +70,7 @@
 
 			$meta_object = new stdClass();
 
-			if(absint($this->parent_id) === 0) { parent::db_throw_error(__('Parent ID not set')); }
+			if(absint($this->parent_id) === 0) { parent::db_throw_error(__('Parent ID not set', 'ws-form')); }
 
 			$sql = $wpdb->prepare(
 
@@ -89,17 +83,7 @@
 
 				foreach($metas as $key => $meta) {
 
-					if(is_serialized($meta['meta_value'])) {
-
-						$metas[$key]['meta_value'] = unserialize($meta['meta_value']);
-
-					} else {
-
-						$metas[$key]['meta_value'] = $meta['meta_value'];
-					}
-
-					// New meta object
-					$meta_object->{$metas[$key]['meta_key']} = $metas[$key]['meta_value'];
+					$meta_object->{$metas[$key]['meta_key']} = WS_Form_Common::maybe_unserialize($meta['meta_value']);
 				}
 			}
 

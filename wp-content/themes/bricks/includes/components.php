@@ -14,7 +14,7 @@ class Components {
 	 *
 	 * @since 1.12
 	 */
-	public static function upgrade_components( $components ) {
+	public static function upgrade_components( $components, $is_import = true ) {
 		// Component in-builder (PanelElements.vue)
 		if ( bricks_is_ajax_call() ) {
 			Ajax::verify_request( 'bricks-nonce-builder' );
@@ -54,8 +54,8 @@ class Components {
 				unset( $components[ $index ]['children'] );
 			}
 
-			// Remove backslashes from component settings (i.e. Code element; @since 2.0)
-			$components[ $index ] = stripslashes_deep( $components[ $index ] );
+			// Remove backslashes from component settings if this is import action (i.e. Code element; @since 2.0)
+			$components[ $index ] = $is_import ? stripslashes_deep( $components[ $index ] ) : $components[ $index ];
 		}
 
 		// Return: Components in-builder import (PanelElements.vue)

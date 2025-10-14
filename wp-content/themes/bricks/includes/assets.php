@@ -8,8 +8,9 @@ class Assets {
 	public static $css_dir        = '';
 	public static $css_url        = '';
 
-	public static $global_colors     = [];
-	public static $google_fonts_urls = [];
+	public static $google_fonts_urls   = [];
+	public static $global_colors       = [];
+	public static $db_colors_generated = false; // (@since 2.1)
 
 	public static $inline_css = [
 		'color_vars'       => '',
@@ -79,9 +80,10 @@ class Assets {
 
 		// Check if cascade layer is enabled to wrap  WordPress generated styles (@since 2.0)
 		if ( ! Database::get_setting( 'disableBricksCascadeLayer' ) ) {
-			add_filter( 'style_loader_tag', [ $this, 'wrap_block_styles_in_cascade_layer' ], 10, 2 ); // Block styles
+			// add_filter( 'style_loader_tag', [ $this, 'wrap_block_styles_in_cascade_layer' ], 10, 2 ); // NOTE: No longer use since as this could cause conflicts with blocks inline styles (@since 2.0.2)
 			add_filter( 'style_loader_tag', [ $this, 'wrap_mediaelement_styles_in_cascade_layer' ], 10, 2 ); // Mediaelement styles
 			add_filter( 'style_loader_tag', [ $this, 'wrap_select2_styles_in_cascade_layer' ], 10, 2 ); // Select2 styles
+			// add_filter( 'style_loader_tag', [ $this, 'wrap_photoswipe_styles_in_cascade_layer' ], 10, 2 ); // NOTE: Not in use as it causes Woo product gallery lightbox to not work (@since 2.1)
 		}
 	}
 
@@ -238,7 +240,7 @@ class Assets {
 
 		// Add settings of used global element to Bricks settings string
 		if ( strpos( $bricks_settings_string, '"global"' ) ) {
-			$global_elements = Database::$global_data['elements'] ? Database::$global_data['elements'] : [];
+			$global_elements = is_array( Database::$global_data['elements'] ) ? Database::$global_data['elements'] : [];
 
 			foreach ( $global_elements as $global_element ) {
 				$global_element_id = ! empty( $global_element['global'] ) ? $global_element['global'] : false;
@@ -744,9 +746,15 @@ class Assets {
 	 * @return string
 	 */
 	public static function generate_css_color( $color ) {
-		// Re-run 'generate_inline_css_color_vars' to set self::$global_colors on file save to add color var to 'post-{ID}.min.css'
-		if ( ! count( self::$global_colors ) ) {
-			$color_vars_inline_css = self::generate_inline_css_color_vars( get_option( BRICKS_DB_COLOR_PALETTE, [] ) );
+		/**
+		 * Avoid unnecessary re-generation by checking the flag
+		 *
+		 * @pre 2.1: Re-run 'generate_inline_css_color_vars' to set self::$global_colors on file save to add color var to 'post-{ID}.min.css'
+		 * @since 2.1
+		 */
+		if ( ! self::$db_colors_generated ) {
+			$color_vars_inline_css     = self::generate_inline_css_color_vars( get_option( BRICKS_DB_COLOR_PALETTE, [] ) );
+			self::$db_colors_generated = true;
 		}
 
 		// Return color var if it exists as defined in the color palette
@@ -1026,8 +1034,15 @@ class Assets {
 
 	/**
 	 * Load Adobe & Google fonts according to inline CSS (source of truth) and remove loading wrapper
+	 *
+	 * @param string $inline_css The CSS to scan for fonts.
+	 * @param bool   $return_html_links Optional. If true, returns HTML link tags instead of enqueuing. Default false.
+	 * @return string|void HTML link tags if $return_html_links is true, void otherwise.
 	 */
-	public static function load_webfonts( $inline_css ) {
+	public static function load_webfonts( $inline_css, $return_html_links = false ) {
+		// Initialize webfont links if returning HTML
+		$webfont_links = '';
+
 		/**
 		 * STEP: Adobe fonts
 		 *
@@ -1059,13 +1074,17 @@ class Assets {
 
 			// At least one Adobe font is in use: Load Adobe fonts CSS file
 			if ( count( $adobe_fonts_in_use ) ) {
-				wp_enqueue_style( "adobe-fonts-project-id-$adobe_fonts_project_id", "https://use.typekit.net/$adobe_fonts_project_id.css" );
+				if ( $return_html_links ) {
+					$webfont_links .= "<link rel=\"stylesheet\" href=\"https://use.typekit.net/{$adobe_fonts_project_id}.css\">";
+				} else {
+					wp_enqueue_style( "adobe-fonts-project-id-$adobe_fonts_project_id", "https://use.typekit.net/$adobe_fonts_project_id.css" );
+				}
 			}
 		}
 
 		// Return: Google fonts disabled
 		if ( Helpers::google_fonts_disabled() ) {
-			return;
+			return $return_html_links ? $webfont_links : null;
 		}
 
 		/**
@@ -1312,10 +1331,18 @@ class Assets {
 
 		// Use font stylesheet URLs
 		if ( bricks_is_builder() || ! count( $active_google_fonts ) ) {
-			return;
+			return $return_html_links ? $webfont_links : null;
 		}
 
 		// Frontend: Load Google font files (via Webfont loader OR stylesheets (= default))
+
+		// Return HTML links if requested (for AJAX contexts like Gutenberg)
+		if ( $return_html_links ) {
+			// Add preconnect and font stylesheet links
+			$webfont_links .= '<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>';
+			$webfont_links .= "<link rel=\"stylesheet\" href=\"{$active_google_fonts_url}\">";
+			return $webfont_links;
+		}
 
 		// Preconnect to Google Fonts for async DNS lookup
 		add_action(
@@ -1598,6 +1625,29 @@ class Assets {
 		$control      = $controls[ $control_key ] ?? false;
 		$control_type = $control['type'] ?? '';
 		$css_rules    = [];
+
+		/**
+		 * STEP: Convert specific control setting key to new values
+		 *
+		 * Control keys: imageRatio (#86c50gz77)
+		 *
+		 * @since 2.0.2
+		 */
+		$convert_control_keys = [
+			'imageRatio' => [
+				'ratio-square' => '1/1',
+				'ratio-16-9'   => '16/9',
+				'ratio-4-3'    => '4/3',
+			],
+		];
+
+		if ( $convert_control_keys[ $control_key ] ?? false ) {
+			$convert_keys = $convert_control_keys[ $control_key ];
+
+			if ( isset( $convert_keys[ $setting_value ] ) ) {
+				$setting_value = $convert_keys[ $setting_value ];
+			}
+		}
 
 		// STEP: Loop over repeater items to generate CSS string
 		if ( $control_type === 'repeater' ) {
@@ -2354,7 +2404,8 @@ class Assets {
 									}
 
 									// Set position: relative for child elements here instead of .has-overlay (@since 1.6)
-									$css_rules[ ":where($css_selector > *)" ] = [ 'position: relative' ];
+									// Don't set position: relative for figcaption elements, so we can get rid of "!important" statement in _image.scss (@since 2.1)
+									$css_rules[ ":where($css_selector > *:not(figcaption))" ] = [ 'position: relative' ];
 
 									$css_selector .= '::before';
 								}
@@ -2775,6 +2826,12 @@ class Assets {
 
 		if ( $component_id ) {
 			$css_selector = ! empty( $element['cid'] ) ? ".brxe-{$element['cid']}" : ".brxe-{$element['id']}";
+
+			// Check for component element "selectors" (@since 2.1)
+			$component_element = Helpers::get_component_element_by_id( $component_id );
+			if ( ! empty( $element['cid'] ) && ! empty( $component_element['selectors'] ) ) {
+				$element['selectors'] = $component_element['selectors'];
+			}
 		}
 
 		elseif ( $element_id ) {
@@ -2870,7 +2927,8 @@ class Assets {
 		 * External files: Use global-elements.min.css to reflect global element changes everywhere.
 		 */
 		if ( Database::get_setting( 'cssLoading' ) !== 'file' ) {
-			foreach ( Database::$global_data['elements'] as $global_element ) {
+			$global_elements = is_array( Database::$global_data['elements'] ) ? Database::$global_data['elements'] : [];
+			foreach ( $global_elements as $global_element ) {
 				// @since 1.2.1
 				if ( ! empty( $global_element['global'] ) && ! empty( $element['global'] ) && $global_element['global'] === $element['global'] ) {
 					$settings   = ! empty( $global_element['settings'] ) ? $global_element['settings'] : [];
@@ -3313,10 +3371,10 @@ class Assets {
 						// STEP 1: Process all direct children of the nested component
 					foreach ( $nested_component['elements'] as $nested_component_element ) {
 						$nested_component_element['parentComponent'] = $nested_component_id;
-						$nested_component_element['instanceId']      = $original_element['id'];
+						$nested_component_element['instanceId']      = $original_element['instanceId'] ?? $original_element['id']; // Use grandparent instanceId if available (nested component) (#86c51y7xy; @since 2.1)
 
 						// Set unique ID for nested component child element (#86c4b31pz)
-						$unique_id                    = $original_element['id'] . '-' . $nested_component_element['id'];
+						$unique_id                    = $nested_component_element['instanceId'] . '-' . $nested_component_element['id'];
 						self::$elements[ $unique_id ] = $nested_component_element;
 					}
 
@@ -3351,12 +3409,14 @@ class Assets {
 							unset( $original_element['cid'] );
 						}
 
-						self::$elements[ $original_element['id'] ] = $original_element;
+						$unique_id = $original_element['ajaxLocalId'] ?? $original_element['id']; // Use grandparent instanceId if available (nested component) (#86c51y7xy; @since 2.1)
+
+						self::$elements[ $unique_id ] = $original_element;
 					}
 				} else {
 					// Set 'parentComponent' to add .brxe- component class to child elements
 					$component_element['parentComponent'] = $parent_component_id;
-					$component_element['instanceId']      = $original_element['id'];
+					$component_element['instanceId']      = $original_element['instanceId'] ?? $original_element['id']; // Use grandparent instanceId if available (nested component) (#86c51y7xy; @since 2.1)
 
 					// If the child element's parent is the component root element, set the parent to the current component instance (#86c4957mc)
 					if ( ! empty( $component_element['parent'] ) && $component_element['parent'] === $parent_component_id ) {
@@ -3364,7 +3424,7 @@ class Assets {
 					}
 
 					// Set unique ID for component child element (#86c4957mc)
-					$unique_id                    = $original_element['id'] . '-' . $component_element['id'];
+					$unique_id                    = $component_element['instanceId'] . '-' . $component_element['id'];
 					self::$elements[ $unique_id ] = $component_element;
 				}
 			}
@@ -3641,7 +3701,7 @@ class Assets {
 	/**
 	 * Wrap WordPress block styles in cascade layer when enabled
 	 *
-	 * @since 1.12.2
+	 * NOTE: Not in use, but keeping it here for reference
 	 */
 	public function wrap_block_styles_in_cascade_layer( $tag, $handle ) {
 		if ( $handle === 'wp-block-library' || $handle === 'global-styles' ) {
@@ -3685,6 +3745,27 @@ class Assets {
 
 			$tag = "<style>@import url('$css_url') layer(bricks);</style>";
 		}
+		return $tag;
+	}
+
+	/**
+	 * Wrap WooCommerce photoswipe styles in cascade layer
+	 *
+	 * @since 2.0.2
+	 *
+	 * @since 2.1: NOTE: Not in use as it causes Woo product gallery lightbox to not work
+	 */
+	public function wrap_photoswipe_styles_in_cascade_layer( $tag, $handle ) {
+		if ( $handle === 'photoswipe' || $handle === 'photoswipe-default-skin' ) {
+			// Extract the CSS file URL from the tag
+			preg_match( '/href=(["\'])([^\1]+)\1/', $tag, $matches );
+
+			if ( ! empty( $matches[2] ) ) {
+				$css_url = $matches[2];
+				$tag     = "<style>@import url('$css_url') layer(bricks);</style>";
+			}
+		}
+
 		return $tag;
 	}
 }

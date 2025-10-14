@@ -376,7 +376,7 @@ class Element_Video extends Element {
 		$this->controls['fileControlNoDownload'] = [
 			'tab'      => 'content',
 			'label'    => esc_html__( 'Disable', 'bricks' ) . ': ' . esc_html__( 'Download', 'bricks' ),
-			'info'     => 'Firefox: ' . esc_html__( 'No supported', 'bricks' ) . ' (controlslist)',
+			'info'     => 'Firefox: ' . esc_html__( 'Not supported', 'bricks' ) . ' (controlslist)',
 			'type'     => 'checkbox',
 			'required' => [
 				[ 'videoType', '=', [ 'media', 'file', 'meta' ] ],
@@ -387,7 +387,7 @@ class Element_Video extends Element {
 		$this->controls['fileControlNoFullscreen'] = [
 			'tab'      => 'content',
 			'label'    => esc_html__( 'Disable', 'bricks' ) . ': ' . esc_html__( 'Fullscreen', 'bricks' ),
-			'info'     => 'Firefox: ' . esc_html__( 'No supported', 'bricks' ) . ' (controlslist)',
+			'info'     => 'Firefox: ' . esc_html__( 'Not supported', 'bricks' ) . ' (controlslist)',
 			'type'     => 'checkbox',
 			'required' => [
 				[ 'videoType', '=', [ 'media', 'file', 'meta' ] ],
@@ -398,7 +398,7 @@ class Element_Video extends Element {
 		$this->controls['fileControlNoRemotePlayback'] = [
 			'tab'      => 'content',
 			'label'    => esc_html__( 'Disable', 'bricks' ) . ': ' . esc_html__( 'Remote playback', 'bricks' ),
-			'info'     => 'Firefox: ' . esc_html__( 'No supported', 'bricks' ) . ' (controlslist)',
+			'info'     => 'Firefox: ' . esc_html__( 'Not supported', 'bricks' ) . ' (controlslist)',
 			'type'     => 'checkbox',
 			'required' => [
 				[ 'videoType', '=', [ 'media', 'file', 'meta' ] ],
@@ -614,7 +614,7 @@ class Element_Video extends Element {
 			case 'youtube':
 				$video_url = "https://www.youtube.com/embed/{$settings['youTubeId']}?";
 
-				if ( isset( $settings['youtubeDoNotTrack'] ) ) { // @since 1.9.2
+				if ( isset( $settings['youtubeDoNotTrack'] ) ) {
 					$video_url = "https://www.youtube-nocookie.com/embed/{$settings['youTubeId']}?";
 				}
 
@@ -1033,7 +1033,7 @@ class Element_Video extends Element {
 			$block        = [ 'blockName' => 'core-embed/youtube' ];
 			$attrs['url'] = "https://www.youtube.com/watch?v={$settings['youTubeId']}";
 
-			if ( isset( $settings['youtubeDoNotTrack'] ) ) { // @since 1.9.2
+			if ( isset( $settings['youtubeDoNotTrack'] ) ) {
 				$attrs['url'] = "https://www.youtube-nocookie.com/watch?v={$settings['youTubeId']}";
 			}
 
@@ -1241,15 +1241,23 @@ class Element_Video extends Element {
 					$meta_video_url = (string) $url_or_id;
 				}
 			}
+		} elseif ( is_string( $meta_media_value ) && ! empty( $meta_media_value ) ) {
+			// If the value is a string, use it directly (the full URL can be provided via @fallback)
+			$meta_video_url = $meta_media_value;
 		}
 
 		if ( empty( $meta_video_url ) ) {
 			return $settings;
 		}
 
-		// Is YouTube video
-		if ( preg_match( '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $meta_video_url, $matches ) ) {
-			// Regex from @see: https://gist.github.com/ghalusa/6c7f3a00fd2383e5ef33
+		/**
+		 * Is YouTube video
+		 *
+		 * Regex from @see: https://gist.github.com/ghalusa/6c7f3a00fd2383e5ef33
+		 *
+		 * @since 2.1: Support for YouTube Shorts and Live URLs
+		 */
+		if ( preg_match( '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|shorts/|live/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $meta_video_url, $matches ) ) {
 			$settings['youTubeId'] = $matches[1];
 			$settings['videoType'] = 'youtube';
 

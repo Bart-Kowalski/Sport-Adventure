@@ -60,7 +60,7 @@
 					$breakpoint_meta_value = round($framework_column_count * $width_factor);
 
 					// Build meta data
-					$field_meta = New WS_Form_Meta();
+					$field_meta = new WS_Form_Meta();
 					$field_meta->object = 'field';
 					$field_meta->parent_id = $ws_form_field->id;
 					$field_meta->db_update_from_array(array($breakpoint_meta_key => $breakpoint_meta_value));
@@ -112,7 +112,7 @@
 			} else {
 
 				// Get meta value (Database)
-				$ws_form_meta = New WS_Form_Meta();
+				$ws_form_meta = new WS_Form_Meta();
 				$ws_form_meta->object = 'field';
 				$ws_form_meta->parent_id = $ws_form_field->id;
 
@@ -203,7 +203,7 @@
 			if($meta_key === false) { parent::api_throw_error(__('Meta key not specified', 'ws-form')); }
 
 			// Read current meta value
-			$ws_form_meta = New WS_Form_Meta();
+			$ws_form_meta = new WS_Form_Meta();
 			$ws_form_meta->object = 'field';
 			$ws_form_meta->parent_id = $ws_form_field->id;
 
@@ -353,7 +353,12 @@
 				$ws_form_field->sort_index = $ws_form_field->db_object_sort_index_get($ws_form_field->table_name, 'section_id', $ws_form_field->section_id, $next_sibling_id);
 
 				// Rename
-				$ws_form_field->label = sprintf(__('%s (Copy)', 'ws-form'), $ws_form_field->label);
+				$ws_form_field->label = sprintf(
+
+					'%s (%s)', 
+					$ws_form_field->label,
+					__('Copy', 'ws-form')
+				);
 
 				// Clone
 				$ws_form_field->id = $ws_form_field->db_clone();
@@ -481,11 +486,11 @@
 
 			// Get form ID
 			$form_id = self::api_get_form_id($parameters);
-			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID.', 'ws-form')); }
+			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID (WS_Form_API_Field | api_dropzonejs)', 'ws-form')); }
 
 			// Get field ID
 			$field_id = self::api_get_id($parameters);
-			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID.', 'ws-form')); }
+			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID (WS_Form_API_Field | api_dropzonejs)', 'ws-form')); }
 
 			// Get field
 			$field = self::api_field_get($form_id, $field_id);
@@ -593,11 +598,11 @@
 
 			// Get form ID
 			$form_id = self::api_get_form_id($parameters);
-			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID.', 'ws-form')); }
+			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID (WS_Form_API_Field | api_select_ajax)', 'ws-form')); }
 
 			// Get field ID
 			$field_id = self::api_get_id($parameters);
-			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID.', 'ws-form')); }
+			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID (WS_Form_API_Field | api_select_ajax)', 'ws-form')); }
 
 			// Get field
 			$field = self::api_field_get($form_id, $field_id);
@@ -835,22 +840,22 @@
 
 			// Get form ID
 			$form_id = self::api_get_form_id($parameters);
-			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID.', 'ws-form')); }
+			if($form_id === 0) { parent::api_throw_error(__('Invalid form ID (WS_Form_API_Field | api_cascade)', 'ws-form')); }
 
 			// Get field ID
 			$field_id = self::api_get_id($parameters);
-			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID.', 'ws-form')); }
+			if($field_id === 0) { parent::api_throw_error(__('Invalid field ID (WS_Form_API_Field | api_cascade)', 'ws-form')); }
 
 			// Get field
 			$field = self::api_field_get($form_id, $field_id);
 
 			// Get field type
-			if(!isset($field->type)) { parent::api_throw_error(__('Invalid field type.', 'ws-form')); }
+			if(!isset($field->type)) { parent::api_throw_error(__('Invalid field type (WS_Form_API_Field | api_cascade)', 'ws-form')); }
 			$field_type = $field->type;
 
 			// Get lookup value
 			$value = json_decode(WS_Form_Common::get_query_var_nonce('value'));
-			if(is_null($value)) { parent::api_throw_error(__('Invalid input value.', 'ws-form')); }
+			if(is_null($value)) { parent::api_throw_error(__('Invalid input value (WS_Form_API_Field | api_cascade)', 'ws-form')); }
 			if(!is_array($value)) { $value = array($value); }
 
 			// Get default value

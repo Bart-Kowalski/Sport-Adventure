@@ -10,9 +10,13 @@
 
 				'language' => array(
 
+					/* translators: %s: Minimum character count */
 					'error_min_length'						=>	__('Minimum character count: %s', 'ws-form'),
+					/* translators: %s: Maximum character count */
 					'error_max_length'						=>	__('Maximum character count: %s', 'ws-form'),
+					/* translators: %s: Minimum word count */
 					'error_min_length_words'				=>	__('Minimum word count: %s', 'ws-form'),
+					/* translators: %s: Maximum word count */
 					'error_max_length_words'				=>	__('Maximum word count: %s', 'ws-form'),
 					'error_data_grid_source_type'			=>	__('Data grid source type not specified', 'ws-form'),
 					'error_data_grid_source_id'				=>	__('Data grid source ID not specified', 'ws-form'),
@@ -22,7 +26,7 @@
 					'error_data_source_group_label'			=>	__('Data source group label not found', 'ws-form'),
 					'error_data_group_rows'					=>	__('Data source group rows not found', 'ws-form'),
 					'error_data_group_label'				=>	__('Data source group label not found', 'ws-form'),
-					'error_mask_help'						=>	__('No help mask defined: %s', 'ws-form'),
+					'error_mask_help'						=>	__('No help mask defined', 'ws-form'),
 					'error_mask_invalid_feedback'			=>	__('No invalid feedback mask defined', 'ws-form'),
 					'error_api_call_hash'					=>	__('Hash not returned in API call', 'ws-form'),
 					'error_api_call_hash_invalid'			=>	__('Invalid hash returned in API call', 'ws-form'),
@@ -31,43 +35,63 @@
 					'error_hcaptcha_invisible'				=>	__('hCaptcha invisible error', 'ws-form'),
 					'error_timeout_recaptcha'				=>	__('Timeout waiting for reCAPTCHA to load', 'ws-form'),
 					'error_timeout_hcaptcha'				=>	__('Timeout waiting for hCaptcha to load', 'ws-form'),
-					'error_timeout_turnstile'				=>	__('Timeout waiting for Turnstile to load', 'ws-form'),
+					'error_timeout_turnstile'				=>	sprintf(
+
+						/* translators: %s: Turnstile */
+						__('Timeout waiting for %s to load', 'ws-form'),
+						'Turnstile'
+					),
 					'error_timeout_analytics_google'		=>	__('Timeout waiting for Google Analytics to load', 'ws-form'),
 					'error_timeout_analytics_data_layer'	=>	__('Timeout waiting for Data Layer to load', 'ws-form'),
-					'error_timeout_google_maps'				=>	__('Timeout waiting for Google Maps to load', 'ws-form'),
+					/* translators: %s: Field type */
+					'error_timeout_google_maps_api_js'		=>	__('Timeout waiting for Google Maps API JS to load (%s)', 'ws-form'),
 					'error_geocoder_google_address_no_results'	=>	__('No results found for Google Geocoder', 'ws-form'),
+					/* translators: %s: Google geocoder error message */
 					'error_geocoder_google_address_error'	=>	__('Google Geocoder error: %s', 'ws-form'),
 					'error_google_key_missing'				=>	__('Google API key has not been entered in global settings', 'ws-form'),
 					'error_google_key_invalid'				=>	__('Google API key is incorrect or misconfigured', 'ws-form'),
+					/* translators: %s: Date/time */
 					'error_datetime_default_value'			=>	__('Default date/time value invalid (%s)', 'ws-form'),
 					'error_framework_tabs_activate_js'		=>	__('Framework tab activate JS not defined', 'ws-form'),
 					'error_form_draft'						=>	__('Form is in draft', 'ws-form'),
 					'error_form_future'						=>	__('Form is scheduled', 'ws-form'),
 					'error_form_trash'						=>	__('Form is trashed', 'ws-form'),
-					'error_calc'							=>	__('Calculation error: %s'),
+					/* translators: %s: Calculation */
+					'error_calc'							=>	__('Calculation error: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_framework_plugin'				=>	__('Framework plugin error: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_tracking_geo_location'			=>	__('Tracking - Geo location error: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_geo'								=>	__('Geo - IP lookup failed: %s', 'ws-form'),
+					/* translators: %s: Message */
 					'error_action'							=>	__('Actions - %s', 'ws-form'),
 					'error_action_no_message'				=>	__('Actions - Error', 'ws-form'),
+					/* translators: %s: Message */
 					'error_payment'							=>	__('Payments - %s', 'ws-form'),
 					'error_termageddon'						=>	__('Error retrieving Termageddon content', 'ws-form'),
 					'error_termageddon_404'					=>	__('Invalid Termageddon key', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_js'								=>	__('Syntax error in JavaScript: %s', 'ws-form'),
 					'error_section_button_no_section'		=>	__('No section assigned to this button', 'ws-form'),
 					'error_section_icon_no_section'			=>	__('No section assigned to these icons', 'ws-form'),
+					/* translators: %s: Section icon */
 					'error_section_icon_not_in_own_section'	=>	__('Icon %s must be in its own assigned section', 'ws-form'),
 					'error_not_supported_video'				=>	__("Sorry, your browser doesn't support embedded videos.", 'ws-form'),
 					'error_not_supported_audio'				=>	__("Sorry, your browser doesn't support embedded audio.", 'ws-form'),
 					'error_google_map_style_js'				=>	__('Invalid Google Map embedded JSON style declaration', 'ws-form'),
 					'error_file_upload'						=>	__('Error uploading file', 'ws-form'),
 					'error_submit_hash'						=>	__('Invalid submission hash', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_invalid_feedback'				=>	__('Invalid feedback set on field ID: %s', 'ws-form'),
 					'error_google_route'					=>	__('Invalid Google Distance field configuration', 'ws-form'),
+					/* translators: %s: Google Directions API error message */
 					'error_google_route_message'			=>	__('Google Directions API error: %s', 'ws-form'),
+					/* translators: %s: Error message */
 					'error_condition_action'				=>	__('Invalid condition action: %s', 'ws-form'),
 
 					// Analytics
+					/* translators: %s: Form label */
 					'analytics_category'				=> __('Form - %s', 'ws-form'),
 
 					// International telephone input errors
@@ -80,9 +104,13 @@
 
 					// Google address
 					'google_address_place_id_invalid_message' => __('Please choose a valid address.', 'ws-form'),
+					'google_address_placeholder'		=> __('Enter a location', 'ws-form'),
 
 					// Google map
 					'reset'								=> __('Reset', 'ws-form'),
+
+					// Email allow deny message
+					'email_allow_deny_message'			=> __('The email address entered is not allowed', 'ws-form'),
 
 					// Password strength
 					'password_strength_short'			=> __('Very weak', 'ws-form'),
@@ -113,6 +141,44 @@
 					'kilometers'	=>	__('km', 'ws-form'),
 				)
 			);
+
+			// Styler
+			if(WS_Form_Common::styler_visible_public()) {
+
+				// Additional language strings for the public styler feature
+				$language_extra = array(
+
+					'styler_logo'						=>	WS_FORM_NAME_PRESENTABLE,
+					'styler_search_placeholder'			=>	__('Setting search...', 'ws-form'),
+					'styler_undo'						=>	__('Undo', 'ws-form'),
+					'styler_undo_confirm'				=>	__('Are you sure you want to undo the changes made to this style?', 'ws-form'),
+					'styler_pick_color'					=>	__('Pick color', 'ws-form'),
+					'styler_save'						=>	__('Save', 'ws-form'),
+					'styler_import'						=>	__('Import', 'ws-form'),
+					'styler_export'						=>	__('Export', 'ws-form'),
+					'styler_loading'					=>	__('Loading...', 'ws-form'),
+					'styler_id'							=>	__('ID', 'ws-form'),
+					'styler_scheme'						=>	__('Scheme', 'ws-form'),
+					'styler_scheme_base'				=>	__('Base', 'ws-form'),
+					'styler_scheme_alt'					=>	__('Alt', 'ws-form'),
+					'styler_scheme_both'				=>	__('Both', 'ws-form'),
+					'styler_settings'					=>	__('Settings', 'ws-form'),
+					'styler_support'					=>	__('Support', 'ws-form'),
+					'styler_label'						=>	__('Name', 'ws-form'),
+					'styler_label_placeholder'			=>	__('Style name', 'ws-form'),
+					'styler_close'						=>	__('Close', 'ws-form'),
+					'styler_alt'						=>	__('Alt', 'ws-form'),
+					'styler_alt_auto'					=>	__('Auto', 'ws-form'),
+					'styler_alt_title'					=>	__('Create alternative color', 'ws-form'),
+					'styler_copy'						=>	__('Copy', 'ws-form'),
+				);
+
+				// Add to language array
+				foreach($language_extra as $key => $value) {
+
+					$settings_form_public['language'][$key] = $value;
+				}
+			}
 			// Check if debug is enabled
 			$debug = WS_Form_Common::debug_enabled();
 
@@ -153,6 +219,7 @@
 
 					'debug_info_label'					=>	__('Form Name', 'ws-form'),
 					'debug_info_id'						=>	__('Form ID', 'ws-form'),
+					'debug_info_style_id'				=>	__('Style ID', 'ws-form'),
 					'debug_info_instance'				=>	__('Instance', 'ws-form'),
 					'debug_info_hash'					=>	__('Session ID', 'ws-form'),
 					'debug_info_checksum'				=>	__('Checksum', 'ws-form'),
@@ -197,6 +264,7 @@
 
 					'debug_submit_loaded'				=>	__('Retrieved submit data', 'ws-form'),
 
+					/* translators: %s: Action name */
 					'debug_action_get'					=>	__('Retrieved %s action data', 'ws-form'),
 
 					'debug_tracking_geo_location_permission_denied'		=>	__('User denied the request for geo location.', 'ws-form'),
@@ -205,14 +273,21 @@
 					'debug_tracking_geo_location_default'				=>	__('An unknown error occurred whilst retrieving geo location.', 'ws-form'),
 
 					// Log
+					/* translators: %s: Hash */
 					'log_hash_set'								=>	__('Session ID received: %s', 'ws-form'),
 					'log_hash_not_found'						=>	__('Session ID not found', 'ws-form'),
 					'log_hash_clear'							=>	__('Session ID cleared', 'ws-form'),
+					/* translators: %s: Token */
 					'log_token_set'								=>	__('Token received: %s', 'ws-form'),
+					/* translators: %s: Condition */
 					'log_conditional_fired_then'				=>	__('IF returned TRUE: %s', 'ws-form'),
+					/* translators: %s: Condition */
 					'log_conditional_fired_else'				=>	__('IF returned FALSE: %s', 'ws-form'),
+					/* translators: %s: Condition */
 					'log_conditional_action_then'				=>	__('THEN: %s', 'ws-form'),
+					/* translators: %s: Condition */
 					'log_conditional_action_else'				=>	__('ELSE: %s', 'ws-form'),
+					/* translators: %s: Condition */
 					'log_conditional_event'						=>	__("Added event handler for %s", 'ws-form'),
 					'log_analytics_google_loaded_analytics_js'	=>	__('Google Analytics successfully loaded (analytics.js)', 'ws-form'),
 					'log_analytics_google_loaded_gtag_js'		=>	__('Google Analytics successfully loaded (gtag.js)', 'ws-form'),
@@ -222,57 +297,98 @@
 					'log_analytics_bento_loaded_js'				=>	__('Bento successfully loaded', 'ws-form'),
 					'log_analytics_facebook_loaded_fbevents_js'	=>	__('Facebook Analytics successfully loaded (fbevents.js)', 'ws-form'),
 					'log_analytics_linkedin_loaded_insight_js'	=>	__('LinkedIn Insight successfully loaded (insight.js)', 'ws-form'),
+					/* translators: %s: Function */
 					'log_analytics_event_form'					=>	__('Analytics form events initialized: %s', 'ws-form'),
+					/* translators: %s: Function */
 					'log_analytics_event_tab'					=>	__('Analytics tab events initialized: %s', 'ws-form'),
+					/* translators: %s: Function */
 					'log_analytics_event_field'					=>	__('Analytics field events initialized: %s', 'ws-form'),
+					/* translators: %s: Function */
 					'log_analytics_event_fired'					=>	__('Analytics event ran: %s', 'ws-form'),
+					'log_analytics_data_layer_reset'			=>	__('Data layer reset', 'ws-form'),
+					/* translators: %s: Function */
 					'log_analytics_event_failed'				=>	__('Analytics event failed: %s (Function does not exist)', 'ws-form'),
+					/* translators: %s: action */
 					'log_recaptcha_v3_action_fired'				=>	__('reCAPTCHA V3 action ran: %s', 'ws-form'),
+					/* translators: %s: Google Geocoder place ID */
 					'log_google_geocode_success'				=>	__('Google Geocoder processed successfully. Place ID: %s', 'ws-form'),
 					'log_javascript'							=>	__('JavaScript ran', 'ws-form'),
 					'log_honeypot'								=>	__('Spam protection - Honeypot initialized', 'ws-form'),
+					/* translators: %s: latitude / longitude */
 					'log_tracking_geo_location'					=>	__('Tracking - Geo location: %s', 'ws-form'),
 					'log_submit_lock'							=>	__('Duplication protection - Button(s) locked', 'ws-form'),
 					'log_submit_unlock'							=>	__('Duplication protection - Button(s) unlocked', 'ws-form'),
 					'log_form_submit'							=>	__('Form submitted', 'ws-form'),
 					'log_form_save'								=>	__('Form saved', 'ws-form'),
+					/* translators: %s: Tab index */
 					'log_group_index'							=>	__('Set tab index to: %s', 'ws-form'),
+					/* translators: %s: Message */
 					'log_action'								=>	__('Actions - %s', 'ws-form'),
+					/* translators: %s: Event */
 					'log_trigger'								=>	"jQuery: $(document).trigger('%s', form_object, form_id, instance_id, form_el, form_canvas_el, tab_index)",
+					/* translators: %s: Ecommerce status */
 					'log_ecommerce_status'						=>	__('Ecommerce - Status set to: %s', 'ws-form'),
+					/* translators: %s: Transaction ID */
 					'log_ecommerce_transaction_id'				=>	__('Ecommerce - Transaction ID set to: %s', 'ws-form'),
+					/* translators: %s: Payment method */
 					'log_ecommerce_payment_method'				=>	__('Ecommerce - Payment method set to: %s', 'ws-form'),
+					/* translators: %s: Payment amount */
 					'log_ecommerce_payment_amount'				=>	__('Ecommerce - Payment amount set to: %s', 'ws-form'),
+					/* translators: %s: Message */
 					'log_payment'								=>	__('Payments - %s', 'ws-form'),
+					/* translators: %s: Anti spam score */
 					'log_anti_spam_score'						=>	__('Anti spam score: %s%', 'ws-form'),
 
 					// Calc
+					/* translators: %s: Calculation */
 					'log_calc_registered'						=>	__('Calculation registered: %s', 'ws-form'),
+					/* translators: %s: Trigger */
 					'log_calc_registered_triggered'				=>	__('Triggered by: %s', 'ws-form'),
+					/* translators: %s: Calculation */
 					'log_calc_fired'							=>	__('Calculation fired: %s', 'ws-form'),
+					/* translators: %s: Trigger */
 					'log_calc_fired_triggered'					=>	__('Triggered by: %s', 'ws-form'),
 					'log_calc_init'								=>	__('Initial calculation', 'ws-form'),
 
 					// Text
+					/* translators: %s: Text */
 					'log_text_registered'						=>	__('Text registered: %s', 'ws-form'),
+					/* translators: %s: Trigger */
 					'log_text_registered_triggered'				=>	__('Triggered by: %s', 'ws-form'),
+					/* translators: %s: text */
 					'log_text_fired'							=>	__('Text fired: %s', 'ws-form'),
+					/* translators: %s: Trigger */
 					'log_text_fired_triggered'					=>	__('Triggered by: %s', 'ws-form'),
 					'log_text_init'								=>	__('Initial text', 'ws-form'),
 
 					// Action JS
+					/* translators: %s: Field ID */
 					'log_field_value'							=>	__('Value set on field ID: %s', 'ws-form'),
+					/* translators: %s: Field objects */
 					'log_field_dropzonejs_file_objects'			=>	__('File field loaded with file objects: %s', 'ws-form'),
 
 					// Geo
 					'log_geo_endpoint_fallback'					=>	__('Using ipapi.co geolocation IP lookup service because chosen service does not support HTTPS', 'ws-form'),
+					/* translators: %s: API endpoint */
 					'log_geo_success'							=>	__('Geo lookup successfully completed using %s endpoint', 'ws-form'),
 
 					// Loader
 					'log_loader_show'							=>	__('Loader shown', 'ws-form'),
 					'log_loader_hide'							=>	__('Loader hidden', 'ws-form'),
 
+					// TrustedForm
+					/* translators: %s: Query string parameters */
+					'log_trustedform_init'							=>	__('Initialized TrustedForm with query string: %s', 'ws-form'),
+
+					/* translators: %s: Field type */
+					'log_google_maps_api_js_init'				=>	__('Google Maps API JS - Initializing (%s)', 'ws-form'),
+					/* translators: %s: Field type */
+					'log_google_maps_api_js_library_import'	=>	__('Google Maps API JS - Libraries loaded (%s)', 'ws-form'),
+					/* translators: %s: Field type */
+					'log_google_maps_api_js_init_complete'		=>	__('Google Maps API JS - Initialized (%s)', 'ws-form'),
+
 					// Debug
+					/* translators: %s: Debug string */
 					'debug'										=>	__('Debug: %s', 'ws-form')
 				);
 
@@ -287,6 +403,12 @@
 			require_once 'class-ws-form-config-conditional.php';
 			$ws_form_config_conditional = new WS_Form_Config_Conditional();
 			$settings_form_public['conditional'] = $ws_form_config_conditional->get_settings_conditional(true, $debug);
+			// Full name components
+			$settings_form_public['name'] = array(
+
+				'prefixes' => WS_Form_Common::get_name_prefixes(),
+				'suffixes' => WS_Form_Common::get_name_suffixes()
+			);
 
 			// Apply filter
 			$settings_form_public = apply_filters('wsf_config_settings_form_public', $settings_form_public);

@@ -103,6 +103,13 @@
 
 			if($key === false) { $key = $this->key; }
 
-			return \Defuse\Crypto\Crypto::decrypt($input, \Defuse\Crypto\Key::loadFromAsciiSafeString($key));
+			try {
+				
+				return \Defuse\Crypto\Crypto::decrypt($input, \Defuse\Crypto\Key::loadFromAsciiSafeString($key));
+
+			} catch (Exception $e) {
+
+				return $input;
+			}
 		}
 	}

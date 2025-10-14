@@ -66,7 +66,7 @@
 
 			wp_editor_params.tinymce.init_instance_callback = function (editor) {
 
-				editor.on('keyup change input paste', function (e) {
+				editor.on('change input', function (e) {
 
 					$('#' + editor.id, ws_this.form_canvas_obj).val(wp.editor.getContent(editor.id)).trigger(e.type);
 				});
@@ -94,6 +94,30 @@
 					wp.editor.initialize(id, wp_editor_params);
 				}
 			});
+
+			// Focus support
+			$(this).on('focus', function() {
+
+				var editor = tinyMCE.get($(this).attr('id'));
+
+				if(editor) {
+
+					var container = (editor.iframeElement && editor.iframeElement.closest)
+						? editor.iframeElement.closest('[data-type="textarea"]')
+						: editor.getContainer();
+
+					if(container) {
+
+						container.scrollIntoView({
+
+							behavior: 'instant',
+							block: 'center'
+						});
+					}
+
+					editor.focus();
+				}
+			});
 		})
 
 		// Remove existing instances of CodeMiror
@@ -109,6 +133,7 @@
 			if(typeof(wp.codeEditor) === 'undefined') { return; }
 
 			var id = $(this).attr('id');
+			if($(id).length === 0) { return; }
 
 			// Initialize
 			wp.codeEditor.initialize(id);
@@ -142,16 +167,16 @@
 
 						if(typeof(wp) === 'undefined') { break; }
 						if(typeof(wp.editor) === 'undefined') { break; }
-						var active_editor = tinyMCE.get($(this).attr('id'));
-						active_editor.setContent(value);
+						var editor = tinyMCE.get($(this).attr('id'));
+						if(editor) { editor.setContent(value); }
 						break;
 
 					case 'html' :
 
 						if(typeof(wp) === 'undefined') { break; }
 						if(typeof(wp.CodeMirror) === 'undefined') { break; }
-						var active_editor = $(this).next().get(0).CodeMirror;
-						active_editor.getDoc().setValue(value);
+						var editor = $(this).next().get(0).CodeMirror;
+						if(editor) { editor.getDoc().setValue(value); }
 						break;
 				}
 

@@ -77,7 +77,7 @@ class AT__Frontend{
         $custom_css = '';
 
         //  Light Colors
-        if ($brxc_acf_fields['color_cpt_deprecated'] && AT__Helpers::is_global_colors_category_activated() ){
+        if (AT__Helpers::is_global_colors_category_activated() ){
             
 
             $global_colors = AT__Global_Colors::load_converted_colors_variables_on_frontend();
@@ -94,7 +94,7 @@ class AT__Frontend{
         }
 
         // Dark Colors
-        if ($brxc_acf_fields['color_cpt_deprecated'] && AT__Helpers::is_global_colors_category_activated() && AT__Helpers::is_value($brxc_acf_fields, 'enable_dark_mode_on_frontend') ){
+        if (AT__Helpers::is_global_colors_category_activated() && AT__Helpers::is_value($brxc_acf_fields, 'enable_dark_mode_on_frontend') ){
 
             $global_colors = AT__Global_Colors::load_converted_colors_variables_on_frontend();
 
@@ -226,50 +226,6 @@ class AT__Frontend{
         }
     }
 
-    public static function load_scoped_variables_on_id (){
-        
-        global $brxc_acf_fields;
-
-        // Inline Styles on ID Level
-        add_filter( 'bricks/element/render_attributes', function( $attributes, $key, $element) {
-    
-            $final = '';
-            $el = $element->element ;
-        
-            if(!AT__Helpers::is_array($el['settings'], '_scopedVariables')) return $attributes;
-        
-            $repeater = $el['settings']['_scopedVariables'];
-        
-            foreach($repeater as $item){
-                if (AT__Helpers::is_value($item, 'title') && AT__Helpers::is_value($item, 'cssVarValue')){
-                    $final .= $item['title'] . ':' . $item['cssVarValue'] . ';';
-                }
-            }
-
-            // If no styles, return early
-            if($final === ''){
-
-                return $attributes;
-            
-            }
-
-            // Has scoped variables
-
-            if (AT__Helpers::is_value($attributes[$key], 'style')){
-        
-                $attributes[$key]['style'] .= $final;
-        
-            } else {
-        
-                $attributes[$key]['style'] = $final;
-        
-            }
-        
-            return $attributes;
-    
-        }, 10, 3 );
-    
-    }
     public static function generate_array_scoped_variables_on_classes(){
         // Get options from the global setting
         $options = get_option('bricks_global_classes', []);
@@ -317,50 +273,6 @@ class AT__Frontend{
         }
 
         return $classes_array;
-    }
-
-    public static function load_scoped_variables_on_classes() {
-        global $brxc_acf_fields;
-
-        if(!AT__Helpers::in_array('scoped-variables', $brxc_acf_fields, 'class_features')){
-            return '';
-        }
-        
-        $classes_array = self::generate_array_scoped_variables_on_classes();
-        $custom_css = '';
-
-        // Return early
-        if(!AT__Helpers::is_array($classes_array)){
-            return $custom_css;
-        }
-    
-        // Iterate through each class to generate custom CSS
-        foreach ($classes_array as $class) {
-            // Check if selector is set and not empty
-            if (!AT__Helpers::is_value($class, 'selector')) {
-                continue;
-            }
-    
-            // Add selector to custom CSS string
-            $custom_css .= '.' . esc_attr($class['selector']) . '{';
-    
-            // Iterate through class settings to add CSS properties
-            foreach ($class['settings'] as $attributes) {
-                // Check if property and value are set and not empty
-                if (!AT__Helpers::is_value($attributes, 'property') || !AT__Helpers::is_value($attributes, 'value')) {
-                    continue;
-                }
-    
-                // Add property and value to custom CSS string
-                $custom_css .= esc_attr($attributes['property']) . ':' . esc_attr($attributes['value']) . ';';
-            }
-    
-            // Close CSS block for the current selector
-            $custom_css .= '}';
-        }
-    
-        // Return the generated custom CSS
-        return $custom_css;
     }
     
 
@@ -1034,56 +946,5 @@ class AT__Frontend{
         }
 
         wp_enqueue_script( 'brxc-scroll-timeline');
-    }
-    public static function manage_stagger_class( $attributes, $key, $element ) {
-        if ( $key !== '_root' ) {
-            return $attributes;
-        }
-    
-        if ( ! is_object( $element ) || ! isset( $element->element ) || ! is_array( $element->element ) ) {
-            return $attributes;
-        }
-    
-        $element_data = $element->element;
-        $element_settings = $element_data['settings'] ?? [];
-        $element_global_classes = $element_settings['_cssGlobalClasses'] ?? [];
-    
-        if ( ! is_array( $element_global_classes ) || empty( $element_global_classes ) ) {
-            return $attributes;
-        }
-    
-        $trigger_classes = [ 'at_anim-stagger' ];
-        $has_trigger_class = ! empty( array_intersect( $trigger_classes, $element_global_classes ) );
-    
-        if ( ! $has_trigger_class ) {
-            return $attributes;
-        }
-    
-        $element_children = $element_data['children'] ?? [];
-    
-        if ( ! is_array( $element_children ) || empty( $element_children ) ) {
-            return $attributes;
-        }
-    
-        $index = 0;
-    
-        foreach ( $element_children as $child_id ) {
-            add_filter( 'bricks/element/render_attributes', function( $attributes, $key, $element ) use ( $child_id, &$index ) {
-                if ( $key !== '_root' || ! is_object( $element ) || $element->id !== $child_id ) {
-                    return $attributes;
-                }
-    
-                if ( isset( $attributes['_root']['style'] ) ) {
-                    $attributes['_root']['style'] = rtrim( $attributes['_root']['style'], ';' ) . ";--at-index:{$index};";
-                } else {
-                    $attributes['_root']['style'] = "--at-index:{$index};";
-                }
-    
-                $index++;
-                return $attributes;
-            }, 10, 3 );
-        }
-    
-        return $attributes;
     }
 }

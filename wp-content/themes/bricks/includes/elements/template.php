@@ -141,7 +141,14 @@ class Element_Template extends Element {
 			 */
 			$loop_id = Query::is_any_looping();
 
-			echo do_shortcode( "[bricks_template id=\"$template_id\" loopid=\"$loop_id\"]" );
+			$shortcode = "bricks_template id=\"$template_id\" loopid=\"$loop_id\"";
+
+			// Pass on_hook (A custom setting not available via UI) attribute to shortcode (#86c4rgke5; @since 2.1)
+			if ( isset( $settings['_onHook'] ) && $settings['_onHook'] ) {
+				$shortcode .= " on_hook='1'";
+			}
+
+			echo do_shortcode( "[$shortcode]" );
 
 			if ( $render_root_div ) {
 				echo '</div>';

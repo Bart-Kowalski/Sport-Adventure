@@ -195,7 +195,7 @@ class Product_Reviews extends Element {
 			'type'  => 'color',
 			'css'   => [
 				[
-					'selector' => 'form .stars.selected a.active::before, form .stars.selected a:not(.active)::before',
+					'selector' => '.stars a.bricks-star-filled::before',
 					'property' => 'color',
 				],
 				[

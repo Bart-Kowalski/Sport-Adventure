@@ -233,9 +233,9 @@ $server_environment['server_php_upload_max_filesize'] = [
 	'label' => esc_html__( 'PHP max upload file size', 'bricks' ),
 	'data'  => sprintf(
 		'<span class="%s">%s</span>%s',
-		wp_convert_hr_to_bytes( $upload_max_filesize ) >= wp_convert_hr_to_bytes( '16M' ) ? 'text-success' : 'text-danger',
+		wp_convert_hr_to_bytes( $upload_max_filesize ) >= wp_convert_hr_to_bytes( '64M' ) ? 'text-success' : 'text-danger',
 		$upload_max_filesize,
-		wp_convert_hr_to_bytes( $upload_max_filesize ) >= wp_convert_hr_to_bytes( '16M' ) ? '' : ' - ' . esc_html__( 'Recommended upload_max_filesize: 16M (or more)', 'bricks' ) . '<a href="https://academy.bricksbuilder.io/article/requirements/#max-file-upload-size" class="tooltip" target="_blank" rel="noopener"><i class="dashicons dashicons-editor-help"></i></a>'
+		wp_convert_hr_to_bytes( $upload_max_filesize ) >= wp_convert_hr_to_bytes( '64M' ) ? '' : ' - ' . esc_html__( 'Recommended upload_max_filesize', 'bricks' ) . ': 64M <a href="https://academy.bricksbuilder.io/article/requirements/#max-file-upload-size" class="tooltip" target="_blank" rel="noopener"><i class="dashicons dashicons-editor-help"></i></a>'
 	),
 ];
 

@@ -9,6 +9,7 @@ use Automattic\WooCommerce\Blocks\BlockTypes\RatingFilter;
 use Automattic\WooCommerce\Blocks\BlockTypes\StockFilter;
 use WP_Query;
 use WC_Tax;
+use Automattic\WooCommerce\Enums\ProductStockStatus;
 
 /**
  * QueryBuilder class.
@@ -142,12 +143,14 @@ class QueryBuilder {
 		$product_ids = $query['post__in'] ?? array();
 		$offset      = $query['offset'] ?? 0;
 		$per_page    = $query['perPage'] ?? 9;
+		$order       = $query['order'] ?? 'asc';
+		$search      = $query['search'] ?? '';
 
 		$common_query_values = array(
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'meta_query'     => array(),
 			'posts_per_page' => $per_page,
-			'order'          => $query['order'] ?? 'asc',
+			'order'          => $order,
 			'offset'         => ( $per_page * ( $page - 1 ) ) + $offset,
 			'post__in'       => $product_ids,
 			'post_status'    => 'publish',
@@ -155,15 +158,18 @@ class QueryBuilder {
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			'tax_query'      => array(),
 			'paged'          => $page,
-			's'              => $query['search'],
+			's'              => $search,
 		);
 
 		$is_on_sale          = $query['woocommerceOnSale'] ?? false;
+		$order_by            = $query['orderBy'] ?? '';
+		$stock_status        = $query['woocommerceStockStatus'] ?? array_keys( wc_get_product_stock_status_options() );
 		$product_attributes  = $query['woocommerceAttributes'] ?? array();
 		$taxonomies_query    = $this->get_filter_by_taxonomies_query( $query['tax_query'] ?? array() );
 		$handpicked_products = $query['woocommerceHandPickedProducts'] ?? array();
 		$time_frame          = $query['timeFrame'] ?? null;
 		$price_range         = $query['priceRange'] ?? null;
+		$featured            = $query['featured'] ?? false;
 
 		// Allow collections to modify the collection arguments passed to the query builder.
 		$handlers = $this->collection_handler_store[ $collection_args['name'] ] ?? null;
@@ -176,12 +182,12 @@ class QueryBuilder {
 			$common_query_values,
 			array(
 				'on_sale'             => $is_on_sale,
-				'stock_status'        => $query['woocommerceStockStatus'],
-				'orderby'             => $query['orderBy'],
+				'stock_status'        => $stock_status,
+				'orderby'             => $order_by,
 				'product_attributes'  => $product_attributes,
 				'taxonomies_query'    => $taxonomies_query,
 				'handpicked_products' => $handpicked_products,
-				'featured'            => $query['featured'] ?? false,
+				'featured'            => $featured,
 				'timeFrame'           => $time_frame,
 				'priceRange'          => $price_range,
 			),
@@ -306,8 +312,9 @@ class QueryBuilder {
 		if ( isset( $handlers['preview_query'] ) ) {
 			$collection_query = call_user_func( $handlers['preview_query'], $collection_args, $args, $request );
 		}
+		$orderby_query = $args['orderby'] ? $this->get_custom_orderby_query( $args['orderby'] ) : array();
 
-		$args = $this->merge_queries( $args, $collection_query );
+		$args = $this->merge_queries( $args, $orderby_query, $collection_query );
 		return $args;
 	}
 
@@ -342,7 +349,7 @@ class QueryBuilder {
 		 * @see get_product_visibility_query()
 		 */
 		$diff = array_diff( $stock_status_options, $stock_statuses );
-		if ( count( $diff ) === 1 && in_array( 'outofstock', $diff, true ) ) {
+		if ( count( $diff ) === 1 && in_array( ProductStockStatus::OUT_OF_STOCK, $diff, true ) ) {
 			return array();
 		}
 
@@ -736,8 +743,8 @@ class QueryBuilder {
 		$product_visibility_not_in = array( is_search() ? $product_visibility_terms['exclude-from-search'] : $product_visibility_terms['exclude-from-catalog'] );
 
 		// Hide out of stock products.
-		if ( empty( $stock_query ) && ! in_array( 'outofstock', $stock_status, true ) ) {
-			$product_visibility_not_in[] = $product_visibility_terms['outofstock'];
+		if ( empty( $stock_query ) && ! in_array( ProductStockStatus::OUT_OF_STOCK, $stock_status, true ) ) {
+			$product_visibility_not_in[] = $product_visibility_terms[ ProductStockStatus::OUT_OF_STOCK ];
 		}
 
 		return array(
@@ -1059,9 +1066,10 @@ class QueryBuilder {
 		}
 
 		if ( 'menu_order' === $orderby ) {
+			add_filter( 'posts_clauses', array( $this, 'add_menu_order_with_title_fallback_posts_clauses' ), 10, 2 );
 			return array(
-				'orderby' => 'menu_order',
-				'order'   => 'ASC',
+				'isProductCollection' => true,
+				'orderby'             => $orderby,
 			);
 		}
 
@@ -1199,5 +1207,34 @@ class QueryBuilder {
 		}
 
 		return array_values( array_unique( $post__in, SORT_NUMERIC ) );
+	}
+
+	/**
+	 * Add the `posts_clauses` filter to add menu order with title fallback sorting
+	 *
+	 * @param array    $clauses The list of clauses for the query.
+	 * @param WP_Query $query   The WP_Query instance.
+	 * @return array   Modified list of clauses.
+	 */
+	public function add_menu_order_with_title_fallback_posts_clauses( $clauses, $query ) {
+		$query_vars                  = $query->query_vars;
+		$is_product_collection_block = $query_vars['isProductCollection'] ?? false;
+
+		if ( ! $is_product_collection_block ) {
+			return $clauses;
+		}
+
+		$orderby = $query_vars['orderby'] ?? null;
+		if ( 'menu_order' !== $orderby ) {
+			return $clauses;
+		}
+
+		$is_ascending_order = ! isset( $query_vars['order'] ) || 'asc' === strtolower( $query_vars['order'] );
+
+		$clauses['orderby'] = $is_ascending_order ?
+			'menu_order ASC, post_title ASC' :
+			'menu_order DESC, post_title DESC';
+
+		return $clauses;
 	}
 }

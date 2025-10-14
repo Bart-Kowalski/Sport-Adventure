@@ -2,8 +2,6 @@
 
 	class WS_Form_WP_List_Table_Form extends WP_List_Table {
 
-		private $form_to_page_array;
-
 		// Construct
 	    public function __construct() {
 
@@ -49,7 +47,7 @@
 		// Get sortable columns
 		public function get_sortable_columns() {
 
-			$sortable_columns = array(
+			return array(
 
 				'media'				=> array('status', true),		// Used 'media' as opposed to 'status' because WordPress considers that a special keyword and excludes it from the screen options column checkboxes
 				'title'				=> array('label', true),		// Used 'title' as opposed to 'label' because WordPress considers that a special keyword and excludes it from the screen options column checkboxes
@@ -59,15 +57,6 @@
 				'conversion'		=> array('conversion', true),
 				'shortcode'			=> array('id', true)
 			);
-
-			$current = WS_Form_Common::get_query_var('ws-form-status', 'all');
-
-			if($current == 'all') {
-
-				$column['status'] = array('status', true);
-			}
-
-			return $sortable_columns;
 		}
 
 		// Column - Default
@@ -79,11 +68,10 @@
 				case 'id':
 
 					return $item[$column_name];
-					break;
 
 				default:
 
-					return print_r($item, true); //Show the whole array for troubleshooting purposes
+					return '';
 			}
 		}
 
@@ -109,7 +97,13 @@
 				$ws_form_form_stat->form_id = $item['id'];
 				$stat_date_from = $ws_form_form_stat->db_get_date_since();
 
-				if($stat_date_from !== false) { $return_html .= '<div class="wsf-helper">' . sprintf(__('Data since: %s', 'ws-form'), $stat_date_from) . '</div>'; }
+				if($stat_date_from !== false) { $return_html .= '<div class="wsf-helper">' . sprintf(
+
+					/* translators: Statistics date from */
+					__('Data since: %s', 'ws-form'),
+					$stat_date_from
+
+				) . '</div>'; }
 			}
 
 			return $return_html;
@@ -160,14 +154,28 @@
 			$url_edit = WS_Form_Common::get_admin_url('ws-form-edit', $id);
 
 			// Title
+			$title = '<strong>';
+
 			if(WS_Form_Common::can_user('edit_form')) {
 
-				$title = sprintf('<strong><a href="%s">%s</a></strong>', $url_edit, esc_html($item['label']));
+				$title .= sprintf('<a href="%s">%s</a>', esc_url($url_edit), esc_html($item['label']));
 
 			} else {
 
-				$title = sprintf('<strong>%s</strong>', esc_html($item['label']));
+				$title .= esc_html($item['label']);
 			}
+
+			// Publish pending
+			if(self::is_publish_pending($item)) {
+
+				$title .= sprintf(
+
+					'<span class="post-state-publish-pending"> — <span class="post-state">%s</span></span>',
+					__('Publish Pending', 'ws-form')
+				);
+			}
+
+			$title .= '</strong>';
 
 			// Actions
 			$status = WS_Form_Common::get_query_var('ws-form-status');
@@ -188,7 +196,7 @@
 
 					if(WS_Form_Common::can_user('edit_form')) {
 
-						$actions['edit'] = 	sprintf('<a href="%s">%s</a>', $url_edit, __('Edit', 'ws-form'));
+						$actions['edit'] = 	sprintf('<a href="%s">%s</a>', esc_url($url_edit), __('Edit', 'ws-form'));
 					}
 
 					if(WS_Form_Common::can_user('create_form')) {
@@ -201,7 +209,12 @@
 						$actions['trash'] = sprintf('<a href="#" data-action="wsf-delete" data-id="%u">%s</a>', $id, __('Trash', 'ws-form'));
 					}
 
-					$actions['preview'] = sprintf('<a href="%s" target="_blank">%s</a>', WS_Form_Common::get_preview_url($id), __('Preview', 'ws-form'));
+					$actions['preview'] = sprintf('<a href="%s" target="_blank">%s</a>', esc_url(WS_Form_Common::get_preview_url($id)), __('Preview', 'ws-form'));
+
+					if(WS_Form_Common::styler_enabled() && WS_Form_Common::can_user('edit_form_style')) {
+
+						$actions['style'] = sprintf('<a href="%s" target="_blank">%s</a>', esc_url(WS_Form_Common::get_preview_url($id, false, false, true)), __('Style', 'ws-form'));
+					}
 
 					if(WS_Form_Common::can_user('export_form')) {
 
@@ -221,8 +234,12 @@
 		function _column_media($item) {
 
 			// Title
-			$ws_form_form = New WS_Form_Form();
-			$status_name = $ws_form_form->db_get_status_name($item['status']);
+			$ws_form_form = new WS_Form_Form();
+			$status_name = $ws_form_form->db_get_status_name(
+
+				$item['status'],
+				self::is_publish_pending($item)
+			);
 
 			$toggle_enabled = true;
 
@@ -231,6 +248,7 @@
 				case 'publish' :
 
 					$toggle_checked = true;
+
 					break;
 
 				case 'trash' :
@@ -249,7 +267,7 @@
 			if($toggle_enabled) {
 
 				$toggle_id = 'wsf-status-' . $item['id'];
-				$status_html = '<input type="checkbox" id="' . $toggle_id . '" class="wsf-field wsf-switch" data-id="' . $item['id'] . '" data-action-ajax="wsf-form-status"' . ($toggle_checked ? ' checked': '') . ' /><label id="' . $toggle_id . '-label" for="' . $toggle_id . '" class="wsf-label" title="' . $status_name . '">&nbsp;</label>';
+				$status_html = '<input type="checkbox" id="' . $toggle_id . '" class="wsf-field wsf-switch' . (self::is_publish_pending($item) ? ' wsf-switch-warning' : '') . '" data-id="' . $item['id'] . '" data-action-ajax="wsf-form-status"' . ($toggle_checked ? ' checked': '') . ' /><label id="' . $toggle_id . '-label" for="' . $toggle_id . '" class="wsf-label" title="' . $status_name . '">&nbsp;</label>';
 			} else {
 
 				$status_html = $status_name;
@@ -269,7 +287,7 @@
 			$count_submit = $item['count_submit'];
 
 			// Build title
-			$title = $count_submit;
+			$title = absint($count_submit);
 
 			$disable_count_submit_unread = WS_Form_Common::option_get('disable_count_submit_unread', false);
 
@@ -285,7 +303,7 @@
 
 			if(WS_Form_Common::can_user('read_submission')) {
 
-				$title = sprintf('<a href="%s">%s</a>', $url_submissions, $title);
+				$title = sprintf('<a href="%s">%s</a>', esc_url($url_submissions), $title);
 			}
 
 			// Actions
@@ -294,12 +312,12 @@
 
 				if(WS_Form_Common::can_user('read_submission')) {
 
-					$actions['view'] = sprintf('<a href="%s">%s</a>', $url_submissions, __('View', 'ws-form'));
+					$actions['view'] = sprintf('<a href="%s">%s</a>', esc_url($url_submissions), __('View', 'ws-form'));
 				}
 
 				if(WS_Form_Common::can_user('export_submission')) {
 
-					$actions['export'] = sprintf('<a href="%s">%s</a>', $url_submissions, __('Export', 'ws-form'));
+					$actions['export'] = sprintf('<a href="%s">%s</a>', esc_url($url_submissions), __('Export', 'ws-form'));
 				}
 			}
 
@@ -312,16 +330,27 @@
 			$id = absint($item['id']);
 
 			// Title
-			$title = sprintf('<div class="wsf-shortcode"><code data-action="wsf-clipboard"%s>%s</code></div>',WS_Form_Common::tooltip(__('Click to Copy', 'ws-form'), 'left'), htmlentities(WS_Form_Common::shortcode($id)));
+			$title = sprintf('<div class="wsf-shortcode"><code data-action="wsf-clipboard"%s>%s</code></div>',WS_Form_Common::tooltip(__('Click to Copy', 'ws-form'), 'left'), esc_html(WS_Form_Common::shortcode($id)));
 
 			return $title;
+		}
+
+		// Publish pending
+		function is_publish_pending($item) {
+
+			return (
+
+				($item['status'] == 'publish') &&
+				($item['checksum'] != $item['published_checksum']) &&
+				WS_Form_Common::can_user('publish_form')
+			);
 		}
 
 		// Views
 		function get_views(){
 
 			// Get data from API
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 
 			$views = array();
 			$current = WS_Form_Common::get_query_var('ws-form-status', 'all');
@@ -330,32 +359,57 @@
 			// All link
 			$count_all = $ws_form_form->db_get_count_by_status();
 			if($count_all) {
-				$class = ($current === 'all' ? ' class="current"' :'');
-				$views['all'] = "<a href=\"{$all_url}\" {$class} >" . __('All', 'ws-form') . " <span class=\"count\">$count_all</span></a>";
+
+				$views['all'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'all', $all_url)),
+					($current === 'all' ? ' class="current"' :''),
+					__('All', 'ws-form'),
+					$count_all
+				);
 			}
 
 			// Draft link
 			$count_draft = $ws_form_form->db_get_count_by_status('draft');
 			if($count_draft) {
-				$draft_url = add_query_arg('ws-form-status', 'draft', $all_url);
-				$class = ($current === 'draft' ? ' class="current"' :'');
-				$views['draft'] = "<a href=\"{$draft_url}\" {$class} >" . __('Draft', 'ws-form') . " <span class=\"count\">$count_draft</span></a>";
+
+				$views['draft'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'draft', $all_url)),
+					($current === 'draft' ? ' class="current"' :''),
+					__('Draft', 'ws-form'),
+					$count_draft
+				);
 			}
 
 			// Published link
 			$count_publish = $ws_form_form->db_get_count_by_status('publish');
 			if($count_publish) {
-				$publish_url = add_query_arg('ws-form-status', 'publish', $all_url);
-				$class = ($current === 'publish' ? ' class="current"' :'');
-				$views['publish'] = "<a href=\"{$publish_url}\" {$class} >" . __('Published', 'ws-form') . " <span class=\"count\">$count_publish</span></a>";
+
+				$views['publish'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'publish', $all_url)),
+					($current === 'publish' ? ' class="current"' :''),
+					__('Published', 'ws-form'),
+					$count_publish
+				);
 			}
 
 			// Trashed link
 			$count_trash = $ws_form_form->db_get_count_by_status('trash');
 			if($count_trash) {
-				$trash_url = add_query_arg('ws-form-status', 'trash', $all_url);
-				$class = ($current === 'trash' ? ' class="current"' :'');
-				$views['trash'] = "<a href=\"{$trash_url}\" {$class} >" . __('Trash', 'ws-form') . " <span class=\"count\">$count_trash</span></a>";
+
+				$views['trash'] = sprintf(
+
+					'<a href="%s"%s>%s <span class="count">%u</span></a>',
+					esc_url(add_query_arg('ws-form-status', 'trash', $all_url)),
+					($current === 'trash' ? ' class="current"' :''),
+					__('Trash', 'ws-form'),
+					$count_trash
+				);
 			}
 
 			return $views;
@@ -438,7 +492,7 @@
 			$offset = ($page_number - 1) * $per_page;
 
 			// Get data from API
-			$ws_form_form = New WS_Form_Form();
+			$ws_form_form = new WS_Form_Form();
 			$result = $ws_form_form->db_read_all($join, $where, $order_by, $limit, $offset);
 
 			return $result;
@@ -526,7 +580,7 @@
 
 			if(empty(WS_Form_Common::get_query_var_nonce('s'))) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 
 				$current = WS_Form_Common::get_query_var('ws-form-status', 'all');
 				if($current === 'all') { $current = ''; }

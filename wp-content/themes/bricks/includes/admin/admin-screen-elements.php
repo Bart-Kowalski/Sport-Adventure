@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $all_elements                = Elements::$elements;
 $bricks_native_element_names = Elements::$native;
-$element_manager             = get_option( BRICKS_DB_ELEMENT_MANAGER, [] );
+$element_manager             = Elements::manager();
 $builder_i18n                = Builder::i18n();
 
 foreach ( $all_elements as $index => $element ) {
@@ -63,6 +63,8 @@ foreach ( $all_elements as $index => $element ) {
 
 			<tbody id="the-list" data-wp-lists="list:submission">
 				<?php
+				$mandatory_elements = Elements::mandatory_elements();
+
 				foreach ( $all_elements as $element ) {
 					$element_name   = $element['name'];
 					$element_label  = $element['label'];
@@ -106,7 +108,7 @@ foreach ( $all_elements as $index => $element ) {
 					}
 
 					// Container element is always active
-					if ( $element_name === 'container' ) {
+					if ( in_array( $element_name, $mandatory_elements, true ) ) {
 						echo ' (' . esc_html__( 'Mandatory', 'bricks' ) . ')';
 					}
 

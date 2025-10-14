@@ -848,7 +848,7 @@ class AT__Ajax{
 
     }
 
-    private static function loop_elements_and_convert_to_logical($post_ids){
+    private static function loop_elements_and_convert_values($post_ids, $logical = true){
         foreach ($post_ids as $post_id) {
             $post_type = get_post_type($post_id);
             $post_meta_key = null;
@@ -880,7 +880,11 @@ class AT__Ajax{
 
             if ($elements && $post_meta_key) {
                 foreach ($elements as &$element) {
-                    $element['settings'] = AT__Conversion::convert_settings_to_logical_properties($element['settings']);
+                    if($logical){
+                        $element['settings'] = AT__Conversion::convert_settings_to_logical_properties($element['settings']);
+                    } else {
+                        $element['settings'] = AT__Conversion::convert_settings_to_directional_properties($element['settings']);
+                    }
                 }
                 unset($element);
 
@@ -902,6 +906,7 @@ class AT__Ajax{
         }
         
         $checked_data = $_POST['checked_data'];
+        $logical = $_POST['logical'] ? json_decode($_POST['logical']) : true;
 
         if(!is_array($checked_data)){
             return;
@@ -912,14 +917,14 @@ class AT__Ajax{
         // Elements
         if (in_array('elements', $checked_data)) {
             $post_ids = \Bricks\Helpers::get_all_bricks_post_ids();
-            self::loop_elements_and_convert_to_logical($post_ids);
+            self::loop_elements_and_convert_values($post_ids, $logical);
             $response[] = 'Elements in Pages/Posts';
         }
 
         // Templates
         if (in_array('templates', $checked_data)) {
             $post_ids = \Bricks\Templates::get_all_template_ids();
-            self::loop_elements_and_convert_to_logical($post_ids);
+            self::loop_elements_and_convert_values($post_ids, $logical);
             $response[] = 'Elements in Templates';
         }
 
@@ -927,7 +932,11 @@ class AT__Ajax{
         if(in_array('global-classes', $checked_data)){
             $global_classes = get_option('bricks_global_classes', [] );
             foreach($global_classes as &$class){
-                $class['settings'] = AT__Conversion::convert_settings_to_logical_properties($class['settings']);
+                if($logical){
+                    $class['settings'] = AT__Conversion::convert_settings_to_logical_properties($class['settings']);
+                } else {
+                    $class['settings'] = AT__Conversion::convert_settings_to_directional_properties($class['settings']);
+                }
             }
             unset($class);
             update_option( 'bricks_global_classes', $global_classes);
@@ -942,7 +951,11 @@ class AT__Ajax{
             foreach ($components as &$component) {
                 if (isset($component['elements']) && is_array($component['elements'])) {
                     foreach ($component['elements'] as &$element) {
-                        $element['settings'] = AT__Conversion::convert_settings_to_logical_properties($element['settings']);
+                        if($logical){
+                            $element['settings'] = AT__Conversion::convert_settings_to_logical_properties($element['settings']);
+                        } else {
+                            $element['settings'] = AT__Conversion::convert_settings_to_directional_properties($element['settings']);
+                        }
                     }
                     unset($element);
                 }

@@ -7,7 +7,7 @@ class Element_Post_Taxonomy extends Element {
 	public $category     = 'single';
 	public $name         = 'post-taxonomy';
 	public $icon         = 'ti-clip';
-	public $css_selector = '.bricks-button';
+	public $css_selector = '&.separator a, .bricks-button';
 
 	public function get_label() {
 		return esc_html__( 'Taxonomy', 'bricks' );
@@ -17,7 +17,6 @@ class Element_Post_Taxonomy extends Element {
 		$this->controls['_margin']['css'][0]['selector'] = '';
 
 		$this->controls['taxonomy'] = [
-			'tab'       => 'content',
 			'label'     => esc_html__( 'Taxonomy', 'bricks' ),
 			'type'      => 'select',
 			'options'   => Setup::$control_options['taxonomies'],
@@ -26,13 +25,11 @@ class Element_Post_Taxonomy extends Element {
 		];
 
 		$this->controls['linkDisable'] = [
-			'tab'   => 'content',
 			'label' => esc_html__( 'Disable link', 'bricks' ),
 			'type'  => 'checkbox',
 		];
 
 		$this->controls['separator'] = [
-			'tab'    => 'content',
 			'label'  => esc_html__( 'Separator', 'bricks' ),
 			'type'   => 'text',
 			'inline' => true,
@@ -42,7 +39,6 @@ class Element_Post_Taxonomy extends Element {
 		unset( $term_order_by['include'] ); // Not needed in this element
 
 		$this->controls['orderby'] = [
-			'tab'         => 'content',
 			'label'       => esc_html__( 'Order by', 'bricks' ),
 			'type'        => 'select',
 			'inline'      => true,
@@ -51,7 +47,6 @@ class Element_Post_Taxonomy extends Element {
 		];
 
 		$this->controls['order'] = [
-			'tab'         => 'content',
 			'label'       => esc_html__( 'Order', 'bricks' ),
 			'type'        => 'select',
 			'inline'      => true,
@@ -69,17 +64,14 @@ class Element_Post_Taxonomy extends Element {
 		];
 
 		$this->controls['style'] = [
-			'tab'         => 'content',
-			'label'       => esc_html__( 'Style', 'bricks' ),
-			'type'        => 'select',
-			'options'     => $this->control_options['styles'],
-			'inline'      => true,
-			'placeholder' => esc_html__( 'None', 'bricks' ),
-			'default'     => 'dark',
+			'label'   => esc_html__( 'Style', 'bricks' ),
+			'type'    => 'select',
+			'options' => $this->control_options['styles'],
+			'inline'  => true,
+			'default' => 'dark',
 		];
 
 		$this->controls['gap'] = [
-			'tab'         => 'content',
 			'label'       => esc_html__( 'Spacing', 'bricks' ),
 			'type'        => 'number',
 			'units'       => true,
@@ -93,7 +85,6 @@ class Element_Post_Taxonomy extends Element {
 		];
 
 		$this->controls['icon'] = [
-			'tab'   => 'content',
 			'label' => esc_html__( 'Icon', 'bricks' ),
 			'type'  => 'icon',
 		];

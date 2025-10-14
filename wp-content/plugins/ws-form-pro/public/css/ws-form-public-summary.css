@@ -1,0 +1,186 @@
+.wsf-form .wsf-summary {
+  background-color: var(--wsf-field-summary-color-background);
+  border-color: var(--wsf-field-summary-border-color);
+  border-radius: var(--wsf-field-summary-border-radius);
+  border-style: var(--wsf-field-summary-border-style);
+  border-width: var(--wsf-field-summary-border-width);
+  color: var(--wsf-field-summary-color);
+  font-family: var(--wsf-field-summary-font-family);
+  font-size: var(--wsf-field-summary-font-size);
+  font-style: var(--wsf-field-summary-font-style);
+  font-weight: var(--wsf-field-summary-font-weight);
+  letter-spacing: var(--wsf-field-summary-letter-spacing);
+  line-height: var(--wsf-field-summary-line-height);
+  margin: 0;
+  padding: var(--wsf-field-summary-padding-vertical) var(--wsf-field-summary-padding-horizontal);
+  -webkit-text-decoration: var(--wsf-field-summary-text-decoration);
+          text-decoration: var(--wsf-field-summary-text-decoration);
+  text-transform: var(--wsf-field-summary-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-form-label {
+  color: var(--wsf-field-summary-form-label-color);
+  font-family: var(--wsf-field-summary-form-label-font-family);
+  font-size: var(--wsf-field-summary-form-label-font-size);
+  font-style: var(--wsf-field-summary-form-label-font-style);
+  font-weight: var(--wsf-field-summary-form-label-font-weight);
+  letter-spacing: var(--wsf-field-summary-form-label-letter-spacing);
+  line-height: var(--wsf-field-summary-form-label-line-height);
+  margin-bottom: var(--wsf-field-summary-gap);
+  -webkit-text-decoration: var(--wsf-field-summary-form-label-text-decoration);
+          text-decoration: var(--wsf-field-summary-form-label-text-decoration);
+  text-transform: var(--wsf-field-summary-form-label-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-group-label {
+  color: var(--wsf-field-summary-group-label-color);
+  font-family: var(--wsf-field-summary-group-label-font-family);
+  font-size: var(--wsf-field-summary-group-label-font-size);
+  font-style: var(--wsf-field-summary-group-label-font-style);
+  font-weight: var(--wsf-field-summary-group-label-font-weight);
+  letter-spacing: var(--wsf-field-summary-group-label-letter-spacing);
+  line-height: var(--wsf-field-summary-group-label-line-height);
+  margin-bottom: var(--wsf-field-summary-gap);
+  -webkit-text-decoration: var(--wsf-field-summary-group-label-text-decoration);
+          text-decoration: var(--wsf-field-summary-group-label-text-decoration);
+  text-transform: var(--wsf-field-summary-group-label-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-section-label {
+  color: var(--wsf-field-summary-section-label-color);
+  font-family: var(--wsf-field-summary-section-label-font-family);
+  font-size: var(--wsf-field-summary-section-label-font-size);
+  font-style: var(--wsf-field-summary-section-label-font-style);
+  font-weight: var(--wsf-field-summary-section-label-font-weight);
+  letter-spacing: var(--wsf-field-summary-section-label-letter-spacing);
+  line-height: var(--wsf-field-summary-section-label-line-height);
+  margin-bottom: var(--wsf-field-summary-gap);
+  -webkit-text-decoration: var(--wsf-field-summary-section-label-text-decoration);
+          text-decoration: var(--wsf-field-summary-section-label-text-decoration);
+  text-transform: var(--wsf-field-summary-section-label-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-section-wrapper {
+  margin-bottom: var(--wsf-field-summary-gap);
+}
+.wsf-form .wsf-summary .wsf-summary-section-wrapper:last-child {
+  margin-bottom: 0;
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper {
+  margin-bottom: var(--wsf-field-summary-gap);
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper:last-child {
+  margin-bottom: 0;
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper.wsf-summary-field-orientation-horizontal dl.wsf-summary-field-wrapper {
+  display: grid;
+  grid-template-columns: var(--wsf-field-summary-field-label-horizontal-width) auto;
+  align-items: start;
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dl.wsf-summary-field-wrapper {
+  margin: 0;
+  margin-bottom: var(--wsf-field-summary-gap);
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dl.wsf-summary-field-wrapper.wsf-inline {
+  margin-right: var(--wsf-field-summary-gap);
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dl.wsf-summary-field-wrapper:not(.wsf-tile) {
+  padding: 0;
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dl.wsf-summary-field-wrapper:last-child {
+  margin-bottom: 0;
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dt.wsf-summary-field-label {
+  color: var(--wsf-field-summary-field-label-color);
+  font-family: var(--wsf-field-summary-field-label-font-family);
+  font-size: var(--wsf-field-summary-field-label-font-size);
+  font-style: var(--wsf-field-summary-field-label-font-style);
+  font-weight: var(--wsf-field-summary-field-label-font-weight);
+  letter-spacing: var(--wsf-field-summary-field-label-letter-spacing);
+  line-height: var(--wsf-field-summary-field-label-line-height);
+  margin: 0;
+  padding: 0;
+  -webkit-text-decoration: var(--wsf-field-summary-field-label-text-decoration);
+          text-decoration: var(--wsf-field-summary-field-label-text-decoration);
+  text-transform: var(--wsf-field-summary-field-label-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dd.wsf-summary-field-value {
+  color: var(--wsf-field-summary-field-value-color);
+  font-family: var(--wsf-field-summary-field-value-font-family);
+  font-size: var(--wsf-field-summary-field-value-font-size);
+  font-style: var(--wsf-field-summary-field-value-font-style);
+  font-weight: var(--wsf-field-summary-field-value-font-weight);
+  letter-spacing: var(--wsf-field-summary-field-value-letter-spacing);
+  line-height: var(--wsf-field-summary-field-value-line-height);
+  margin: 0;
+  padding: 0;
+  -webkit-text-decoration: var(--wsf-field-summary-field-value-text-decoration);
+          text-decoration: var(--wsf-field-summary-field-value-text-decoration);
+  text-transform: var(--wsf-field-summary-field-value-text-transform);
+}
+.wsf-form .wsf-summary .wsf-summary-fields-wrapper dd.wsf-summary-field-value p:last-child {
+  margin-bottom: 0;
+}
+.wsf-form .wsf-summary table {
+  border-spacing: var(--wsf-field-summary-table-gap);
+  border-collapse: separate;
+  margin-bottom: var(--wsf-field-summary-gap);
+}
+.wsf-form .wsf-summary table thead th {
+  background-color: var(--wsf-field-summary-thead-color-background);
+  color: var(--wsf-field-summary-thead-color);
+  font-family: var(--wsf-field-summary-thead-font-family);
+  font-size: var(--wsf-field-summary-thead-font-size);
+  font-style: var(--wsf-field-summary-thead-font-style);
+  font-weight: var(--wsf-field-summary-thead-font-weight);
+  letter-spacing: var(--wsf-field-summary-thead-letter-spacing);
+  line-height: var(--wsf-field-summary-thead-line-height);
+  padding: var(--wsf-field-summary-table-padding);
+  -webkit-text-decoration: var(--wsf-field-summary-thead-text-decoration);
+          text-decoration: var(--wsf-field-summary-thead-text-decoration);
+  text-transform: var(--wsf-field-summary-thead-text-transform);
+}
+.wsf-form .wsf-summary table tbody td {
+  background-color: var(--wsf-field-summary-tbody-color-background);
+  color: var(--wsf-field-summary-tbody-color);
+  font-family: var(--wsf-field-summary-tbody-font-family);
+  font-size: var(--wsf-field-summary-tbody-font-size);
+  font-style: var(--wsf-field-summary-tbody-font-style);
+  font-weight: var(--wsf-field-summary-tbody-font-weight);
+  letter-spacing: var(--wsf-field-summary-tbody-letter-spacing);
+  line-height: var(--wsf-field-summary-tbody-line-height);
+  padding: var(--wsf-field-summary-table-padding);
+  -webkit-text-decoration: var(--wsf-field-summary-tbody-text-decoration);
+          text-decoration: var(--wsf-field-summary-tbody-text-decoration);
+  text-transform: var(--wsf-field-summary-tbody-text-transform);
+}
+
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary {
+  background-color: var(--wsf-field-summary-color-background-alt);
+  border-color: var(--wsf-field-summary-border-color-alt);
+  color: var(--wsf-field-summary-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary .wsf-summary-form-label {
+  color: var(--wsf-field-summary-form-label-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary .wsf-summary-group-label {
+  color: var(--wsf-field-summary-group-label-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary .wsf-summary-section-label {
+  color: var(--wsf-field-summary-section-label-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary dl.wsf-summary-field-wrapper.wsf-inline {
+  margin-right: 0;
+  margin-left: var(--wsf-field-summary-gap);
+  padding: 0;
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary dt.wsf-summary-field-label {
+  color: var(--wsf-field-summary-field-label-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary dd.wsf-summary-field-value {
+  color: var(--wsf-field-summary-field-value-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary table thead th {
+  background-color: var(--wsf-field-summary-thead-color-background-alt);
+  color: var(--wsf-field-summary-thead-color-alt);
+}
+html.wsf-styler-scheme-alt .wsf-form[data-wsf-style-has-alt] .wsf-summary table tbody td {
+  background-color: var(--wsf-field-summary-tbody-color-background-alt);
+  color: var(--wsf-field-summary-tbody-color-alt);
+}

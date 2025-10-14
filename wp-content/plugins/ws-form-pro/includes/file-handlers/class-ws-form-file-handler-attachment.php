@@ -9,14 +9,20 @@
 
 		public function __construct() {
 
+			// Create intial file handler
+			add_filter('wsf_file_handler_' . $this->id, array($this, 'handler'), 10, 5);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
 			// Set label
 			$this->label = __('Media Library', 'ws-form');
 
-			// Register action
+			// Register file handler
 			parent::register($this);
-
-			// Create intial file handler
-			add_filter('wsf_file_handler_' . $this->id, array($this, 'handler'), 10, 5);
 		}
 
 		// Handler
@@ -31,9 +37,9 @@
 			// Need to require these files
 			if(!function_exists('media_handle_upload')) {
 
-				require_once(ABSPATH . "wp-admin" . '/includes/image.php');
-				require_once(ABSPATH . "wp-admin" . '/includes/file.php');
-				require_once(ABSPATH . "wp-admin" . '/includes/media.php');
+				require_once(ABSPATH . 'wp-admin/includes/image.php');
+				require_once(ABSPATH . 'wp-admin/includes/file.php');
+				require_once(ABSPATH . 'wp-admin/includes/media.php');
 			}
 
 			// Field ID
@@ -103,7 +109,8 @@
 
 						parent::db_throw_error(
 
-							sprintf(__('File handler error [%s]: %s', 'ws-form'), $this->id, $error_message)
+							/* translators: %1$s: Attachment, $2$s: Error message */
+							sprintf(__('File handler error [%1$s]: %2$s', 'ws-form'), $this->id, $error_message)
 						);
 					}
 				}
@@ -137,7 +144,7 @@
 				if($attachment_title !== '') {
 
 					// Parse
-					$attachment_update['post_title'] = WS_Form_Common::parse_variables_process($attachment_title, $submit->form_object, $submit);
+					$attachment_update['post_title'] = WS_Form_Common::parse_variables_process($attachment_title, $submit->form_object, $submit, 'text/plain', false, $section_repeatable_index);
 				}
 
 				// Set caption
@@ -145,7 +152,7 @@
 				if($attachment_caption !== '') {
 
 					// Parse
-					$attachment_update['post_excerpt'] = WS_Form_Common::parse_variables_process($attachment_caption, $submit->form_object, $submit);
+					$attachment_update['post_excerpt'] = WS_Form_Common::parse_variables_process($attachment_caption, $submit->form_object, $submit, 'text/plain', false, $section_repeatable_index);
 				}
 
 				// Set description
@@ -153,7 +160,7 @@
 				if($attachment_description !== '') {
 
 					// Parse
-					$attachment_update['post_content'] = WS_Form_Common::parse_variables_process($attachment_description, $submit->form_object, $submit);
+					$attachment_update['post_content'] = WS_Form_Common::parse_variables_process($attachment_description, $submit->form_object, $submit, 'text/plain', false, $section_repeatable_index);
 				}
 
 				// Set alt text
@@ -163,7 +170,7 @@
 					// Parse
 					$attachment_update['meta_input'] = array(
 
-						'_wp_attachment_image_alt' => WS_Form_Common::parse_variables_process($attachment_alt, $submit->form_object, $submit)
+						'_wp_attachment_image_alt' => WS_Form_Common::parse_variables_process($attachment_alt, $submit->form_object, $submit, 'text/plain', false, $section_repeatable_index)
 					);
 				}
 

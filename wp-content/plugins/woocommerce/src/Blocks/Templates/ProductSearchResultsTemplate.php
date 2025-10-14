@@ -57,8 +57,6 @@ class ProductSearchResultsTemplate extends AbstractTemplate {
 			if ( isset( $templates[0] ) && BlockTemplateUtils::template_has_legacy_template_block( $templates[0] ) ) {
 				add_filter( 'woocommerce_disable_compatibility_layer', '__return_true' );
 			}
-
-			add_filter( 'woocommerce_has_block_template', '__return_true', 10, 0 );
 		}
 	}
 
@@ -68,7 +66,7 @@ class ProductSearchResultsTemplate extends AbstractTemplate {
 	 * @param array $templates Templates that match the search hierarchy.
 	 */
 	public function update_search_template_hierarchy( $templates ) {
-		if ( ( is_search() && is_post_type_archive( 'product' ) ) && wc_current_theme_is_fse_theme() ) {
+		if ( ( is_search() && is_post_type_archive( 'product' ) ) && wp_is_block_theme() ) {
 			array_unshift( $templates, self::SLUG );
 		}
 		return $templates;

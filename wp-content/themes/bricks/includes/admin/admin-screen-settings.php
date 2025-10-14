@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 $settings = Database::$global_settings;
 
 /**
- * Global elements review
+ * STEP: Global elements review
  *
  * To identify all Bricks pages & templates that contain global elements
  * to convert to components or manually review and unlink them.
@@ -14,58 +14,54 @@ $settings = Database::$global_settings;
  *
  * @since 2.0
  */
+
+// Raw database query to check if bricks_global_elements exists and is not empty
+$global_elements        = Database::$global_data['elements'];
 $global_elements_review = ! empty( $_GET['global-elements-review'] ) ? sanitize_key( $_GET['global-elements-review'] ) : false;
 
-$all_echo_tags          = [];
-$code_review            = ! empty( $_GET['code-review'] ) ? sanitize_key( $_GET['code-review'] ) : false;
-$code_signature_results = [
-	'missing' => 0,
-	'invalid' => 0,
-	'valid'   => 0,
-	'total'   => 0,
-];
+if ( $global_elements_review ) {
+	// Get global elements from all Bricks pages & templates
+	$bricks_post_ids            = [];
+	$global_elements_by_post_id = [];
 
-// STEP: Get global elements from all Bricks pages & templates
-$bricks_post_ids            = [];
-$global_elements_by_post_id = [];
+	// Get IDs of all Bricks templates
+	$template_ids    = Templates::get_all_template_ids();
+	$bricks_post_ids = array_merge( $bricks_post_ids, $template_ids );
 
-// Get IDs of all Bricks templates
-$template_ids    = Templates::get_all_template_ids();
-$bricks_post_ids = array_merge( $bricks_post_ids, $template_ids );
+	// Get IDs of all Bricks data posts
+	$post_ids        = Helpers::get_all_bricks_post_ids();
+	$bricks_post_ids = array_merge( $bricks_post_ids, $post_ids );
 
-// Get IDs of all Bricks data posts
-$post_ids        = Helpers::get_all_bricks_post_ids();
-$bricks_post_ids = array_merge( $bricks_post_ids, $post_ids );
+	// Loop over all posts and templates to get global elements data
+	foreach ( $bricks_post_ids as $bricks_post_id ) {
+		$global_elements_by_post_id[ $bricks_post_id ] = [];
 
-// Loop over all posts and templates to get global elements data
-foreach ( $bricks_post_ids as $bricks_post_id ) {
-	$global_elements_by_post_id[ $bricks_post_id ] = [];
+		$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_CONTENT, true );
 
-	$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_CONTENT, true );
+		// Is Bricks template: Get elements from template by type
+		$post_type = get_post_type( $bricks_post_id );
+		if ( ! $elements && $post_type === BRICKS_DB_TEMPLATE_SLUG ) {
+			$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_HEADER, true );
 
-	// Is Bricks template: Get elements from template by type
-	$post_type = get_post_type( $bricks_post_id );
-	if ( ! $elements && $post_type === BRICKS_DB_TEMPLATE_SLUG ) {
-		$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_HEADER, true );
-
-		if ( ! $elements ) {
-			$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_FOOTER, true );
-		}
-	}
-
-	// Collect all elements based on filter type
-	if ( is_array( $elements ) && ! empty( $elements ) ) {
-		foreach ( $elements as $element ) {
-			$global_element = Helpers::get_global_element( $element );
-			if ( $global_element ) {
-				$global_elements_by_post_id[ $bricks_post_id ][] = $global_element;
+			if ( ! $elements ) {
+				$elements = get_post_meta( $bricks_post_id, BRICKS_DB_PAGE_FOOTER, true );
 			}
 		}
-	}
 
-	// Remove empty arrays
-	if ( empty( $global_elements_by_post_id[ $bricks_post_id ] ) ) {
-		unset( $global_elements_by_post_id[ $bricks_post_id ] );
+		// Collect all elements based on filter type
+		if ( is_array( $elements ) && ! empty( $elements ) ) {
+			foreach ( $elements as $element ) {
+				$global_element = Helpers::get_global_element( $element );
+				if ( $global_element ) {
+					$global_elements_by_post_id[ $bricks_post_id ][] = $global_element;
+				}
+			}
+		}
+
+		// Remove empty arrays
+		if ( empty( $global_elements_by_post_id[ $bricks_post_id ] ) ) {
+			unset( $global_elements_by_post_id[ $bricks_post_id ] );
+		}
 	}
 }
 
@@ -76,6 +72,15 @@ foreach ( $bricks_post_ids as $bricks_post_id ) {
  *
  * @since 1.9.7
  */
+$code_review            = ! empty( $_GET['code-review'] ) ? sanitize_key( $_GET['code-review'] ) : false;
+$all_echo_tags          = [];
+$code_signature_results = [
+	'missing' => 0,
+	'invalid' => 0,
+	'valid'   => 0,
+	'total'   => 0,
+];
+
 if ( $code_review ) {
 	$code_review_items = [];
 
@@ -170,7 +175,12 @@ if ( $code_review ) {
 		<table id="tab-general" class="active">
 			<tbody>
 				<!-- Global elements (deprecated @since 2.0) -->
-				<tr>
+				<tr
+				<?php
+				if ( ! $global_elements && ! $global_elements_review ) {
+					echo ' style="display:none;"'; }
+				?>
+	>
 					<th>
 						<label for="search_replace"><?php esc_html_e( 'Global elements', 'bricks' ); ?></label> <span class="badge"><?php esc_html_e( 'deprecated', 'bricks' ); ?></span>
 					</th>
@@ -279,24 +289,54 @@ if ( $code_review ) {
 
 				<tr>
 					<th>
-						<label><?php esc_html_e( 'Gutenberg data', 'bricks' ); ?></label>
+						<label><?php esc_html_e( 'Block editor', 'bricks' ); ?></label>
 						<p class="description">
-							<?php
-							// translators: %s = article link
-							printf( esc_html__( '%s into Bricks data and vice versa.', 'bricks' ), Helpers::article_link( 'gutenberg', esc_html__( 'Convert Gutenberg data', 'bricks' ) ) );
-							?>
+							<?php echo Helpers::article_link( 'gutenberg', esc_html__( 'Convert Block editor data into Bricks data and vice versa.', 'bricks' ) ); ?>
 						</p>
 					</th>
 
 					<td>
 						<div class="setting-wrapper">
 							<input type="checkbox" name="wp_to_bricks" id="wp_to_bricks" <?php checked( isset( $settings['wp_to_bricks'] ) ); ?>>
-							<label for="wp_to_bricks"><?php esc_html_e( 'Load Gutenberg data into Bricks', 'bricks' ); ?></label>
+							<label for="wp_to_bricks">
+							<?php
+							// translators: %s = "Bricks" (theme name)
+							echo sprintf( esc_html__( 'Load Block editor data into %s', 'bricks' ), 'Bricks' );
+							?>
+							</label>
+							<br>
+							<input type="checkbox" name="bricks_to_wp" id="bricks_to_wp" <?php checked( isset( $settings['bricks_to_wp'] ) ); ?>>
+							<label for="bricks_to_wp">
+							<?php
+							// translators: %s = "Bricks" (theme name)
+							echo sprintf( esc_html__( 'Save %s data as Block editor data', 'bricks' ), 'Bricks' );
+							?>
+							</label>
 						</div>
 
+						<div class="separator"></div>
+
 						<div class="setting-wrapper">
-							<input type="checkbox" name="bricks_to_wp" id="bricks_to_wp" <?php checked( isset( $settings['bricks_to_wp'] ) ); ?>>
-							<label for="bricks_to_wp"><?php esc_html_e( 'Save Bricks data as Gutenberg data', 'bricks' ); ?></label>
+						</div>
+						<div class="setting-wrapper" id="bricks-components-availability-wrapper">
+							<?php echo Helpers::render_badge( '2.1' ); ?>
+							<span class="badge"><?php esc_html_e( 'Experimental', 'bricks' ); ?></span>
+							<label class="sub" for="bricksComponentsInBlockEditor">
+								<?php
+								// translators: %s = "Bricks" (theme name)
+								echo sprintf( esc_html__( '%s components in the block editor', 'bricks' ), 'Bricks' );
+								?>
+							</label>
+
+							<select name="bricksComponentsInBlockEditor" id="bricksComponentsInBlockEditor" style="width: auto">
+								<option value="" <?php selected( Database::get_setting( 'bricksComponentsInBlockEditor', '' ), '' ); ?>><?php esc_html_e( 'Disabled (default)', 'bricks' ); ?></option>
+								<option value="manual" <?php selected( Database::get_setting( 'bricksComponentsInBlockEditor', '' ), 'manual' ); ?>><?php esc_html_e( 'Enable individual components manually', 'bricks' ); ?></option>
+								<option value="all" <?php selected( Database::get_setting( 'bricksComponentsInBlockEditor', '' ), 'all' ); ?>><?php esc_html_e( 'Enable all components automatically', 'bricks' ); ?></option>
+							</select>
+
+							<p class="description">
+								<?php esc_html_e( 'Determines how components are made available in the block editor.', 'bricks' ); ?>
+							</p>
 						</div>
 					</td>
 				</tr>
@@ -802,6 +842,125 @@ if ( $code_review ) {
 					</td>
 				</tr>
 
+				<!-- User registration account activation (@since 2.1) -->
+				<tr>
+					<th>
+						<label><?php esc_html_e( 'User activation', 'bricks' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Send an email to every newly registered user with an activation link that must be clicked to activate their account.', 'bricks' ); ?></p>
+						<p class="description"><?php esc_html_e( 'There is an "Activation status" column under "Users", where you can manually set the status to active/inactive and resend the activation email.', 'bricks' ); ?></p>
+					</th>
+
+					<td>
+						<div class="setting-wrapper">
+							<input type="checkbox" name="userActivationEnabled" id="userActivationEnabled" <?php checked( isset( $settings['userActivationEnabled'] ) ); ?>>
+							<label for="userActivationEnabled"><?php esc_html_e( 'User activation', 'bricks' ); ?></label>
+							<p class="description"><?php esc_html_e( 'Enable to require user to verify the email after registration through an activation link.', 'bricks' ); ?></p>
+							<p class="message info"><?php esc_html_e( 'This feature affects all new user registrations, not just those submitted via the Form element.', 'bricks' ); ?></p>
+						</div>
+
+						<div class="setting-wrapper" data-on="userActivationEnabled">
+							<input type="checkbox" name="userActivationAutoLogin" id="userActivationAutoLogin" <?php checked( isset( $settings['userActivationAutoLogin'] ) ); ?>>
+							<label for="userActivationAutoLogin"><?php esc_html_e( 'Auto login after activation', 'bricks' ); ?></label>
+							<p class="description"><?php esc_html_e( 'Enable to automatically log the user in after successful email verification.', 'bricks' ); ?></p>
+						</div>
+
+						<section data-on="userActivationEnabled">
+							<label class="sub" for="userActivationLinkSuccessPage"><?php echo esc_html__( 'Verification success page', 'bricks' ); ?></label>
+							<select name="userActivationLinkSuccessPage" id="userActivationLinkSuccessPage" style="width: auto">
+								<option value=""><?php esc_html_e( 'Select', 'bricks' ); ?></option>
+								<?php
+								foreach ( $page_titles as $page_id => $page_title ) {
+									$selected = selected( $page_id == ( $settings['userActivationLinkSuccessPage'] ?? '' ), true, false );
+									echo '<option value="' . esc_attr( $page_id ) . '" ' . $selected . '>' . esc_html( $page_title ) . '</option>';
+								}
+								?>
+							</select>
+
+							<br><br>
+
+							<label class="sub" for="userActivationLinkFailurePage"><?php esc_html_e( 'Verification failure page', 'bricks' ); ?></label>
+							<select name="userActivationLinkFailurePage" id="userActivationLinkFailurePage" style="width: auto">
+								<option value=""><?php esc_html_e( 'Select', 'bricks' ); ?></option>
+								<?php
+								foreach ( $page_titles as $page_id => $page_title ) {
+									$selected = selected( $page_id == ( $settings['userActivationLinkFailurePage'] ?? '' ), true, false );
+									echo '<option value="' . esc_attr( $page_id ) . '" ' . $selected . '>' . esc_html( $page_title ) . '</option>';
+								}
+								?>
+							</select>
+						</section>
+					</td>
+				</tr>
+
+				<tr data-on="userActivationEnabled" class="<?php echo isset( $settings['userActivationEnabled'] ) ? '' : 'hide'; ?>">
+					<th>
+						<label><?php echo esc_html__( 'User activation', 'bricks' ) . ': ' . esc_html__( 'Email', 'bricks' ); ?></label>
+						<p class="description">
+							<?php echo esc_html__( 'Parameters', 'bricks' ) . ':'; ?>
+							<ul>
+							<li><code>{{site_name}}</code></li>
+							<li><code>{{site_tagline}}</code></li>
+							<li><code>{{site_url}}</code></li>
+							<li><code>{{username}}</code></li>
+							<li><code>{{user_display_name}}</code></li>
+							<li><code>{{user_first_name}}</code></li>
+							<li><code>{{user_last_name}}</code></li>
+							<li><code>{{user_email}}</code></li>
+							<li><code>{{activation_link}}</code></li>
+							<li><code>{{activation_url}}</code></li>
+							</ul>
+						</p>
+					</th>
+
+					<?php
+					function get_effective_wp_mail_from_address() {
+						// Replicate WordPress' default logic
+						$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+						if ( substr( $sitename, 0, 4 ) === 'www.' ) {
+							$sitename = substr( $sitename, 4 );
+						}
+
+						$default = 'wordpress@' . $sitename;
+
+						return apply_filters( 'wp_mail_from', $default );
+					}
+
+					function get_effective_wp_mail_from_name() {
+						$default = 'WordPress';
+						return apply_filters( 'wp_mail_from_name', $default );
+					}
+					?>
+					<td>
+						<section>
+							<div class="setting-wrapper">
+								<label for="userActivationLinkEmailFrom"><?php esc_html_e( 'From email address', 'bricks' ); ?></label>
+								<input type="text" name="userActivationLinkEmailFrom" id="userActivationLinkEmailFrom" placeholder="<?php echo get_effective_wp_mail_from_address(); ?>" value="<?php echo isset( $settings['userActivationLinkEmailFrom'] ) ? esc_attr( $settings['userActivationLinkEmailFrom'] ) : ''; ?>" spellcheck="false">
+							</div>
+
+							<div class="setting-wrapper">
+								<label for="userActivationLinkEmailFromName"><?php esc_html_e( 'From name', 'bricks' ); ?></label>
+								<input type="text" name="userActivationLinkEmailFromName" id="userActivationLinkEmailFromName" placeholder="<?php echo get_effective_wp_mail_from_name(); ?>" value="<?php echo esc_attr( $settings['userActivationLinkEmailFromName'] ?? '' ); ?>" spellcheck="false">
+							</div>
+
+							<div class="setting-wrapper">
+								<label for="userActivationLinkEmailSubject"><?php esc_html_e( 'Subject', 'bricks' ); ?></label>
+								<input type="text" name="userActivationLinkEmailSubject" id="userActivationLinkEmailSubject" placeholder="<?php esc_attr_e( 'Activate your account', 'bricks' ); ?>" value="<?php echo esc_attr( $settings['userActivationLinkEmailSubject'] ?? '' ); ?>" spellcheck="false">
+							</div>
+
+							<div class="setting-wrapper">
+								<label for="userActivationLinkEmailContent"><?php esc_html_e( 'Email content', 'bricks' ); ?></label>
+								<textarea name="userActivationLinkEmailContent" id="userActivationLinkEmailContent" placeholder="<?php echo esc_attr__( 'Please click the link below to activate your account', 'bricks' ) . ":\n{{activation_link}}"; ?>" rows="5"><?php echo esc_textarea( $settings['userActivationLinkEmailContent'] ?? '' ); ?></textarea>
+							</div>
+
+							<div class="setting-wrapper">
+								<input type="checkbox" name="userActivationLinkEmailIsHtml" id="userActivationLinkEmailIsHtml" <?php checked( isset( $settings['userActivationLinkEmailIsHtml'] ) ); ?>>
+								<label for="userActivationLinkEmailIsHtml"><?php esc_html_e( 'HTML email', 'bricks' ); ?></label>
+							</div>
+						</section>
+					</td>
+				</tr>
+
+				<!-- Password protection -->
 				<tr>
 					<th>
 						<label><?php esc_html_e( 'Password protection', 'bricks' ); ?></label></span>

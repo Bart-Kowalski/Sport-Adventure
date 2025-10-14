@@ -76,7 +76,7 @@
 				if(process_fields) { this.form_analytics_process_fields('google', analytics_google_function); }
 
 				// Save which function should be used for future event firing
-				this.analytics_function['google'] = analytics_google_function;
+				this.analytics_function.google = analytics_google_function;
 
 				break;
 			}
@@ -449,7 +449,7 @@
 	}
 
 	// Form analytics - Push to data layer
-	$.WS_Form.prototype.data_layer_push = function(parse_values) {
+	$.WS_Form.prototype.data_layer_push = function(parse_values, data_layer_reset) {
 
 		if(
 			(typeof(window.dataLayer) !== 'object') ||
@@ -464,7 +464,13 @@
 		try {
 
 			// Reset data layer (Fixes scroll bug)
-			window.dataLayer.push(function() { this.reset(); });
+			if(data_layer_reset) {
+
+				window.dataLayer.push(function() { this.reset(); });
+
+				// Log event
+				this.log('log_analytics_data_layer_reset', '', 'analytics');
+			}
 
 			// Push to data layer
 			window.dataLayer.push(parse_values);
@@ -480,7 +486,7 @@
 	}
 
 	// JS Action - Conversion
-	$.WS_Form.prototype.action_conversion = function(type, parse_values) {
+	$.WS_Form.prototype.action_conversion = function(type, parse_values, data_layer_reset) {
 
 		switch(type) {
 
@@ -488,7 +494,8 @@
 
 				this.data_layer_push(
 
-					parse_values
+					parse_values,
+					data_layer_reset
 				);
 
 				break;

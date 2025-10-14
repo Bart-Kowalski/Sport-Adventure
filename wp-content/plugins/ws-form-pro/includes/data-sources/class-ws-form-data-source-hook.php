@@ -11,15 +11,6 @@
 
 		public function __construct() {
 
-			// Set label
-			$this->label = __('WordPress Filter Hook', 'ws-form');
-
-			// Set label retrieving
-			$this->label_retrieving = __('Retrieving data...', 'ws-form');
-
-			// Register action
-			parent::register($this);
-
 			// Register config filters
 			add_filter('wsf_config_meta_keys', array($this, 'config_meta_keys'), 10, 2);
 
@@ -28,6 +19,21 @@
 
 			// Records per page
 			$this->records_per_page = apply_filters('wsf_data_source_' . $this->id . '_records_per_age', $this->records_per_page);
+
+			// Register init actin
+			add_action('init', array($this, 'init'));
+		}
+
+		public function init() {
+
+			// Set label
+			$this->label = __('WordPress Filter Hook', 'ws-form');
+
+			// Set label retrieving
+			$this->label_retrieving = __('Retrieving data...', 'ws-form');
+
+			// Register data source
+			parent::register($this);
 		}
 
 		// Get
@@ -87,6 +93,7 @@
 			
 			} catch(Exception $e) {
 
+				/* translators: %s: Error message */
 				return self::error(sprintf(__('PHP Exception: %s', 'ws-form'), $e->getMessage()), $field_id, $this, $api_request);;
 			}
 
@@ -246,7 +253,7 @@
 			$form_id = WS_Form_Common::get_query_var('id', 0);
 			if($form_id > 0) {
 
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$ws_form_form->id = $form_id;
 				$form_object = $ws_form_form->db_read(true, true);
  			}

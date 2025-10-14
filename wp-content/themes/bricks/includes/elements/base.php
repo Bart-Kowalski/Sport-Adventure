@@ -72,7 +72,8 @@ abstract class Element {
 		$this->is_frontend = isset( $element['is_frontend'] ) ? $element['is_frontend'] : bricks_is_frontend();
 
 		// Ensure the ID is a string as it could be 6-digit number (@since 1.12)
-		$this->id       = $this->uid = ! empty( $element['id'] ) ? (string) $element['id'] : (string) Helpers::generate_random_id( false );
+		$this->id       = ! empty( $element['id'] ) ? (string) $element['id'] : (string) Helpers::generate_random_id( false );
+		$this->uid      = $this->id;
 		$this->cid      = ! empty( $element['cid'] ) ? $element['cid'] : '';
 		$this->settings = ! empty( $element['settings'] ) ? $element['settings'] : [];
 
@@ -1021,6 +1022,7 @@ abstract class Element {
 				// translators: %s: Masonry layout is active.
 				'content'  => sprintf(
 					'%s. %s',
+					// translators: %s: Masonry
 					sprintf( esc_html__( '%s layout is active' ), esc_html__( 'Masonry', 'bricks' ) ),
 					esc_html__( 'Ensure that no conflicting CSS styles are applied to this element.', 'bricks' )
 				),
@@ -1426,6 +1428,18 @@ abstract class Element {
 			'class'       => 'ltr',
 			'type'        => 'text',
 			'description' => esc_html__( 'No spaces. No pound (#) sign.', 'bricks' ),
+		];
+
+		// @since 2.1
+		$this->controls['_cssIdComponentInfo'] = [
+			'tab'      => 'style',
+			'group'    => '_css',
+			'type'     => 'info',
+			'content'  => esc_html__( 'Connect the CSS ID to a property to set it on an per-instance basis to avoid same ID conflicts.', 'bricks' ),
+			'required' => [
+				[ '_cssId', '!=', '' ],
+				[ 'id', '!=', '', 'activeComponent' ], // Show when editing component
+			],
 		];
 
 		$this->controls['_cssFilters'] = [
@@ -1838,10 +1852,29 @@ abstract class Element {
 			$classes[] = 'bricks-lazy-hidden';
 		}
 
+		/**
+		 * STEP: Check if array item is an array and merge into main array
+		 *
+		 * Component property type "class" with muliple options.
+		 *
+		 * @since 2.0.2
+		 */
+		foreach ( $classes as $class_index => $class_name ) {
+			if ( is_array( $class_name ) ) {
+				$classes = array_merge( $classes, $class_name );
+
+				// Remove class index
+				unset( $classes[ $class_index ] );
+
+				// Re-index array
+				$classes = array_values( $classes );
+			}
+		}
+
 		// Parse CSS classes for dynamic data (@since 1.7.1)
-		foreach ( $classes as $index => $class_name ) {
+		foreach ( $classes as $class_index => $class_name ) {
 			if ( strpos( $class_name, '{' ) !== false && strpos( $class_name, '}' ) !== false ) {
-				$classes[ $index ] = bricks_render_dynamic_data( $class_name );
+				$classes[ $class_index ] = bricks_render_dynamic_data( $class_name );
 			}
 		}
 
@@ -1975,11 +2008,6 @@ abstract class Element {
 
 			// Icon has 'css' property, but only used if 'svg' option is selected
 			if ( ! empty( $control['type'] ) && $control['type'] === 'icon' ) {
-				// Skip icon font
-				if ( ! empty( $value['icon'] ) ) {
-					continue;
-				}
-
 				// Return true: Property besides 'library' and 'svg' set (e.g. height, width, etc.)
 				if ( ! empty( $value['svg'] ) && count( $value['svg'] ) > 2 ) {
 					$has_css_settings = true;
@@ -2123,7 +2151,11 @@ abstract class Element {
 			}
 
 			$link_url = $permalink;
-			$this->set_attribute( $attribute_key, 'href', $permalink );
+
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $permalink ) ) {
+				$this->set_attribute( $attribute_key, 'href', $permalink );
+			}
 		}
 
 		// Taxonomy term link (@since 1.10.2)
@@ -2139,7 +2171,11 @@ abstract class Element {
 
 				if ( $term && ! is_wp_error( $term ) ) {
 					$link_url = get_term_link( $term );
-					$this->set_attribute( $attribute_key, 'href', $link_url );
+
+					// Skip 'href' attribute if the value is empty (@since 2.1)
+					if ( ! empty( $link_url ) ) {
+						$this->set_attribute( $attribute_key, 'href', $link_url );
+					}
 				}
 			}
 		}
@@ -2159,8 +2195,13 @@ abstract class Element {
 				$context = 'link';
 			}
 
-			$href = $link_url = bricks_render_dynamic_data( $raw_href, $post_id, $context );
-			$this->set_attribute( $attribute_key, 'href', $href );
+			$href     = bricks_render_dynamic_data( $raw_href, $post_id, $context );
+			$link_url = $href;
+
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $href ) ) {
+				$this->set_attribute( $attribute_key, 'href', $href );
+			}
 		}
 
 		// Lightbox image or video: Set lightbox ID through 'data-pswp-id' attribute
@@ -2208,8 +2249,10 @@ abstract class Element {
 				$lightbox_height = $image[2] ?? '';
 			}
 
-			// $link_url = $image_url; // Don't need to set aria-current for lightbox image
-			$this->set_attribute( $attribute_key, 'href', $image_url );
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $image_url ) ) {
+				$this->set_attribute( $attribute_key, 'href', $image_url );
+			}
 			$this->set_attribute( $attribute_key, 'class', 'bricks-lightbox' );
 			$this->set_attribute( $attribute_key, 'data-pswp-src', $image_url );
 			$this->set_attribute( $attribute_key, 'data-pswp-width', $lightbox_width );
@@ -2220,8 +2263,11 @@ abstract class Element {
 		// Lightbox video
 		if ( $link_type === 'lightboxVideo' && isset( $link_settings['lightboxVideo'] ) ) {
 			$video_url = bricks_render_dynamic_data( $link_settings['lightboxVideo'], $this->post_id );
-			// $link_url  = $video_url; // Don't need to set aria-current for lightbox video
-			$this->set_attribute( $attribute_key, 'href', $video_url );
+
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $video_url ) ) {
+				$this->set_attribute( $attribute_key, 'href', $video_url );
+			}
 			$this->set_attribute( $attribute_key, 'class', 'bricks-lightbox' );
 			$this->set_attribute( $attribute_key, 'data-pswp-width', $lightbox_width );
 			$this->set_attribute( $attribute_key, 'data-pswp-height', $lightbox_height );
@@ -2230,6 +2276,11 @@ abstract class Element {
 			// Disable controls (@since 1.10.3)
 			if ( isset( $link_settings['lightboxVideoNoControls'] ) ) {
 				$this->set_attribute( $attribute_key, 'data-no-controls', 1 );
+			}
+
+			// Mute video (@since 2.1)
+			if ( isset( $link_settings['lightboxVideoMuted'] ) ) {
+				$this->set_attribute( $attribute_key, 'data-muted', 1 );
 			}
 		}
 
@@ -2248,14 +2299,23 @@ abstract class Element {
 				$context = 'link';
 			}
 
-			$href = $link_url = bricks_render_dynamic_data( $link_dd_tag, $post_id, $context );
-			$this->set_attribute( $attribute_key, 'href', $href );
+			$href     = bricks_render_dynamic_data( $link_dd_tag, $post_id, $context );
+			$link_url = $href;
+
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $href ) ) {
+				$this->set_attribute( $attribute_key, 'href', $href );
+			}
 		}
 
 		// Media link
 		if ( $link_type === 'media' && isset( $link_settings['mediaData']['id'] ) ) {
 			$link_url = wp_get_attachment_url( $link_settings['mediaData']['id'] );
-			$this->set_attribute( $attribute_key, 'href', $link_url );
+
+			// Skip 'href' attribute if the value is empty (@since 2.1)
+			if ( ! empty( $link_url ) ) {
+				$this->set_attribute( $attribute_key, 'href', $link_url );
+			}
 		}
 
 		if ( isset( $link_settings['rel'] ) ) {
@@ -2611,6 +2671,11 @@ abstract class Element {
 		// Check element conditions. Use _conditions before changes via bricks/element/settings hook
 		elseif ( ! empty( $this->settings['_conditions'] ) ) {
 			$render_element = Conditions::check( $this->settings['_conditions'], $this );
+		}
+
+		// Always render element if it is the queried element in REST API call (#86c5ruqqz; @since 2.1)
+		if ( Api::is_bricks_rest_request() && (string) Api::$query_element_id === (string) $this->id ) {
+			$render_element = true;
 		}
 
 		// https://academy.bricksbuilder.io/article/filter-bricks-element-render/ (@since 1.5 to interject element render)
@@ -3025,14 +3090,17 @@ abstract class Element {
 		];
 
 		$controls['imageRatio'] = [
-			'tab'       => 'content',
-			'group'     => 'settings',
-			'label'     => esc_html__( 'Image ratio', 'bricks' ),
-			'type'      => 'select',
-			'options'   => Setup::$control_options['imageRatio'],
-			'default'   => 'ratio-square',
-			'clearable' => false,
-			'inline'    => true,
+			'tab'    => 'content',
+			'group'  => 'settings',
+			'label'  => esc_html__( 'Image ratio', 'bricks' ),
+			'type'   => 'text',
+			'inline' => true,
+			'css'    => [
+				[
+					'selector' => '.image',
+					'property' => 'aspect-ratio',
+				],
+			],
 		];
 
 		$controls['initialSlide'] = [
@@ -4251,7 +4319,7 @@ abstract class Element {
 			$nav_menu_selector = $is_component ? ".brxe-{$this->id}" : "#{$element_id}";
 
 			// Component instance as root (#86c3aq36e)
-			if ( isset( $this->element['cid'] ) && ! empty( $this->element['cid'] ) ) {
+			if ( ! empty( $this->element['cid'] ) ) {
 				$nav_menu_selector = ".brxe-{$this->element['cid']}";
 			}
 
@@ -4617,9 +4685,8 @@ abstract class Element {
 		];
 
 		$controls['marker'] = [
-			'type'        => 'image',
-			'unsplash'    => false,
-			'description' => sprintf( '<a href="https://icons8.com/icon/set/map-marker/all" target="_blank">%s</a>', esc_html__( 'Get free marker icons from icons8.com', 'bricks' ) ),
+			'type'     => 'image',
+			'unsplash' => false,
 		];
 
 		$controls['markerHeight'] = [
@@ -4667,9 +4734,8 @@ abstract class Element {
 		];
 
 		$controls['markerActive'] = [
-			'type'        => 'image',
-			'unsplash'    => false,
-			'description' => sprintf( '<a href="https://icons8.com/icon/set/map-marker/all" target="_blank">%s</a>', esc_html__( 'Get free marker icons from icons8.com', 'bricks' ) ),
+			'type'     => 'image',
+			'unsplash' => false,
 		];
 
 		$controls['markerActiveHeight'] = [

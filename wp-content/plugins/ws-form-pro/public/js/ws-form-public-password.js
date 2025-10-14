@@ -114,7 +114,7 @@
 				if(max_length < 1) { max_length = 16; }
 
 				// Set password
-				input_obj.val(ws_this.generate_password(16)).trigger('change');
+				input_obj.val(ws_this.generate_password(24)).trigger('change');
 
 				// Make password visible
 				ws_this.form_password_visibility_on($('[data-wsf-password-visibility-toggle]', field_wrapper_obj), field, input_obj);
@@ -139,12 +139,16 @@
 			return;
 		}
 
-		var password_field_objs = $('[data-password-strength-meter]:not([data-init-password-strength-meter])', this.form_canvas_obj);
-
-		password_field_objs.each(function() {
+		$('[data-password-strength-meter]:not([data-init-password-strength-meter])', this.form_canvas_obj).each(function() {
 
 			// Flag so it only initializes once
 			$(this).attr('data-init-password-strength-meter', '');
+
+			// Strength meter markup
+			if(ws_form_settings.styler_enabled) {
+
+				$(this).after('<ul><li /><li /><li /></ul>');
+			}
 
 			// Add password strength meter message div
 			var field_wrapper = ws_this.get_field_wrapper($(this));
@@ -179,12 +183,13 @@
 
 			// Initial run
 			ws_this.form_password_strength_meter_process($(this));
-		});
 
-		password_field_objs.on('change keyup paste', function() {
+			// Event handling
+			$(this).on('change input', function() {
 
-			// Run on keyup
-			ws_this.form_password_strength_meter_process($(this));
+				// Run on keyup
+				ws_this.form_password_strength_meter_process($(this));
+			});
 		});
 	}
 

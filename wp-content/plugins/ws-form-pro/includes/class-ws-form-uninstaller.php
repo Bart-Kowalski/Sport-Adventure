@@ -37,7 +37,7 @@
 				}
 
 				// Delete submission hidden column meta
-				$ws_form_form = New WS_Form_Form();
+				$ws_form_form = new WS_Form_Form();
 				$forms = $ws_form_form->db_read_all('', '', '', '', '', false);
 				foreach($forms as $form) {
 
@@ -55,7 +55,7 @@
 				$table_prefix = $wpdb->prefix . WS_FORM_DB_TABLE_PREFIX;
 
 				// Tables to delete
-				$tables = array('form', 'form_meta', 'form_stat', 'group', 'group_meta', 'section', 'section_meta', 'field', 'field_meta', 'submit', 'submit_meta');
+				$tables = array('form', 'form_meta', 'form_stat', 'group', 'group_meta', 'section', 'section_meta', 'field', 'field_meta', 'submit', 'submit_meta', 'style', 'style_meta');
 
 				// Run through each table and delete
 				foreach($tables as $table_name) {

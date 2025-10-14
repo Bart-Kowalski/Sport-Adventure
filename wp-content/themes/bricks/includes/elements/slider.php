@@ -709,7 +709,7 @@ class Element_Slider extends Element {
 			$images = $this->render_dynamic_data_tag( $slide['background']['image']['useDynamicData'], 'image' );
 
 			if ( isset( $images[0] ) ) {
-				$slide['background']['image']['url'] = is_numeric( $images[0] ) ? wp_get_attachment_image_url( $images[0], 'full' ) : $images[0];
+				$slide['background']['image']['url'] = is_numeric( $images[0] ) ? wp_get_attachment_image_url( $images[0], $slide['background']['image']['size'] ?? 'full' ) : $images[0];
 			} else {
 				// Reset the image url (in a loop it could be set to the page featured image in the builder)
 				$slide['background']['image']['url'] = '';
@@ -832,8 +832,9 @@ class Element_Slider extends Element {
 					echo "<div {$this->render_attributes( "content-{$index}" )}>" . Helpers::parse_editor_content( $content ) . '</div>';
 				}
 
-				if ( isset( $slide['buttonText'] ) && ! empty( $slide['buttonText'] ) ) {
-					echo "<a {$this->render_attributes( "slide-button-{$index}" )}>{$slide['buttonText']}</a>";
+				$button_text = isset( $slide['buttonText'] ) ? $this->render_dynamic_data( $slide['buttonText'] ) : false;
+				if ( ! empty( $button_text ) ) {
+					echo "<a {$this->render_attributes( "slide-button-{$index}" )}>{$button_text}</a>";
 				}
 				?>
 			</div>

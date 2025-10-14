@@ -60,7 +60,7 @@
 			$type = self::api_get_type($parameters);
 
 			// Get form object from post $_FILE
-			$form_object = WS_Form_Common::get_form_object_from_post_file();
+			$form_object = WS_Form_Common::get_object_from_post_file();
 
 			$ws_form_template = new WS_Form_Template();
 			$ws_form_template->type = $type;
@@ -104,13 +104,13 @@
 			}
 
 			// Build filename
-			$filename = sprintf('wsf-%s-%s', $type, strtolower($ws_form_template->form_object->label) . '.json');
+			$filename = sprintf('wsf-%s-%s', $type, strtolower($ws_form_template->object->label) . '.json');
 
 			// HTTP headers
 			WS_Form_Common::file_download_headers($filename, 'application/json');
 
 			// Output form as JSON
-			echo $ws_form_template->form_json;	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+			echo $ws_form_template->json;	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
 			exit;
 		}
 
@@ -158,7 +158,7 @@
 
 				parent::api_throw_error(sprintf(
 
-					/* translators: %s = Config file name */
+					/* translators: %s: Config file name */
 					__('Unable to open config.json file: %s', 'ws-form'),
 
 					$file_config
@@ -172,7 +172,7 @@
 
 				parent::api_throw_error(sprintf(
 
-					/* translators: %s = Config file name */
+					/* translators: %s: Config file name */
 					__('Unable to decode config.json file: %s', 'ws-form'),
 
 					$file_config
@@ -188,7 +188,7 @@
 
 				parent::api_throw_error(sprintf(
 
-					/* translators: %s = Config file name */
+					/* translators: %s: Config file name */
 					__('Unable to write config.json file: %s', 'ws-form'),
 
 					$file_config
@@ -204,13 +204,13 @@
 
 				if(
 					!file_exists($file_json) ||
-					!unlink($file_json)
+					!wp_delete_file($file_json)
 				) {
 
 					// Throw error
 					parent::api_throw_error(sprintf(
 
-						/* translators: %s = Template file name */
+						/* translators: %s: Template file name */
 						__('Template file not found: %s', 'ws-form'),
 
 						$file_json
@@ -227,9 +227,9 @@
 
 			$type = WS_Form_Common::get_query_var_nonce('type', 'section', $parameters);
 
-			if(!in_array($type, array('form', 'section'))) {
+			if(!in_array($type, array('form', 'section', 'preview', 'style'))) {
 
-				parent::api_throw_error(__('Invalid template type'));
+				parent::api_throw_error(__('Invalid template type', 'ws-form'));
 			}
 
 			return $type;

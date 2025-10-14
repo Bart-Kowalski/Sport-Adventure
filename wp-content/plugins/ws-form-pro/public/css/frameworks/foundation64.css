@@ -31,6 +31,10 @@
 	margin: 0 0 1rem;
 }
 
+[dir="rtl"] input[type="file"].dz-hidden-input {
+	display: none;
+}
+
 [data-wsf-hierarchy='1'] {
 	-webkit-margin-start: 13px;
 	margin-inline-start: 13px;
@@ -79,19 +83,6 @@
 [data-wsf-hierarchy='10'] {
 	-webkit-margin-start: 130px;
 	margin-inline-start: 130px;
-}
-
-.wsf-form .minicolors-input {
-	padding-left: 44px;
-}
-
-.wsf-form .minicolors-theme-foundation .minicolors-swatch {
-	border: 1px solid hsla(0,0%,4%,.25);
-	cursor: pointer;
-	height: 29px;
-	left: 5px;
-	top: 5px;
-	width: 29px;
 }
 
 .wsf-form .wsf-rating {
@@ -250,9 +241,9 @@
 .wsf-form .input-group input[type=text] ~ canvas {
 	border-radius: 0;
     -webkit-box-flex: 1;
-    -webkit-flex: 1 1 0px;
-    -ms-flex: 1 1 0px;
-    flex: 1 1 0px;
+    -webkit-flex: 1 1 0;
+    -ms-flex: 1 1 0;
+    flex: 1 1 0;
     margin: 0;
     min-width: 0;
     white-space: nowrap;

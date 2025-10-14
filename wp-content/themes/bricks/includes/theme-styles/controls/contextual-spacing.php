@@ -105,7 +105,6 @@ $controls['contextualSpacingCustomTarget'] = [
 	'type'          => 'repeater',
 	'titleProperty' => 'selector',
 	'selector'      => 'contextualSpacing',
-	'alwaysOpen'    => true,
 	'placeholder'   => esc_html__( 'Target', 'bricks' ),
 	'fields'        => [
 		'selector'     => [

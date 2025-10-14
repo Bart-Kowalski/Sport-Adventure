@@ -39,9 +39,7 @@ class Query_Filters_Indexer {
 		add_filter( 'cron_schedules', [ $this, 'add_cron_interval' ] );
 
 		// Schedule the cron job
-		if ( ! wp_next_scheduled( 'bricks_indexer' ) ) {
-			wp_schedule_event( time(), 'brx_every_five_minutes', 'bricks_indexer' );
-		}
+		add_action( 'init', [ $this, 'schedule_cron_job' ] );
 
 		// Index query filters every 5 minutes
 		add_action( 'bricks_indexer', [ $this, 'continue_index_jobs' ] );
@@ -60,6 +58,17 @@ class Query_Filters_Indexer {
 		];
 
 		return $schedules;
+	}
+
+	/**
+	 * Schedule the cron job
+	 *
+	 * @since 2.1
+	 */
+	public function schedule_cron_job() {
+		if ( ! wp_next_scheduled( 'bricks_indexer' ) ) {
+			wp_schedule_event( time(), 'brx_every_five_minutes', 'bricks_indexer' );
+		}
 	}
 
 	/**

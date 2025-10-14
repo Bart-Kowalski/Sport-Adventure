@@ -119,9 +119,12 @@ class Dynamic_Data_Parser {
 	 * IMAGE: @fallback-image:123 (Image ID or URL)
 	 * SANITIZE: @sanitize:false (@since 1.11.1)
 	 * EXCLUDE: @exclude:q1w2e3,880712 ({active_filters_count @query:'mn9456' @exclude:'q1w2e3,880712'} @since 2.0)
+	 * START-AT: @start-at:1 (query_loop_index; @since 2.1)
+	 * PAD: @pad:3 (query_loop_index; @since 2.1)
+	 * KEY: @key:'title|rendered' (For {query_api} @since 2.1)
 	 */
 	public function set_allowed_keys() {
-		$default_keys = [ 'fallback', 'fallback-image', 'sanitize', 'exclude' ];
+		$default_keys = [ 'fallback', 'fallback-image', 'sanitize', 'exclude', 'start-at', 'pad', 'key' ];
 
 		// NOTE: Undocumented
 		self::$allowed_keys = apply_filters( 'bricks/dynamic_data/allowed_keys', $default_keys );
