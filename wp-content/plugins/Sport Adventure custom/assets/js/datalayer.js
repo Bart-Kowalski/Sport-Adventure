@@ -97,33 +97,35 @@
             return saDataLayer.product.item_id;
         }
         
-        // Priority 2: Check data attributes on the element
-        let itemId = $element.data('product-id') || $element.data('product_id') || $element.data('id');
+        // Priority 2: Check post-id attribute on card wrapper
+        let itemId = $element.attr('post-id');
         
-        // Priority 3: If we have a title element, try to extract from URL
-        if (!itemId && $title) {
+        // Priority 3: Check data attributes on the element
+        if (!itemId) {
+            itemId = $element.data('product-id') || $element.data('product_id') || $element.data('id');
+        }
+        
+        // Priority 4: If we have a title element, try to extract from URL
+        if (!itemId && $title && $title.length) {
             const href = $title.attr('href');
             if (href) {
                 // Try to extract product ID from URL parameters first
                 const urlParams = new URLSearchParams(href.split('?')[1] || '');
                 itemId = urlParams.get('product_id') || urlParams.get('p');
                 
-                // If still no ID, try to get it from the URL path
+                // If still no ID, use the URL slug as identifier
                 if (!itemId) {
-                    const urlParts = href.split('/');
+                    const urlParts = href.split('/').filter(Boolean);
                     const wyprawaIndex = urlParts.indexOf('wyprawa');
                     if (wyprawaIndex !== -1 && urlParts[wyprawaIndex + 1]) {
-                        const slug = urlParts[wyprawaIndex + 1];
-                        // Only use numeric slugs as IDs
-                        if (/^\d+$/.test(slug)) {
-                            itemId = slug;
-                        }
+                        // Use the slug as the item_id
+                        itemId = urlParts[wyprawaIndex + 1];
                     }
                 }
             }
         }
         
-        // Priority 4: Check for WooCommerce product ID in form
+        // Priority 5: Check for WooCommerce product ID in form
         if (!itemId) {
             const $form = $element.closest('form');
             if ($form.length) {
@@ -372,11 +374,120 @@
         });
     }
 
+    // Function to initialize select_item tracking for product clicks
+    function initSelectItemTracking() {
+        // Track clicks on wyprawa links in product grids - simple approach
+        $(document).on('click', '.product-10__grid a[href*="/wyprawa/"]', function(e) {
+            const $link = $(this);
+            const $card = $link.closest('.card-product-10__wrapper');
+            const $productList = $card.closest('.product-10__grid');
+            const $article = $card.find('article');
+            
+            const listId = $productList.data('list-id') || window.location.pathname;
+            const listName = $productList.data('list-name') || $productList.data('list-type') || document.title;
+            const index = $card.index();
+            
+            const $title = $article.find('.wyprawa-card__title a');
+            const $price = $article.find('.wyprawa-card__price');
+            const $location = $article.find('.wyprawa-card__location');
+            const $tags = $article.find('.wyprawa-card__sale-text');
+            
+            // Get all tags
+            const tags = $tags.map(function() {
+                return $(this).text().trim();
+            }).get();
+
+            // Extract price and currency
+            const priceText = $price.text().trim();
+            const priceMatch = priceText.match(/(\d+(?:,\d+)?)\s*(USD|PLN|EUR)/);
+            const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '')) : 0;
+            const currency = priceMatch ? priceMatch[2] : 'PLN';
+            
+            // Get consistent item_id using helper function
+            const itemId = getConsistentItemId($card, $title);
+            
+            const productData = {
+                item_id: itemId || '',
+                item_name: $title.text().trim(),
+                price: price,
+                currency: currency,
+                item_category: tags[0] || '',
+                item_category2: tags[1] || '',
+                destination: $location.text().trim(),
+                product_tags: tags
+            };
+
+            dataLayerInstance.trackSelectItem(productData, listId, listName, index);
+        });
+
+        // Track clicks on wyprawa links in harmonogram lists
+        $(document).on('click', '.month-wyprawa-list a[href*="/wyprawa/"]', function(e) {
+            const $link = $(this);
+            const $listItem = $link.closest('li');
+            const $monthList = $listItem.closest('.month-wyprawa-list');
+            const $article = $listItem.find('article');
+            
+            const monthYear = $monthList.attr('miesiac');
+            const listId = 'harmonogram';
+            const listName = `harmonogram - ${monthYear}`;
+            const index = $listItem.index();
+            
+            const $title = $article.find('.wyprawa-card__title a, h3 a').first();
+            const $price = $article.find('.wyprawa-card__price').first();
+            const $location = $article.find('.wyprawa-card__location').first();
+            const $tags = $article.find('.wyprawa-card__sale-text');
+            
+            // Get all tags
+            const tags = $tags.map(function() {
+                return $(this).text().trim();
+            }).get();
+
+            // Extract price and currency
+            const priceText = $price.text().trim();
+            const priceMatch = priceText.match(/(\d+(?:,\d+)?)\s*(USD|PLN|EUR)/);
+            const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '')) : 0;
+            const currency = priceMatch ? priceMatch[2] : 'PLN';
+            
+            // Get consistent item_id using helper function
+            const itemId = getConsistentItemId($listItem, $title);
+            
+            const productData = {
+                item_id: itemId,
+                item_name: $title.text().trim(),
+                price: price,
+                currency: currency,
+                item_category: tags[0] || '',
+                item_category2: tags[1] || '',
+                destination: $location.text().trim(),
+                product_tags: tags
+            };
+
+            dataLayerInstance.trackSelectItem(productData, listId, listName, index);
+        });
+
+        // Track clicks on wyprawa links in podobne wyprawy
+        $(document).on('click', '#podobne-wyprawy a[href*="/wyprawa/"]', function(e) {
+            const $link = $(this);
+            const $product = $link.closest('.product');
+            
+            const listId = 'podobne-wyprawy';
+            const listName = 'Podobne wyprawy';
+            const index = $product.index();
+            
+            const productData = getProductData($product, false);
+            
+            if (productData) {
+                dataLayerInstance.trackSelectItem(productData, listId, listName, index);
+            }
+        });
+    }
+
     // Initialize when DOM is ready and after a short delay to ensure all content is loaded
     $(document).ready(function() {
         // Initial attempt
         initProductListTracking();
         initHarmonogramTracking();
+        initSelectItemTracking();
         
         // Retry after a short delay to catch any dynamically loaded content
         setTimeout(initProductListTracking, 1000);
@@ -1052,6 +1163,26 @@
             });
         } catch (error) {
             console.warn('Error tracking view_item_list:', error);
+        }
+    };
+
+    // --- Centralized Select Item Tracking ---
+    dataLayerInstance.trackSelectItem = function(productData, listId, listName, index) {
+        try {
+            dataLayerInstance.trackEcommerceEvent('select_item', {
+                currency: productData.currency || 'PLN',
+                value: productData.price,
+                items: [{
+                    ...productData,
+                    index: index,
+                    item_list_id: listId,
+                    item_list_name: listName
+                }],
+                item_list_id: listId,
+                item_list_name: listName
+            });
+        } catch (error) {
+            console.warn('Error tracking select_item:', error);
         }
     };
 

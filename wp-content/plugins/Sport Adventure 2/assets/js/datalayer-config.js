@@ -32,6 +32,11 @@ const DATALAYER_CONFIG = {
             validate: data => data?.ecommerce?.items?.length > 0,
             batchable: true
         },
+        select_item: {
+            required: ['ecommerce'],
+            validate: data => data?.ecommerce?.items?.length > 0,
+            batchable: false
+        },
         add_to_cart: {
             required: ['ecommerce'],
             validate: data => data?.ecommerce?.items?.length > 0,
