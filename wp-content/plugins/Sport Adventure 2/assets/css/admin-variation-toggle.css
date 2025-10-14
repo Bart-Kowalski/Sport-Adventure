@@ -1,0 +1,140 @@
+/**
+ * Styles for variation toggle functionality
+ */
+
+/* Toggle button */
+#sa-toggle-disabled-variations {
+    margin-left: 10px;
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    height: 32px;
+    line-height: 1;
+}
+
+#sa-toggle-disabled-variations:hover {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff;
+}
+
+#sa-toggle-disabled-variations:focus {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1;
+    outline: 2px solid transparent;
+    outline-offset: 0;
+}
+
+#sa-toggle-disabled-variations.sa-showing-enabled-only {
+    background: #dba617;
+    border-color: #dba617;
+}
+
+#sa-toggle-disabled-variations.sa-showing-enabled-only:hover {
+    background: #c69214;
+    border-color: #c69214;
+}
+
+#sa-toggle-disabled-variations .dashicons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.sa-toggle-separator {
+    display: inline-block;
+    width: 1px;
+    height: 24px;
+    background: #dcdcde;
+    margin: 0 10px;
+    vertical-align: middle;
+}
+
+/* Hidden variations */
+.woocommerce_variation.sa-variation-hidden {
+    display: none !important;
+}
+
+/* Notice about hidden variations */
+#sa-disabled-variations-notice {
+    margin: 15px 0;
+    padding: 10px 15px;
+}
+
+#sa-disabled-variations-notice p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#sa-disabled-variations-notice .dashicons {
+    color: #2271b1;
+}
+
+#sa-disabled-variations-notice a {
+    text-decoration: underline;
+    margin-left: 5px;
+}
+
+#sa-disabled-variations-notice a:hover {
+    text-decoration: none;
+}
+
+/* Notification toast */
+.sa-variation-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #2c3338;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.sa-variation-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    #sa-toggle-disabled-variations {
+        margin: 5px 0;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .sa-toggle-separator {
+        display: none;
+    }
+    
+    .toolbar.toolbar-variations-defaults {
+        flex-wrap: wrap;
+    }
+}
+
+/* Better integration with WooCommerce toolbar */
+.toolbar.toolbar-variations-defaults {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* Ensure button doesn't break layout */
+#variable_product_options .toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+

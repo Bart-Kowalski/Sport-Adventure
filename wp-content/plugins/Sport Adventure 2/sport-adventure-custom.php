@@ -78,6 +78,9 @@ require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/acf-variation-fields-simple
 // Include custom breadcrumbs
 require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/custom-breadcrumbs.php';
 
+// Include admin variation toggle
+require_once SPORT_ADVENTURE_CUSTOM_PATH . 'includes/admin-variation-toggle.php';
+
 
 
 // Handle direct checkout redirects
