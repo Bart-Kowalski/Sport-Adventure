@@ -79,7 +79,53 @@ if (!function_exists('sa_run_custom_queries')) {
 
         // All Wyprawy Query
         if ($query_obj->object_type === 'all_wyprawy_query') {
-            return sa_get_filtered_products($base_args, $featured_term);
+            // FORCE status to publish - absolute override
+            $base_args['post_status'] = 'publish';
+            
+            // ALWAYS log what we're doing for debugging
+            $debug_mode = current_user_can('manage_options');
+            
+            if ($debug_mode) {
+                error_log('=== ALL WYPRAWY QUERY START ===');
+                error_log('Query Object Type: ' . $query_obj->object_type);
+                error_log('Base Args BEFORE get_filtered: ' . print_r($base_args, true));
+            }
+            
+            // Get filtered products
+            $results = sa_get_filtered_products($base_args, $featured_term);
+            
+            if ($debug_mode) {
+                error_log('Results BEFORE filtering: ' . count($results));
+                error_log('Checking each product status:');
+                foreach ($results as $idx => $product) {
+                    $status = get_post_status($product->ID);
+                    error_log(sprintf('  [%d] ID: %d | Status: %s | Title: %s', 
+                        $idx,
+                        $product->ID, 
+                        $status,
+                        $product->post_title
+                    ));
+                    if ($status !== 'publish') {
+                        error_log('    ^^^ WARNING: NON-PUBLISH PRODUCT FOUND!');
+                    }
+                }
+            }
+            
+            // Extra safety: Filter out any non-publish products
+            $results = array_filter($results, function($product) {
+                $status = get_post_status($product->ID);
+                return $status === 'publish';
+            });
+            
+            // Re-index array after filtering
+            $results = array_values($results);
+            
+            if ($debug_mode) {
+                error_log('Results AFTER filtering: ' . count($results));
+                error_log('=== ALL WYPRAWY QUERY END ===');
+            }
+            
+            return $results;
         }
 
         // Wyprawy 2025 Query
@@ -583,6 +629,16 @@ if (!function_exists('sa_run_custom_queries')) {
 /* Helper function to get filtered products with featured first */
 if (!function_exists('sa_get_filtered_products')) {
     function sa_get_filtered_products($args, $featured_term) {
+        $debug_mode = current_user_can('manage_options');
+        
+        if ($debug_mode) {
+            error_log('  >> sa_get_filtered_products called');
+            error_log('  >> Input args: ' . print_r($args, true));
+        }
+        
+        // FORCE post_status to publish if not set or if it's wrong
+        $args['post_status'] = 'publish';
+        
         // Get featured products first
         $args_featured = array_merge($args, array(
             'posts_per_page' => -1,
@@ -614,9 +670,19 @@ if (!function_exists('sa_get_filtered_products')) {
             )
         ));
 
+        if ($debug_mode) {
+            error_log('  >> Featured query args: ' . print_r($args_featured, true));
+            error_log('  >> Normal query args: ' . print_r($args_normal, true));
+        }
+
         // Run both queries
         $featured_products = get_posts($args_featured);
         $normal_products = get_posts($args_normal);
+
+        if ($debug_mode) {
+            error_log('  >> Featured products count: ' . count($featured_products));
+            error_log('  >> Normal products count: ' . count($normal_products));
+        }
 
         // Combine results
         return array_merge($featured_products, $normal_products);
