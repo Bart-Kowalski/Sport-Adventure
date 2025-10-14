@@ -1563,26 +1563,38 @@ function sa_sync_product_taxonomies_from_variants() {
             }
         }
         
-        if (!empty($month_terms)) {
-            // Remove duplicates
-            $month_terms = array_unique($month_terms);
+        // Remove duplicates from expected terms
+        $month_terms = array_unique($month_terms);
+        
+        // Get current terms BEFORE updating
+        $old_terms = wp_get_object_terms($product_id, 'miesiace', ['fields' => 'ids']);
+        $old_count = count($old_terms);
+        $new_count = count($month_terms);
+        
+        // ALWAYS set the terms - this will remove old terms if variants were deleted
+        // If no variants have dates, $month_terms will be empty and this clears all month taxonomies
+        $result = wp_set_object_terms($product_id, $month_terms, 'miesiace', false);
+        
+        if (!is_wp_error($result)) {
+            $updated++;
             
-            // Get existing month terms for this product
-            $existing_terms = wp_get_object_terms($product_id, 'miesiace', ['fields' => 'ids']);
-            
-            // Merge with existing terms and remove duplicates
-            $all_terms = array_unique(array_merge($existing_terms, $month_terms));
-            
-            // Assign all month terms to the parent product (append mode)
-            $result = wp_set_object_terms($product_id, $all_terms, 'miesiace', false);
-            
-            if (!is_wp_error($result)) {
-                $updated++;
-                $details[] = "Product {$product_id} ({$product->post_title}): {$variations_processed} variations, " . count($month_terms) . " new terms, " . count($all_terms) . " total terms";
-                $debug_log[] = "Updated product {$product_id}: {$variations_processed} variations, " . count($month_terms) . " new terms, " . count($all_terms) . " total terms (was " . count($existing_terms) . ")";
+            if ($new_count == 0 && $old_count > 0) {
+                $details[] = "Product {$product_id} ({$product->post_title}): CLEARED all {$old_count} months (no active variants with dates)";
+                $debug_log[] = "Cleared product {$product_id}: Removed all {$old_count} months - no variants with dates";
+            } elseif ($new_count < $old_count) {
+                $removed = $old_count - $new_count;
+                $details[] = "Product {$product_id} ({$product->post_title}): REDUCED from {$old_count} to {$new_count} months (removed {$removed})";
+                $debug_log[] = "Reduced product {$product_id}: {$old_count} → {$new_count} months (removed {$removed})";
+            } elseif ($new_count > $old_count) {
+                $added = $new_count - $old_count;
+                $details[] = "Product {$product_id} ({$product->post_title}): ADDED {$added} months ({$old_count} → {$new_count})";
+                $debug_log[] = "Added to product {$product_id}: {$old_count} → {$new_count} months (added {$added})";
             } else {
-                $debug_log[] = "Error updating product {$product_id}: " . $result->get_error_message();
+                $details[] = "Product {$product_id} ({$product->post_title}): {$variations_processed} variations, {$new_count} months (unchanged)";
+                $debug_log[] = "No change for product {$product_id}: {$new_count} months";
             }
+        } else {
+            $debug_log[] = "Error updating product {$product_id}: " . $result->get_error_message();
         }
     }
     
