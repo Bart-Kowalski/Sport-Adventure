@@ -211,9 +211,9 @@ if (!function_exists('sa_run_custom_queries')) {
                 'taxonomy' => 'miesiace',
                 'hide_empty' => true,
                 'orderby' => 'meta_value_num',
-                'meta_key' => 'numer_miesiaca',
+                'meta_key' => 'calculated_number',
                 'order' => 'ASC',
-                'number' => 12,
+                'number' => 64,
                 'meta_query' => array(
                     array(
                         'key' => 'rok',
@@ -243,6 +243,7 @@ if (!function_exists('sa_run_custom_queries')) {
                     continue;
                 }
                 
+                // Check if there are published variants with this taxonomy
                 $has_published = $wpdb->get_var($wpdb->prepare("
                     SELECT COUNT(*)
                     FROM {$wpdb->term_relationships} tr

@@ -96,6 +96,13 @@ function sa_render_sync_months_page() {
         $updated = true;
     }
     
+    // Handle manual cron trigger
+    if (isset($_POST['trigger_cron']) && check_admin_referer('sync_variant_months')) {
+        error_log('SA Cron: Manual trigger started by ' . wp_get_current_user()->user_login);
+        sa_daily_sync_handler();
+        $cron_triggered = true;
+    }
+    
     // Handle diagnose specific product
     if (isset($_POST['diagnose_product']) && check_admin_referer('sync_variant_months')) {
         $product_id = intval($_POST['product_id']);
@@ -354,6 +361,13 @@ function sa_render_sync_months_page() {
             </div>
         <?php endif; ?>
         
+        <?php if (isset($cron_triggered)): ?>
+            <div class="notice notice-success">
+                <p><strong>✅ Cron uruchomiony ręcznie!</strong></p>
+                <p>Wykonano pełną synchronizację (warianty → produkty → daty). Sprawdź logi w debug.log dla szczegółów.</p>
+            </div>
+        <?php endif; ?>
+        
         <?php if (isset($fix_results)): ?>
             <div class="notice notice-success">
                 <p><strong>Naprawiono 2026 terms!</strong></p>
@@ -554,10 +568,35 @@ function sa_render_sync_months_page() {
             <?php wp_nonce_field('sync_variant_months'); ?>
             
             <h3>🚀 Główne Akcje</h3>
+            <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <h4 style="margin-top: 0; color: #856404;">⚡ Krok 1: Synchronizuj Warianty z Miesiącami</h4>
+                <p style="margin-bottom: 10px;">Przypisuje taxonomie <code>miesiace</code> do wariantów produktów na podstawie ich dat ACF. <strong>To musi być uruchomione najpierw!</strong></p>
+                <p class="submit" style="margin: 0;">
+                    <input type="submit" name="sync_months" class="button button-primary button-hero" value="🔄 Synchronizuj Warianty z Miesiącami" style="margin-right: 10px;">
+                </p>
+            </div>
+            
             <p class="submit">
-                <input type="submit" name="sync_product_taxonomies" class="button button-primary button-hero" value="🔄 Synchronizuj Taxonomie Produktów" style="margin-right: 10px;">
+                <input type="submit" name="sync_product_taxonomies" class="button button-primary" value="📦 Synchronizuj Taxonomie Produktów" style="margin-right: 10px;">
                 <input type="submit" name="sync_earliest_dates" class="button button-primary" value="📅 Aktualizuj Najwcześniejsze Terminy" style="margin-right: 10px;">
             </p>
+            
+            <hr style="margin: 30px 0;">
+            
+            <h3>🤖 Automatyczna Synchronizacja</h3>
+            <div style="background: #e7f7ff; border: 2px solid #0073aa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p><strong>ℹ️ Cron Job:</strong> Synchronizacja uruchamia się automatycznie codziennie o 2:00 w nocy.</p>
+                <p>Wykonywane operacje w kolejności:</p>
+                <ol style="margin-left: 20px;">
+                    <li>Synchronizacja wariantów z miesiącami (przypisuje taxonomie do wariantów)</li>
+                    <li>Synchronizacja taxonomii produktów (kopiuje z wariantów do produktów)</li>
+                    <li>Aktualizacja najwcześniejszych dat</li>
+                </ol>
+                <p style="margin-bottom: 10px;"><strong>Test:</strong> Możesz uruchomić cron manualnie poniżej (może potrwać do 5 minut).</p>
+                <p class="submit" style="margin: 0;">
+                    <input type="submit" name="trigger_cron" class="button button-secondary" value="▶️ Uruchom Cron Manualnie" onclick="return confirm('Uruchomić pełną synchronizację? Może to potrwać kilka minut.');">
+                </p>
+            </div>
             
             <details style="margin-top: 20px;">
                 <summary style="cursor: pointer; font-weight: bold; padding: 10px; background: #f0f0f0; border-radius: 4px;">⚙️ Narzędzia Deweloperskie (kliknij aby rozwinąć)</summary>
@@ -571,7 +610,6 @@ function sa_render_sync_months_page() {
                     <hr style="margin: 20px 0;">
                     
                     <p class="submit">
-                        <input type="submit" name="sync_months" class="button button-secondary" value="Synchronizuj miesiące (stara wersja)" style="margin-right: 10px;">
                         <input type="submit" name="fix_2026_terms" class="button button-secondary" value="🔧 Napraw terminy 2026" style="margin-right: 10px;">
                         <input type="submit" name="clear_product_taxonomies" class="button button-secondary" value="🗑️ Wyczyść taxonomie" style="margin-right: 10px;" onclick="return confirm('Czy na pewno chcesz wyczyścić wszystkie taxonomie miesięcy?');">
                         <input type="submit" name="create_default_months" class="button button-secondary" value="Utwórz miesiące 2025-2026" style="margin-right: 10px;">
@@ -770,25 +808,47 @@ function sa_sync_variant_months() {
                 continue;
             }
             
-            // Get current terms on parent product
-            $current_terms = wp_get_object_terms($parent_product_id, 'miesiace', ['fields' => 'ids']);
+            // Get current terms on parent product and variant
+            $current_terms_parent = wp_get_object_terms($parent_product_id, 'miesiace', ['fields' => 'ids']);
+            $current_terms_variant = wp_get_object_terms($variation->ID, 'miesiace', ['fields' => 'ids']);
             
-            $debug_entry .= ", Parent product ID: {$parent_product_id}, Current terms: " . (empty($current_terms) ? 'none' : implode(',', $current_terms));
+            $debug_entry .= ", Parent ID: {$parent_product_id}, Parent terms: " . (empty($current_terms_parent) ? 'none' : implode(',', $current_terms_parent));
+            $debug_entry .= ", Variant terms: " . (empty($current_terms_variant) ? 'none' : implode(',', $current_terms_variant));
             
-            // Check if this term is already assigned
-            if (!in_array($term->term_id, $current_terms)) {
-                // Append this term to existing terms
-                $all_terms = array_unique(array_merge($current_terms, [$term->term_id]));
+            $parent_updated = false;
+            $variant_updated = false;
+            
+            // Assign to parent product if not already assigned
+            if (!in_array($term->term_id, $current_terms_parent)) {
+                $all_terms = array_unique(array_merge($current_terms_parent, [$term->term_id]));
                 $result = wp_set_object_terms($parent_product_id, $all_terms, 'miesiace', false);
                 if (!is_wp_error($result)) {
-                    $updated++;
-                    $variations_processed++;
-                    $debug_entry .= ", ADDED term {$term->term_id} (now has " . count($all_terms) . " terms)";
+                    $parent_updated = true;
+                    $debug_entry .= ", ADDED to parent";
                 } else {
-                    $debug_entry .= ", FAILED to update parent product: " . $result->get_error_message();
+                    $debug_entry .= ", FAILED parent: " . $result->get_error_message();
                 }
             } else {
-                $debug_entry .= ", Term {$term->term_id} already assigned";
+                $debug_entry .= ", Already on parent";
+            }
+            
+            // Assign to variant itself if not already assigned
+            if (!in_array($term->term_id, $current_terms_variant)) {
+                $all_terms_variant = array_unique(array_merge($current_terms_variant, [$term->term_id]));
+                $result = wp_set_object_terms($variation->ID, $all_terms_variant, 'miesiace', false);
+                if (!is_wp_error($result)) {
+                    $variant_updated = true;
+                    $debug_entry .= ", ADDED to variant ✓";
+                } else {
+                    $debug_entry .= ", FAILED variant: " . $result->get_error_message();
+                }
+            } else {
+                $debug_entry .= ", Already on variant";
+            }
+            
+            if ($parent_updated || $variant_updated) {
+                $updated++;
+                $variations_processed++;
             }
         } else {
             $debug_entry .= ", No term available";
@@ -1744,10 +1804,17 @@ function sa_daily_sync_handler() {
     }
     
     try {
-        // Sync product taxonomies from variants
+        // Step 1: Sync variants with months (assigns miesiace taxonomy to variants)
+        error_log('SA Cron: Starting variant month sync...');
+        $variant_result = sa_sync_variant_months();
+        error_log('SA Cron: Variant sync completed - ' . $variant_result . ' variants updated');
+        
+        // Step 2: Sync product taxonomies from variants
+        error_log('SA Cron: Starting product taxonomy sync...');
         sa_sync_product_taxonomies_from_variants();
         
-        // Update earliest dates
+        // Step 3: Update earliest dates
+        error_log('SA Cron: Starting earliest dates sync...');
         sa_sync_earliest_dates();
         
         error_log('SA Cron: Daily sync completed successfully');
