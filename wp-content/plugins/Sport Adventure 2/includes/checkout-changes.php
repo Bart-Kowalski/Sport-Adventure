@@ -678,7 +678,7 @@ function custom_review_order_item_subtotal($subtotal, $cart_item, $cart_item_key
     ?>
     <div class="cart-subtotal-details" data-cart-key="<?php echo esc_attr($cart_item_key); ?>">
         <div class="deposit-info">
-            <span class="deposit-label">Zaliczka do zapłaty</span>
+            <span class="deposit-label">Łączna zaliczka płatna do 7 dni</span>
             <span class="deposit-amount"><?php echo number_format($deposit, 0, ',', '') . ' PLN'; ?></span>
         </div>
         <?php if (!empty($remaining_payments)): ?>
@@ -930,7 +930,7 @@ function custom_order_review_template() {
 
         <?php if (count($cart->get_cart()) > 1): ?>
             <div class="order-total">
-                <div class="order-total-label">Łączna zaliczka do zapłaty</div>
+                <div class="order-total-label">Łączna zaliczka płatna do 7 dni</div>
                 <div class="order-total-value">
                     <?php echo modify_cart_total_html(''); ?>
                 </div>

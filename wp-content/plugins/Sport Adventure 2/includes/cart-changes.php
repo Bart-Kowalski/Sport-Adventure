@@ -85,7 +85,7 @@ function cart_custom_item_subtotal($subtotal, $cart_item, $cart_item_key) {
     <div class="cart-item-price-info">
         <div class="cart-subtotal-details">
             <div class="deposit-info">
-                <span class="deposit-label">Zaliczka do zapłaty</span>
+                <span class="deposit-label">Łączna zaliczka płatna do 7 dni</span>
                 <span class="deposit-amount"><?php echo number_format($deposit, 0, ',', '') . ' PLN'; ?></span>
             </div>
             <?php if (!empty($remaining_payments)): ?>
@@ -122,7 +122,7 @@ function cart_modify_total_html($total) {
     ?>
     <div class="cart-total-details">
         <div class="deposit-info">
-            <span class="deposit-label">Zaliczka do zapłaty</span>
+            <span class="deposit-label">Łączna zaliczka płatna do 7 dni</span>
             <span class="deposit-amount"><?php echo number_format($total_deposit, 0, ',', '') . ' PLN'; ?></span>
         </div>
         <?php if (!empty($remaining_payments)): ?>

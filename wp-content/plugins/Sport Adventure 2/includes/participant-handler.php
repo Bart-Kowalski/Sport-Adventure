@@ -150,7 +150,7 @@ class SA_Participant_Handler {
                 echo '<div><span class="order-summary-label">Metoda płatności:</span><span class="order-summary-value">' . $order->get_payment_method_title() . '</span></div>';
                 echo '<div><span class="order-summary-label">Email:</span><span class="order-summary-value">' . $order->get_billing_email() . '</span></div>';
                 echo '<div><span class="order-summary-label">Telefon:</span><span class="order-summary-value">' . $order->get_billing_phone() . '</span></div>';
-                echo '<div><span class="order-summary-label">Łączna zaliczka do zapłaty:</span><span class="order-summary-value">' . $order->get_formatted_order_total() . '</span></div>';
+                echo '<div><span class="order-summary-label">Łączna zaliczka płatna do 7 dni:</span><span class="order-summary-value">' . $order->get_formatted_order_total() . '</span></div>';
                 echo '</div>';
 
                 // Add bank account information if payment method is BACS
@@ -356,7 +356,7 @@ class SA_Participant_Handler {
 
         // Total amount
         $output .= '<div class="order-totals__amount">';
-        $output .= '<p class="order-totals__detail"><span class="order-totals__label">Łączna zaliczka do zapłaty:</span> ' . $order->get_formatted_order_total() . '</p>';
+        $output .= '<p class="order-totals__detail"><span class="order-totals__label">Łączna zaliczka płatna do 7 dni:</span> ' . $order->get_formatted_order_total() . '</p>';
         $output .= '</div>';
 
         $output .= '</div>';
@@ -886,7 +886,7 @@ class SA_Participant_Handler {
                             <span class="order-summary__value"><?php echo $order->get_billing_phone(); ?></span>
                         </div>
                         <div class="order-summary__detail order-summary__detail--total">
-                            <span class="order-summary__label">Łączna zaliczka do zapłaty:</span>
+                            <span class="order-summary__label">Łączna zaliczka płatna do 7 dni:</span>
                             <span class="order-summary__value"><?php echo $order->get_formatted_order_total(); ?></span>
                         </div>
                     </div>

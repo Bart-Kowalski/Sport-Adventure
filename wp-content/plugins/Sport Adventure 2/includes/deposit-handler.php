@@ -352,7 +352,7 @@ class SA_Deposit_Handler {
         ob_start();
         ?>
         <div class="deposit-info">
-            <span class="deposit-label">Zaliczka do zapłaty</span>
+            <span class="deposit-label">Łączna zaliczka płatna do 7 dni</span>
             <span class="deposit-amount"><?php echo $this->format_price($components['deposit']); ?></span>
         </div>
         <?php if (!empty($remaining_payments)): ?>

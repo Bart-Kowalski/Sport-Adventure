@@ -322,7 +322,7 @@ function add_payment_info_section() {
         ?>
         <div class="payment-info-section">
             <div class="deposit-row">
-                <span class="deposit-label">Zaliczka do zapłaty</span>
+                <span class="deposit-label">Łączna zaliczka płatna do 7 dni</span>
                 <span class="deposit-amount" data-deposit-amount></span>
             </div>
             <?php if ($cena_bez_lotow > 0): ?>

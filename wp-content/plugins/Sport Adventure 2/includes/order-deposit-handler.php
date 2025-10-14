@@ -138,7 +138,7 @@ class SA_Order_Deposit_Handler {
             ?>
             <div class="order-deposit-info">
                 <h3>Informacje o płatnościach</h3>
-                <p class="deposit-amount">Łączna zaliczka do zapłaty: <?php echo $formatted_deposit; ?></p>
+                <p class="deposit-amount">Łączna zaliczka płatna do 7 dni: <?php echo $formatted_deposit; ?></p>
                 <?php if (!empty($all_remaining_payments)): ?>
                     <div class="remaining-payments">
                         <h4>Pozostałe płatności:</h4>
