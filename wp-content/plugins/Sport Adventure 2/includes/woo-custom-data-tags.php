@@ -565,6 +565,11 @@ add_filter( 'bricks/dynamic_data/render_tag', function( $tag, $post, $context = 
         return $tag;
     }
 
+    // Check if product is in "Wyprawy w Polsce" category
+    if (has_term('Polska', 'lokalizacja', $post->ID)) {
+        return '';
+    }
+
     global $wpdb;
     $exists = $wpdb->get_var($wpdb->prepare("
         SELECT EXISTS (
@@ -588,6 +593,11 @@ add_filter( 'bricks/dynamic_data/render_content', function( $content, $post, $co
         return $content;
     }
 
+    // Check if product is in "Wyprawy w Polsce" category
+    if (has_term('Polska', 'lokalizacja', $post->ID)) {
+        return str_replace( '{flight_price_text}', '', $content );
+    }
+
     global $wpdb;
     $exists = $wpdb->get_var($wpdb->prepare("
         SELECT EXISTS (
@@ -608,6 +618,11 @@ add_filter( 'bricks/dynamic_data/render_content', function( $content, $post, $co
 add_filter( 'bricks/frontend/render_data', function( $content, $post ) {
     if ( strpos( $content, '{flight_price_text}' ) === false ) {
         return $content;
+    }
+
+    // Check if product is in "Wyprawy w Polsce" category
+    if (has_term('Polska', 'lokalizacja', $post->ID)) {
+        return str_replace( '{flight_price_text}', '', $content );
     }
 
     global $wpdb;
