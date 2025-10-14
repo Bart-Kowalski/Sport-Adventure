@@ -318,13 +318,15 @@ if (!function_exists('sa_run_custom_queries')) {
                         AND pm_stock_status.meta_key = '_stock_status'
                     LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                         AND pm_stock.meta_key = '_stock'
+                    LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                        AND pm_manage_stock.meta_key = '_manage_stock'
                     {$tax_join}
                     WHERE p.post_type = 'product_variation'
                     AND p.post_status IN ('publish', 'private')
                     {$tax_where}
                     AND (
                         pm_stock_status.meta_value = 'instock' 
-                        OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                        OR pm_manage_stock.meta_value = 'yes'
                         OR pm_stock_status.meta_value IS NULL
                     )
                 )
@@ -432,12 +434,14 @@ if (!function_exists('sa_run_custom_queries')) {
                         AND pm_stock_status.meta_key = '_stock_status'
                     LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                         AND pm_stock.meta_key = '_stock'
+                    LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                        AND pm_manage_stock.meta_key = '_manage_stock'
                     WHERE p.post_parent = %d
                     AND p.post_type = 'product_variation'
                     AND p.post_status = 'publish'
                     AND (
                         pm_stock_status.meta_value = 'instock' 
-                        OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                        OR pm_manage_stock.meta_value = 'yes'
                         OR pm_stock_status.meta_value IS NULL
                     )
                 )
@@ -570,6 +574,8 @@ if (!function_exists('sa_run_custom_queries')) {
                         AND pm_stock_status.meta_key = '_stock_status'
                     LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                         AND pm_stock.meta_key = '_stock'
+                    LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                        AND pm_manage_stock.meta_key = '_manage_stock'
                     WHERE p.post_parent = %d
                     AND p.post_type = 'product_variation'
                     AND p.post_status = 'publish'
@@ -580,7 +586,7 @@ if (!function_exists('sa_run_custom_queries')) {
                     )
                     AND (
                         pm_stock_status.meta_value = 'instock' 
-                        OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                        OR pm_manage_stock.meta_value = 'yes'
                         OR pm_stock_status.meta_value IS NULL
                     )
                 )

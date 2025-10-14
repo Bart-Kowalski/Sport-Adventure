@@ -73,13 +73,15 @@ if (!function_exists('get_unique_variants_count_value')) {
                 AND pm_stock_status.meta_key = '_stock_status'
             LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                 AND pm_stock.meta_key = '_stock'
+            LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                AND pm_manage_stock.meta_key = '_manage_stock'
             WHERE tt.term_id = %d
             AND tt.taxonomy = 'miesiace'
             AND p.post_type = 'product_variation'
             AND p.post_status = 'publish'
             AND (
                 pm_stock_status.meta_value = 'instock' 
-                OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                OR pm_manage_stock.meta_value = 'yes'
                 OR pm_stock_status.meta_value IS NULL
             )
         ", $term_id);
@@ -127,13 +129,15 @@ if (!function_exists('render_unique_variants_count')) {
                 AND pm_stock_status.meta_key = '_stock_status'
             LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                 AND pm_stock.meta_key = '_stock'
+            LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                AND pm_manage_stock.meta_key = '_manage_stock'
             WHERE tt.term_id = %d
             AND tt.taxonomy = 'miesiace'
             AND p.post_type = 'product_variation'
             AND p.post_status = 'publish'
             AND (
                 pm_stock_status.meta_value = 'instock' 
-                OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                OR pm_manage_stock.meta_value = 'yes'
                 OR pm_stock_status.meta_value IS NULL
             )
         ", $term_id);
@@ -193,7 +197,7 @@ if (!function_exists('get_published_variants_count')) {
     function get_published_variants_count($post_id) {
         global $wpdb;
         
-        // Get count of unique date combinations excluding variants with 0 stock
+        // Get count of unique date combinations excluding manually unavailable variants
         $count = $wpdb->get_var($wpdb->prepare("
             SELECT COUNT(DISTINCT pm_start.meta_value)
             FROM {$wpdb->posts} p
@@ -202,13 +206,15 @@ if (!function_exists('get_published_variants_count')) {
                 AND pm_stock_status.meta_key = '_stock_status'
             LEFT JOIN {$wpdb->postmeta} pm_stock ON p.ID = pm_stock.post_id 
                 AND pm_stock.meta_key = '_stock'
+            LEFT JOIN {$wpdb->postmeta} pm_manage_stock ON p.ID = pm_manage_stock.post_id 
+                AND pm_manage_stock.meta_key = '_manage_stock'
             WHERE p.post_parent = %d
             AND p.post_type = 'product_variation'
             AND p.post_status = 'publish'
             AND pm_start.meta_value IS NOT NULL
             AND (
                 pm_stock_status.meta_value = 'instock' 
-                OR (pm_stock_status.meta_value = 'outofstock' AND CAST(COALESCE(pm_stock.meta_value, '0') AS SIGNED) > 0)
+                OR pm_manage_stock.meta_value = 'yes'
                 OR pm_stock_status.meta_value IS NULL
             )
         ", $post_id));
