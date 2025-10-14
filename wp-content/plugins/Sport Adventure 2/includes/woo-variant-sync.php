@@ -96,6 +96,14 @@ function sa_render_sync_months_page() {
         $updated = true;
     }
     
+    // Handle diagnose specific product
+    if (isset($_POST['diagnose_product']) && check_admin_referer('sync_variant_months')) {
+        $product_id = intval($_POST['product_id']);
+        if ($product_id > 0) {
+            $diagnose_results = sa_diagnose_product($product_id);
+        }
+    }
+    
     // Get statistics
     $stats = sa_get_sync_statistics();
     
@@ -317,11 +325,31 @@ function sa_render_sync_months_page() {
             </div>
         <?php endif; ?>
         
-        <?php if (isset($sync_results) && $sync_results['updated'] > 0): ?>
-            <div class="notice notice-success">
-                <p>Synchronizacja taxonomii zakończona pomyślnie. Zaktualizowano <?php echo $sync_results['updated']; ?> produktów.</p>
+        <?php if (isset($sync_results)): ?>
+            <div class="notice notice-<?php echo $sync_results['updated'] > 0 ? 'success' : 'warning'; ?>">
+                <p><strong>Synchronizacja taxonomii zakończona.</strong> Zaktualizowano <?php echo $sync_results['updated']; ?> z <?php echo $sync_results['total_products_checked']; ?> produktów.</p>
+                <?php if (!empty($sync_results['errors'])): ?>
+                    <div style="background: #fff3cd; padding: 10px; margin-top: 10px; border-left: 4px solid #ffc107;">
+                        <strong>⚠️ Błędy:</strong>
+                        <ul style="margin: 5px 0 0 20px;">
+                            <?php foreach ($sync_results['errors'] as $error): ?>
+                                <li><?php echo esc_html($error); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
                 <?php if (!empty($sync_results['details'])): ?>
-                    <p><strong>Szczegóły:</strong> <?php echo $sync_results['details']; ?></p>
+                    <details style="margin-top: 10px;">
+                        <summary style="cursor: pointer; font-weight: bold;">📋 Pokaż szczegóły (<?php echo count(explode('; ', $sync_results['details'])); ?> produktów)</summary>
+                        <div style="background: #f9f9f9; padding: 10px; margin-top: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <?php 
+                            $details_array = explode('; ', $sync_results['details']);
+                            foreach ($details_array as $detail) {
+                                echo "<div style='padding: 3px 0; border-bottom: 1px solid #eee;'>" . esc_html($detail) . "</div>";
+                            }
+                            ?>
+                        </div>
+                    </details>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -340,6 +368,42 @@ function sa_render_sync_months_page() {
             <div class="notice notice-warning">
                 <p><strong>Wyczyszczono taxonomie produktów!</strong></p>
                 <p>Wyczyszczono: <?php echo $clear_results['cleared']; ?> produktów</p>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($diagnose_results)): ?>
+            <div class="notice notice-info" style="border-left-color: #0073aa;">
+                <h3>🔍 Diagnostyka Produktu ID: <?php echo $diagnose_results['product_id']; ?></h3>
+                <p><strong>Nazwa:</strong> <?php echo esc_html($diagnose_results['product_title']); ?></p>
+                <hr>
+                <p><strong>Liczba wariantów:</strong> <?php echo $diagnose_results['total_variants']; ?></p>
+                <p><strong>Warianty z datami:</strong> <?php echo $diagnose_results['variants_with_dates']; ?></p>
+                <p><strong>Oczekiwane miesiące (z wariantów):</strong> <?php echo $diagnose_results['expected_months_count']; ?></p>
+                <p><strong>Aktualne taxonomie (na produkcie):</strong> <?php echo $diagnose_results['current_months_count']; ?></p>
+                
+                <?php if (!empty($diagnose_results['variant_details'])): ?>
+                    <details style="margin-top: 10px;">
+                        <summary style="cursor: pointer; font-weight: bold;">📋 Szczegóły wariantów</summary>
+                        <div style="background: #f9f9f9; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px;">
+                            <?php foreach ($diagnose_results['variant_details'] as $detail): ?>
+                                <div style="padding: 5px 0; border-bottom: 1px solid #ddd;">
+                                    <?php echo esc_html($detail); ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </details>
+                <?php endif; ?>
+                
+                <?php if (!empty($diagnose_results['issues'])): ?>
+                    <div style="background: #fff3cd; padding: 10px; margin-top: 10px; border-left: 4px solid #ffc107;">
+                        <strong>⚠️ Problemy znalezione:</strong>
+                        <ul style="margin: 5px 0 0 20px;">
+                            <?php foreach ($diagnose_results['issues'] as $issue): ?>
+                                <li><?php echo esc_html($issue); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
         
@@ -498,6 +562,14 @@ function sa_render_sync_months_page() {
             <details style="margin-top: 20px;">
                 <summary style="cursor: pointer; font-weight: bold; padding: 10px; background: #f0f0f0; border-radius: 4px;">⚙️ Narzędzia Deweloperskie (kliknij aby rozwinąć)</summary>
                 <div style="margin-top: 10px; padding: 15px; background: #fafafa; border-left: 4px solid #999;">
+                    
+                    <h4>🔍 Diagnozuj Konkretny Produkt</h4>
+                    <p style="margin-bottom: 10px;">
+                        <input type="number" name="product_id" placeholder="ID produktu (np. 8552)" style="width: 200px; padding: 5px;">
+                        <input type="submit" name="diagnose_product" class="button button-secondary" value="Diagnozuj" style="margin-left: 10px;">
+                    </p>
+                    <hr style="margin: 20px 0;">
+                    
                     <p class="submit">
                         <input type="submit" name="sync_months" class="button button-secondary" value="Synchronizuj miesiące (stara wersja)" style="margin-right: 10px;">
                         <input type="submit" name="fix_2026_terms" class="button button-secondary" value="🔧 Napraw terminy 2026" style="margin-right: 10px;">
@@ -1493,24 +1565,49 @@ function sa_sync_product_taxonomies_from_variants() {
     $updated = 0;
     $debug_log = [];
     $details = [];
+    $errors = [];
     
-    $debug_log[] = "Starting product taxonomy sync from variants";
+    $debug_log[] = "Starting product taxonomy sync from variants at " . current_time('mysql');
     
-    // Get all variable products
-    $products = get_posts([
-        'post_type' => 'product',
-        'post_status' => 'publish',
-        'posts_per_page' => -1,
-        'meta_query' => [
-            [
-                'key' => '_product_type',
-                'value' => 'variable',
-                'compare' => '='
-            ]
-        ]
+    // Check if ACF is available
+    if (!function_exists('get_field')) {
+        $errors[] = "ACF plugin not active - cannot read variant dates";
+        return [
+            'updated' => 0,
+            'details' => 'ERROR: ACF plugin not active',
+            'debug_log' => $debug_log,
+            'total_products_checked' => 0,
+            'products_with_changes' => 0,
+            'errors' => $errors
+        ];
+    }
+    
+    // Get all variable products using WooCommerce function
+    $product_ids = wc_get_products([
+        'type' => 'variable',
+        'status' => 'publish',
+        'limit' => -1,
+        'return' => 'ids'
     ]);
     
-    $debug_log[] = "Found " . count($products) . " variable products to check";
+    $debug_log[] = "WooCommerce found " . count($product_ids) . " variable product IDs";
+    
+    // Convert IDs to post objects
+    $products = [];
+    if (!empty($product_ids)) {
+        foreach ($product_ids as $product_id) {
+            $post = get_post($product_id);
+            if ($post) {
+                $products[] = $post;
+            }
+        }
+    }
+    
+    $debug_log[] = "Converted to " . count($products) . " post objects";
+    
+    if (empty($products)) {
+        $errors[] = "No variable products found (checked " . count($product_ids) . " IDs)";
+    }
     
     foreach ($products as $product) {
         $product_id = $product->ID;
@@ -1573,9 +1670,17 @@ function sa_sync_product_taxonomies_from_variants() {
         
         // ALWAYS set the terms - this will remove old terms if variants were deleted
         // If no variants have dates, $month_terms will be empty and this clears all month taxonomies
+        
+        // Clear WordPress object cache for this product to avoid stale data
+        clean_object_term_cache($product_id, 'product');
+        
         $result = wp_set_object_terms($product_id, $month_terms, 'miesiace', false);
         
         if (!is_wp_error($result)) {
+            // Clear cache again after update
+            clean_object_term_cache($product_id, 'product');
+            wp_cache_delete($product_id, 'product_cat_relationships');
+            
             $updated++;
             
             if ($new_count == 0 && $old_count > 0) {
@@ -1594,7 +1699,10 @@ function sa_sync_product_taxonomies_from_variants() {
                 $debug_log[] = "No change for product {$product_id}: {$new_count} months";
             }
         } else {
-            $debug_log[] = "Error updating product {$product_id}: " . $result->get_error_message();
+            $error_msg = "Error updating product {$product_id}: " . $result->get_error_message();
+            $debug_log[] = $error_msg;
+            $errors[] = $error_msg;
+            $details[] = "Product {$product_id} ({$product->post_title}): ERROR - " . $result->get_error_message();
         }
     }
     
@@ -1604,10 +1712,19 @@ function sa_sync_product_taxonomies_from_variants() {
         error_log("SA Product Taxonomy Sync: " . implode(" | ", $debug_log));
     }
     
+    // Always log to error log for production debugging
+    error_log("SA Sync: Checked " . count($products) . " products, updated {$updated}");
+    if (!empty($errors)) {
+        error_log("SA Sync Errors: " . implode('; ', $errors));
+    }
+    
     return [
         'updated' => $updated,
-        'details' => implode('; ', array_slice($details, 0, 10)) . (count($details) > 10 ? '...' : ''),
-        'debug_log' => $debug_log
+        'details' => implode('; ', $details), // Return ALL details
+        'debug_log' => $debug_log,
+        'total_products_checked' => count($products),
+        'products_with_changes' => $updated,
+        'errors' => $errors
     ];
 }
 
@@ -1776,6 +1893,107 @@ function sa_fix_2026_terms() {
         'updated' => $updated,
         'details' => $details
     ];
+}
+
+/**
+ * Diagnose a specific product - show exactly what's happening
+ */
+function sa_diagnose_product($product_id) {
+    $product = get_post($product_id);
+    
+    if (!$product || $product->post_type !== 'product') {
+        return [
+            'product_id' => $product_id,
+            'product_title' => 'Product not found or not a product',
+            'issues' => ['Product ID ' . $product_id . ' is not a valid product']
+        ];
+    }
+    
+    $result = [
+        'product_id' => $product_id,
+        'product_title' => $product->post_title,
+        'total_variants' => 0,
+        'variants_with_dates' => 0,
+        'expected_months_count' => 0,
+        'current_months_count' => 0,
+        'variant_details' => [],
+        'issues' => []
+    ];
+    
+    // Get all variations
+    $variations = get_posts([
+        'post_type' => 'product_variation',
+        'post_parent' => $product_id,
+        'posts_per_page' => -1,
+        'post_status' => ['publish', 'private', 'draft']
+    ]);
+    
+    $result['total_variants'] = count($variations);
+    
+    $expected_terms = [];
+    foreach ($variations as $variation) {
+        $start_date = get_field('wyprawa-termin__data-poczatkowa', $variation->ID);
+        
+        if (!$start_date) {
+            $result['variant_details'][] = "Variant {$variation->ID}: NO DATE FOUND";
+            continue;
+        }
+        
+        $result['variants_with_dates']++;
+        
+        // Try to parse date
+        $date = null;
+        $date_formats = ['Ymd', 'Y-m-d', 'd.m.Y', 'Y/m/d', 'd-m-Y', 'd/m/Y'];
+        $parsed_format = null;
+        
+        foreach ($date_formats as $format) {
+            $date = DateTime::createFromFormat($format, $start_date);
+            if ($date) {
+                $parsed_format = $format;
+                break;
+            }
+        }
+        
+        if (!$date) {
+            $result['variant_details'][] = "Variant {$variation->ID}: Date '{$start_date}' - FAILED TO PARSE";
+            $result['issues'][] = "Variant {$variation->ID} has unparseable date: '{$start_date}'";
+            continue;
+        }
+        
+        $year = $date->format('Y');
+        $month_number = $date->format('n');
+        
+        // Check if term exists
+        $term = sa_get_month_term($year, $month_number);
+        
+        if (!$term) {
+            $result['variant_details'][] = "Variant {$variation->ID}: Date '{$start_date}' (format: {$parsed_format}) → {$year}-{$month_number} - TERM NOT FOUND";
+            $result['issues'][] = "Month term for {$year}-{$month_number} doesn't exist - will be created on sync";
+        } else {
+            $expected_terms[] = $term->term_id;
+            $result['variant_details'][] = "Variant {$variation->ID}: Date '{$start_date}' (format: {$parsed_format}) → {$term->name} (ID: {$term->term_id}) ✓";
+        }
+    }
+    
+    $expected_terms = array_unique($expected_terms);
+    $result['expected_months_count'] = count($expected_terms);
+    
+    // Get current taxonomies on product
+    $current_terms = wp_get_object_terms($product_id, 'miesiace');
+    $result['current_months_count'] = count($current_terms);
+    
+    // Compare expected vs actual
+    if (count($current_terms) == 0 && count($expected_terms) > 0) {
+        $result['issues'][] = "Product has NO month taxonomies but should have " . count($expected_terms);
+    } elseif (count($current_terms) != count($expected_terms)) {
+        $result['issues'][] = "Product has " . count($current_terms) . " taxonomies but should have " . count($expected_terms);
+    }
+    
+    if (empty($result['issues'])) {
+        $result['issues'][] = "✅ Everything looks correct!";
+    }
+    
+    return $result;
 }
 
 /**

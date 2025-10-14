@@ -24,7 +24,7 @@ error_reporting(0);
  * Plugin Name: Sport Adventure Custom
  * Plugin URI: https://sportadventure.pl
  * Description: Custom functionality for Sport Adventure website including cart and checkout modifications
- * Version: 1.3.4
+ * Version: 1.3.5
  * Author: Sport Adventure
  * Author URI: https://sportadventure.pl
  * Text Domain: sport-adventure-custom
